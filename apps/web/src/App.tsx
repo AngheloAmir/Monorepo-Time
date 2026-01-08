@@ -8,6 +8,7 @@ import Turborepo from './pages/Turborepo';
 import TurboCICD from './pages/TurboCICD';
 import CRUDTester from './pages/CRUDTester';
 import Setting from './pages/Setting';
+import Modal from './modal';
 
 function App() {
      const currentPage = useNavState.use.currentPage();
@@ -35,6 +36,8 @@ function App() {
                     </div>
                 </main>
             </div>
+            
+            <Modal />
         </div>
     )
 }
