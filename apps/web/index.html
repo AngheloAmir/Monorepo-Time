@@ -4,9 +4,42 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web</title>
+    <title>Monorepo Time</title>
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://monorepo-time.vercel.app/" />
+    <meta property="og:title" content="Monorepo Time - The Ultimate Monorepo Tool" />
+    <meta property="og:description" content="Manage your monorepo projects efficiently with Monorepo Time. The all-in-one tool for developers." />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://monorepo-time.vercel.app/" />
+    <meta property="twitter:title" content="Monorepo Time - The Ultimate Monorepo Tool" />
+    <meta property="twitter:description" content="Manage your monorepo projects efficiently with Monorepo Time. The all-in-one tool for developers." />
+    <meta property="twitter:image" content="/og-image.png" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
-  <body>
+  <body class="bg-gray-900 text-gray-100 font-sans h-screen overflow-hidden flex flex-col selection:bg-blue-500/30 selection:text-blue-200">
+    
+    <header class="h-16 flex-none bg-gray-900/80 backdrop-blur-md border-b border-gray-800 flex items-center px-6 justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i class="fas fa-boxes text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-wide text-white">
+                    Monorepo 
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                        Time
+                    </span>
+                </h1>
+            </div>
+        </div>
+    </header>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
