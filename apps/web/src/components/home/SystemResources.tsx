@@ -10,7 +10,7 @@ export default function SystemResources() {
     useEffect(() => {
         const interval = setInterval(async () => {
             await loadChildProcessInfo();   
-        }, 1000);
+        }, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -18,12 +18,9 @@ export default function SystemResources() {
         <>
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    <i className="fas fa-chart-line text-blue-500"></i> System Resources
+                    <i className="fas fa-chart-line text-blue-500"></i>
+                    Processes Memory Usage
                 </h2>
-                <div className="flex items-center gap-2">
-                    <span className="block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span className="text-xs text-gray-400 font-mono">LIVE</span>
-                </div>
             </div>
 
             {/* <!-- Key Metrics --> */}
@@ -54,7 +51,7 @@ export default function SystemResources() {
                         <div className="text-center text-xs text-gray-600 py-2">Loading...</div>
                     )}
                     {childprocessInfo.map((p, i) => (
-                        <div key={i} className="flex items-center justify-between p-1 rounded bg-gray-900/40 hover:bg-gray-800/60 border border-transparent hover:border-gray-700 transition-colors text-xs">
+                        <div key={i} className="flex items-center justify-between p-2 rounded bg-gray-900/40 hover:bg-gray-800/60 border border-transparent hover:border-gray-700 transition-colors text-xs">
                             <div className="flex items-center gap-2 overflow-hidden">
                                 <i className="fas fa-boxes w-4 text-center"></i>
                                 <span className="text-gray-300 font-mono truncate">
