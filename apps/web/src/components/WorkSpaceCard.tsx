@@ -98,26 +98,32 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                 </button>
 
                 <div className="flex-1 flex gap-2">
-                    {props.isRunningAs == 'start' && (
-                        <button onClick={handleStop} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-orange-600 text-white hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                    { loading && (
+                        <button  className="flex-1 py-1 px-2 rounded-lg bg-gray-600 text-white hover:bg-gray-500 transition-colors shadow-lg shadow-gray-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                            <i className="fas fa-spinner animate-spin text-lg"></i>
+                            Loading
+                        </button>
+                    )}
+                    { !loading && props.isRunningAs == 'start' && (
+                        <button onClick={handleStop}  className="flex-1 py-1 px-2 rounded-lg bg-orange-600 text-white hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-check-circle text-lg"></i>
                             Server is up
                         </button>
                     )}
-                    {props.isRunningAs == 'dev' && (
-                        <button onClick={() => handleStop()} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                    { !loading && props.isRunningAs == 'dev' && (
+                        <button onClick={() => handleStop()} className="flex-1 py-1 px-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-stop text-lg"></i>
                             Stop Dev
                         </button>
                     )}
-                    {props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.startCommand && (
-                        <button onClick={() => connectAndRun('start')} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-green-600 text-white hover:bg-green-500 transition-colors shadow-lg shadow-green-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                    { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.startCommand && (
+                        <button onClick={() => connectAndRun('start')} className="flex-1 py-1 px-2 rounded-lg bg-green-600 text-white hover:bg-green-500 transition-colors shadow-lg shadow-green-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-play text-lg"></i>
                             Start
                         </button>
                     )}
-                    {props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.devCommand && (
-                        <button onClick={() => connectAndRun('dev')} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                    { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.devCommand && (
+                        <button onClick={() => connectAndRun('dev')} className="flex-1 py-1 px-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-play text-lg"></i>
                             Start Dev
                         </button>

@@ -68,5 +68,3 @@ async function handleOnRun( socket: Socket, data: RequestBody) {
         socket.emit('exit', `Process exited with code ${code}`);
     });
 }
-
-

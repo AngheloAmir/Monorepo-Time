@@ -75,7 +75,28 @@ router.post("/", async (req: Request, res: Response) => {
             currentSocket?.emit('log', chalk.yellow("No active process found to stop."));
         }
 
-        // 2. Execute Stop Command (if any)
+        // 2. Kill Port (if detected from localUrl)
+        if (workspace.localUrl) {
+            const portMatch = workspace.localUrl.match(/:(\d+)/);
+            if (portMatch && portMatch[1]) {
+                const port = portMatch[1];
+                currentSocket?.emit('log', chalk.yellow(`Releasing port ${port}...`));
+                try {
+                    await new Promise<void>((resolve) => {
+                         const kp = spawn('npx', ['-y', 'kill-port', port], {
+                             shell: true,
+                             stdio: 'ignore'
+                         });
+                         kp.on('close', () => resolve());
+                         kp.on('error', () => resolve()); // minimal error handling for helper
+                    });
+                } catch (e) {
+                    // Ignore errors here
+                }
+            }
+        }
+
+        // 3. Execute Stop Command (if any)
         const commandToRun = workspace.stopCommand;
         if (commandToRun) {
             currentSocket?.emit('log', chalk.green(`Running stop command: ${commandToRun}`));
