@@ -7,31 +7,33 @@ import { Server } from 'socket.io';
 
 //routers
 import apiScanWorkspace from './routes/scanworkspace';
-import runCmdDevSocket from './routes/runcmddev';
+import runCmdDevSocket  from './routes/runcmddev';
+import stopProcess      from './routes/stopcmd';
 
 const app = express();
 const port = config.apiPort;
 
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true,
+}));
 app.use(express.static('public'));
 app.use(express.json());
 
 //routes=======================================================================
 app.use("/" + apiRoute.scanWorkspace, apiScanWorkspace);
+app.use("/" + apiRoute.stopProcess, stopProcess);
 
 // Socket.IO Setup ============================================================
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
+const io         = new Server(httpServer, {
   cors: {
-    origin: "*", // Adjust this to match your frontend URL in production
-    methods: ["GET", "POST"]
-  }
+    origin:  "*",
+    methods: ["GET", "POST"],
+  },
+  transports: ['websocket', 'polling']
 });
-
-io.on('connection', (socket) => {
-  runCmdDevSocket(io, socket);
-  //socket.on('disconnect', () => {});
-});
+runCmdDevSocket( io );
 
 //=============================================================================
 httpServer.listen(port, () => {

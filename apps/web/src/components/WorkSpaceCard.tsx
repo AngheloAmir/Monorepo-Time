@@ -1,76 +1,80 @@
-import { useEffect, useRef } from "react";
+import { useRef, useState } from "react";
 import type { WorkspaceItem } from "../_context/workspace";
-import config   from "config";
+import config from "config";
 import { io, Socket } from "socket.io-client";
 import useWorkspaceState from "../_context/workspace";
+import apiRoute from "apiroute";
 
 export default function WorkspaceCard(props: WorkspaceItem) {
-    const socketRef    = useRef<Socket | null>(null);
-    const WriteConsole          = useWorkspaceState.use.writeOnConsole();
+    const socketRef = useRef<Socket | null>(null);
+    const WriteConsole = useWorkspaceState.use.writeOnConsole();
+    const clearConsole = useWorkspaceState.use.clearConsole();
     const setWorkSpaceRunningAs = useWorkspaceState.use.setWorkSpaceRunningAs();
-
-    useEffect(() => {
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-            }
-        };
-    }, []);
+    const setActiveTerminal = useWorkspaceState.use.setActiveTerminal();
+    const [loading, setLoading] = useState(false);
 
     const connectAndRun = (runas: 'dev' | 'start') => {
-        if (socketRef.current) {
-            socketRef.current.disconnect();
-        }
+        if(loading) return;
+        try {
+            setLoading(true);
+            setTimeout(() => setLoading(false), 2000);
 
-        const url = `http://localhost:${config.apiPort}`;
-        console.log('Connecting to:', url);
-        const socket      = io(url);
-        socketRef.current = socket;
-
-        socket.on("connect", () => {
-            console.log('connected');
-            setWorkSpaceRunningAs(props.info.name, runas);
-            socket.emit('run-command', {
-                workspace: props.info,
-                runas: runas
+            const port = config.apiPort || 3000;
+            const socket = io(`http://localhost:${port}`, {
+                transports: ['websocket']
             });
-        });
+            socketRef.current = socket;
 
-        socket.on("command-output", (data) => {
-            console.log( data )
-            if (data.workspaceName === props.info.name) {
-                WriteConsole(props.info.name, data.output);
-            }
-        });
+            socketRef.current && socketRef.current.on("connect", () => {
+                setWorkSpaceRunningAs(props.info.name, runas);
+                setActiveTerminal(props.info.name);
+                socketRef.current && socketRef.current.emit('run', {
+                    workspace: props.info,
+                    runas: runas
+                });
 
-        socket.on("process-started", (data) => {
-            console.log( data )
-            if (data.workspaceName === props.info.name) {
-                WriteConsole(props.info.name, `Process started for ${data.workspaceName} (PID: ${data.pid})`);
-            }
-        });
+                socketRef.current && socketRef.current.on("log", (data) => {
+                    WriteConsole(props.info.name, data);
+                });
 
-        socket.on("command-error", (data) => {
-            console.log( data )
-            if (data.workspaceName === props.info.name) {
-                WriteConsole(props.info.name, data.output);
-            }
-        });
-        
-        socket.on("process-exit", (data) => {
-            console.log( data )
-            if (data.workspaceName === props.info.name) {
-                WriteConsole(props.info.name, `Process exited for ${data.workspaceName} with code ${data.code}`);
-                socket.disconnect();
-            }
-        });
+                socketRef.current && socketRef.current.on("error", (data) => {
+                    WriteConsole(props.info.name, data);
+                });
+
+                socketRef.current && socketRef.current.on("exit", (data) => {
+                    WriteConsole(props.info.name, data);
+                });
+
+                socketRef.current && socketRef.current.on("disconnect", () => {
+                    WriteConsole(props.info.name, "Disconnected");
+                });
+            })
+        } catch (e) {
+            console.error(e);
+            setLoading(false);
+        }
     }
 
-    function handleStop() {
-        if (socketRef.current) {
-            socketRef.current.emit('stop-command', {
-                 workspaceName: props.info.name
+    async function handleStop() {
+        if(loading) return;
+        try {
+            setLoading(true);
+            WriteConsole(props.info.name, "..");
+
+            await fetch(`http://localhost:${config.apiPort}/${apiRoute.stopProcess}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ workspace: props.info })
             });
+            setWorkSpaceRunningAs(props.info.name, null);
+            setLoading(false);
+            
+            clearConsole(props.info.name);
+        } catch (e) {
+            console.error(e);
+            setLoading(false);
         }
     }
 
@@ -95,25 +99,25 @@ export default function WorkspaceCard(props: WorkspaceItem) {
 
                 <div className="flex-1 flex gap-2">
                     {props.isRunningAs == 'start' && (
-                        <button onClick={handleStop} className="flex-1 py-1 px-2 rounded-lg bg-orange-600 text-white hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button onClick={handleStop} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-orange-600 text-white hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-check-circle text-lg"></i>
                             Server is up
                         </button>
                     )}
                     {props.isRunningAs == 'dev' && (
-                        <button onClick={handleStop} className="flex-1 py-1 px-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button onClick={() => handleStop()} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-stop text-lg"></i>
                             Stop Dev
                         </button>
                     )}
                     {props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.startCommand && (
-                        <button onClick={() => connectAndRun('start')} className="flex-1 py-1 px-2 rounded-lg bg-green-600 text-white hover:bg-green-500 transition-colors shadow-lg shadow-green-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button onClick={() => connectAndRun('start')} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-green-600 text-white hover:bg-green-500 transition-colors shadow-lg shadow-green-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-play text-lg"></i>
                             Start
                         </button>
                     )}
                     {props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.devCommand && (
-                        <button onClick={() => connectAndRun('dev')} className="flex-1 py-1 px-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button onClick={() => connectAndRun('dev')} disabled={loading} className="flex-1 py-1 px-2 rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="fas fa-play text-lg"></i>
                             Start Dev
                         </button>

@@ -44,7 +44,14 @@ export default function TabTerminal() {
             <div className="flex-1 overflow-y-auto bg-gray-900 p-2">
                 {/* all workspace have active console but are made invisible */}
                 {workspace.map((item) => (
-                    <Console key={item.info.name} consoleOutput={item.consoleOutput} show={activeTerminal == item.info.name} />
+                    <Console
+                        key={item.info.name}
+                        consoleOutput={item.consoleOutput}
+                        show={
+                            activeTerminal == item.info.name &&
+                            (item.isRunningAs == 'dev' || item.isRunningAs == 'start')
+                        }
+                    />
                 ))}
             </div>
         </div>

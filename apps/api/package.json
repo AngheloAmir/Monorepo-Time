@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "apiroute": "*",
+    "chalk": "^4.1.2",
     "config": "*",
     "cors": "^2.8.5",
     "express": "^4.19.2",

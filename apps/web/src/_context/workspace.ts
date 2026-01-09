@@ -23,6 +23,7 @@ interface workspaceContext {
      * @param output 
      */
     writeOnConsole: (workspaceName: string, output: string) => void;
+    clearConsole: (workspaceName: string) => void;
     setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | null) => void;
 }
 
@@ -53,14 +54,34 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
     writeOnConsole: (workspaceName: string, output: string) => {
         const workspace = get().workspace.find((item) => item.info.name === workspaceName);
-        console.log(output);
+        const trimed    = output.trim();
+        if (workspace && trimed) {
+            set({
+                workspace: get().workspace.map((item) => {
+                    if (item.info.name === workspaceName) {
+                        return {
+                            ...item,
+                            consoleOutput: 
+                                item.consoleOutput ? 
+                                `${item.consoleOutput}\n${trimed}` : 
+                                trimed
+                        }
+                    }
+                    return item;
+                })
+            });
+        }
+    },
+
+    clearConsole: (workspaceName: string) => {
+        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
         if (workspace) {
             set({
                 workspace: get().workspace.map((item) => {
                     if (item.info.name === workspaceName) {
                         return {
                             ...item,
-                            consoleOutput: item.consoleOutput ? `${item.consoleOutput}\n${output}` : output
+                            consoleOutput: null
                         }
                     }
                     return item;
