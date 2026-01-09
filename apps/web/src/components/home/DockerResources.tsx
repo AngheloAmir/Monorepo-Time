@@ -27,8 +27,8 @@ export default function DockerResources() {
             <div className="overflow-y-auto flex-1 space-y-2 pr-1 custom-scrollbar" id="docker-list-container">
                 <div className="text-center text-xs text-gray-600 py-2">Waiting for data...</div>
 
-                { dockerprocessInfo.map((c) => (
-                    <div className="flex items-center justify-between p-2 rounded bg-gray-900/40 border border-gray-700/30 text-xs">
+                { dockerprocessInfo.map((c, i) => (
+                    <div key={i} className="flex items-center justify-between p-2 rounded bg-gray-900/40 border border-gray-700/30 text-xs">
                         <div className="flex flex-col gap-0.5 overflow-hidden">
                             <div className="flex items-center gap-2">
                                 <i className="fab fa-docker text-blue-500"></i>

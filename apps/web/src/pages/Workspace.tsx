@@ -7,12 +7,21 @@ interface WorkspaceProps {
     isVisible: boolean
 }
 
+declare global {
+  interface Window {
+    isWorkSpaceLoaded: boolean;
+  }
+}
+
 export default function Workspace(props: WorkspaceProps) {
-    const workspace = useWorkspaceState.use.workspace();
+    const workspace     = useWorkspaceState.use.workspace();
     const loadWorkspace = useWorkspaceState.use.loadWorkspace();
 
     useEffect(() => {
-        loadWorkspace();
+        if( !window.isWorkSpaceLoaded ) {
+            window.isWorkSpaceLoaded = true;
+            loadWorkspace();
+        }
     }, []);
 
     return (

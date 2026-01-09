@@ -164,9 +164,9 @@ route.get("/", async (req: Request, res: Response) => {
     }))).filter(Boolean); // Filter out any failed reads
 
     res.json({
-      root: ROOT,
-      count: projectInfos.length,
-      projects: projectInfos,
+      root:      ROOT,
+      count:     projectInfos.length,
+      workspace: projectInfos,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

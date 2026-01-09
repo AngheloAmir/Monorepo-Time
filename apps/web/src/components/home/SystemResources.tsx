@@ -51,7 +51,7 @@ export default function SystemResources() {
                         <div className="text-center text-xs text-gray-600 py-2">Loading...</div>
                     )}
                     {childprocessInfo.map((p, i) => (
-                        <div key={i} className="flex items-center justify-between p-2 rounded bg-gray-900/40 hover:bg-gray-800/60 border border-transparent hover:border-gray-700 transition-colors text-xs">
+                        <div key={i + p.name} className="flex items-center justify-between p-2 rounded bg-gray-900/40 hover:bg-gray-800/60 border border-transparent hover:border-gray-700 transition-colors text-xs">
                             <div className="flex items-center gap-2 overflow-hidden">
                                 <i className="fas fa-boxes w-4 text-center"></i>
                                 <span className="text-gray-300 font-mono truncate">
