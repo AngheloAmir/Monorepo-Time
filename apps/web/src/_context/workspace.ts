@@ -5,16 +5,23 @@ import type { WorkspaceInfo } from 'types';
 export interface WorkspaceItem {
     isRunningAs:    'dev' | 'start' | null;
     consoleOutput:  string | null;
-    info:           WorkspaceInfo;  
+    info:           WorkspaceInfo;
 }
 
 interface workspaceContext {
     workspace: WorkspaceItem[];
+    activeTerminal: string;
     loadWorkspace: () => Promise<void>;
+    setActiveTerminal: (terminal: string) => void;
 }
 
 const workspaceState = create<workspaceContext>()((set) => ({
     workspace: [],
+    activeTerminal: '',
+
+    setActiveTerminal: (terminal: string) => {
+        set({ activeTerminal: terminal });
+    },
 
     loadWorkspace: async () => {
         //const workspace = await fetch('/api/workspace').then(res => res.json());

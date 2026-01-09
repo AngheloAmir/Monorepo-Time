@@ -15,36 +15,34 @@ export default function Workspace(props: WorkspaceProps) {
         loadWorkspace();
     }, []);
 
-    if (!props.isVisible) return null;
     return (
-        <div className="flex-col gap-3 h-full">
-            <div id="workspaceContainer" className="overflow-y-scroll flex flex-col gap-3 p-4 w-full h-[calc(100vh-350px)]">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {workspace.map((item, index) => {
-                        if (item.isRunningAs == 'dev' || item.isRunningAs == 'start') {
-                            return (
-                                <WorkspaceCard key={index} {...item} />
+        <div className={`flex flex-col w-full h-[calc(100vh-68px)] ${props.isVisible ? '' : 'hidden'}`}>
+            <div className="grid grid-rows-5 h-full min-h-0 gap-2">
+                <div className="row-span-3 min-h-0 overflow-y-auto flex flex-col gap-3 p-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                        {workspace.map((item, index) => (
+                            (item.isRunningAs === 'dev' || item.isRunningAs === 'start') && (
+                                <div key={index}>
+                                    <WorkspaceCard {...item} />
+                                </div>
                             )
-                        }
-                        return null;
-                    })}
+                        ))}
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                        {workspace.map((item, index) => (
+                            !item.isRunningAs && (
+                                <div key={index}>
+                                    <WorkspaceCard {...item} />
+                                </div>
+                            )
+                        ))}
+                    </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {workspace.map((item, index) => {
-                        if (!item.isRunningAs) {
-                            return (
-                                <WorkspaceCard key={index} {...item} />
-                            )
-                        }
-                        return null;
-                    })}
+                <div className="row-span-2">
+                    <TabTerminal />
                 </div>
             </div>
-
-            <div className="flex-1 flex w-full h-full">
-                <TabTerminal />
-            </div>
-        </div >
+        </div>
     )
 }
 
