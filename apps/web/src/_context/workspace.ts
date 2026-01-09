@@ -16,6 +16,14 @@ interface workspaceContext {
     activeTerminal: string;
     loadWorkspace: () => Promise<void>;
     setActiveTerminal: (terminal: string) => void;
+
+    /**
+     * Write on console of a workspace
+     * @param workspaceName 
+     * @param output 
+     */
+    writeOnConsole: (workspaceName: string, output: string) => void;
+    setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | null) => void;
 }
 
 const workspaceState = create<workspaceContext>()((set, get) => ({
@@ -26,9 +34,44 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         set({ activeTerminal: terminal });
     },
 
+    setWorkSpaceRunningAs: (workspaceName, runas) => {
+        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
+        if (workspace) {
+            set({
+                workspace: get().workspace.map((item) => {
+                    if (item.info.name === workspaceName) {
+                        return {
+                            ...item,
+                            isRunningAs: runas
+                        }
+                    }
+                    return item;
+                })
+            });
+        }
+    },
+
+    writeOnConsole: (workspaceName: string, output: string) => {
+        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
+        console.log(output);
+        if (workspace) {
+            set({
+                workspace: get().workspace.map((item) => {
+                    if (item.info.name === workspaceName) {
+                        return {
+                            ...item,
+                            consoleOutput: item.consoleOutput ? `${item.consoleOutput}\n${output}` : output
+                        }
+                    }
+                    return item;
+                })
+            });
+        }
+    },
+
     loadWorkspace: async () => {
         try {
-            const response = await fetch(`http://localhost:${config.apiPort}/api${apiRoute.scanWorkspace}`);
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.scanWorkspace}`);
             let workspaceResponse: {
                 root: string;
                 count: number;

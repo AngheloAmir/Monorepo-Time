@@ -1,5 +1,6 @@
 const apiRoute = {
-    scanWorkspace: '/scanworkspace',
+    scanWorkspace: 'scanworkspace',
+    runCmdDev:     'runcmddev',
 }
 
 export default apiRoute;
