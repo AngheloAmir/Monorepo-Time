@@ -7,6 +7,7 @@ import WorkspaceNew from "../components/workspace/WorkspaceNew";
 import ModalTerminal from "../components/workspace/ModalTerminal";
 import config   from "config";
 import apiRoute from "apiroute";
+import useAppState from "../_context/app";
 
 interface WorkspaceProps {
     isVisible: boolean
@@ -22,6 +23,7 @@ export default function Workspace(props: WorkspaceProps) {
     const workspace           = useWorkspaceState.use.workspace();
     const loadWorkspace       = useWorkspaceState.use.loadWorkspace();
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
+    const setShowTerminal     = useAppState.use.setShowTerminal();
     const [filesShow, setFilesShow] = useState(true);
 
     useEffect(() => {
@@ -81,6 +83,15 @@ export default function Workspace(props: WorkspaceProps) {
                     <TabTerminal />
                 </div>
             </div>
+
+            <button
+                onClick={() => setShowTerminal(true)}
+                className="p-2 pt-3 fixed bottom-44 right-8 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-110 flex items-center gap-2 z-50 group">
+                <i className="w-8 h-8 fa-solid fa-terminal text-xl"></i>
+                <span className="font-medium pr-2 hidden group-hover:inline-block transition-all duration-300 whitespace-nowrap overflow-hidden">
+                    Root Terminal
+                </span>
+            </button>
 
             <button
                 onClick={showHideFiles}

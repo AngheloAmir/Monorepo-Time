@@ -87,8 +87,6 @@ except Exception as e:
 
                 activeTerminals.set(socket.id, child);
 
-                socket.emit('terminal:log', `\r\n$ ${command}\r\n`);
-
                 child.stdout?.on('data', (chunk) => {
                     socket.emit('terminal:log', chunk.toString());
                 });
@@ -113,7 +111,7 @@ except Exception as e:
                     } else if (code !== 0) {
                         socket.emit('terminal:error', `\r\nProcess exited with code ${code}`);
                     } else {
-                        socket.emit('terminal:log', `\r\nProcess finished successfully.`);
+                        //socket.emit('terminal:log', `\r\nProcess finished successfully.`);
                     }
                     socket.emit('terminal:exit', code);
                     cleanup(socket.id);

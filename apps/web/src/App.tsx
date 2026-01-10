@@ -9,9 +9,10 @@ import TurboCICD from './contents/TurboCICD';
 import CRUDTester from './contents/CRUDTester';
 import Setting from './contents/Setting';
 import Modal from './modal';
+import RootTerminal from './components/RootTerminal';
 
 function App() {
-     const currentPage = useNavState.use.currentPage();
+    const currentPage = useNavState.use.currentPage();
 
     return (
         <div className='w-screen h-screen overflow-hidden'>
@@ -38,6 +39,7 @@ function App() {
             </div>
             
             <Modal />
+            <RootTerminal />
         </div>
     )
 }

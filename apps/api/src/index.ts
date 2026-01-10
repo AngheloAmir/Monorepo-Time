@@ -14,6 +14,7 @@ import newWorkspace      from './routes/newworkspace';
 import interactiveTerminal, { interactiveTerminalSocket } from './routes/interactiveTerminal';
 import updateWorkspace   from './routes/updateworkspace';
 import vscodeHideShow    from './routes/vscodeHideShow';
+import rootPath          from './routes/rootPath';
 
 const app = express();
 const port = config.apiPort;
@@ -33,6 +34,8 @@ app.use("/" + apiRoute.newWorkspace,       newWorkspace);
 app.use("/" + apiRoute.interactvTerminal,  interactiveTerminal);
 app.use("/" + apiRoute.updateWorkspace,    updateWorkspace); 
 app.use("/" + apiRoute.hideShowFileFolder, vscodeHideShow);
+app.use("/" + apiRoute.getRootPath,        rootPath);
+
 
 // Socket.IO Setup ============================================================
 const httpServer = createServer(app);

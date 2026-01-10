@@ -39,6 +39,12 @@ const apiRoute = {
      * request body: { workspace: WorkspaceInfo }
     */
     updateWorkspace: 'updateworkspace',
+    
+    /** Get the root path of the project
+     * It is a get request
+     * returns: { path: string }
+    */
+    getRootPath: 'getrootpath',
 }
 
 export default apiRoute;
