@@ -14,8 +14,10 @@ export interface WorkspaceItem {
 interface workspaceContext {
     workspace: WorkspaceItem[];
     activeTerminal: string;
+    activeWorkspaceOptionModal: WorkspaceInfo | null;
     loadWorkspace: () => Promise<void>;
     setActiveTerminal: (terminal: string) => void;
+    setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => void;
 
     /**
      * Write on console of a workspace
@@ -30,6 +32,11 @@ interface workspaceContext {
 const workspaceState = create<workspaceContext>()((set, get) => ({
     workspace: [],
     activeTerminal: '',
+    activeWorkspaceOptionModal: null,
+
+    setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => {
+        set({ activeWorkspaceOptionModal: workspace });
+    },
 
     setActiveTerminal: (terminal: string) => {
         set({ activeTerminal: terminal });

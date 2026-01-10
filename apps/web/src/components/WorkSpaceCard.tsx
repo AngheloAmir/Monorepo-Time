@@ -7,11 +7,12 @@ import apiRoute from "apiroute";
 
 export default function WorkspaceCard(props: WorkspaceItem) {
     const socketRef = useRef<Socket | null>(null);
-    const WriteConsole = useWorkspaceState.use.writeOnConsole();
-    const clearConsole = useWorkspaceState.use.clearConsole();
-    const setWorkSpaceRunningAs = useWorkspaceState.use.setWorkSpaceRunningAs();
-    const setActiveTerminal = useWorkspaceState.use.setActiveTerminal();
-    const [loading, setLoading] = useState(false);
+    const WriteConsole                  = useWorkspaceState.use.writeOnConsole();
+    const clearConsole                  = useWorkspaceState.use.clearConsole();
+    const setWorkSpaceRunningAs         = useWorkspaceState.use.setWorkSpaceRunningAs();
+    const setActiveTerminal             = useWorkspaceState.use.setActiveTerminal();
+    const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
+    const [loading, setLoading]         = useState(false);
 
     const connectAndRun = (runas: 'dev' | 'start') => {
         if(loading) return;
@@ -93,7 +94,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
             </header>
 
             <div className="p-3 bg-gray-900/30 border-t border-gray-800 flex gap-2 relative">
-                <button className="flex-none w-10 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors text-sm font-medium flex items-center justify-center" title="Options">
+                <button onClick={() => setActiveWorkspaceOptionModal(props.info)} className="flex-none w-10 py-2 rounded-lg border border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors text-sm font-medium flex items-center justify-center" title="Options">
                     <i className="fas fa-cog"></i>
                 </button>
 

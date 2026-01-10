@@ -2,8 +2,8 @@ import useWorkspaceState from "../_context/workspace";
 import Console from "./Console";
 
 export default function TabTerminal() {
-    const workspace = useWorkspaceState.use.workspace();
-    const activeTerminal = useWorkspaceState.use.activeTerminal();
+    const workspace         = useWorkspaceState.use.workspace();
+    const activeTerminal    = useWorkspaceState.use.activeTerminal();
     const setActiveTerminal = useWorkspaceState.use.setActiveTerminal();
 
     return (
