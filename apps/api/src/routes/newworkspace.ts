@@ -1,12 +1,49 @@
 import { Request, Response, Router } from "express";
 import type { WorkspaceInfo } from "types";
+import fs from "fs-extra";
+import path from "path";
+
 const router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
-    const reqBody: WorkspaceInfo = req.body;
+router.post("/", async (req: Request, res: Response) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    
+    try {
+        const reqBody: WorkspaceInfo = req.body;
+        const targetPath = reqBody.path;
 
-    console.log('called')
-    res.send("Hello World!");
+        if (!targetPath) {
+            return res.status(400).json({ error: "Path is required" });
+        }
+
+        await fs.ensureDir(targetPath);
+        const packageJson: any = {
+            name:       reqBody.name || path.basename(targetPath),
+            version:    "1.0.0",
+            description: reqBody.description || "",
+            fontawesomeIcon: reqBody.fontawesomeIcon || "",
+            scripts: {
+                dev:   reqBody.devCommand   || "",
+                start: reqBody.startCommand || undefined,
+                stop:  reqBody.stopCommand  || undefined,
+                build: reqBody.buildCommand || undefined,
+                clean: reqBody.cleanCommand || undefined,
+                lint:  reqBody.lintCommand  || undefined,
+                test:  reqBody.testCommand  || undefined
+            }
+        };
+
+        Object.keys(packageJson.scripts).forEach(key => 
+            packageJson.scripts[key] === undefined && delete packageJson.scripts[key]
+        );
+        await fs.writeJSON(path.join(targetPath, "package.json"), packageJson, { spaces: 2 });
+
+        res.json({ message: "Workspace created successfully", path: targetPath });
+
+    } catch (e: any) {
+        console.error("Error creating workspace:", e);
+        res.status(500).json({ error: e.message });
+    }
 });
 
 export default router;
