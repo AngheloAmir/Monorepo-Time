@@ -12,6 +12,7 @@ import stopProcess       from './routes/stopcmd';
 import listWorkspacesDir from './routes/listworkspacedirs';
 import newWorkspace      from './routes/newworkspace';
 import interactiveTerminal, { interactiveTerminalSocket } from './routes/interactiveTerminal';
+import updateWorkspace   from './routes/updateworkspace';
 
 const app = express();
 const port = config.apiPort;
@@ -29,6 +30,7 @@ app.use("/" + apiRoute.stopProcess,       stopProcess);
 app.use("/" + apiRoute.listWorkspacesDir, listWorkspacesDir);
 app.use("/" + apiRoute.newWorkspace,      newWorkspace);
 app.use("/" + apiRoute.interactvTerminal, interactiveTerminal);
+app.use("/" + apiRoute.updateWorkspace,   updateWorkspace); 
 
 // Socket.IO Setup ============================================================
 const httpServer = createServer(app);

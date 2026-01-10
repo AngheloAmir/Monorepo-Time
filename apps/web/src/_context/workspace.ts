@@ -66,6 +66,7 @@ interface workspaceContext {
     stopProcess: (workspaceName: string) => Promise<void>;
     listWorkspace: () => Promise<any>;
     createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
+    updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
 
 }
 
@@ -256,7 +257,23 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         } catch (error) {
             return false;
         }
-    }
+    },
+    
+    updateWorkspace: async (workspace: WorkspaceInfo) => {
+        try {
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.updateWorkspace}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(workspace),
+            });
+            await response.json();
+            return true;
+        } catch (error) {
+            return false;
+        }
+    },
 
 }));
 
