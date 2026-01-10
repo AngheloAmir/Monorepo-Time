@@ -1,10 +1,37 @@
+import { useState } from "react";
 import useWorkspaceState from "../_context/workspace";
 import Console from "./Console";
 
 export default function TabTerminal() {
-    const workspace         = useWorkspaceState.use.workspace();
-    const activeTerminal    = useWorkspaceState.use.activeTerminal();
+    const workspace = useWorkspaceState.use.workspace();
+    const activeTerminal = useWorkspaceState.use.activeTerminal();
     const setActiveTerminal = useWorkspaceState.use.setActiveTerminal();
+
+    const stopProcess = useWorkspaceState.use.stopProcess();
+    const WriteConsole = useWorkspaceState.use.writeOnConsole();
+    const clearConsole = useWorkspaceState.use.clearConsole();
+    const setWorkSpaceRunningAs = useWorkspaceState.use.setWorkSpaceRunningAs();
+    const [loading, setLoading] = useState(false);
+
+    async function handleStop() {
+        if (loading) return;
+        try {
+            setLoading(true);
+            WriteConsole(activeTerminal, "..");
+            const currentWorkspace = workspace.find((item) => item.info.name === activeTerminal);
+            if (!currentWorkspace) return;
+
+            await stopProcess(activeTerminal);
+            setWorkSpaceRunningAs(activeTerminal, null);
+            setLoading(false);
+
+            clearConsole(activeTerminal);
+            setActiveTerminal('');
+        } catch (e) {
+            console.error(e);
+            setLoading(false);
+        }
+    }
 
     return (
         <div className="w-full h-full flex flex-col">
@@ -18,8 +45,8 @@ export default function TabTerminal() {
                                 className={`group px-2 w-[200px] gap-2 flex items-center ${activeTerminal === item.info.name ? 'bg-gray-800' : 'mb-1 opacity-60 cursor-pointer bg-gray-700 hover:bg-gray-600'}`}
                             >
                                 <div className="flex-1 flex items-center gap-2 truncate overflow-hidden">
-                                    <i className={`${item.info.fontawesomeIcon ?? 'fas fa-terminal'} text-[18px] flex-shrink-0`}></i>
-                                    <span className="truncate font-medium text-[16px]">
+                                    <i className={`${item.info.fontawesomeIcon ?? 'fas fa-terminal'} text-blue-500/50 text-[18px] flex-shrink-0`}></i>
+                                    <span className="truncate font-medium text-[16px] text-gray-100">
                                         {item.info.name}
                                     </span>
                                 </div>
@@ -27,7 +54,7 @@ export default function TabTerminal() {
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setActiveTerminal('');
+                                        handleStop();
                                     }}
                                     className="opacity-0 group-hover:opacity-100 transition-opacity duration-150"
                                 >
@@ -43,6 +70,16 @@ export default function TabTerminal() {
 
             <div className="flex-1 overflow-y-auto bg-gray-900 p-2">
                 {/* all workspace have active console but are made invisible */}
+
+                {activeTerminal == '' && (
+                    <div className="flex-1 flex gap-4 items-center justify-center mt-8 opacity-40">
+                        <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center shadow-inner">
+                            <i className="fas fa-terminal text-md text-gray-600"></i>
+                        </div>
+                        <span className="text-[16px]">Terminal</span>
+                    </div>
+                )}
+
                 {workspace.map((item) => (
                     <Console
                         key={item.info.name}

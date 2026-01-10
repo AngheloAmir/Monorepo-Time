@@ -12,11 +12,25 @@ export interface WorkspaceItem {
 }
 
 interface workspaceContext {
+    /** Base information of workspace */
     workspace: WorkspaceItem[];
+
+    /** show the workspace console */
     activeTerminal: string;
+
+    /** show the workspace option modal */
     activeWorkspaceOptionModal: WorkspaceInfo | null;
+
+    /** name of the workspace that is still loading */
+    loadingWorkspace: string | null;
+
+    /** load workspace */
     loadWorkspace: () => Promise<void>;
+
+    /** set active terminal */
     setActiveTerminal: (terminal: string) => void;
+
+    /** set active workspace option modal */
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => void;
 
     /**
@@ -25,14 +39,26 @@ interface workspaceContext {
      * @param output 
      */
     writeOnConsole: (workspaceName: string, output: string) => void;
+
+    /** clear console of a workspace */
     clearConsole: (workspaceName: string) => void;
+
+    /** set workspace running as */
     setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | null) => void;
+
+    /** stop process */
+    stopProcess: (workspaceName: string) => Promise<void>;
+
+    /** loading */
+    loading: boolean;
 }
 
 const workspaceState = create<workspaceContext>()((set, get) => ({
     workspace: [],
     activeTerminal: '',
     activeWorkspaceOptionModal: null,
+    loadingWorkspace: null,
+    loading: false,
 
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => {
         set({ activeWorkspaceOptionModal: workspace });
@@ -98,6 +124,10 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     loadWorkspace: async () => {
+        const isLoading = get().loading;
+        if (isLoading) return;
+        set({ loading: true });
+
         try {
             const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.scanWorkspace}`);
             let workspaceResponse: {
@@ -109,50 +139,34 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
                 throw new Error('Failed to fetch workspace');
             }
 
-        //if already exist in workspace dont add to make sure data is not cleared
+            const newWorkspace: WorkspaceItem[] = [];
             const currentWorkspace = get().workspace;
-            const newWorkspace: WorkspaceItem[] = []
-            workspaceResponse.workspace.forEach((item) => {
-                if (!currentWorkspace.find((i) => i.info.name === item.name)) {
+            workspaceResponse.workspace.forEach((item :WorkspaceInfo) => {
+                //if already exist in workspace dont add to make sure data is not cleared
+                //but refresh only the information
+                if (currentWorkspace.find((i) => i.info.name === item.name)) {
                     newWorkspace.push({
-                        isRunningAs: null,
+                        isRunningAs:   currentWorkspace.find((i) => i.info.name === item.name)?.isRunningAs ?? null,
+                        consoleOutput: currentWorkspace.find((i) => i.info.name === item.name)?.consoleOutput ?? null,
+                        info:          item
+                    })
+                } else {
+                    newWorkspace.push({
+                        isRunningAs:   null,
                         consoleOutput: null,
-                        info: item
+                        info:          item
                     })
                 }
             })
 
-        //Perform filter
-            const runningStartWorkspace = newWorkspace.filter((item) => item.isRunningAs === 'start');
-            const runningDevWorkspace   = newWorkspace.filter((item) => item.isRunningAs === 'dev');
-            const runningStartWorkSpaceAlphabetical = runningStartWorkspace.sort((a, b) => {
-                if (a.info.name < b.info.name) return -1;
-                if (a.info.name > b.info.name) return 1;
-                return 0;
-            });
-            const runningDevWorkSpaceAlphabetical = runningDevWorkspace.sort((a, b) => {
+            //sort workspace alphabetically
+            const alphabeticalWorkspace = newWorkspace.sort((a, b) => {
                 if (a.info.name < b.info.name) return -1;
                 if (a.info.name > b.info.name) return 1;
                 return 0;
             });
 
-            const stoppedWorkspace = newWorkspace.filter((item) => !item.isRunningAs);
-            stoppedWorkspace.sort((a, b) => {
-                if (a.info.name < b.info.name) return -1;
-                if (a.info.name > b.info.name) return 1;
-                return 0;
-            });
-
-            set({
-                workspace: [
-                    ...runningStartWorkSpaceAlphabetical,
-                    ...runningDevWorkSpaceAlphabetical,
-                    ...stoppedWorkspace
-                ]
-            });
-
-
-
+            set({  workspace: alphabeticalWorkspace });
         } catch (error) {
             console.error('Error fetching workspace:', error);
             set({
@@ -160,13 +174,30 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             });
         }
 
+        set({ loading: false });
+    },
 
+    stopProcess: async (workspaceName: string) => {
+        const isLoading = get().loadingWorkspace;
+        if (isLoading == workspaceName) return;
+        set({ loadingWorkspace: workspaceName });
 
+        try {
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.stopProcess}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ workspace: { name: workspaceName } })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to stop process');
+            }
+        } catch (error) {
+            console.error('Error stopping process:', error);
+        }
 
-
-
-
-
+        set({ loadingWorkspace: null });
     }
 }));
 

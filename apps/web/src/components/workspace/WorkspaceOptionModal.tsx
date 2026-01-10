@@ -120,9 +120,9 @@ export default function WorkspaceOptionModal() {
                     </div>
                 </div>
 
-                <footer className="p-2 border-t border-gray-600 flex justify-end gap-2">
-                    <button onClick={close} className="bg-gray-700 hover:bg-gray-600 transition-colors p-2 rounded">Cancel</button>
-                    <button onClick={close} className="bg-blue-500 hover:bg-blue-600 transition-colors p-2 rounded">Save</button>
+                <footer className="p-2 border-t border-gray-600 flex justify-end gap-4">
+                    <button onClick={close} className="w-32 bg-gray-700 hover:bg-gray-600 transition-colors p-1 rounded">Cancel</button>
+                    <button onClick={close} className="w-40 bg-blue-500 hover:bg-blue-600 transition-colors p-1 rounded">Save</button>
                 </footer>
             </div>
         </div>

@@ -12,8 +12,18 @@ export default function WorkspaceCard(props: WorkspaceItem) {
     const setWorkSpaceRunningAs         = useWorkspaceState.use.setWorkSpaceRunningAs();
     const setActiveTerminal             = useWorkspaceState.use.setActiveTerminal();
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
+    const loadingWorkspace              = useWorkspaceState.use.loadingWorkspace();
     const [loading, setLoading]         = useState(false);
 
+    //if loadingWorkspace is this workspace, then show loading
+    useEffect(() => {
+        if (loadingWorkspace == props.info.name) {
+            setLoading(true);
+        } else {
+            setLoading(false);
+        }
+    }, [loadingWorkspace]);
+    
     useEffect(() => {
         return () => {
             if (socketRef.current) {
