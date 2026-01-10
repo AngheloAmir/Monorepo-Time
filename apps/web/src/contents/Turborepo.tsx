@@ -22,6 +22,14 @@ export default function Turborepo( props : TurborepoProps ) {
             .catch(err => console.error("Failed to fetch root path", err));
     }, []);
 
+    useEffect(() => {
+        if (props.isVisible && consoleRef.current) {
+            setTimeout(() => {
+                consoleRef.current?.fit();
+            }, 50);
+        }
+    }, [props.isVisible]);
+
     const handleCommand = (cmd: string) => {
         if (consoleRef.current) {
             consoleRef.current.runCommand(cmd);
@@ -29,13 +37,13 @@ export default function Turborepo( props : TurborepoProps ) {
     };
 
     return (
-        <div className={`h-[92%] w-full grid grid-cols-5 gap-4 min-h-0 ${props.isVisible ? 'flex' : 'hidden'}`}>
+        <div className={`h-[92%] w-full p-4 gap-4  ${props.isVisible ? 'grid grid-cols-5' : 'hidden'}`}>
 
-             <div className="col-span-2 min-h-0 ">
+             <div className="col-span-2 h-full">
                <TurboButtons onCommand={handleCommand} /> 
             </div>
 
-            <div className="col-span-3 flex-1 h-full min-w-0 min-h-0">
+            <div className="col-span-3 flex-1 h-full">
                <TurboConsole ref={consoleRef} rootPath={rootPath} />
             </div>
         </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
@@ -16,13 +16,27 @@ interface ConsoleProps {
     terminalRef?: React.MutableRefObject<Terminal | null>;
 }
 
-export default function Console(props: ConsoleProps) {
+export interface ConsoleRef {
+    fit: () => void;
+}
+
+const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
     const divRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
     const fitAddonRef = useRef<FitAddon | null>(null);
     
     // Store the latest onData callback in a ref to avoid stale closures in the xterm listener
     const onDataRef = useRef(props.onData);
+
+    useImperativeHandle(ref, () => ({
+        fit: () => {
+             try {
+                fitAddonRef.current?.fit();
+             } catch (e) {
+                 // ignore
+             }
+        }
+    }));
     
     useEffect(() => {
         onDataRef.current = props.onData;
@@ -97,4 +111,6 @@ export default function Console(props: ConsoleProps) {
     return (
         <div className="h-full w-full overflow-hidden bg-gray-900 p-1" ref={divRef} />
     );
-}
+});
+
+export default Console;

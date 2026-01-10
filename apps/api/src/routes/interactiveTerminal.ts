@@ -27,8 +27,18 @@ export function interactiveTerminalSocket(io: Server) {
             const { path, command } = data;
 
             if (activeTerminals.has(socket.id)) {
-                socket.emit('terminal:error', 'A process is already running in this terminal.');
-                return;
+                const oldChild = activeTerminals.get(socket.id);
+                if (oldChild) {
+                    // Remove all listeners to prevent 'exit' or 'data' events from the old process
+                    // interfering with the new one or sending confusing logs.
+                    oldChild.removeAllListeners();
+                    oldChild.stdout?.removeAllListeners();
+                    oldChild.stderr?.removeAllListeners();
+                    
+                    oldChild.kill();
+                    activeTerminals.delete(socket.id);
+                    socket.emit('terminal:log', '\r\n\x1b[33m[System] Previous command terminated.\x1b[0m\r\n');
+                }
             }
 
             try {

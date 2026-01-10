@@ -11,10 +11,12 @@ interface TurboConsoleProps {
 
 export interface TurboConsoleRef {
     runCommand: (cmd: string) => void;
+    fit: () => void;
 }
 
 const TurboConsole = forwardRef<TurboConsoleRef, TurboConsoleProps>(({ rootPath }, ref) => {
-    const terminalRef = useRef<any>(null);
+    const terminalRef = useRef<any>(null); // This is the XTerm instance ref (MutableRefObject<Terminal>)
+    const consoleComponentRef = useRef<any>(null); // Ref to the Console component itself to call fit()
     const socketRef = useRef<Socket | null>(null);
     const [processActive, setProcessActive] = useState(false);
     const commandLineBuffer = useRef("");
@@ -33,6 +35,9 @@ const TurboConsole = forwardRef<TurboConsoleRef, TurboConsoleProps>(({ rootPath 
                 path: rootPath,
                 command: cmd
             });
+        },
+        fit: () => {
+             consoleComponentRef.current?.fit();
         }
     }));
 
@@ -106,8 +111,8 @@ const TurboConsole = forwardRef<TurboConsoleRef, TurboConsoleProps>(({ rootPath 
     };
 
     return (
-        <div className="h-full w-full flex flex-col bg-gray-950 rounded-xl overflow-hidden border border-gray-800 shadow-2xl">
-            <div className="bg-gray-900 px-4 py-2 border-b border-gray-800 flex items-center justify-between">
+        <div className="h-full w-full flex flex-col bg-gray-900 rounded-xl overflow-hidden border border-gray-800">
+            <div className="bg-gray-900/70 px-4 py-2 border-b border-gray-800 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <i className="fas fa-terminal text-gray-400 text-xs"></i>
                     <span className="text-xs font-mono text-gray-400">Terminal Output</span>
@@ -119,7 +124,7 @@ const TurboConsole = forwardRef<TurboConsoleRef, TurboConsoleProps>(({ rootPath 
                 </div>
             </div>
             <div className="flex-1 min-h-0 relative">
-                 <Console terminalRef={terminalRef} onData={handleTerminalData} />
+                 <Console ref={consoleComponentRef} terminalRef={terminalRef} onData={handleTerminalData} />
             </div>
         </div>
     );

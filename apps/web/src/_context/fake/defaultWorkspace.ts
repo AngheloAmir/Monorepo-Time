@@ -7,8 +7,6 @@ const workspace: WorkspaceItem[] = [
         info: {
             name: 'Power JS',
             path: '/workspace/1',
-            serviceType: 'app',
-            localUrl: 'http://localhost:3000',
             description: 'Description 1',
             devCommand: 'npm run dev',
             startCommand: 'npm run start',
@@ -26,8 +24,6 @@ const workspace: WorkspaceItem[] = [
         info: {
             name: 'Workspace 2',
             path: '/workspace/2',
-            serviceType: 'app',
-            localUrl: 'http://localhost:3001',
             description: 'Description 2',
             devCommand: 'npm run dev',
             startCommand: 'npm run start',
@@ -45,8 +41,6 @@ const workspace: WorkspaceItem[] = [
         info: {
             name: 'Workspace 3',
             path: '/workspace/3',
-            serviceType: 'app',
-            localUrl: 'http://localhost:3002',
             description: 'Description 3 asdsad asd asd asd asd asd asd asdas dasd as dasd asd asd asd asd',
             devCommand: 'npm run dev',
             startCommand: 'npm run start',
@@ -64,8 +58,6 @@ const workspace: WorkspaceItem[] = [
         info: {
             name: 'Workspace 4 asd asd asd  asd',
             path: '/workspace/4',
-            serviceType: 'app',
-            localUrl: 'http://localhost:3003',
             description: 'Description 4',
             devCommand: 'npm run dev',
             startCommand: 'npm run start',
@@ -83,8 +75,6 @@ const workspace: WorkspaceItem[] = [
         info: {
             name: 'AAA I am last',
             path: '/workspace/6',
-            serviceType: 'app',
-            localUrl: 'http://localhost:3005',
             description: 'Description 6',
             devCommand: 'npm run dev',
             startCommand: 'npm run start',
@@ -102,8 +92,6 @@ const workspace: WorkspaceItem[] = [
         info: {
             name: 'Opps',
             path: '/workspace/6',
-            serviceType: 'app',
-            localUrl: 'http://localhost:3005',
             description: 'Description 6',
             devCommand: 'npm run dev',
             startCommand: 'npm run start',
