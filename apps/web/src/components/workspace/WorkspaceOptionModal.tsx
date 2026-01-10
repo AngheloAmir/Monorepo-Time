@@ -7,15 +7,18 @@ export default function WorkspaceOptionModal() {
     const activeWorkspaceOptionModal        = useWorkspaceState.use.activeWorkspaceOptionModal();
     const setActiveWorkspaceOptionModal     = useWorkspaceState.use.setActiveWorkspaceOptionModal();
     const [workspaceCopy, setWorkspaceCopy] = useState<WorkspaceInfo | null>(null);
+    const [packageName, setPackageName]     = useState<string>('');
     
     useEffect(() => {
         if (activeWorkspaceOptionModal) {
             setWorkspaceCopy(activeWorkspaceOptionModal);
+            setPackageName(activeWorkspaceOptionModal.name);
         }
     }, [activeWorkspaceOptionModal]);
 
     function close() {
         setActiveWorkspaceOptionModal(null);
+        setPackageName('.');
     }
 
     if (!activeWorkspaceOptionModal) return null;
@@ -28,9 +31,9 @@ export default function WorkspaceOptionModal() {
 
                         <div className="flex flex-col">
                             <span className="text-xl">
-                                {workspaceCopy?.name}
+                                { packageName }
                             </span>
-                            <span className="text-gray-400 text-sm">
+                            <span className="text-gray-400 font-normal text-sm truncate w-full text-xs">
                                 {workspaceCopy?.path}
                             </span>
                         </div>
@@ -40,11 +43,11 @@ export default function WorkspaceOptionModal() {
                     </button>
                 </header>
 
-                <div className="p-2 flex-1 overflow-y-auto text-md">
-                    <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 flex-1 overflow-y-auto text-md">
+                    <div className="grid grid-cols-2 gap-2 mb-2">
                     {(
                         [
-                            {pkg: "description",     label: "Description",   icon: "fas fa-info", placeholder: "(optional) Description"},
+                            {pkg: "name",            label: "Package Name",          icon: "fas fa-code", placeholder: "Workspace Name"},
                             {pkg: "fontawesomeIcon", label: "Icon",          icon: "fas fa-code", placeholder: "(optional) fontawesome icon"},
                         ] as Array<{pkg: keyof WorkspaceInfo, label: string, icon: string, placeholder: string}>
                     ).map((item) => (
@@ -65,14 +68,29 @@ export default function WorkspaceOptionModal() {
                     ))}
                     </div>
 
-                    <h4 className="my-4 w-full text-center font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                    <InputField
+                            key="description"
+                            label="Description"
+                            icon="fas fa-info"
+                            placeholder="(optional) Description"
+                            value={workspaceCopy?.description || ''}
+                            onChange={(e) => {
+                                if (!workspaceCopy) return;
+                                setWorkspaceCopy({
+                                    ...workspaceCopy,
+                                    description: e.target.value
+                                })
+                            }}
+                        />
+
+                    <h4 className="my-4 w-full font-semibold text-gray-500 uppercase tracking-wider flex items-center">
                         <p className="flex-1 text-sm">
-                            <i className="fas fa-terminal"></i> 
+                            <i className="fas fa-terminal mr-2"></i> 
                             <span>Scripts & Commands</span>
                         </p>
                     </h4>
 
-                    <div className="grid grid-cols-2 gap-2 bg-gray-700/30 rounded p-2">
+                    <div className="grid grid-cols-2 gap-2">
                     {(
                         [
                             {pkg: "devCommand",      label: "Dev Command",   icon: "fas fa-code", placeholder: "ex: nodemon index.js"},

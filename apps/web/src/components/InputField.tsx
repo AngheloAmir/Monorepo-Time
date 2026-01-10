@@ -15,7 +15,7 @@ export default function InputField({label, icon, placeholder, value, onChange}: 
 
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i className={`${icon} text-gray-600 group-focus-within:text-green-500 transition-colors text-md`}></i>
+                    <i className={`${icon} text-blue-500/50 group-focus-within:text-green-500 transition-colors text-md`}></i>
                 </div>
                 <input
                     type="text"

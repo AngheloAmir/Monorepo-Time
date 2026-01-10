@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { WorkspaceItem } from "../_context/workspace";
 import config from "config";
 import { io, Socket } from "socket.io-client";
@@ -14,6 +14,15 @@ export default function WorkspaceCard(props: WorkspaceItem) {
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
     const [loading, setLoading]         = useState(false);
 
+    useEffect(() => {
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                WriteConsole(props.info.name, "Terminal Disconnected");
+            }
+        };
+    }, []);
+
     const connectAndRun = (runas: 'dev' | 'start') => {
         if(loading) return;
         try {
@@ -21,35 +30,44 @@ export default function WorkspaceCard(props: WorkspaceItem) {
             setTimeout(() => setLoading(false), 2000);
 
             const port = config.apiPort || 3000;
-            const socket = io(`http://localhost:${port}`, {
-                transports: ['websocket']
-            });
-            socketRef.current = socket;
+            
+            if (!socketRef.current || !socketRef.current.connected) {
+                socketRef.current = io(`http://localhost:${port}`, {
+                    transports: ['websocket']
+                });
 
-            socketRef.current && socketRef.current.on("connect", () => {
-                setWorkSpaceRunningAs(props.info.name, runas);
-                setActiveTerminal(props.info.name);
-                socketRef.current && socketRef.current.emit('run', {
+                socketRef.current.on("connect", () => {
+                    setWorkSpaceRunningAs(props.info.name, runas);
+                    setActiveTerminal(props.info.name);
+                    socketRef.current?.emit('run', {
+                        workspace: props.info,
+                        runas: runas
+                    });
+
+                    socketRef.current?.on("log", (data) => {
+                        WriteConsole(props.info.name, data);
+                    });
+
+                    socketRef.current?.on("error", (data) => {
+                        WriteConsole(props.info.name, data);
+                    });
+
+                    socketRef.current?.on("exit", (data) => {
+                        WriteConsole(props.info.name, data);
+                    });
+
+                    socketRef.current?.on("disconnect", () => {
+                        WriteConsole(props.info.name, "Disconnected");
+                    });
+                });
+            } else {
+                 setWorkSpaceRunningAs(props.info.name, runas);
+                 setActiveTerminal(props.info.name);
+                 socketRef.current.emit('run', {
                     workspace: props.info,
                     runas: runas
                 });
-
-                socketRef.current && socketRef.current.on("log", (data) => {
-                    WriteConsole(props.info.name, data);
-                });
-
-                socketRef.current && socketRef.current.on("error", (data) => {
-                    WriteConsole(props.info.name, data);
-                });
-
-                socketRef.current && socketRef.current.on("exit", (data) => {
-                    WriteConsole(props.info.name, data);
-                });
-
-                socketRef.current && socketRef.current.on("disconnect", () => {
-                    WriteConsole(props.info.name, "Disconnected");
-                });
-            })
+            }
         } catch (e) {
             console.error(e);
             setLoading(false);

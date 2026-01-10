@@ -9,6 +9,8 @@ import { Server } from 'socket.io';
 import apiScanWorkspace from './routes/scanworkspace';
 import runCmdDevSocket  from './routes/runcmddev';
 import stopProcess      from './routes/stopcmd';
+import listWorkspaces   from './routes/listworkspace';
+import newWorkspace     from './routes/newworkspace';
 
 const app = express();
 const port = config.apiPort;
@@ -21,8 +23,10 @@ app.use(express.static('public'));
 app.use(express.json());
 
 //routes=======================================================================
-app.use("/" + apiRoute.scanWorkspace, apiScanWorkspace);
-app.use("/" + apiRoute.stopProcess, stopProcess);
+app.use("/" + apiRoute.scanWorkspace,  apiScanWorkspace);
+app.use("/" + apiRoute.stopProcess,    stopProcess);
+app.use("/" + apiRoute.listWorkspaces, listWorkspaces);
+app.use("/" + apiRoute.newWorkspace,   newWorkspace);
 
 // Socket.IO Setup ============================================================
 const httpServer = createServer(app);

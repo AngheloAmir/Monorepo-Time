@@ -30,8 +30,8 @@ export default function Workspace(props: WorkspaceProps) {
             <div className="grid grid-rows-5 h-full min-h-0 gap-2">
                 <div className="row-span-3 min-h-0 overflow-y-auto flex flex-col gap-3 p-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                        { workspace.map((item, index) => (
-                            <div key={index}>
+                        { workspace.map((item) => (
+                            <div key={ item.info.name }>
                                 <WorkspaceCard {...item} />
                             </div>
                         ))}
