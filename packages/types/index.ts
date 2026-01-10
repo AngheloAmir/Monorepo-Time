@@ -41,7 +41,6 @@ export interface DockerProcessInfo {
     //These are found inside of the package the json of the project
     fontawesomeIcon?: string;
     description?: string;
-    localUrl?: string;
     
     devCommand?: string;
     startCommand?: string;

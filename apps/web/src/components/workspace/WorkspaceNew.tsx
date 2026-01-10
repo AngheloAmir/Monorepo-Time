@@ -1,40 +1,110 @@
-import { useEffect, useState } from "react";
+import type { WorkspaceInfo } from "types";
 import useWorkspaceState from "../../_context/workspace";
-import { type WorkspaceInfo } from "types";
 import InputField from "../InputField";
+import SelectField from "../SelectField";
+import { useEffect, useState } from "react";
+import config from "config";
+import apiRoute from "apiroute";
 
-export default function WorkspaceOptionModal() {
-    const activeWorkspaceOptionModal = useWorkspaceState.use.activeWorkspaceOptionModal();
-    const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
-    const [workspaceCopy, setWorkspaceCopy] = useState<WorkspaceInfo | null>(null);
-    const [packageName, setPackageName] = useState<string>('');
+export default function WorkspaceNew() {
+    const [workspaceCopy, setWorkspaceCopy] = useState<WorkspaceInfo>(
+        {
+            name: '',
+            path: '',
+            fontawesomeIcon: '',
+            description: '',
+            devCommand: '',
+            startCommand: '',
+            stopCommand: '',
+            buildCommand: '',
+            cleanCommand: '',
+            lintCommand: '',
+            testCommand: '',
+        }
+    );
+    const [paths, setpaths]   = useState<(string | { label: string; path: string })[]>([]);
+    const showWorkspaceNew    = useWorkspaceState.use.showWorkspaceNew();
+    const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
+    const loadWorkspace       = useWorkspaceState.use.loadWorkspace();
 
     useEffect(() => {
-        if (activeWorkspaceOptionModal) {
-            setWorkspaceCopy(activeWorkspaceOptionModal);
-            setPackageName(activeWorkspaceOptionModal.name);
+        if (showWorkspaceNew) {
+            setWorkspaceCopy(
+                {
+                    name: '',
+                    path: '',
+                    fontawesomeIcon: '',
+                    description: '',
+                    devCommand: '',
+                    startCommand: '',
+                    stopCommand: '',
+                    buildCommand: '',
+                    cleanCommand: '',
+                    lintCommand: '',
+                    testCommand: '',
+                }
+            );
+            const loadPaths = async () => {
+                const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.listWorkspacesDir}`);
+                const data = await response.json();
+                setpaths(data);
+            }
+            loadPaths();
         }
-    }, [activeWorkspaceOptionModal]);
+    }, [showWorkspaceNew]);
 
     function close() {
-        setActiveWorkspaceOptionModal(null);
-        setPackageName('.');
+        setShowWorkspaceNew(false);
     }
 
-    if (!activeWorkspaceOptionModal) return null;
+    async function createWorkspace() {
+        if(workspaceCopy.name === '') return;
+        if(workspaceCopy.path === '') return;
+        const workspace = {
+            name:            workspaceCopy.name,
+            path:            workspaceCopy.path,
+            devCommand:      workspaceCopy.devCommand,
+            fontawesomeIcon: workspaceCopy.fontawesomeIcon || null,
+            description:     workspaceCopy.description     || null,
+            startCommand:    workspaceCopy.startCommand    || null,
+            stopCommand:     workspaceCopy.stopCommand     || null,
+            buildCommand:    workspaceCopy.buildCommand    || null,
+            cleanCommand:    workspaceCopy.cleanCommand    || null,
+            lintCommand:     workspaceCopy.lintCommand     || null,
+            testCommand:     workspaceCopy.testCommand     || null,
+        };
+
+        try {
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.newWorkspace}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(workspace),
+            });
+            const data = await response.json();
+            console.log(data);
+            loadWorkspace();
+        } catch (error) {
+            console.error(error);
+        }   
+    }
+
+
+
+    if (!showWorkspaceNew) return null;
     return (
         <div onClick={close} className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/70">
             <div onClick={(e) => e.stopPropagation()} className="bg-gray-800 border border-gray-700 w-[80%] md:w-[50%] max-w-[600px] h-[80%] max-h-[650x] overflow-hidden flex flex-col">
                 <header className="px-4 py-2 border-b border-gray-700 flex justify-between items-center bg-gray-800/50">
                     <div className="text-md font-bold text-white flex items-center gap-4">
-                        <i className="fas fa-cog text-blue-500 text-3xl"></i>
-
+                        <i className="fas fa-cube text-blue-500 text-3xl"></i>
                         <div className="flex flex-col">
                             <span className="text-xl">
-                                {packageName}
+                                New Workspace
                             </span>
                             <span className="text-gray-400 font-normal text-sm truncate w-full text-xs">
-                                {workspaceCopy?.path}
+                                Create a new workspace
                             </span>
                         </div>
                     </div>
@@ -83,14 +153,22 @@ export default function WorkspaceOptionModal() {
                         }}
                     />
 
-                    <h4 className="my-4 w-full font-semibold text-gray-500 uppercase tracking-wider flex items-center">
-                        <p className="flex-1 text-sm">
-                            <i className="fas fa-terminal mr-2"></i>
-                            <span>Scripts & Commands</span>
-                        </p>
-                    </h4>
+                    <SelectField
+                        label="Path"
+                        icon="fas fa-folder"
+                        placeholder="Select a path"
+                        value={workspaceCopy?.path || ''}
+                        onChange={(e) => {
+                            if (!workspaceCopy) return;
+                            setWorkspaceCopy({
+                                ...workspaceCopy,
+                                path: e.target.value
+                            })
+                        }}
+                        options={paths}
+                    /> 
 
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="mt-4 grid grid-cols-2 gap-2">
                         {(
                             [
                                 { pkg: "devCommand", label: "Dev Command", icon: "fas fa-code", placeholder: "ex: nodemon index.js" },
@@ -122,7 +200,7 @@ export default function WorkspaceOptionModal() {
 
                 <footer className="p-2 border-t border-gray-600 flex justify-end gap-4">
                     <button onClick={close} className="w-32 bg-gray-700 hover:bg-gray-600 transition-colors p-1 rounded">Cancel</button>
-                    <button onClick={close} className="w-40 bg-blue-500 hover:bg-blue-600 transition-colors p-1 rounded">Save</button>
+                    <button onClick={createWorkspace} className="w-40 bg-blue-500 hover:bg-blue-600 transition-colors p-1 rounded">New Workspace</button>
                 </footer>
             </div>
         </div>

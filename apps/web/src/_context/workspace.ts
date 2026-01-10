@@ -24,6 +24,9 @@ interface workspaceContext {
     /** name of the workspace that is still loading */
     loadingWorkspace: string | null;
 
+    /** show workspace new modal */
+    showWorkspaceNew: boolean;
+
     /** load workspace */
     loadWorkspace: () => Promise<void>;
 
@@ -51,6 +54,9 @@ interface workspaceContext {
 
     /** loading */
     loading: boolean;
+
+    /** show workspace new modal */
+    setShowWorkspaceNew: (show: boolean) => void;
 }
 
 const workspaceState = create<workspaceContext>()((set, get) => ({
@@ -59,6 +65,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     activeWorkspaceOptionModal: null,
     loadingWorkspace: null,
     loading: false,
+    showWorkspaceNew: false,
 
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => {
         set({ activeWorkspaceOptionModal: workspace });
@@ -66,6 +73,10 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
     setActiveTerminal: (terminal: string) => {
         set({ activeTerminal: terminal });
+    },
+
+    setShowWorkspaceNew: (show: boolean) => {
+        set({ showWorkspaceNew: show });
     },
 
     setWorkSpaceRunningAs: (workspaceName, runas) => {

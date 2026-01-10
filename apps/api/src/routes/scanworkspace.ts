@@ -62,7 +62,13 @@ async function isRunnableProject(dir: string) {
   const pkg = await readJSON(pkgPath);
   if (!pkg?.scripts) return false;
 
-  return Boolean(pkg.scripts.dev || pkg.scripts.start);
+  //even if the dev script or start script is empty as long it exist
+  //it is considred as runnable
+  if( pkg.scripts.dev != typeof null || pkg.scripts.start != typeof null){
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -149,15 +155,15 @@ route.get("/", async (req: Request, res: Response) => {
       return {
         name: pkg.name || path.basename(p),
         path: p,
-        fontawesomeIcon: pkg.fontawesomeIcon || null,
-        description: pkg.description || null,
-        devCommand: pkg.scripts?.dev || null,
-        startCommand: pkg.scripts?.start || null,
-        stopCommand: pkg.scripts?.stop || null,
-        buildCommand: pkg.scripts?.build || null,
-        cleanCommand: pkg.scripts?.clean || null,
-        lintCommand: pkg.scripts?.lint || null,
-        testCommand: pkg.scripts?.test || null,
+        fontawesomeIcon: (pkg.fontawesomeIcon != typeof null) ? pkg.fontawesomeIcon : null,
+        description:   (pkg.description != typeof null) ? pkg.description : null,
+        devCommand:   (pkg.scripts.dev != typeof null) ? pkg.scripts.dev : null,
+        startCommand: (pkg.scripts.start != typeof null) ? pkg.scripts.start : null,
+        stopCommand:  (pkg.scripts.stop != typeof null) ? pkg.scripts.stop : null,
+        buildCommand: (pkg.scripts.build != typeof null) ? pkg.scripts.build : null,
+        cleanCommand: (pkg.scripts.clean != typeof null) ? pkg.scripts.clean : null,
+        lintCommand:  (pkg.scripts.lint != typeof null) ? pkg.scripts.lint : null,
+        testCommand:  (pkg.scripts.test != typeof null) ? pkg.scripts.test : null,
       } as WorkspaceInfo;
     }))).filter(Boolean); // Filter out any failed reads
 
