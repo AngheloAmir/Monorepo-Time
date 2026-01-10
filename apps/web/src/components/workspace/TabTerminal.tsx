@@ -1,6 +1,50 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useWorkspaceState from "../../_context/workspace";
 import Console from "../Console";
+import { Terminal } from "xterm";
+
+// Wrapper to sync string-based state (consoleOutput) with stream-based xterm
+function TerminalController({ output, visible }: { output: string; visible: boolean }) {
+    const terminalRef = useRef<Terminal | null>(null);
+    const lastOutputLen = useRef(0);
+
+    useEffect(() => {
+        // If terminal not ready, wait
+        if (!terminalRef.current) return;
+
+        // Detect if the store was cleared (e.g. user clicked clear)
+        if (output.length < lastOutputLen.current) {
+            terminalRef.current.reset();
+            lastOutputLen.current = 0;
+        }
+
+        // Write only the new part of the string
+        const newContent = output.slice(lastOutputLen.current);
+        if (newContent) {
+            terminalRef.current.write(newContent);
+            lastOutputLen.current = output.length;
+        }
+    }, [output]);
+
+    // Force layouts when becoming visible to ensure xterm fits correctly
+    useEffect(() => {
+        if (visible && terminalRef.current) {
+            // Small delay to allow DOM to paint
+            setTimeout(() => {
+                // Trigger a resize event or re-fit if we had access to addon. 
+                // Since Console handles ResizeObserver, just ensuring the div is visible should trigger it.
+                // But sometimes manual trigger is needed. Console doesn't expose fit directly but ResizeObserver on div
+                // should notice 0x0 -> WxH change.
+            }, 10);
+        }
+    }, [visible]);
+
+    return (
+        <div className={`w-full h-full ${visible ? 'block' : 'hidden'}`}>
+             <Console terminalRef={terminalRef} />
+        </div>
+    );
+}
 
 export default function TabTerminal() {
     const workspace = useWorkspaceState.use.workspace();
@@ -68,25 +112,25 @@ export default function TabTerminal() {
             </header>
 
 
-            <div className="flex-1 overflow-y-auto bg-gray-900 p-2">
+            <div className="flex-1 overflow-hidden bg-gray-900 p-2 relative">
                 {/* all workspace have active console but are made invisible */}
 
                 {activeTerminal == '' && (
-                    <div className="flex-1 flex gap-4 items-center justify-center mt-8 opacity-40">
+                    <div className="absolute inset-0 flex gap-4 items-center justify-center opacity-40 select-none pointer-events-none">
                         <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center shadow-inner">
                             <i className="fas fa-terminal text-md text-gray-600"></i>
                         </div>
-                        <span className="text-[16px]">Terminal</span>
+                        <span className="text-[16px] text-gray-500">Terminal</span>
                     </div>
                 )}
 
                 {workspace.map((item) => (
-                    <Console
+                    <TerminalController
                         key={item.info.name}
-                        consoleOutput={item.consoleOutput}
-                        show={
+                        output={item.consoleOutput || ""}
+                        visible={
                             activeTerminal == item.info.name &&
-                            (item.isRunningAs == 'dev' || item.isRunningAs == 'start')
+                            (item.isRunningAs == 'dev' || item.isRunningAs == 'start' || false)
                         }
                     />
                 ))}

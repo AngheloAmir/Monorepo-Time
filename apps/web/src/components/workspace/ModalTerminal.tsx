@@ -9,18 +9,24 @@ import { io, Socket } from "socket.io-client";
 export default function ModalTerminal() {
     const showNewTerminalWindow = useWorkspaceState.use.showNewTerminalWindow();
     const setShowNewTerminalWindow = useWorkspaceState.use.setShowNewTerminalWindow();
-    const [output, setOutput]       = useState("");
-    const [inputText, setInputText] = useState("");
     const [processActive, setProcessActive] = useState(false);
     
+    // We use a ref to access the xterm instance directly for writing data
+    const terminalRef = useRef<any>(null); // Type 'any' or 'Terminal' if available
     const socketRef = useRef<Socket | null>(null);
 
     useEffect(() => {
         if (showNewTerminalWindow) {
+            // Write initial banner
             const firstLine  = `\x1b[34m[PATH]\x1b[0m \x1b[32m${showNewTerminalWindow?.path}\x1b[0m`;
             const secondLine = `\x1b[34m[SYSTEM]\x1b[0m Please enter your command prompt.`;
             const thirdLine  = `\x1b[34m[SYSTEM]\x1b[0m Example: npm install nodemon -D`;
-            setOutput(`${firstLine}\n${secondLine}\n${thirdLine}`);
+            const prompt     = `\r\n$ `;
+            
+            // Wait a tick for the terminal ref to be populated
+            setTimeout(() => {
+                terminalRef.current?.write(`${firstLine}\r\n${secondLine}\r\n${thirdLine}${prompt}`);
+            }, 100);
 
             // Initialize socket connection
             const port = config.apiPort || 3000;
@@ -29,28 +35,24 @@ export default function ModalTerminal() {
             });
 
             socketRef.current.on('connect', () => {
-                // Connection established, ready for commands
+                // Connection established
             });
 
             socketRef.current.on('terminal:log', (data: string) => {
-                setOutput(prev => prev + data);
+                terminalRef.current?.write(data);
             });
 
             socketRef.current.on('terminal:error', (data: string) => {
-                 setOutput(prev => prev + `\x1b[31m${data}\x1b[0m`);
+                 terminalRef.current?.write(`\x1b[31m${data}\x1b[0m`);
             });
 
             socketRef.current.on('terminal:exit', (code: number) => {
                 setProcessActive(false);
                 if (code === 0) {
-                     setOutput(prev => prev + `\n\x1b[32mCommand finished successfully.\x1b[0m\n`);
+                     terminalRef.current?.write(`\r\n\x1b[32mCommand finished successfully.\x1b[0m\r\n$ `);
                 } else {
-                     setOutput(prev => prev + `\n\x1b[31mCommand failed with exit code ${code}.\x1b[0m\n`);
+                     terminalRef.current?.write(`\r\n\x1b[31mCommand failed with exit code ${code}.\x1b[0m\r\n$ `);
                 }
-                // We don't close the socket here automatically to allow user to read output, 
-                // but the process on backend is killed. User can close modal or run another command?
-                // The requirements say: "WAIT for another user input to execute."
-                // So we stay open.
             });
 
             return () => {
@@ -65,30 +67,42 @@ export default function ModalTerminal() {
         setShowNewTerminalWindow(null);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!inputText) return;
+    // Buffer to hold current command line input for local echo before sending
+    const commandLineBuffer = useRef("");
 
-        const userInput = inputText;
-        setInputText("");
-
-        if (!socketRef.current) return;
-
-        // If process is NOT active, treat input as a new command to start
+    const handleTerminalData = (data: string) => {
         if (!processActive) {
-            setOutput(prev => prev + `\n\x1b[33m$ ${userInput}\x1b[0m\n`);
-            setProcessActive(true);
-            socketRef.current.emit('terminal:start', {
-                workspace: showNewTerminalWindow,
-                command: userInput
-            });
-        } 
-        // If process IS active, treat input as stdin for the running process
-        else {
-             // Echo input to console (optional, but good for feedback)
-             setOutput(prev => prev + `${userInput}\n`);
-             socketRef.current.emit('terminal:input', userInput);
+            // "Shell" mode emulation
+            // We need to implement basic line editing for the 'shell' prompt ($ )
+            if (data === '\r') { // Enter
+                const cmd = commandLineBuffer.current;
+                terminalRef.current?.write('\r\n');
+                
+                if (cmd.trim()) {
+                    setProcessActive(true);
+                    socketRef.current?.emit('terminal:start', {
+                        workspace: showNewTerminalWindow,
+                        command: cmd.trim()
+                    });
+                } else {
+                   terminalRef.current?.write('$ ');
+                }
+                commandLineBuffer.current = "";
+            } else if (data === '\u007F') { // Backspace
+                if (commandLineBuffer.current.length > 0) {
+                    commandLineBuffer.current = commandLineBuffer.current.slice(0, -1);
+                    terminalRef.current?.write('\b \b');
+                }
+            } else if (data >= ' ' && data <= '~') { // Printable characters
+                commandLineBuffer.current += data;
+                terminalRef.current?.write(data);
+            }
+            // Ignore other keys (arrows, etc) in this simple shell prompt
+        } else {
+            // "Interactive" mode: raw passthrough to backend PTY
+            // PTY handles echo, so we usually don't echo locally unless PTY is dumb
+            // With python pty, it echoes.
+            socketRef.current?.emit('terminal:input', data);
         }
     };
 
@@ -102,24 +116,16 @@ export default function ModalTerminal() {
                 icon="fas fa-terminal text-blue-500 text-xl"
             />
 
-            <div className="flex-1 overflow-y-auto p-3">
+            <div className="flex-1 overflow-hidden p-3 bg-gray-900">
                 <Console
-                    consoleOutput={output}
-                    show={true}
+                    terminalRef={terminalRef}
+                    onData={handleTerminalData}
                 />
             </div>
-
-            <form onSubmit={handleSubmit} className="flex-none flex gap-4 w-full p-2">
-                <input 
-                    type="text" 
-                    className="w-full h-8 p-1 rounded-md border border-gray-600 bg-gray-900 text-gray-100 focus:outline-none focus:border-blue-500" 
-                    value={inputText} 
-                    onChange={(e) => setInputText(e.target.value)}
-                    placeholder={processActive ? "Type input..." : "Enter command..."}
-                    autoFocus
-                />
+            
+            <div className="flex-none p-2 flex justify-end">
                 <button type="button" onClick={close} className="bg-gray-700 hover:bg-gray-600 text-gray-100 px-4 py-1 rounded-md">Close</button>
-            </form>
+            </div>
         </ModalBody>
     );
 }
