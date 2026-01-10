@@ -11,6 +11,7 @@ import runCmdDevSocket   from './routes/runcmddev';
 import stopProcess       from './routes/stopcmd';
 import listWorkspacesDir from './routes/listworkspacedirs';
 import newWorkspace      from './routes/newworkspace';
+import interactiveTerminal from './routes/interactiveTerminal';
 
 const app = express();
 const port = config.apiPort;
@@ -27,6 +28,7 @@ app.use("/" + apiRoute.scanWorkspace,     apiScanWorkspace);
 app.use("/" + apiRoute.stopProcess,       stopProcess);
 app.use("/" + apiRoute.listWorkspacesDir, listWorkspacesDir);
 app.use("/" + apiRoute.newWorkspace,      newWorkspace);
+app.use("/" + apiRoute.interactvTerminal, interactiveTerminal);
 
 // Socket.IO Setup ============================================================
 const httpServer = createServer(app);

@@ -4,6 +4,7 @@ const apiRoute = {
     stopProcess:       'stopprocess',
     listWorkspacesDir: 'listworkspacedirs',
     newWorkspace:      'newworkspace',
+    interactvTerminal: 'interactvterminal'
 }
 
 export default apiRoute;
