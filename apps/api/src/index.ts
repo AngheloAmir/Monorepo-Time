@@ -11,7 +11,7 @@ import runCmdDevSocket   from './routes/runcmddev';
 import stopProcess       from './routes/stopcmd';
 import listWorkspacesDir from './routes/listworkspacedirs';
 import newWorkspace      from './routes/newworkspace';
-import interactiveTerminal from './routes/interactiveTerminal';
+import interactiveTerminal, { interactiveTerminalSocket } from './routes/interactiveTerminal';
 
 const app = express();
 const port = config.apiPort;
@@ -40,6 +40,7 @@ const io         = new Server(httpServer, {
   transports: ['websocket', 'polling']
 });
 runCmdDevSocket( io );
+interactiveTerminalSocket( io );
 
 //=============================================================================
 httpServer.listen(port, () => {
