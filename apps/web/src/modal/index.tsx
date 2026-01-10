@@ -25,7 +25,7 @@ export default function Modal() {
 
     return (
         <div>
-            {currentModal == 'alert' && (
+            {currentModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
                     <div className="w-[500px] min-h-[200px] max-h-[300px] flex flex-col bg-gray-800 p-4 rounded-xl shadow-lg">
                         <div className="flex-1  ">
@@ -36,16 +36,42 @@ export default function Modal() {
                             <p className="text-gray-300">{message}</p>
                         </div>
 
-                        <button
-                            onClick={() => {
-                                callback && callback();
-                                hideModal();
-                            }}
-                            autoFocus
-                            className={`w-[80%] mx-auto py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
-                        >
-                            OK
-                        </button>
+                        {currentModal === 'alert' && (
+                             <button
+                                onClick={() => {
+                                    callback && callback(undefined);
+                                    hideModal();
+                                }}
+                                autoFocus
+                                className={`w-[80%] mx-auto py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
+                            >
+                                OK
+                            </button>
+                        )}
+
+                        {currentModal === 'confirm' && (
+                            <div className="flex gap-4 justify-end">
+                                <button
+                                    onClick={() => {
+                                        callback && callback(false);
+                                        hideModal();
+                                    }}
+                                    className="px-4 py-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        callback && callback(true);
+                                        hideModal();
+                                    }}
+                                    className={`px-4 py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
+                                >
+                                    OK
+                                </button>
+                            </div>
+                        )}
+                       
                     </div>
                 </div>
             )}

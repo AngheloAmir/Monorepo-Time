@@ -10,6 +10,7 @@ import Setting from './contents/Setting';
 import Modal from './modal';
 import RootTerminal from './components/RootTerminal';
 
+
 function App() {
     const currentPage = useNavState.use.currentPage();
 

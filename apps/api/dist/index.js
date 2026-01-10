@@ -53,6 +53,8 @@ const interactiveTerminal_1 = __importStar(require("./routes/interactiveTerminal
 const updateworkspace_1 = __importDefault(require("./routes/updateworkspace"));
 const vscodeHideShow_1 = __importDefault(require("./routes/vscodeHideShow"));
 const rootPath_1 = __importDefault(require("./routes/rootPath"));
+const scafoldrepo_1 = __importDefault(require("./routes/scafoldrepo"));
+const turborepoexist_1 = __importDefault(require("./routes/turborepoexist"));
 const app = (0, express_1.default)();
 exports.app = app;
 const port = config_1.default.apiPort;
@@ -71,6 +73,8 @@ app.use("/" + apiroute_1.default.interactvTerminal, interactiveTerminal_1.defaul
 app.use("/" + apiroute_1.default.updateWorkspace, updateworkspace_1.default);
 app.use("/" + apiroute_1.default.hideShowFileFolder, vscodeHideShow_1.default);
 app.use("/" + apiroute_1.default.getRootPath, rootPath_1.default);
+app.use("/" + apiroute_1.default.scaffoldRepo, scafoldrepo_1.default);
+app.use("/" + apiroute_1.default.turborepoExist, turborepoexist_1.default);
 // Socket.IO Setup ============================================================
 const httpServer = (0, http_1.createServer)(app);
 exports.httpServer = httpServer;
