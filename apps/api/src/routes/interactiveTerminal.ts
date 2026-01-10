@@ -32,64 +32,88 @@ export function interactiveTerminalSocket(io: Server) {
             }
 
             try {
-                // Prepare environment: Remove CI to allow interactivity
-                // Set TERM to xterm-256color because we are now using xterm.js frontend which supports it
                 const env: NodeJS.ProcessEnv = { ...process.env };
                 delete env.CI;
                 env.TERM = 'xterm-256color';
-                env.CMD = command;
                 env.FORCE_COLOR = '1';
 
-                // Python script to bridge PTY
-                // We use python3 pty module to provide a real TTY
-                // We wrap the command in stty to ensure reasonable window size (80x24) to prevent wrapping issues
-                const pythonScript = `
+                let child: ChildProcess;
+
+                if (process.platform === 'win32') {
+                    // Windows does not support the python pty module.
+                    // We fall back to standard spawn with shell: true.
+                    // Interactivity might be limited (arrow keys might not work in some apps),
+                    // but standard input/output should function.
+                    socket.emit('terminal:log', '\x1b[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1b[0m\r\n');
+                    
+                    const baseCMD = command.split(" ")[0];
+                    const args = command.split(" ").slice(1);
+                    
+                    child = spawn(baseCMD, args, {
+                        cwd: workspace.path,
+                        env: env,
+                        shell: true,
+                        stdio: ['pipe', 'pipe', 'pipe']
+                    });
+                } else {
+                    // Linux/Mac: Use Python PTY bridge for full interactivity
+                    env.CMD = command;
+                    const pythonScript = `
 import pty, sys, os
 
-cmd = os.environ.get('CMD')
-if not cmd:
-    sys.exit(1)
+try:
+    cmd = os.environ.get('CMD')
+    if not cmd:
+        sys.exit(1)
 
-# pty.spawn(argv) executes argv and connects stdin/stdout to pty
-status = pty.spawn(['/bin/bash', '-c', 'stty cols 80 rows 24; ' + cmd])
+    # pty.spawn(argv) executes argv and connects stdin/stdout to pty
+    status = pty.spawn(['/bin/bash', '-c', 'stty cols 80 rows 24; ' + cmd])
 
-if os.WIFEXITED(status):
-    sys.exit(os.WEXITSTATUS(status))
-else:
+    if os.WIFEXITED(status):
+        sys.exit(os.WEXITSTATUS(status))
+    else:
+        sys.exit(1)
+except ImportError:
+    sys.exit(127) # Return special code if pty module missing (unlikely on unix)
+except Exception as e:
     sys.exit(1)
 `;
-                
-                const child = spawn('python3', ['-u', '-c', pythonScript], {
-                    cwd: workspace.path,
-                    env: env,
-                    stdio: ['pipe', 'pipe', 'pipe']
-                });
+                    child = spawn('python3', ['-u', '-c', pythonScript], {
+                        cwd: workspace.path,
+                        env: env,
+                        stdio: ['pipe', 'pipe', 'pipe']
+                    });
+                }
 
                 activeTerminals.set(socket.id, child);
 
-                socket.emit('terminal:log', `\n$ ${command}\n`);
+                socket.emit('terminal:log', `\r\n$ ${command}\r\n`);
 
                 child.stdout?.on('data', (chunk) => {
                     socket.emit('terminal:log', chunk.toString());
                 });
 
                 child.stderr?.on('data', (chunk) => {
-                    // Start 1-10T15... is how npm often outputs. We can just emit log or error.
-                    // Stderr is not always an error (e.g. warnings), but let's send it to log for now
-                    // or separate event if frontend distinguishes colors.
                     socket.emit('terminal:log', chunk.toString()); 
                 });
 
-                child.on('error', (err) => {
-                    socket.emit('terminal:error', `Failed to start command: ${err.message}`);
+                child.on('error', (err: any) => {
+                    if (err.code === 'ENOENT' && process.platform !== 'win32') {
+                         socket.emit('terminal:error', '\r\n\x1b[31mError: Python3 is required for interactive mode on Linux/Mac but was not found.\x1b[0m');
+                    } else {
+                         socket.emit('terminal:error', `Failed to start command: ${err.message}`);
+                    }
                     cleanup(socket.id);
                 });
 
                 child.on('exit', (code) => {
-                    if (code !== 0) {
-                        socket.emit('terminal:error', `\nProcess exited with code ${code}`);
+                    // Check for our custom "Python missing pty" code or general failure logic
+                   if (code === 127 && process.platform !== 'win32') {
+                         socket.emit('terminal:error', '\r\n\x1b[31mError: Python PTY module issue.\x1b[0m');
+                    } else if (code !== 0) {
+                        socket.emit('terminal:error', `\r\nProcess exited with code ${code}`);
                     } else {
-                        socket.emit('terminal:log', `\nProcess finished successfully.`);
+                        socket.emit('terminal:log', `\r\nProcess finished successfully.`);
                     }
                     socket.emit('terminal:exit', code);
                     cleanup(socket.id);

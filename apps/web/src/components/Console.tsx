@@ -35,7 +35,7 @@ export default function Console(props: ConsoleProps) {
         const term = new Terminal({
             cursorBlink: true,
             fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-            fontSize: 14,
+            fontSize: 15,
             theme: {
                 background: '#111827', // matching bg-gray-900 roughly
                 foreground: '#f3f4f6',
