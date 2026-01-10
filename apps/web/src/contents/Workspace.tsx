@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import useWorkspaceState from "../_context/workspace"
-import TabTerminal from "../components/TabTerminal";
-import WorkspaceCard from "../components/WorkSpaceCard";
+import TabTerminal from "../components/workspace/TabTerminal";
+import WorkspaceCard from "../components/workspace/WorkSpaceCard";
 import WorkspaceOptionModal from "../components/workspace/WorkspaceOptionModal";
 import WorkspaceNew from "../components/workspace/WorkspaceNew";
+import ModalTerminal from "../components/workspace/ModalTerminal";
 
 interface WorkspaceProps {
     isVisible: boolean
@@ -61,6 +62,7 @@ export default function Workspace(props: WorkspaceProps) {
 
             <WorkspaceOptionModal />
             <WorkspaceNew />
+            <ModalTerminal />
         </div>
     )
 }

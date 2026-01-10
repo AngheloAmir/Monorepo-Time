@@ -1,9 +1,8 @@
 import { useRef, useState, useEffect } from "react";
-import type { WorkspaceItem } from "../_context/workspace";
+import type { WorkspaceItem } from "../../_context/workspace";
 import config from "config";
 import { io, Socket } from "socket.io-client";
-import useWorkspaceState from "../_context/workspace";
-import apiRoute from "apiroute";
+import useWorkspaceState from "../../_context/workspace";
 
 export default function WorkspaceCard(props: WorkspaceItem) {
     const socketRef = useRef<Socket | null>(null);
@@ -12,6 +11,8 @@ export default function WorkspaceCard(props: WorkspaceItem) {
     const setWorkSpaceRunningAs         = useWorkspaceState.use.setWorkSpaceRunningAs();
     const setActiveTerminal             = useWorkspaceState.use.setActiveTerminal();
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
+    const setShowNewTerminalWindow      = useWorkspaceState.use.setShowNewTerminalWindow();
+    const stopProcess                   = useWorkspaceState.use.stopProcess();
     const loadingWorkspace              = useWorkspaceState.use.loadingWorkspace();
     const [loading, setLoading]         = useState(false);
 
@@ -54,21 +55,10 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                         runas: runas
                     });
 
-                    socketRef.current?.on("log", (data) => {
-                        WriteConsole(props.info.name, data);
-                    });
-
-                    socketRef.current?.on("error", (data) => {
-                        WriteConsole(props.info.name, data);
-                    });
-
-                    socketRef.current?.on("exit", (data) => {
-                        WriteConsole(props.info.name, data);
-                    });
-
-                    socketRef.current?.on("disconnect", () => {
-                        WriteConsole(props.info.name, "Disconnected");
-                    });
+                    socketRef.current?.on("log", (data)    => { WriteConsole(props.info.name, data); });
+                    socketRef.current?.on("error", (data)  => { WriteConsole(props.info.name, data); });
+                    socketRef.current?.on("exit", (data)   => { WriteConsole(props.info.name, data); });
+                    socketRef.current?.on("disconnect", () => { WriteConsole(props.info.name, "Disconnected"); });
                 });
             } else {
                  setWorkSpaceRunningAs(props.info.name, runas);
@@ -89,17 +79,9 @@ export default function WorkspaceCard(props: WorkspaceItem) {
         try {
             setLoading(true);
             WriteConsole(props.info.name, "..");
-
-            await fetch(`http://localhost:${config.apiPort}/${apiRoute.stopProcess}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ workspace: props.info })
-            });
+            await stopProcess(props.info.name);
             setWorkSpaceRunningAs(props.info.name, null);
             setLoading(false);
-            
             clearConsole(props.info.name);
         } catch (e) {
             console.error(e);
@@ -109,9 +91,9 @@ export default function WorkspaceCard(props: WorkspaceItem) {
 
     return (
         <div className="bg-gray-800 border border-gray-700 overflow-hidden flex flex-col">
-            <header className="p-2 flex-1 flex gap-4">
+            <header className="p-2 flex-1 flex gap-4 items-center">
                 <i className={`${props.info.fontawesomeIcon ?? 'fa fa-cube'} text-blue-400 text-3xl`}></i>
-                <div className="flex flex-col h-10 overflow-hidden">
+                <div className="flex flex-col h-10 overflow-hidden flex-1">
                     <h3 className="text-base font-bold text-white leading-tight mb-0.5 ">
                         {props.info.name}
                     </h3>
@@ -119,6 +101,12 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                         {props.info.description}
                     </p>
                 </div>
+                
+                <button 
+                    onClick={() => setShowNewTerminalWindow(props.info)} 
+                    className="text-gray-500 hover:text-white" >
+                    <i className="fas fa-terminal text-sm"></i>
+                </button>
             </header>
 
             <div className="p-3 bg-gray-900/30 border-t border-gray-800 flex gap-2 relative">

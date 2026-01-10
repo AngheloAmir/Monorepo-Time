@@ -27,7 +27,7 @@ interface workspaceContext {
     /** show workspace new modal */
     showWorkspaceNew: boolean;
 
-    /** load workspace */
+    /** load/refresh the content of workspaces */
     loadWorkspace: () => Promise<void>;
 
     /** set active terminal */
@@ -49,14 +49,24 @@ interface workspaceContext {
     /** set workspace running as */
     setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | null) => void;
 
-    /** stop process */
-    stopProcess: (workspaceName: string) => Promise<void>;
-
     /** loading */
     loading: boolean;
 
     /** show workspace new modal */
     setShowWorkspaceNew: (show: boolean) => void;
+
+    /** It has content of workspace to show new terminal window */
+    showNewTerminalWindow: WorkspaceInfo | null;
+
+    /** Close or show a terminal window */
+    setShowNewTerminalWindow: (workspace: WorkspaceInfo | null) => void;
+
+    ///API calls
+    //function that calls API
+    stopProcess: (workspaceName: string) => Promise<void>;
+    listWorkspace: () => Promise<any>;
+    createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
+
 }
 
 const workspaceState = create<workspaceContext>()((set, get) => ({
@@ -66,6 +76,11 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     loadingWorkspace: null,
     loading: false,
     showWorkspaceNew: false,
+    showNewTerminalWindow: null,
+
+    setShowNewTerminalWindow: (workspace: WorkspaceInfo | null) => {
+        set({ showNewTerminalWindow: workspace });
+    },
 
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => {
         set({ activeWorkspaceOptionModal: workspace });
@@ -98,17 +113,17 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
     writeOnConsole: (workspaceName: string, output: string) => {
         const workspace = get().workspace.find((item) => item.info.name === workspaceName);
-        const trimed    = output.trim();
+        const trimed = output.trim();
         if (workspace && trimed) {
             set({
                 workspace: get().workspace.map((item) => {
                     if (item.info.name === workspaceName) {
                         return {
                             ...item,
-                            consoleOutput: 
-                                item.consoleOutput ? 
-                                `${item.consoleOutput}\n${trimed}` : 
-                                trimed
+                            consoleOutput:
+                                item.consoleOutput ?
+                                    `${item.consoleOutput}\n${trimed}` :
+                                    trimed
                         }
                     }
                     return item;
@@ -152,20 +167,20 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
             const newWorkspace: WorkspaceItem[] = [];
             const currentWorkspace = get().workspace;
-            workspaceResponse.workspace.forEach((item :WorkspaceInfo) => {
+            workspaceResponse.workspace.forEach((item: WorkspaceInfo) => {
                 //if already exist in workspace dont add to make sure data is not cleared
                 //but refresh only the information
                 if (currentWorkspace.find((i) => i.info.name === item.name)) {
                     newWorkspace.push({
-                        isRunningAs:   currentWorkspace.find((i) => i.info.name === item.name)?.isRunningAs ?? null,
+                        isRunningAs: currentWorkspace.find((i) => i.info.name === item.name)?.isRunningAs ?? null,
                         consoleOutput: currentWorkspace.find((i) => i.info.name === item.name)?.consoleOutput ?? null,
-                        info:          item
+                        info: item
                     })
                 } else {
                     newWorkspace.push({
-                        isRunningAs:   null,
+                        isRunningAs: null,
                         consoleOutput: null,
-                        info:          item
+                        info: item
                     })
                 }
             })
@@ -177,7 +192,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
                 return 0;
             });
 
-            set({  workspace: alphabeticalWorkspace });
+            set({ workspace: alphabeticalWorkspace });
         } catch (error) {
             console.error('Error fetching workspace:', error);
             set({
@@ -188,6 +203,9 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         set({ loading: false });
     },
 
+    //==========================================================================
+    // API calls
+    //==========================================================================
     stopProcess: async (workspaceName: string) => {
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
@@ -209,7 +227,37 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         }
 
         set({ loadingWorkspace: null });
+    },
+
+    listWorkspace: async () => {
+        try {
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.listWorkspacesDir}`);
+            if (!response.ok) {
+                throw new Error('Failed to list workspace');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error listing workspace:', error);
+            return [];
+        }
+    },
+
+    createNewWorkspace: async (workspaceName: WorkspaceInfo) => {
+        try {
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.newWorkspace}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(workspaceName),
+            });
+            await response.json();
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
+
 }));
 
 const useWorkspaceState = createSelectors(workspaceState);

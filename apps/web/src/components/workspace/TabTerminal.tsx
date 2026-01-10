@@ -1,6 +1,6 @@
 import { useState } from "react";
-import useWorkspaceState from "../_context/workspace";
-import Console from "./Console";
+import useWorkspaceState from "../../_context/workspace";
+import Console from "../Console";
 
 export default function TabTerminal() {
     const workspace = useWorkspaceState.use.workspace();
