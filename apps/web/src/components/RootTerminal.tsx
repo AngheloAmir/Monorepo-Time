@@ -36,9 +36,8 @@ export default function RootTerminal() {
 
             socketRef.current.on('connect', () => {
                 const firstLine  = `\x1b[34m[PATH]\x1b[0m \x1b[32m${rootPath}\x1b[0m`;
-                const secondLine = `\x1b[34m[SYSTEM]\x1b[0m Root Terminal`;
                 const prompt     = `\r\n$ `;
-                terminalRef.current?.write(`${firstLine}\r\n${secondLine}${prompt}`);
+                terminalRef.current?.write(`${firstLine}${prompt}`);
             });
 
             socketRef.current.on('terminal:log', (data: string) => {
