@@ -153,10 +153,9 @@ export default function ModalTerminal() {
                     className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all
                         ${processActive 
                             ? 'bg-gray-700 text-gray-500 cursor-not-allowed opacity-50' 
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20'
+                            : 'bg-gray-800 hover:bg-gray-700 text-white'
                         }`}
                 >
-                    <i className="fas fa-magic"></i>
                     <span>Project Templates</span>
                     <i className={`fas fa-chevron-down transition-transform ${isTemplateMenuOpen ? 'rotate-180' : ''}`}></i>
                 </button>
