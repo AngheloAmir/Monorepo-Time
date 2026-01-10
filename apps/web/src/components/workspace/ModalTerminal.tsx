@@ -64,6 +64,9 @@ export default function ModalTerminal() {
     }, [showNewTerminalWindow]);
 
     const close = () => {
+        if(socketRef.current) {
+            socketRef.current.disconnect();
+        }
         setShowNewTerminalWindow(null);
     };
 
@@ -121,10 +124,6 @@ export default function ModalTerminal() {
                     terminalRef={terminalRef}
                     onData={handleTerminalData}
                 />
-            </div>
-            
-            <div className="flex-none p-2 flex justify-end">
-                <button type="button" onClick={close} className="bg-gray-700 hover:bg-gray-600 text-gray-100 px-4 py-1 rounded-md">Close</button>
             </div>
         </ModalBody>
     );

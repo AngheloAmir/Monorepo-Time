@@ -19,3 +19,5 @@ export default function Header() {
         </header>
     )
 }
+
+// npx create-vite@latest . --template react-ts

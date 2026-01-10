@@ -32,18 +32,36 @@ export function interactiveTerminalSocket(io: Server) {
             }
 
             try {
-                const baseCMD = command.split(" ")[0];
-                const args = command.split(" ").slice(1);
+                // Prepare environment: Remove CI to allow interactivity
+                // Set TERM to xterm-256color because we are now using xterm.js frontend which supports it
+                const env: NodeJS.ProcessEnv = { ...process.env };
+                delete env.CI;
+                env.TERM = 'xterm-256color';
+                env.CMD = command;
+                env.FORCE_COLOR = '1';
+
+                // Python script to bridge PTY
+                // We use python3 pty module to provide a real TTY
+                // We wrap the command in stty to ensure reasonable window size (80x24) to prevent wrapping issues
+                const pythonScript = `
+import pty, sys, os
+
+cmd = os.environ.get('CMD')
+if not cmd:
+    sys.exit(1)
+
+# pty.spawn(argv) executes argv and connects stdin/stdout to pty
+status = pty.spawn(['/bin/bash', '-c', 'stty cols 80 rows 24; ' + cmd])
+
+if os.WIFEXITED(status):
+    sys.exit(os.WEXITSTATUS(status))
+else:
+    sys.exit(1)
+`;
                 
-                // Use shell: true to support commands like 'npm' directly
-                const child = spawn(baseCMD, args, {
+                const child = spawn('python3', ['-u', '-c', pythonScript], {
                     cwd: workspace.path,
-                    env: {
-                        ...process.env,
-                        TERM: 'dumb', // Suppress most interactive spinners/animations
-                        CI: 'true'    // Further hints to CLI tools to be less interactive/animated
-                    },
-                    shell: true,
+                    env: env,
                     stdio: ['pipe', 'pipe', 'pipe']
                 });
 
@@ -86,10 +104,8 @@ export function interactiveTerminalSocket(io: Server) {
         socket.on('terminal:input', (input: string) => {
             const child = activeTerminals.get(socket.id);
             if (child && child.stdin) {
-                // Ensure newline is sent if that's what user expects, 
-                // but usually user input from form doesn't have \n.
-                // CLI usually expects \n to process line.
-                child.stdin.write(input + '\n');
+                // With PTY bridge, we send raw input. PTY handles newlines/signals.
+                child.stdin.write(input);
             }
         });
 

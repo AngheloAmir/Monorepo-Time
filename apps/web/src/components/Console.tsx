@@ -20,6 +20,13 @@ export default function Console(props: ConsoleProps) {
     const divRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
     const fitAddonRef = useRef<FitAddon | null>(null);
+    
+    // Store the latest onData callback in a ref to avoid stale closures in the xterm listener
+    const onDataRef = useRef(props.onData);
+    
+    useEffect(() => {
+        onDataRef.current = props.onData;
+    }, [props.onData]);
 
     useEffect(() => {
         if (!divRef.current) return;
@@ -65,8 +72,8 @@ export default function Console(props: ConsoleProps) {
         }
 
         term.onData((data) => {
-            if (props.onData) {
-                props.onData(data);
+            if (onDataRef.current) {
+                onDataRef.current(data);
             }
         });
 
