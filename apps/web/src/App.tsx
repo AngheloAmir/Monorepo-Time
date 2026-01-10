@@ -1,13 +1,13 @@
 import Header from './components/Header'
 import Navigation from './components/Navigation'
-import Home from './pages/Home'
+import Home from './contents/Home'
 
 import useNavState from "./_context/navigation";
-import Workspace from './pages/Workspace';
-import Turborepo from './pages/Turborepo';
-import TurboCICD from './pages/TurboCICD';
-import CRUDTester from './pages/CRUDTester';
-import Setting from './pages/Setting';
+import Workspace from './contents/Workspace';
+import Turborepo from './contents/Turborepo';
+import TurboCICD from './contents/TurboCICD';
+import CRUDTester from './contents/CRUDTester';
+import Setting from './contents/Setting';
 import Modal from './modal';
 
 function App() {
