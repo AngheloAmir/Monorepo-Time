@@ -58,7 +58,7 @@ interface workspaceContext {
     /** It has content of workspace to show new terminal window */
     showNewTerminalWindow: WorkspaceInfo | null;
 
-    /** Close or show a terminal window */
+    /** Close or show a terminal window for the particular workspace */
     setShowNewTerminalWindow: (workspace: WorkspaceInfo | null) => void;
 
     ///API calls

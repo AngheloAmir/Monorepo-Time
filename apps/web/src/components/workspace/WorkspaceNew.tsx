@@ -20,6 +20,7 @@ export default function WorkspaceNew() {
     const workspace = useWorkspaceState.use.workspace();
     const createNewWorkspace = useWorkspaceState.use.createNewWorkspace();
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
+    const setShowNewTerminalWindow = useWorkspaceState.use.setShowNewTerminalWindow();
     const loadWorkspace = useWorkspaceState.use.loadWorkspace();
 
     useEffect(() => {
@@ -69,6 +70,7 @@ export default function WorkspaceNew() {
             const response = await createNewWorkspace(newWorkspaceToAdd);
             if (response) {
                 loadWorkspace();
+                setShowNewTerminalWindow(newWorkspaceToAdd);
                 close();
             }
         } catch (error) {
