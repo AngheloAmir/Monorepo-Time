@@ -8,7 +8,7 @@ const commands = [
     { label: 'Lint',    cmd: 'turbo lint',  icon: 'fa-check-double', color: 'from-yellow-500 to-orange-600' },
     { label: 'Test',    cmd: 'turbo test',  icon: 'fa-vial', color: 'from-pink-500 to-rose-600' },
     { label: 'Clean',   cmd: 'turbo clean', icon: 'fa-broom', color: 'from-gray-500 to-gray-600' },
-    { label: 'Summary', cmd: 'turbo summary', icon: 'fa-list-alt', color: 'from-purple-500 to-violet-600' },
+    { label: 'Summary', cmd: 'turbo run build --dry-run', icon: 'fa-list-alt' },
     { label: 'Prune',   cmd: 'turbo prune', icon: 'fa-scissors', color: 'from-red-500 to-red-600' },
     { label: 'Docker',  cmd: 'turbo prune --docker', icon: 'fa-docker', color: 'from-blue-400 to-blue-500' },
     { label: 'Remote',  cmd: 'npx turbo link',  icon: 'fa-cloud', color: 'from-cyan-500 to-blue-600' },
