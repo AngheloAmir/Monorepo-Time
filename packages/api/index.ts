@@ -45,6 +45,17 @@ const apiRoute = {
      * returns: { path: string }
     */
     getRootPath: 'getrootpath',
+
+
+    /** Scaffold a new repo 
+     * get request returns { success: boolean }
+    */
+    scaffoldRepo:   'scaffoldrepo',
+
+    /** Check if a turbo repo exists in the rootdir 
+     * get return { exists: boolean }
+    */
+    turborepoExist: 'turborepoexist',
 }
 
 export default apiRoute;

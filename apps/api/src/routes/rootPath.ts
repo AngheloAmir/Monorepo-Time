@@ -4,7 +4,7 @@ import { Request, Response, Router } from "express";
 
 const START_DIR = process.cwd();
 
-function findMonorepoRoot(startDir: string): string {
+export function findMonorepoRoot(startDir: string): string {
   let dir = startDir;
   while (dir !== path.dirname(dir)) {
     const pkgPath = path.join(dir, "package.json");
@@ -23,7 +23,7 @@ function findMonorepoRoot(startDir: string): string {
   return startDir;
 }
 
-const ROOT = findMonorepoRoot(START_DIR);
+export const ROOT = findMonorepoRoot(START_DIR);
 const route = Router();
 
 route.get("/", async (req: Request, res: Response) => {
