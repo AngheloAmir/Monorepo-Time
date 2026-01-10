@@ -18,11 +18,9 @@ export interface WorkspaceInfo {
     path: string;
 
     //These are found inside of the package the json of the project
-    serviceType?: 'app' | 'frontend' | 'backend' | 'database' | 'service';
     fontawesomeIcon?: string;
-    localUrl?: string;
-    prodUrl?: string;
     description?: string;
+    
     devCommand?: string;
     startCommand?: string;
     stopCommand?: string;

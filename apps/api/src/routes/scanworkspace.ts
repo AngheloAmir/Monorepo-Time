@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import fg from "fast-glob";
 import { Request, Response, Router } from "express";
+import { WorkspaceInfo } from "types";
 
 const START_DIR = process.cwd();
 
@@ -148,10 +149,7 @@ route.get("/", async (req: Request, res: Response) => {
       return {
         name: pkg.name || path.basename(p),
         path: p,
-        serviceType: pkg.serviceType || null,
         fontawesomeIcon: pkg.fontawesomeIcon || null,
-        localUrl: pkg.localUrl || null,
-        prodUrl: pkg.prodUrl || null,
         description: pkg.description || null,
         devCommand: pkg.scripts?.dev || null,
         startCommand: pkg.scripts?.start || null,
@@ -160,7 +158,7 @@ route.get("/", async (req: Request, res: Response) => {
         cleanCommand: pkg.scripts?.clean || null,
         lintCommand: pkg.scripts?.lint || null,
         testCommand: pkg.scripts?.test || null,
-      };
+      } as WorkspaceInfo;
     }))).filter(Boolean); // Filter out any failed reads
 
     res.json({
