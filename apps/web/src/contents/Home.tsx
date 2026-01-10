@@ -40,17 +40,6 @@ export default function Home(props: HomeProps) {
                                 <div className="absolute inset-0 bg-blue-500/20 blur-xl -z-10"></div>
                             </div>
                         </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <button
-                                className="p-5 rounded-xl bg-gray-800/30 border border-gray-700/30 hover:bg-gray-700/50 hover:border-gray-500/50 transition-all group flex flex-col items-center justify-center gap-3 text-center h-32 hover:-translate-y-1 hover:shadow-lg">
-                                <div
-                                    className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                                    <i className="fa-solid fa-link-slash text-2xl text-red-400"></i>
-                                </div>
-                                <span className="text-sm font-semibold text-gray-300 group-hover:text-white">Port Remover</span>
-                            </button>
-                        </div>
                     </div>
 
                     {/* <!-- Real-time Monitor Card --> */}

@@ -5,7 +5,6 @@ import Home from './contents/Home'
 import useNavState from "./_context/navigation";
 import Workspace from './contents/Workspace';
 import Turborepo from './contents/Turborepo';
-import TurboCICD from './contents/TurboCICD';
 import CRUDTester from './contents/CRUDTester';
 import Setting from './contents/Setting';
 import Modal from './modal';
@@ -31,7 +30,6 @@ function App() {
                         <Home isVisible={currentPage === "home"}/>
                         <Workspace isVisible={currentPage === "workspace"}/>
                         <Turborepo isVisible={currentPage === "turborepo"}/>
-                        <TurboCICD isVisible={currentPage === "cicd"}/>
                         <CRUDTester isVisible={currentPage === "crud"}/>
                         <Setting isVisible={currentPage === "settings"}/>
                     </div>
