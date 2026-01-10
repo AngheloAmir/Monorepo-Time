@@ -6,6 +6,8 @@ import path from 'path';
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
+    res.header("Access-Control-Allow-Origin", "*");
+
     try {
         const workspace: WorkspaceInfo = req.body; 
         

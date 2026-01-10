@@ -135,6 +135,8 @@ async function scanRecursively() {
  * Route
  */
 route.get("/", async (req: Request, res: Response) => {
+  res.header("Access-Control-Allow-Origin", "*");
+
   try {
     const rootPkgPath = path.join(ROOT, "package.json");
     const rootPkg = await readJSON(rootPkgPath);

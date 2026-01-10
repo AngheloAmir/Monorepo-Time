@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useWorkspaceState from "../_context/workspace"
 import TabTerminal from "../components/workspace/TabTerminal";
 import WorkspaceCard from "../components/workspace/WorkSpaceCard";
 import WorkspaceOptionModal from "../components/workspace/WorkspaceOptionModal";
 import WorkspaceNew from "../components/workspace/WorkspaceNew";
 import ModalTerminal from "../components/workspace/ModalTerminal";
+import config   from "config";
+import apiRoute from "apiroute";
 
 interface WorkspaceProps {
     isVisible: boolean
@@ -20,6 +22,7 @@ export default function Workspace(props: WorkspaceProps) {
     const workspace           = useWorkspaceState.use.workspace();
     const loadWorkspace       = useWorkspaceState.use.loadWorkspace();
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
+    const [filesShow, setFilesShow] = useState(true);
 
     useEffect(() => {
         if (!window.isWorkSpaceLoaded) {
@@ -27,6 +30,33 @@ export default function Workspace(props: WorkspaceProps) {
             loadWorkspace();
         }
     }, []);
+
+    async function showHideFiles() {
+        try {
+            const listOfWorkspaceRunning = workspace.filter((item) => item.isRunningAs != null);
+            const activePath             = listOfWorkspaceRunning.map((item) => item.info.path);
+
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.hideShowFileFolder}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    hide:       filesShow,
+                    activePath: activePath
+                }),
+            });
+            const data = await response.json();
+            if( data.isHidden ) {
+                setFilesShow( false );
+            } else {
+                setFilesShow( true );
+            }
+
+        } catch (error) {
+            console.error('Error toggling files visibility:', error);
+        }
+    }
 
     return (
         <div className={`relative flex flex-col w-full h-[calc(100vh-68px)] ${props.isVisible ? '' : 'hidden'}`}>
@@ -45,10 +75,16 @@ export default function Workspace(props: WorkspaceProps) {
                 </div>
             </div>
 
-            <button id="vscode-fab-btn"
-                className="p-2 pt-3 fixed bottom-26 right-8 bg-blue-600 hover:bg-blue-500 text-white rounded-full  shadow-lg shadow-blue-600/30 transition-all hover:scale-110 flex items-center gap-2 z-50 group">
-                <i className="w-8 h-8 fa-solid fa-eye-slash text-xl"></i>
-                <span className="font-medium pr-2 hidden group-hover:inline-block transition-all duration-300 whitespace-nowrap overflow-hidden">Hide Files</span>
+            <button
+                onClick={showHideFiles}
+                className={ `p-2 pt-3 fixed bottom-26 right-8  ${filesShow ? 'bg-blue-600 hover:bg-blue-500 ' : 'bg-green-600 hover:bg-green-500 ' }text-white rounded-full  shadow-lg shadow-blue-600/30 transition-all hover:scale-110 flex items-center gap-2 z-50 group `}>
+                { filesShow ?
+                    <i className="w-8 h-8 fa-solid fa-eye-slash text-xl"></i> 
+                    :   
+                    <i className="w-8 h-8 fa-solid fa-eye text-xl"></i>
+                }
+                <span className="font-medium pr-2 hidden group-hover:inline-block transition-all duration-300 whitespace-nowrap overflow-hidden">
+                    {filesShow ? 'Hide Files' : 'Show Files'}</span>
             </button>
 
             <button
