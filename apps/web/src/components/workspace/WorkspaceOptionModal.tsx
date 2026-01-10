@@ -8,6 +8,7 @@ import ModalBody from "./ModalBody";
 export default function WorkspaceOptionModal() {
     const activeWorkspaceOptionModal = useWorkspaceState.use.activeWorkspaceOptionModal();
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
+    const updateWorkspace = useWorkspaceState.use.updateWorkspace();
     const [workspaceCopy, setWorkspaceCopy] = useState<WorkspaceInfo | null>(null);
     const [packageName, setPackageName] = useState<string>('');
 
@@ -21,6 +22,12 @@ export default function WorkspaceOptionModal() {
     function close() {
         setActiveWorkspaceOptionModal(null);
         setPackageName('.');
+    }
+
+    function save() {
+        if (!workspaceCopy) return;
+        if (!updateWorkspace(workspaceCopy)) return;
+        close();
     }
 
     if (!activeWorkspaceOptionModal) return null;
@@ -107,7 +114,7 @@ export default function WorkspaceOptionModal() {
 
             <footer className="p-2 border-t border-gray-600 flex justify-end gap-4">
                 <button onClick={close} className="w-32 bg-gray-700 hover:bg-gray-600 transition-colors p-1 rounded">Cancel</button>
-                <button onClick={close} className="w-40 bg-blue-500 hover:bg-blue-600 transition-colors p-1 rounded">Save</button>
+                <button onClick={save} className="w-40 bg-blue-500 hover:bg-blue-600 transition-colors p-1 rounded">Save</button>
             </footer>
         </ModalBody>
     )
