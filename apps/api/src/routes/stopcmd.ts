@@ -1,7 +1,8 @@
 import { Request, Response, Router } from "express";
 import { activeProcesses, sockets } from "./runcmddev";
 import { WorkspaceInfo } from "types";
-import { spawn } from "child_process";
+import { spawn, exec } from "child_process";
+import { promisify } from "util";
 import chalk from "chalk";
 
 const router = Router();
@@ -27,6 +28,12 @@ router.post("/", async (req: Request, res: Response) => {
         // 1. Kill the Active Process
         if (currentProcess) {
             currentSocket?.emit('log', chalk.yellow("Stopping active process..."));
+
+            if (currentProcess.pid) {
+                if (process.platform !== 'win32') {
+                    await cleanupProcessPorts(currentProcess.pid, currentSocket);
+                }
+            }
 
             await new Promise<void>((resolve) => {
                 let resolved = false;
@@ -122,5 +129,93 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 export default router;
+
+const execAsync = promisify(exec);
+
+async function getProcessTreePids(rootPid: number): Promise<number[]> {
+    try {
+        // getting all processes with ppid
+        const { stdout } = await execAsync('ps -e -o pid,ppid --no-headers');
+        const pids = new Set<number>();
+        pids.add(rootPid);
+
+        const tree = new Map<number, number[]>();
+        const lines = stdout.trim().split('\n');
+        for (const line of lines) {
+            const parts = line.trim().split(/\s+/);
+            if (parts.length >= 2) {
+                const pid = parseInt(parts[0], 10);
+                const ppid = parseInt(parts[1], 10);
+                if (!tree.has(ppid)) tree.set(ppid, []);
+                tree.get(ppid)?.push(pid);
+            }
+        }
+
+        const queue = [rootPid];
+        while (queue.length > 0) {
+            const current = queue.shift()!;
+            const children = tree.get(current);
+            if (children) {
+                for (const child of children) {
+                    pids.add(child);
+                    queue.push(child);
+                }
+            }
+        }
+        return Array.from(pids);
+    } catch (e) {
+        console.error("Error building process tree:", e);
+        return [rootPid];
+    }
+}
+
+async function cleanupProcessPorts(rootPid: number, socket: any) {
+    try {
+        const pids = await getProcessTreePids(rootPid);
+        
+        // lsof output format "-F pn":
+        // p1234
+        // n*:3000
+        const { stdout } = await execAsync('lsof -P -n -iTCP -sTCP:LISTEN -F pn');
+        const lines = stdout.trim().split('\n');
+        
+        let currentPid = -1;
+        const pidPorts = new Map<number, string[]>();
+
+        for (const line of lines) {
+            const type = line[0];
+            const content = line.substring(1);
+            if (type === 'p') {
+                currentPid = parseInt(content, 10);
+            } else if (type === 'n' && currentPid !== -1) {
+                const match = content.match(/:(\d+)$/);
+                if (match) {
+                     const port = match[1];
+                     // Only check if this port belongs to one of our tree PIDs
+                     if (!pidPorts.has(currentPid)) pidPorts.set(currentPid, []);
+                     pidPorts.get(currentPid)?.push(port);
+                }
+            }
+        }
+
+        for (const pid of pids) {
+            if (pidPorts.has(pid)) {
+                const ports = pidPorts.get(pid);
+                if (ports) {
+                    for (const port of ports) {
+                        socket?.emit('log', chalk.yellow(`Detected active port ${port} on PID ${pid}. Killing port...`));
+                        try {
+                            await execAsync(`npx -y kill-port ${port}`);
+                        } catch (err: any) {
+                             socket?.emit('log', chalk.red(`Failed to kill port ${port}: ${err.message}`));
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        // If lsof fails (e.g. no permissions or no ports open), just ignore
+    }
+}
 
 
