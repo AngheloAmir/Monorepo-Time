@@ -1,12 +1,7 @@
 {
     "files.exclude": {
-        ".vscode": true,
-        "**/backend": false,
-        "**/frontend": false,
-        "**/service": false,
-        "**/database": false,
-        "**/shared": false,
         "**/.git": true,
+        ".vscode": true,
         ".turbo": true
     }
 }

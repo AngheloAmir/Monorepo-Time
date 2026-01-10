@@ -91,34 +91,43 @@ const ensureSettingsFile = async () => {
 };
 
 
+/**
+ * POST /
+ * Body: { hide: boolean, pathInclude?: string[] }
+ * Updates files.exclude in settings.json
+ */
 router.post("/", async (req: Request, res: Response): Promise<any> => {
     try {
-        const { hide, activePath } : { hide: boolean, activePath: string[] } = req.body;
+        const { hide, pathInclude } : { hide: boolean, pathInclude: string[] } = req.body;
 
         await ensureSettingsFile();
         const settingsPath = getSettingsPath();
         const settings = await fs.readJson(settingsPath);
         
-        if (!settings['files.exclude']) {
-            settings['files.exclude'] = {};
-        }
-
-        // 1. Always ensure defaults are hidden
-        Object.assign(settings['files.exclude'], EXCLUDE_PATTERNS_DEFAULT);
+        // We will reconstruct files.exclude based on the logic
+        // 1. Start with valid defaults
+        const newExcludes: { [key: string]: boolean } = { ...EXCLUDE_PATTERNS_DEFAULT };
 
         if (hide) {
-            // 2. If hide is true, merge ALL patterns
-            Object.assign(settings['files.exclude'], EXCLUDE_PATTERNS);
-        } else {
-            // 3. If hide is false, remove patterns that are NOT in defaults
-            Object.keys(EXCLUDE_PATTERNS).forEach(key => {
-                // strict check against defaults
-                // We check if this key exists in EXCLUDE_PATTERNS_DEFAULT
-                if (!Object.prototype.hasOwnProperty.call(EXCLUDE_PATTERNS_DEFAULT, key)) {
-                    delete settings['files.exclude'][key];
-                }
-            });
-        }
+            // 2a. If hide is true, add the standard patterns
+            Object.assign(newExcludes, EXCLUDE_PATTERNS);
+
+            // 2b. Add the specific paths from pathInclude (converted to relative)
+            if (Array.isArray(pathInclude)) {
+                pathInclude.forEach(p => {
+                    // Ensure path is relative to the workspace ROOT
+                    const relativePath = path.relative(ROOT, p);
+                    if (relativePath && !relativePath.startsWith('..') && !path.isAbsolute(relativePath)) {
+                        newExcludes[relativePath] = true;
+                    }
+                });
+            }
+        } 
+        // 3. If hide is false, we strictly return the defaults (which we already initialized in step 1).
+        // This effectively "shows all files" (removes other exclusions) except the defaults.
+
+        // Update the settings object
+        settings['files.exclude'] = newExcludes;
 
         await fs.writeJson(settingsPath, settings, { spaces: 4 });
         res.json({ success: true, isHidden: hide });

@@ -33,8 +33,15 @@ export default function Workspace(props: WorkspaceProps) {
 
     async function showHideFiles() {
         try {
-            const listOfWorkspaceRunning = workspace.filter((item) => item.isRunningAs != null);
-            const activePath             = listOfWorkspaceRunning.map((item) => item.info.path);
+            //count the number of running workspace
+            let pathInclude: string[] = [];
+            const runningWorkspace = workspace.filter((item) => item.isRunningAs != null);
+            const runningCount     = runningWorkspace.length;
+
+            //return list of workspace that is not running
+            if (runningCount > 0) {
+                pathInclude = workspace.filter((item) => item.isRunningAs == null).map((item) => item.info.path);
+            }
 
             const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.hideShowFileFolder}`, {
                 method: 'POST',
@@ -43,7 +50,7 @@ export default function Workspace(props: WorkspaceProps) {
                 },
                 body: JSON.stringify({
                     hide:       filesShow,
-                    activePath: activePath
+                    pathInclude: pathInclude
                 }),
             });
             const data = await response.json();
