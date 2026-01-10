@@ -17,25 +17,17 @@ export default function ModalTerminal() {
 
     useEffect(() => {
         if (showNewTerminalWindow) {
-            // Write initial banner
-            const firstLine  = `\x1b[34m[PATH]\x1b[0m \x1b[32m${showNewTerminalWindow?.path}\x1b[0m`;
-            const secondLine = `\x1b[34m[SYSTEM]\x1b[0m Please enter your command prompt.`;
-            const thirdLine  = `\x1b[34m[SYSTEM]\x1b[0m Example: npm install nodemon -D`;
-            const prompt     = `\r\n$ `;
-            
-            // Wait a tick for the terminal ref to be populated
-            setTimeout(() => {
-                terminalRef.current?.write(`${firstLine}\r\n${secondLine}\r\n${thirdLine}${prompt}`);
-            }, 100);
-
-            // Initialize socket connection
             const port = config.apiPort || 3000;
             socketRef.current = io(`http://localhost:${port}`, {
                 transports: ['websocket']
             });
 
             socketRef.current.on('connect', () => {
-                // Connection established
+                const firstLine  = `\x1b[34m[PATH]\x1b[0m \x1b[32m${showNewTerminalWindow?.path}\x1b[0m`;
+                const secondLine = `\x1b[34m[SYSTEM]\x1b[0m Please enter your command prompt.`;
+                const thirdLine  = `\x1b[34m[SYSTEM]\x1b[0m Example: npm install nodemon -D`;
+                const prompt     = `\r\n$ `;
+                terminalRef.current?.write(`${firstLine}\r\n${secondLine}\r\n${thirdLine}${prompt}`);
             });
 
             socketRef.current.on('terminal:log', (data: string) => {
@@ -84,7 +76,7 @@ export default function ModalTerminal() {
                 if (cmd.trim()) {
                     setProcessActive(true);
                     socketRef.current?.emit('terminal:start', {
-                        workspace: showNewTerminalWindow,
+                        path: showNewTerminalWindow?.path || "",
                         command: cmd.trim()
                     });
                 } else {

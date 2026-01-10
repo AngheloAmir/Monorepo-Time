@@ -16,7 +16,7 @@ export default router;
 const activeTerminals = new Map<string, ChildProcess>();
 
 interface StartTerminalPayload {
-    workspace: WorkspaceInfo;
+    path: string;
     command: string;
 }
 
@@ -24,7 +24,7 @@ export function interactiveTerminalSocket(io: Server) {
     io.on('connection', (socket: Socket) => {
         
         socket.on('terminal:start', (data: StartTerminalPayload) => {
-            const { workspace, command } = data;
+            const { path, command } = data;
 
             if (activeTerminals.has(socket.id)) {
                 socket.emit('terminal:error', 'A process is already running in this terminal.');
@@ -50,7 +50,7 @@ export function interactiveTerminalSocket(io: Server) {
                     const args = command.split(" ").slice(1);
                     
                     child = spawn(baseCMD, args, {
-                        cwd: workspace.path,
+                        cwd: path,
                         env: env,
                         shell: true,
                         stdio: ['pipe', 'pipe', 'pipe']
@@ -79,7 +79,7 @@ except Exception as e:
     sys.exit(1)
 `;
                     child = spawn('python3', ['-u', '-c', pythonScript], {
-                        cwd: workspace.path,
+                        cwd: path,
                         env: env,
                         stdio: ['pipe', 'pipe', 'pipe']
                     });

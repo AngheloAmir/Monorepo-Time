@@ -3,49 +3,6 @@ import useWorkspaceState from "../../_context/workspace";
 import Console from "../Console";
 import { Terminal } from "xterm";
 
-// Wrapper to sync string-based state (consoleOutput) with stream-based xterm
-function TerminalController({ output, visible }: { output: string; visible: boolean }) {
-    const terminalRef = useRef<Terminal | null>(null);
-    const lastOutputLen = useRef(0);
-
-    useEffect(() => {
-        // If terminal not ready, wait
-        if (!terminalRef.current) return;
-
-        // Detect if the store was cleared (e.g. user clicked clear)
-        if (output.length < lastOutputLen.current) {
-            terminalRef.current.reset();
-            lastOutputLen.current = 0;
-        }
-
-        // Write only the new part of the string
-        const newContent = output.slice(lastOutputLen.current);
-        if (newContent) {
-            terminalRef.current.write(newContent);
-            lastOutputLen.current = output.length;
-        }
-    }, [output]);
-
-    // Force layouts when becoming visible to ensure xterm fits correctly
-    useEffect(() => {
-        if (visible && terminalRef.current) {
-            // Small delay to allow DOM to paint
-            setTimeout(() => {
-                // Trigger a resize event or re-fit if we had access to addon. 
-                // Since Console handles ResizeObserver, just ensuring the div is visible should trigger it.
-                // But sometimes manual trigger is needed. Console doesn't expose fit directly but ResizeObserver on div
-                // should notice 0x0 -> WxH change.
-            }, 10);
-        }
-    }, [visible]);
-
-    return (
-        <div className={`w-full h-full ${visible ? 'block' : 'hidden'}`}>
-             <Console terminalRef={terminalRef} />
-        </div>
-    );
-}
-
 export default function TabTerminal() {
     const workspace = useWorkspaceState.use.workspace();
     const activeTerminal = useWorkspaceState.use.activeTerminal();
@@ -135,6 +92,35 @@ export default function TabTerminal() {
                     />
                 ))}
             </div>
+        </div>
+    );
+}
+
+function TerminalController({ output, visible }: { output: string; visible: boolean }) {
+    const terminalRef = useRef<Terminal | null>(null);
+    const lastOutputLen = useRef(0);
+
+    useEffect(() => {
+        // If terminal not ready, wait
+        if (!terminalRef.current) return;
+
+        // Detect if the store was cleared (e.g. user clicked clear)
+        if (output.length < lastOutputLen.current) {
+            terminalRef.current.reset();
+            lastOutputLen.current = 0;
+        }
+
+        // Write only the new part of the string
+        const newContent = output.slice(lastOutputLen.current);
+        if (newContent) {
+            terminalRef.current.write(newContent);
+            lastOutputLen.current = output.length;
+        }
+    }, [output]);
+
+    return (
+        <div className={`w-full h-full ${visible ? 'block' : 'hidden'}`}>
+            <Console terminalRef={terminalRef} />
         </div>
     );
 }
