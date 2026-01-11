@@ -1,23 +1,17 @@
 import { useEffect, useState } from 'react';
+import useCrudState from '../../_context/crud';
 import type { CrudCategory } from './types';
 
-interface ManageCategoriesProps {
-    isOpen: boolean;
-    onClose: () => void;
-    categories: CrudCategory[];
-    onUpdate: (index: number, data: Partial<CrudCategory>) => Promise<void>;
-    onDelete: (index: number) => Promise<void>;
-    onAdd: (data: { category: string; devurl: string; produrl: string }) => Promise<void>;
-}
+export default function ManageCategories() {
+    // Store Selectors
+    // Store Selectors
+    const categories = useCrudState.use.crudData();
+    const onAdd = useCrudState.use.handleAddCategory();
+    const setViewMode = useCrudState.use.setViewMode();
 
-export default function ManageCategories({
-    isOpen,
-    onClose,
-    categories,
-    onUpdate,
-    onDelete,
-    onAdd
-}: ManageCategoriesProps) {
+    const onClose = () => setViewMode('tester');
+    const isOpen = true; // Always true when rendered in this context
+
     const [newItem, setNewItem] = useState({
         category: '',
         devurl: '',
@@ -34,7 +28,10 @@ export default function ManageCategories({
     const handleAdd = async () => {
         if (!newItem.category.trim()) return;
         
-        await onAdd({
+        // Wrapper to match previous Promise signature if needed, but actions are void. 
+        // User used async/await in handlers, but setCrudData is sync. 
+        // We can just call the action.
+        onAdd({
             category: newItem.category.trim(),
             devurl: newItem.devurl.trim() || 'http://localhost:3200',
             produrl: newItem.produrl.trim() || 'http://localhost:3200'
@@ -42,8 +39,6 @@ export default function ManageCategories({
         
         setNewItem({ category: '', devurl: '', produrl: '' });
     };
-
-    if (!isOpen) return null;
 
     return (
         <div className="absolute inset-0 z-[50] flex items-center justify-center animate-fade-in">
@@ -132,8 +127,6 @@ export default function ManageCategories({
                                 key={index} 
                                 category={cat} 
                                 index={index} 
-                                onUpdate={onUpdate} 
-                                onDelete={onDelete} 
                             />
                         ))}
                         {categories.length === 0 && (
@@ -162,11 +155,12 @@ export default function ManageCategories({
 interface ManageCategoryItemProps {
     category: CrudCategory;
     index: number;
-    onUpdate: (index: number, data: Partial<CrudCategory>) => Promise<void>;
-    onDelete: (index: number) => Promise<void>;
 }
 
-function ManageCategoryItem({ category, index, onUpdate, onDelete }: ManageCategoryItemProps) {
+function ManageCategoryItem({ category, index }: ManageCategoryItemProps) {
+    const onUpdate = useCrudState.use.handleUpdateCategory();
+    const onDelete = useCrudState.use.handleDeleteCategory();
+
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
         category: category.category,
@@ -184,7 +178,7 @@ function ManageCategoryItem({ category, index, onUpdate, onDelete }: ManageCateg
 
     const handleSave = async () => {
         if (!editData.category.trim()) return;
-        await onUpdate(index, {
+        onUpdate(index, {
             category: editData.category.trim(),
             devurl: editData.devurl.trim(),
             produrl: editData.produrl.trim()
@@ -194,7 +188,7 @@ function ManageCategoryItem({ category, index, onUpdate, onDelete }: ManageCateg
 
     const handleDelete = async () => {
         if (window.confirm("The delete method can only be reversed by GIT, continue?")) {
-            await onDelete(index);
+            onDelete(index);
         }
     };
 

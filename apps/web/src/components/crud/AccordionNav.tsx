@@ -1,25 +1,18 @@
 import { useState } from 'react';
-import type { CrudCategory } from './types';
+import useCrudState from '../../_context/crud';
 
-interface AccordionNavProps {
-    categories: CrudCategory[];
-    selectedCategoryIndex: number | null;
-    selectedItemIndex: number | null;
-    onSelect: (categoryIndex: number, itemIndex: number) => void;
-    onAddRoute: (categoryIndex: number) => void;
-    onEditRoute: (categoryIndex: number, itemIndex: number) => void;
-    onManageCategories: () => void;
-}
+export default function AccordionNav() {
+  const categories = useCrudState.use.crudData();
+  const selectedRoute = useCrudState.use.selectedRoute();
+  
+  const onSelect = useCrudState.use.handleSelectRoute();
+  const onAddRoute = useCrudState.use.handleAddRoute();
+  const onEditRoute = useCrudState.use.handleEditRoute();
+  const onManageCategories = useCrudState.use.handleManageCategories();
 
-export default function AccordionNav({
-    categories,
-    selectedCategoryIndex,
-    selectedItemIndex,
-    onSelect,
-    onAddRoute,
-    onEditRoute,
-    onManageCategories
-}: AccordionNavProps) {
+  const selectedCategoryIndex = selectedRoute?.catIndex ?? null;
+  const selectedItemIndex = selectedRoute?.itemIndex ?? null;
+
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set([0]));
 
   const toggleCategory = (index: number) => {

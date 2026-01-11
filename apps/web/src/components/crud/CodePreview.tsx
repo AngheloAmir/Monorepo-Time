@@ -1,43 +1,39 @@
 import { useEffect, useState } from 'react';
-import type { CrudItem } from './types';
+import useCrudState from '../../_context/crud';
 
-interface CodePreviewProps {
-    isOpen: boolean;
-    onClose: () => void;
-    item: CrudItem | null;
-    paramValue: string;
-    headerValue: string;
-    bodyValue: string;
-    devUrl: string;
-    prodUrl: string;
-    useProd: boolean;
-}
+export default function CodePreview() {
+    const isCodePreviewOpen = useCrudState.use.isCodePreviewOpen();
+    const setIsCodePreviewOpen = useCrudState.use.setIsCodePreviewOpen();
+    const crudData = useCrudState.use.crudData();
+    const selectedRoute = useCrudState.use.selectedRoute();
+    const activeParams = useCrudState.use.activeParams();
+    const activeHeaders = useCrudState.use.activeHeaders();
+    const activeBody = useCrudState.use.activeBody();
+    const useProd = useCrudState.use.useProd();
 
-export default function CodePreview({ 
-    isOpen, 
-    onClose, 
-    item, 
-    paramValue, 
-    headerValue, 
-    bodyValue,
-    devUrl,
-    prodUrl,
-    useProd
-}: CodePreviewProps) {
+    const selectedItem = selectedRoute && crudData[selectedRoute.catIndex]?.items[selectedRoute.itemIndex];
+    const activeCategory = selectedRoute && crudData[selectedRoute.catIndex];
+    
+    // Fallbacks
+    const item = selectedItem || null;
+    const paramValue = activeParams;
+    const headerValue = activeHeaders;
+    const bodyValue = activeBody;
+    const devUrl = activeCategory?.devurl || '';
+    const prodUrl = activeCategory?.produrl || '';
+    
     const [codeHtml, setCodeHtml] = useState('');
 
     useEffect(() => {
-        if (isOpen && item) {
+        if (isCodePreviewOpen && item) {
             generateCode();
         }
-    }, [isOpen, item, paramValue, headerValue, bodyValue, useProd]);
+    }, [isCodePreviewOpen, item, paramValue, headerValue, bodyValue, useProd]);
 
     const generateCode = () => {
         if (!item) return;
 
         const root = useProd ? prodUrl : devUrl;
-        // ensure paramValue starts with ? or is empty handled by logic? Original just appended.
-        // Original: const params = window.crudState.paramValue || '';
         const params = paramValue || '';
         const url = `${root}${item.route}${params}`;
         
@@ -103,7 +99,7 @@ export default function CodePreview({
         setCodeHtml(code);
     };
 
-    if (!isOpen) return null;
+    if (!isCodePreviewOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
@@ -114,7 +110,7 @@ export default function CodePreview({
                         <i className="fas fa-code text-blue-400"></i>
                         <h3 className="text-white font-bold text-lg">Code Preview</h3>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                    <button onClick={() => setIsCodePreviewOpen(false)} className="text-gray-400 hover:text-white transition-colors">
                         <i className="fas fa-times text-lg"></i>
                     </button>
                 </div>

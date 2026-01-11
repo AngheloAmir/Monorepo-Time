@@ -1,5 +1,5 @@
 //import Undercontsruct from "../components/Undercontsruct"
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react"; // No longer needed
 import AccordionNav from "../components/crud/AccordionNav";
 import CrudEditor from "../components/crud/CrudEditor";
 import CrudInputEditor from "../components/crud/CrudInputEditor";
@@ -7,178 +7,30 @@ import CrudOutput from "../components/crud/CrudOutput";
 import CrudSuggest from "../components/crud/CrudSuggest";
 import ManageCategories from "../components/crud/ManageCategories";
 
-import type { CrudItem, CrudCategory } from '../components/crud/types';
-
-const INITIAL_CRUD_DATA: CrudCategory[] = [
-  {
-    "category": "Internal CRUD Test",
-    "devurl": "http://localhost:3200",
-    "produrl": "",
-    "items": [
-      {
-        "label": "Ping the Tool Server",
-        "route": "/pingme",
-        "methods": "GET",
-        "description": "Ping the tool server to check if it is running.",
-        "sampleInput": "{}",
-        "suggested": [],
-        "expectedOutcome": "# You should see the word \"pong\" as a message \n\n{\n  \"message\": \"pong\"\n}",
-        "availableFor": "public"
-      },
-      {
-        "label": "Check Post",
-        "route": "/pingpost",
-        "methods": "POST",
-        "description": "Send a POST request to check if it sending correctly",
-        "sampleInput": "{\n   \"data\": \"test\",\n   \"message\": \"test\"\n}",
-        "suggested": [
-          {
-            "name": "Customer Data",
-            "urlparams": "",
-            "content": "{\n    \"name\": \"Demo Customer\",\n    \"email\": \"demo@test.com\",\n    \"phone\": \"123456789\",\n    \"icon\": \"test icon\"\n}"
-          }
-        ],
-        "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
-        "availableFor": "public"
-      },
-      {
-        "label": "Check Stream",
-        "route": "/pingstream",
-        "methods": "STREAM",
-        "description": "Send a stream request to check if it sending correctly",
-        "sampleInput": "{ }",
-        "suggested": [
-          {
-            "name": "I Wandered Lonely as a Cloud",
-            "urlparams": "?poem=I%20Wandered%20Lonely%20as%20a%20Cloud",
-            "content": "{}"
-          },
-          {
-            "name": "The Sun Has Long Been Set",
-            "urlparams": "?poem=The%20Sun%20Has%20Long%20Been%20Set",
-            "content": "{}"
-          }
-        ],
-        "expectedOutcome": "# Note \nYou should see the stream of words",
-        "availableFor": "public"
-      }
-    ]
-  }
-];
+// import type { CrudItem, CrudCategory } from '../components/crud/types'; 
+import useCrudState from "../_context/crud";
+import CodePreview from "../components/crud/CodePreview";
 
 interface CRUDTesterProps {
     isVisible: boolean
 }
 
 export default function CRUDTester(props: CRUDTesterProps) {
-    const [crudData, setCrudData] = useState<CrudCategory[]>(INITIAL_CRUD_DATA);
-    
-    // Selection State
-    const [selectedRoute, setSelectedRoute] = useState<{ catIndex: number, itemIndex: number } | null>(null);
-    const [viewMode, setViewMode] = useState<'tester' | 'manage'>('tester');
-    
-    // Editor Components State
-    const [editorState, setEditorState] = useState<{ isOpen: boolean, catIndex: number, itemIndex: number }>({
-        isOpen: false,
-        catIndex: -1,
-        itemIndex: -1
-    });
+    const crudData = useCrudState.use.crudData();
+    const selectedRoute = useCrudState.use.selectedRoute();
+    const viewMode = useCrudState.use.viewMode();
+    const isPresetsOpen = useCrudState.use.isPresetsOpen();
+    const activeBody = useCrudState.use.activeBody();
+    const activeParams = useCrudState.use.activeParams();
 
-    // Validated Selected Item
+    const setIsPresetsOpen = useCrudState.use.setIsPresetsOpen();
+    const setActiveBody = useCrudState.use.setActiveBody();
+    const setActiveParams = useCrudState.use.setActiveParams();
+    const handlePresetSelect = useCrudState.use.handlePresetSelect();
+
+    // Derived State
     const selectedItem = selectedRoute && crudData[selectedRoute.catIndex]?.items[selectedRoute.itemIndex];
     const activeCategory = selectedRoute && crudData[selectedRoute.catIndex];
-
-    // Presets & Active Inputs State
-    const [isPresetsOpen, setIsPresetsOpen] = useState(false);
-    const [activeBody, setActiveBody] = useState('');
-    const [activeParams, setActiveParams] = useState('');
-
-    // Reset inputs when selected item changes
-    useEffect(() => {
-        if (selectedItem) {
-            setActiveBody(selectedItem.sampleInput || '{}');
-            setActiveParams('');
-            setIsPresetsOpen(false);
-        }
-    }, [selectedItem]);
-
-    // --- Handlers for AccordionNav ---
-
-    const handleSelectRoute = (categoryIndex: number, itemIndex: number) => {
-        setSelectedRoute({ catIndex: categoryIndex, itemIndex });
-        setViewMode('tester');
-    };
-
-    const handleManageCategories = () => {
-        setViewMode('manage');
-    };
-
-    const handleAddRoute = (categoryIndex: number) => {
-        setEditorState({ isOpen: true, catIndex: categoryIndex, itemIndex: -1 });
-    };
-
-    const handleEditRoute = (categoryIndex: number, itemIndex: number) => {
-        setEditorState({ isOpen: true, catIndex: categoryIndex, itemIndex });
-    };
-
-    const handlePresetSelect = (suggestion: any) => {
-        setActiveBody(suggestion.content);
-        setActiveParams(suggestion.urlparams);
-        setIsPresetsOpen(false);
-    };
-
-    // --- Handlers for CrudEditor (Route) ---
-
-    const handleSaveRoute = async (data: CrudItem, catIndex: number, itemIndex: number, action: 'add' | 'update') => {
-        const newData = [...crudData];
-        if (action === 'add') {
-            newData[catIndex].items.push(data);
-             // Select the new item
-             setSelectedRoute({ catIndex, itemIndex: newData[catIndex].items.length - 1 });
-        } else {
-            newData[catIndex].items[itemIndex] = data;
-        }
-        setCrudData(newData);
-        setViewMode('tester'); // Ensure we are in tester mode to see changes
-    };
-
-    const handleDeleteRoute = async (catIndex: number, itemIndex: number) => {
-        const newData = [...crudData];
-        newData[catIndex].items.splice(itemIndex, 1);
-        setCrudData(newData);
-        
-        // If we deleted the selected item, deselect it
-        if (selectedRoute && selectedRoute.catIndex === catIndex && selectedRoute.itemIndex === itemIndex) {
-            setSelectedRoute(null);
-        }
-    };
-
-    // --- Handlers for ManageCategories ---
-
-    const handleUpdateCategory = async (index: number, data: Partial<CrudCategory>) => {
-        const newData = [...crudData];
-        newData[index] = { ...newData[index], ...data };
-        setCrudData(newData);
-    };
-
-    const handleDeleteCategory = async (index: number) => {
-        const newData = [...crudData];
-        newData.splice(index, 1);
-        setCrudData(newData);
-        
-        // If selected route was in this category, deselect it
-        if (selectedRoute && selectedRoute.catIndex === index) {
-            setSelectedRoute(null);
-        }
-    };
-
-    const handleAddCategory = async (data: { category: string; devurl: string; produrl: string }) => {
-        const newCategory: CrudCategory = {
-            ...data,
-            items: []
-        };
-        setCrudData([...crudData, newCategory]);
-    };
 
     return (
         <div className={`flex h-full w-full opacity-0 animate-fade-in ${props.isVisible ? 'opacity-100' : ''}`}>
@@ -195,15 +47,7 @@ export default function CRUDTester(props: CRUDTesterProps) {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-3 custom-scrollbar" id="crud-nav-container">
-                    <AccordionNav 
-                        categories={crudData}
-                        selectedCategoryIndex={selectedRoute?.catIndex ?? null}
-                        selectedItemIndex={selectedRoute?.itemIndex ?? null}
-                        onSelect={handleSelectRoute}
-                        onAddRoute={handleAddRoute}
-                        onEditRoute={handleEditRoute}
-                        onManageCategories={handleManageCategories}
-                    />
+                    <AccordionNav />
                 </div>
             </div>
 
@@ -213,14 +57,7 @@ export default function CRUDTester(props: CRUDTesterProps) {
                 
 
                 {viewMode === 'manage' ? (
-                     <ManageCategories 
-                        isOpen={true} 
-                        onClose={() => setViewMode('tester')}
-                        categories={crudData}
-                        onUpdate={handleUpdateCategory}
-                        onDelete={handleDeleteCategory}
-                        onAdd={handleAddCategory}
-                     />
+                     <ManageCategories />
                 ) : (
                     <>
                     {/* Tester View */}
@@ -366,12 +203,15 @@ export default function CRUDTester(props: CRUDTesterProps) {
                                 {/* Col 2: Output */}
                                 <div className="flex flex-col h-full min-h-0 ">
                                     <div id="output-container" className="h-full p-3">
-                                        <CrudOutput output={{
-                                            status: 200,
-                                            statusText: "OK",
-                                            data: selectedItem.expectedOutcome,
-                                            headers: {"content-type": "application/json"}
-                                        }} />
+                                        <CrudOutput 
+                                            output={{
+                                                status: 200,
+                                                statusText: "OK",
+                                                data: selectedItem.expectedOutcome,
+                                                headers: {"content-type": "application/json"}
+                                            }} 
+                                            onShowCode={() => useCrudState.getState().setIsCodePreviewOpen(true)}
+                                        />
                                     </div>
                                 </div>
         
@@ -396,19 +236,8 @@ export default function CRUDTester(props: CRUDTesterProps) {
             </div>
 
             {/* CrudEditor Modal */}
-            <CrudEditor 
-                isOpen={editorState.isOpen} 
-                onClose={() => setEditorState(prev => ({ ...prev, isOpen: false }))} 
-                categoryIndex={editorState.catIndex} 
-                itemIndex={editorState.itemIndex} 
-                initialData={
-                    editorState.itemIndex !== -1 
-                        ? crudData[editorState.catIndex]?.items[editorState.itemIndex] 
-                        : undefined
-                }
-                onSave={handleSaveRoute} 
-                onDelete={handleDeleteRoute} 
-            />
+            <CrudEditor />
+            <CodePreview />
         </div>
     )
 }

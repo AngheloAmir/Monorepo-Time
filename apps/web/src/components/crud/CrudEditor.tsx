@@ -1,25 +1,21 @@
 import { useEffect, useState } from 'react';
 import type { CrudItem, Suggestion } from './types';
+import useCrudState from '../../_context/crud';
 
-interface CrudEditorProps {
-    isOpen: boolean;
-    onClose: () => void;
-    initialData?: CrudItem;
-    categoryIndex: number;
-    itemIndex: number;
-    onSave: (data: CrudItem, catIndex: number, itemIndex: number, action: 'add' | 'update') => Promise<void>;
-    onDelete: (catIndex: number, itemIndex: number) => Promise<void>;
-}
+export default function CrudEditor() {
+    // Store Selectors
+    const editorState = useCrudState.use.editorState();
+    const crudData = useCrudState.use.crudData();
+    const setEditorState = useCrudState.use.setEditorState();
+    const onSave = useCrudState.use.handleSaveRoute();
+    const onDelete = useCrudState.use.handleDeleteRoute();
 
-export default function CrudEditor({ 
-    isOpen, 
-    onClose, 
-    initialData, 
-    categoryIndex, 
-    itemIndex, 
-    onSave, 
-    onDelete 
-}: CrudEditorProps) {
+    const { isOpen, catIndex: categoryIndex, itemIndex } = editorState;
+    const initialData = (categoryIndex !== -1 && itemIndex !== -1) ? crudData[categoryIndex]?.items[itemIndex] : undefined;
+
+    const onClose = () => setEditorState({ ...editorState, isOpen: false });
+
+    // Local state for form
     const defaultData: CrudItem = {
         label: '',
         route: '',
@@ -69,13 +65,14 @@ export default function CrudEditor({
 
     const handleSaveClick = async () => {
         const action = itemIndex === -1 ? 'add' : 'update';
-        await onSave(formData, categoryIndex, itemIndex, action);
+        // onSave is actually synchronous in our store, but keeping async if we ever want to await
+        onSave(formData, categoryIndex, itemIndex, action);
         onClose();
     };
 
     const handleDeleteClick = async () => {
         if (window.confirm("Delete method can only be reversed by GIT, continue?")) {
-            await onDelete(categoryIndex, itemIndex);
+            onDelete(categoryIndex, itemIndex);
             onClose();
         }
     };
