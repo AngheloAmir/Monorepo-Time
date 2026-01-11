@@ -25,7 +25,6 @@ export default function RootTerminal() {
                 terminalRef.current?.connect(rootDir);
                 terminalRef.current?.focus();
             }, 50);
-
             return () => clearTimeout(timeoutId);
         }
     }, [showTerminal, rootDir]);
@@ -40,12 +39,12 @@ export default function RootTerminal() {
                 icon="fas fa-terminal text-blue-500 text-xl"
             />
             
-            <div className="flex-1 overflow-hidden p-3 bg-gray-900">
+            <div className="flex-1 overflow-hidden p-2 bg-gray-900">
                 <InteractiveTerminal 
                     ref={terminalRef}
                     isInteractive={true}
                     className="h-full"
-                    onExit={() => setShowTerminal(false)}
+                    //onExit={() => setShowTerminal(false)}
                 />
             </div>
         </ModalBody>

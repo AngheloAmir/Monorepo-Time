@@ -35,10 +35,6 @@ interface InteractiveTerminalProps {
     socketUrl?: string;
     /** Whether the terminal accepts user input (default: true) */
     isInteractive?: boolean;
-    /** The working directory path to start the terminal process in */
-    path?: string;
-    /** The command to execute (e.g. 'bash') */
-    command?: string;
     /** Callback function called when the process exits */
     onExit?: () => void;
 }
@@ -99,9 +95,8 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     // Helper to connect socket
     const connectSocket = (path: string, command: string = 'bash') => {
         disconnectSocket();
-
-        const url = props.socketUrl || 'http://localhost:3000';
-        const socket = io(url, {
+        const url      = props.socketUrl || 'http://localhost:3000';
+        const socket   = io(url, {
             transports: ['websocket'],
             forceNew: true, // Important for connection stability
             reconnection: false // We manage lifecycle manually, so disable auto-reconnect to avoid race conditions
@@ -111,7 +106,11 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
 
         socket.on('connect', () => {
             terminalRef.current?.clear();
-            // Start the terminal process on the backend
+            
+            if( command !=  'bash' ) {
+                terminalRef.current?.write(`\x1b[34m${path}\x1b[0m: ${command}\r\n`);
+            }
+
             socket.emit('terminal:start', { path, command });
             terminalRef.current?.focus();
             
