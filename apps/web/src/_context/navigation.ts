@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 
 export const NavigationalPages = [
-    { name: 'home', label: 'Home', icon: 'fa fa-home' },
+    { name: 'dashboard', label: 'Dashboard', icon: 'fa fa-solid fa-house' },
     { name: 'workspace', label: 'Workspace', icon: 'fa fa-cube'},
     { name: 'turborepo', label: 'Turborepo', icon: 'fa fa-solid fa-truck-fast'},
     //{ name: 'cicd', label: 'Turbp CI/CD', icon: 'fa fa-server'},
@@ -18,7 +18,7 @@ interface navigationContext {
 }
 
 const navstate = create<navigationContext>()((set) => ({
-    currentPage: "home",
+    currentPage: "dashboard",
 
     action: {
         setCurrentPage: (page: string) => set({ currentPage: page })

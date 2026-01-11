@@ -8,7 +8,9 @@ import Workspace from './contents/Workspace';
 import Modal from './modal';
 import RootTerminal from './components/RootTerminal';
 import useAppState from './_context/app';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import Flash from './contents/Flash';
+import Loading from './contents/_Loading';
 
 
 // import Turborepo from './contents/Turborepo';
@@ -16,15 +18,33 @@ import { useEffect } from 'react';
 // import Setting from './contents/Setting';
 
 function App() {
-    const currentPage = useNavState.use.currentPage();
-    const loadRootDir = useAppState.use.loadRootDir();
+    const currentPage      = useNavState.use.currentPage();
+    const loadRootDir      = useAppState.use.loadRootDir();
+    const checkIfFirstTime = useAppState.use.checkIfFirstTime();
+    const [isFlashVisible, setIsFlashVisible] = useState(false);
+    const [loading, setLoading]               = useState(true);
 
     useEffect(() => {
-        setTimeout(() => {
-            loadRootDir();
-        }, 10);
+        setTimeout( async () => {
+            try {
+                const isFirstTime = await checkIfFirstTime();
+                if(isFirstTime){
+                    setIsFlashVisible(true);
+                }
+                await loadRootDir();
+            } catch (error) {
+                console.error("Error checking first time:", error);
+            }
+            setLoading(false);
+        }, 0);
     }, []);
 
+    if(loading)
+        return <Loading />;
+
+    if(isFlashVisible)
+        return <Flash onComplete={() => setIsFlashVisible(false)} />
+    
     return (
         <div className='w-screen h-screen overflow-hidden'>
             <Header />
@@ -39,7 +59,7 @@ function App() {
                     </div>
 
                     <div id="app-content" className="w-full h-full p-2">
-                        <Home isVisible={currentPage === "home"}/>
+                        <Home isVisible={currentPage === "dashboard"}/>
                         <Workspace isVisible={currentPage === "workspace"}/>
                         {/* <Turborepo isVisible={currentPage === "turborepo"}/>
                         <CRUDTester isVisible={currentPage === "crud"}/>

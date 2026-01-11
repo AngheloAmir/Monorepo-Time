@@ -7,7 +7,8 @@ interface appContext {
     showTerminal: boolean;
     setShowTerminal: (show: boolean) => void;
     rootDir: string;
-    loadRootDir: () => Promise<void>;
+    loadRootDir: ()      => Promise<void>;
+    checkIfFirstTime: () => Promise<boolean>;
 }
 
 const appstate = create<appContext>()((set, get) => ({
@@ -20,6 +21,12 @@ const appstate = create<appContext>()((set, get) => ({
         const response = await fetch(`http://localhost:${port}/${apiRoute.getRootPath}`);
         const data     = await response.json();
         set({ rootDir: data.path });
+    },
+    checkIfFirstTime: async () => {
+        const port     = config.apiPort || 3000;
+        const response = await fetch(`http://localhost:${port}/${apiRoute.firstRun}`);
+        const data     = await response.json();
+        return data.isFirstTime;
     }
 }));
 

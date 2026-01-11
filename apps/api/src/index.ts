@@ -21,6 +21,7 @@ import vscodeHideShow    from './routes/vscodeHideShow';
 import rootPath          from './routes/rootPath';
 import scaffoldRepo      from './routes/scafoldrepo';
 import turborepoExist    from './routes/turborepoexist';
+import firstRunRoute     from './routes/firstrun';
 
 const app = express();
 const port = config.apiPort;
@@ -45,6 +46,7 @@ app.use("/" + apiRoute.hideShowFileFolder, vscodeHideShow);
 app.use("/" + apiRoute.getRootPath,        rootPath);
 app.use("/" + apiRoute.scaffoldRepo,       scaffoldRepo);
 app.use("/" + apiRoute.turborepoExist,     turborepoExist);
+app.use("/" + apiRoute.firstRun,           firstRunRoute);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');

@@ -56,6 +56,12 @@ const apiRoute = {
      * get return { exists: boolean }
     */
     turborepoExist: 'turborepoexist',
+
+
+    /** Check if it is the first run
+     * get return { isFirstTime: boolean }
+    */
+    firstRun: 'firstrun',
 }
 
 export default apiRoute;

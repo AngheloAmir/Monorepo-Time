@@ -1,12 +1,10 @@
-
+import Logo from "./Logo";
 
 export default function Header() {
     return (
         <header className="h-12 w-full bg-gray-900/80 border-b border-gray-800 px-6 py-2">
             <div className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <i className="fas fa-boxes text-white text-lg"></i>
-                </div>
+                <Logo className="w-8 h-8" />
                 <div>
                     <h1 className="font-bold text-lg tracking-wide text-white">
                         Monorepo
