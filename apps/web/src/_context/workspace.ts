@@ -7,7 +7,6 @@ import defaultWorkspace from './fake/defaultWorkspace';
 
 export interface WorkspaceItem {
     isRunningAs: 'dev' | 'start' | null;
-    consoleOutput: string | null;
     info: WorkspaceInfo;
 }
 
@@ -35,16 +34,6 @@ interface workspaceContext {
 
     /** set active workspace option modal */
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => void;
-
-    /**
-     * Write on console of a workspace
-     * @param workspaceName 
-     * @param output 
-     */
-    writeOnConsole: (workspaceName: string, output: string) => void;
-
-    /** clear console of a workspace */
-    clearConsole: (workspaceName: string) => void;
 
     /** set workspace running as */
     setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | null) => void;
@@ -112,44 +101,6 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         }
     },
 
-    writeOnConsole: (workspaceName: string, output: string) => {
-        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
-        const trimed = output.trim();
-        if (workspace && trimed) {
-            set({
-                workspace: get().workspace.map((item) => {
-                    if (item.info.name === workspaceName) {
-                        return {
-                            ...item,
-                            consoleOutput:
-                                item.consoleOutput ?
-                                    `${item.consoleOutput}\n${trimed}` :
-                                    trimed
-                        }
-                    }
-                    return item;
-                })
-            });
-        }
-    },
-
-    clearConsole: (workspaceName: string) => {
-        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
-        if (workspace) {
-            set({
-                workspace: get().workspace.map((item) => {
-                    if (item.info.name === workspaceName) {
-                        return {
-                            ...item,
-                            consoleOutput: null
-                        }
-                    }
-                    return item;
-                })
-            });
-        }
-    },
-
     loadWorkspace: async () => {
         const isLoading = get().loading;
         if (isLoading) return;
@@ -174,13 +125,11 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
                 if (currentWorkspace.find((i) => i.info.name === item.name)) {
                     newWorkspace.push({
                         isRunningAs: currentWorkspace.find((i) => i.info.name === item.name)?.isRunningAs ?? null,
-                        consoleOutput: currentWorkspace.find((i) => i.info.name === item.name)?.consoleOutput ?? null,
                         info: item
                     })
                 } else {
                     newWorkspace.push({
                         isRunningAs: null,
-                        consoleOutput: null,
                         info: item
                     })
                 }

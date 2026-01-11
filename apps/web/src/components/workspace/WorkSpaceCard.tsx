@@ -1,13 +1,8 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { WorkspaceItem } from "../../_context/workspace";
-import config from "config";
-import { io, Socket } from "socket.io-client";
 import useWorkspaceState from "../../_context/workspace";
 
 export default function WorkspaceCard(props: WorkspaceItem) {
-    const socketRef = useRef<Socket | null>(null);
-    const WriteConsole                  = useWorkspaceState.use.writeOnConsole();
-    const clearConsole                  = useWorkspaceState.use.clearConsole();
     const setWorkSpaceRunningAs         = useWorkspaceState.use.setWorkSpaceRunningAs();
     const setActiveTerminal             = useWorkspaceState.use.setActiveTerminal();
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
@@ -16,7 +11,6 @@ export default function WorkspaceCard(props: WorkspaceItem) {
     const loadingWorkspace              = useWorkspaceState.use.loadingWorkspace();
     const [loading, setLoading]         = useState(false);
 
-    //if loadingWorkspace is this workspace, then show loading
     useEffect(() => {
         if (loadingWorkspace == props.info.name) {
             setLoading(true);
@@ -25,70 +19,6 @@ export default function WorkspaceCard(props: WorkspaceItem) {
         }
     }, [loadingWorkspace]);
     
-    useEffect(() => {
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                WriteConsole(props.info.name, "Terminal Disconnected");
-            }
-        };
-    }, []);
-
-    const connectAndRun = (runas: 'dev' | 'start') => {
-        if(loading) return;
-        try {
-            setLoading(true);
-            setTimeout(() => setLoading(false), 2000);
-
-            const port = config.apiPort || 3000;
-            
-            if (!socketRef.current || !socketRef.current.connected) {
-                socketRef.current = io(`http://localhost:${port}`, {
-                    transports: ['websocket']
-                });
-
-                socketRef.current.on("connect", () => {
-                    setWorkSpaceRunningAs(props.info.name, runas);
-                    setActiveTerminal(props.info.name);
-                    socketRef.current?.emit('run', {
-                        workspace: props.info,
-                        runas: runas
-                    });
-
-                    socketRef.current?.on("log", (data)    => { WriteConsole(props.info.name, data); });
-                    socketRef.current?.on("error", (data)  => { WriteConsole(props.info.name, data); });
-                    socketRef.current?.on("exit", (data)   => { WriteConsole(props.info.name, data); });
-                    socketRef.current?.on("disconnect", () => { WriteConsole(props.info.name, "Disconnected"); });
-                });
-            } else {
-                 setWorkSpaceRunningAs(props.info.name, runas);
-                 setActiveTerminal(props.info.name);
-                 socketRef.current.emit('run', {
-                    workspace: props.info,
-                    runas: runas
-                });
-            }
-        } catch (e) {
-            console.error(e);
-            setLoading(false);
-        }
-    }
-
-    async function handleStop() {
-        if(loading) return;
-        try {
-            setLoading(true);
-            WriteConsole(props.info.name, "..");
-            await stopProcess(props.info.name);
-            setWorkSpaceRunningAs(props.info.name, null);
-            setLoading(false);
-            clearConsole(props.info.name);
-        } catch (e) {
-            console.error(e);
-            setLoading(false);
-        }
-    }
-
     return (
         <div className="bg-gray-800 rounded-lg transition-all overflow-hidden flex flex-col">
             <header className="p-2 flex-1 flex gap-4 items-center">
@@ -124,25 +54,49 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                         </button>
                     )}
                     { !loading && props.isRunningAs == 'start' && (
-                        <button onClick={handleStop}  className="flex-1 py-1 px-2 rounded-lg bg-orange-700 text-white hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button 
+                            onClick={ async () => {
+                                await stopProcess(props.info.name);
+                                setWorkSpaceRunningAs(props.info.name, null);
+                            }}
+                            className="flex-1 py-1 px-2 rounded-lg bg-orange-700 text-white hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="opacity-70 fas fa-check-circle text-lg"></i>
                             Server is up
                         </button>
                     )}
                     { !loading && props.isRunningAs == 'dev' && (
-                        <button onClick={() => handleStop()} className="flex-1 py-1 px-2 rounded-lg bg-red-800 text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button 
+                            onClick={async () => {
+                                await stopProcess(props.info.name);
+                                setWorkSpaceRunningAs(props.info.name, null);
+                            }}
+                            className="flex-1 py-1 px-2 rounded-lg bg-red-800 text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="opacity-70 fas fa-stop text-lg"></i>
                             Stop Dev
                         </button>
                     )}
                     { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.startCommand && (
-                        <button onClick={() => connectAndRun('start')} className="flex-1 py-1 px-2 rounded-lg bg-green-800 text-white hover:bg-green-600 transition-colors shadow-lg shadow-green-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button 
+                            onClick={() => {
+                                setLoading(true);
+                                setWorkSpaceRunningAs(props.info.name, 'start');
+                                setActiveTerminal(props.info.name);
+                                setTimeout(() => setLoading(false), 1000);
+                            }}
+                            className="flex-1 py-1 px-2 rounded-lg bg-green-800 text-white hover:bg-green-600 transition-colors shadow-lg shadow-green-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="opacity-70 fas fa-play text-lg"></i>
                             Start
                         </button>
                     )}
                     { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.devCommand && (
-                        <button onClick={() => connectAndRun('dev')} className="flex-1 py-1 px-2 rounded-lg bg-blue-800 text-white hover:bg-blue-600 transition-colors shadow-lg shadow-blue-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                        <button 
+                            onClick={() => {
+                                setLoading(true);
+                                setWorkSpaceRunningAs(props.info.name, 'dev');
+                                setActiveTerminal(props.info.name);
+                                setTimeout(() => setLoading(false), 1000);
+                            }}
+                            className="flex-1 py-1 px-2 rounded-lg bg-blue-800 text-white hover:bg-blue-600 transition-colors shadow-lg shadow-blue-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="opacity-70 fas fa-play text-lg"></i>
                             Start Dev
                         </button>
