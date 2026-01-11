@@ -27,8 +27,13 @@ export default function Modal() {
     return (
         <div>
             {currentModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-                    <div className="w-[500px] min-h-[200px] max-h-[500px] flex flex-col bg-gray-800 p-4 rounded-xl shadow-lg">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+                    <div className="relative w-[500px] min-h-[200px] max-h-[500px] flex flex-col rounded-xl overflow-hidden shadow-2xl shadow-blue-900/20">
+                        {/* Gradient Border Background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 pointer-events-none"></div>
+                        <div className="absolute inset-[1px] bg-[#0A0A0A] rounded-[10px] pointer-events-none"></div>
+                        
+                        <div className="relative z-10 p-6 flex flex-col h-full">
                         <div className="flex-1  ">
                             <div className="mb-2 flex gap-4">
                                 <i className={`${iconClass} text-3xl`}></i>
@@ -103,6 +108,7 @@ export default function Modal() {
                             </div>
                         )}
                        
+                        </div>
                     </div>
                 </div>
             )}

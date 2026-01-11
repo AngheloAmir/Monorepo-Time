@@ -46,7 +46,7 @@ function App() {
         <div className='w-screen h-screen overflow-hidden'>
             <Header />
 
-            <div className="flex flex-1 overflow-hidden ">
+            <div className="flex flex-1 overflow-hidden h-full w-full ">
                 <Navigation />
 
                 <main className="flex-1 relative overflow-hidden bg-black">

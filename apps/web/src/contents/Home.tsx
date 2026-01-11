@@ -54,7 +54,7 @@ export default function Home(props: HomeProps) {
     }, []);
 
     return (
-        <div className={props.isVisible ? 'block' : 'hidden'}>
+        <div className={`h-full w-full ${props.isVisible ? 'block' : 'hidden'}`}>
             <div className="px-6 py-8 space-y-8 animate-fade-in max-w-[1600px] mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     
