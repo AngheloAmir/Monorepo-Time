@@ -7,6 +7,7 @@ export default function Modal() {
     const callback = useModal.use.callback();
     const hideModal = useModal.use.hideModal();
     const banner = useModal.use.banner();
+    const data = useModal.use.data();
 
     // Type Styling
     let iconClass = 'fa fa-info-circle text-blue-500';
@@ -27,7 +28,7 @@ export default function Modal() {
         <div>
             {currentModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-                    <div className="w-[500px] min-h-[200px] max-h-[300px] flex flex-col bg-gray-800 p-4 rounded-xl shadow-lg">
+                    <div className="w-[500px] min-h-[200px] max-h-[500px] flex flex-col bg-gray-800 p-4 rounded-xl shadow-lg">
                         <div className="flex-1  ">
                             <div className="mb-2 flex gap-4">
                                 <i className={`${iconClass} text-3xl`}></i>
@@ -47,6 +48,36 @@ export default function Modal() {
                             >
                                 OK
                             </button>
+                        )}
+
+                        {currentModal === 'selection' && (
+                             <div className="flex flex-col gap-2 h-full overflow-y-auto pr-1">
+                                {(data as any[])?.map((item: any, index: number) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => {
+                                            callback && callback(item);
+                                            hideModal();
+                                        }}
+                                        className="flex items-center gap-3 w-full p-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors text-left group"
+                                    >
+                                        <div className="w-8 h-8 rounded bg-gray-600 flex items-center justify-center text-gray-400 group-hover:text-white transition-colors">
+                                           <i className={`fas ${item.info.fontawesomeIcon || 'fa-box'}`}></i>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-white font-medium truncate">{item.info.name}</div>
+                                            <div className="text-gray-400 text-xs truncate">{item.info.path}</div>
+                                        </div>
+                                        <i className="fas fa-chevron-right text-gray-500 group-hover:text-white"></i>
+                                    </button>
+                                ))}
+                                <button
+                                    onClick={() => hideModal()}
+                                    className="mt-4 w-full py-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         )}
 
                         {currentModal === 'confirm' && (

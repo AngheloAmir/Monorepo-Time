@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import Button from "../components/Button";
 import InteractiveTerminal, { type InteractiveTerminalRef } from "../components/InteractiveTerminal";
 import useAppState from "../_context/app";
+import useModal from "../modal/modals";
+import useWorkspaceState from "../_context/workspace";
 
 interface TurborepoProps {
     isVisible: boolean
@@ -33,7 +35,10 @@ export default function Turborepo(props: TurborepoProps) {
         }
     }, []);
 
-    function handleCommand(cmd: string) {
+    const showModal = useModal.use.showModal();
+    const workspaces = useWorkspaceState.use.workspace();
+
+    function execute(cmd: string) {
         if (terminalRef.current) {
             terminalRef.current.clear();
             terminalRef.current.disconnect();
@@ -48,6 +53,27 @@ export default function Turborepo(props: TurborepoProps) {
             });
             setIsRunning(true);
         }
+    }
+
+    function handleCommand(cmd: string) {
+        if (cmd === 'turbo prune' || cmd === 'turbo prune --docker') {
+             showModal(
+                'selection',
+                'Select Workspace',
+                'Choose a workspace to prune / dockerize',
+                null, 
+                (selectedItem: any) => {
+                     if (selectedItem) {
+                         const isDocker = cmd.includes('--docker');
+                         const newCmd = `turbo prune ${selectedItem.info.name}${isDocker ? ' --docker' : ''}`;
+                         execute(newCmd); 
+                     }
+                },
+                workspaces
+             );
+             return;
+        }
+        execute(cmd);
     }
 
     function handleStop() {

@@ -12,9 +12,7 @@ import { useEffect, useState } from 'react';
 import Flash from './contents/Flash';
 import Loading from './contents/_Loading';
 import Turborepo from './contents/Turborepo';
-
-// import CRUDTester from './contents/CRUDTester';
-// import Setting from './contents/Setting';
+import CRUDTester from './contents/CRUDTester';
 
 function App() {
     const currentPage      = useNavState.use.currentPage();
@@ -61,10 +59,9 @@ function App() {
                         <Home isVisible={currentPage === "dashboard"}/>
                         <Workspace isVisible={currentPage === "workspace"}/>
                         <Turborepo isVisible={currentPage === "turborepo"}/>
-
-                        {/* 
                         <CRUDTester isVisible={currentPage === "crud"}/>
-                        <Setting isVisible={currentPage === "settings"}/> */}
+
+                        {/* <Setting isVisible={currentPage === "settings"}/> */}
                     </div>
                 </main>
             </div>

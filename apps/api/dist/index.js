@@ -39,7 +39,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 var import_express15 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
-var import_path12 = __toESM(require("path"));
+var import_path13 = __toESM(require("path"));
 
 // ../../packages/api/index.ts
 var apiRoute = {
@@ -567,7 +567,37 @@ var listworkspacedirs_default = router2;
 // src/routes/newworkspace.ts
 var import_express4 = require("express");
 var import_fs_extra3 = __toESM(require("fs-extra"));
+var import_path4 = __toESM(require("path"));
+
+// src/routes/_nameExist.ts
 var import_path3 = __toESM(require("path"));
+async function checkNameExists(name, excludePath) {
+  const rootPkgPath = import_path3.default.join(ROOT, "package.json");
+  const rootPkg = await readJSON(rootPkgPath);
+  let projects = [];
+  if (rootPkg == null ? void 0 : rootPkg.workspaces) {
+    projects = await scanWorkspaces(rootPkg);
+  } else {
+    projects = await scanRecursively();
+  }
+  for (const projectPath of projects) {
+    if (excludePath && import_path3.default.resolve(projectPath) === import_path3.default.resolve(excludePath)) {
+      continue;
+    }
+    const folderName = import_path3.default.basename(projectPath);
+    if (folderName === name) {
+      return true;
+    }
+    const pkgPath = import_path3.default.join(projectPath, "package.json");
+    const pkg = await readJSON(pkgPath);
+    if (pkg && pkg.name === name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// src/routes/newworkspace.ts
 var router3 = (0, import_express4.Router)();
 router3.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -577,9 +607,13 @@ router3.post("/", async (req, res) => {
     if (!targetPath) {
       return res.status(400).json({ error: "Path is required" });
     }
+    const nameToCheck = reqBody.name || import_path4.default.basename(targetPath);
+    if (await checkNameExists(nameToCheck)) {
+      return res.status(409).json({ error: `Workspace with name "${nameToCheck}" already exists.` });
+    }
     await import_fs_extra3.default.ensureDir(targetPath);
     const packageJson = {
-      name: reqBody.name || import_path3.default.basename(targetPath),
+      name: reqBody.name || import_path4.default.basename(targetPath),
       version: "1.0.0",
       description: reqBody.description || "",
       fontawesomeIcon: reqBody.fontawesomeIcon || "",
@@ -596,7 +630,7 @@ router3.post("/", async (req, res) => {
     Object.keys(packageJson.scripts).forEach(
       (key) => packageJson.scripts[key] === void 0 && delete packageJson.scripts[key]
     );
-    await import_fs_extra3.default.writeJSON(import_path3.default.join(targetPath, "package.json"), packageJson, { spaces: 2 });
+    await import_fs_extra3.default.writeJSON(import_path4.default.join(targetPath, "package.json"), packageJson, { spaces: 2 });
     res.json({ message: "Workspace created successfully", path: targetPath });
   } catch (e) {
     console.error("Error creating workspace:", e);
@@ -640,7 +674,7 @@ function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
     socket.on("terminal:start", (data) => {
       var _a, _b;
-      const { path: path13, command, workspaceName } = data;
+      const { path: path14, command, workspaceName } = data;
       stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
@@ -654,7 +688,7 @@ function interactiveTerminalSocket(io2) {
           const baseCMD = command.split(" ")[0];
           const args = command.split(" ").slice(1);
           child = (0, import_child_process3.spawn)(baseCMD, args, {
-            cwd: path13,
+            cwd: path14,
             env,
             shell: true,
             stdio: ["pipe", "pipe", "pipe"]
@@ -682,7 +716,7 @@ except Exception as e:
     sys.exit(1)
 `;
           child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
-            cwd: path13,
+            cwd: path14,
             env,
             stdio: ["pipe", "pipe", "pipe"]
           });
@@ -763,7 +797,7 @@ var stopInteractiveTerminal_default = router5;
 // src/routes/updateworkspace.ts
 var import_express7 = require("express");
 var import_fs_extra4 = __toESM(require("fs-extra"));
-var import_path4 = __toESM(require("path"));
+var import_path5 = __toESM(require("path"));
 var router6 = (0, import_express7.Router)();
 router6.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -773,7 +807,11 @@ router6.post("/", async (req, res) => {
       res.status(400).send({ error: "Invalid workspace data" });
       return;
     }
-    const packageJsonPath = import_path4.default.join(workspace.path, "package.json");
+    if (workspace.name && await checkNameExists(workspace.name, workspace.path)) {
+      res.status(409).send({ error: `Workspace with name "${workspace.name}" already exists.` });
+      return;
+    }
+    const packageJsonPath = import_path5.default.join(workspace.path, "package.json");
     if (!import_fs_extra4.default.existsSync(packageJsonPath)) {
       res.status(404).send({ error: "package.json not found in workspace path" });
       return;
@@ -800,7 +838,7 @@ var updateworkspace_default = router6;
 // src/routes/vscodeHideShow.ts
 var import_express8 = require("express");
 var import_fs_extra5 = __toESM(require("fs-extra"));
-var import_path5 = __toESM(require("path"));
+var import_path6 = __toESM(require("path"));
 var router7 = (0, import_express8.Router)();
 var EXCLUDE_PATTERNS = {
   "**/node_modules": true,
@@ -842,8 +880,8 @@ var EXCLUDE_PATTERNS_DEFAULT = {
 var START_DIR3 = process.cwd();
 function findMonorepoRoot2(startDir) {
   let dir = startDir;
-  while (dir !== import_path5.default.dirname(dir)) {
-    const pkgPath = import_path5.default.join(dir, "package.json");
+  while (dir !== import_path6.default.dirname(dir)) {
+    const pkgPath = import_path6.default.join(dir, "package.json");
     if (import_fs_extra5.default.existsSync(pkgPath)) {
       try {
         const pkg = import_fs_extra5.default.readJsonSync(pkgPath);
@@ -853,20 +891,20 @@ function findMonorepoRoot2(startDir) {
       } catch (e) {
       }
     }
-    if (import_fs_extra5.default.existsSync(import_path5.default.join(dir, ".vscode"))) {
+    if (import_fs_extra5.default.existsSync(import_path6.default.join(dir, ".vscode"))) {
       return dir;
     }
-    dir = import_path5.default.dirname(dir);
+    dir = import_path6.default.dirname(dir);
   }
   return startDir;
 }
 var ROOT2 = findMonorepoRoot2(START_DIR3);
 var getSettingsPath = () => {
-  return import_path5.default.join(ROOT2, ".vscode/settings.json");
+  return import_path6.default.join(ROOT2, ".vscode/settings.json");
 };
 var ensureSettingsFile = async () => {
   const settingsPath = getSettingsPath();
-  const dir = import_path5.default.dirname(settingsPath);
+  const dir = import_path6.default.dirname(settingsPath);
   await import_fs_extra5.default.ensureDir(dir);
   if (!await import_fs_extra5.default.pathExists(settingsPath)) {
     await import_fs_extra5.default.writeJson(settingsPath, { "files.exclude": {} }, { spaces: 4 });
@@ -883,8 +921,8 @@ router7.post("/", async (req, res) => {
       Object.assign(newExcludes, EXCLUDE_PATTERNS);
       if (Array.isArray(pathInclude)) {
         pathInclude.forEach((p) => {
-          const relativePath = import_path5.default.relative(ROOT2, p);
-          if (relativePath && !relativePath.startsWith("..") && !import_path5.default.isAbsolute(relativePath)) {
+          const relativePath = import_path6.default.relative(ROOT2, p);
+          if (relativePath && !relativePath.startsWith("..") && !import_path6.default.isAbsolute(relativePath)) {
             newExcludes[relativePath] = true;
           }
         });
@@ -902,13 +940,13 @@ var vscodeHideShow_default = router7;
 
 // src/routes/rootPath.ts
 var import_fs_extra6 = __toESM(require("fs-extra"));
-var import_path6 = __toESM(require("path"));
+var import_path7 = __toESM(require("path"));
 var import_express9 = require("express");
 var START_DIR4 = process.cwd();
 function findMonorepoRoot3(startDir) {
   let dir = startDir;
-  while (dir !== import_path6.default.dirname(dir)) {
-    const pkgPath = import_path6.default.join(dir, "package.json");
+  while (dir !== import_path7.default.dirname(dir)) {
+    const pkgPath = import_path7.default.join(dir, "package.json");
     if (import_fs_extra6.default.existsSync(pkgPath)) {
       try {
         const pkg = import_fs_extra6.default.readJsonSync(pkgPath);
@@ -918,7 +956,7 @@ function findMonorepoRoot3(startDir) {
       } catch (e) {
       }
     }
-    dir = import_path6.default.dirname(dir);
+    dir = import_path7.default.dirname(dir);
   }
   return startDir;
 }
@@ -932,14 +970,14 @@ var rootPath_default = route2;
 // src/routes/scafoldrepo.ts
 var import_express10 = require("express");
 var import_fs_extra7 = __toESM(require("fs-extra"));
-var import_path7 = __toESM(require("path"));
+var import_path8 = __toESM(require("path"));
 var import_child_process4 = require("child_process");
 var router8 = (0, import_express10.Router)();
 router8.get("/", async (req, res) => {
   var _a;
   try {
-    const packageJsonPath = import_path7.default.join(ROOT3, "package.json");
-    const turboJsonPath = import_path7.default.join(ROOT3, "turbo.json");
+    const packageJsonPath = import_path8.default.join(ROOT3, "package.json");
+    const turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
     if (!import_fs_extra7.default.existsSync(packageJsonPath)) {
       res.status(400).json({ error: "package.json not found in root" });
       return;
@@ -953,25 +991,25 @@ router8.get("/", async (req, res) => {
     if (pkgChanged) {
       import_fs_extra7.default.writeJsonSync(packageJsonPath, pkg, { spaces: 2 });
     }
-    await import_fs_extra7.default.ensureDir(import_path7.default.join(ROOT3, "apps"));
-    await import_fs_extra7.default.ensureDir(import_path7.default.join(ROOT3, "packages"));
-    const SCAFFOLD_DIR = import_path7.default.join(__dirname, "scaffold");
-    const typesPackagePath = import_path7.default.join(ROOT3, "packages", "types");
+    await import_fs_extra7.default.ensureDir(import_path8.default.join(ROOT3, "apps"));
+    await import_fs_extra7.default.ensureDir(import_path8.default.join(ROOT3, "packages"));
+    const SCAFFOLD_DIR = import_path8.default.join(__dirname, "scaffold");
+    const typesPackagePath = import_path8.default.join(ROOT3, "packages", "types");
     if (!import_fs_extra7.default.existsSync(typesPackagePath)) {
       await import_fs_extra7.default.ensureDir(typesPackagePath);
       try {
-        const indexContent = await import_fs_extra7.default.readFile(import_path7.default.join(SCAFFOLD_DIR, "index.ts"), "utf-8");
-        const packageJsonContent = await import_fs_extra7.default.readJson(import_path7.default.join(SCAFFOLD_DIR, "package.json"));
-        await import_fs_extra7.default.writeFile(import_path7.default.join(typesPackagePath, "index.ts"), indexContent);
-        await import_fs_extra7.default.writeJson(import_path7.default.join(typesPackagePath, "package.json"), packageJsonContent, { spaces: 4 });
+        const indexContent = await import_fs_extra7.default.readFile(import_path8.default.join(SCAFFOLD_DIR, "index.ts"), "utf-8");
+        const packageJsonContent = await import_fs_extra7.default.readJson(import_path8.default.join(SCAFFOLD_DIR, "package.json"));
+        await import_fs_extra7.default.writeFile(import_path8.default.join(typesPackagePath, "index.ts"), indexContent);
+        await import_fs_extra7.default.writeJson(import_path8.default.join(typesPackagePath, "package.json"), packageJsonContent, { spaces: 4 });
       } catch (err) {
         console.error("Error reading scaffold files for types package:", err);
       }
     }
-    const monorepoTimePath3 = import_path7.default.join(ROOT3, "monorepotime.json");
+    const monorepoTimePath3 = import_path8.default.join(ROOT3, "monorepotime.json");
     if (!import_fs_extra7.default.existsSync(monorepoTimePath3)) {
       try {
-        const defaultMonorepoTime = await import_fs_extra7.default.readJson(import_path7.default.join(SCAFFOLD_DIR, "monorepotime.json"));
+        const defaultMonorepoTime = await import_fs_extra7.default.readJson(import_path8.default.join(SCAFFOLD_DIR, "monorepotime.json"));
         import_fs_extra7.default.writeJsonSync(monorepoTimePath3, defaultMonorepoTime, { spaces: 4 });
       } catch (err) {
         console.error("Error reading scaffold file for monorepotime.json:", err);
@@ -1029,17 +1067,17 @@ var scafoldrepo_default = router8;
 // src/routes/turborepoexist.ts
 var import_express11 = require("express");
 var import_fs = __toESM(require("fs"));
-var import_path8 = __toESM(require("path"));
+var import_path9 = __toESM(require("path"));
 var router9 = (0, import_express11.Router)();
 router9.get("/", async (req, res) => {
   try {
     let isExist = true;
-    const turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
+    const turboJsonPath = import_path9.default.join(ROOT3, "turbo.json");
     const turboExists = import_fs.default.existsSync(turboJsonPath);
     if (!turboExists) {
       isExist = false;
     }
-    const monorepoJsonPath = import_path8.default.join(ROOT3, "monorepotime.json");
+    const monorepoJsonPath = import_path9.default.join(ROOT3, "monorepotime.json");
     const monorepoExists = import_fs.default.existsSync(monorepoJsonPath);
     if (!monorepoExists) {
       isExist = false;
@@ -1055,15 +1093,15 @@ var turborepoexist_default = router9;
 // src/routes/firstrun.ts
 var import_express12 = require("express");
 var import_fs_extra8 = __toESM(require("fs-extra"));
-var import_path9 = __toESM(require("path"));
+var import_path10 = __toESM(require("path"));
 var router10 = (0, import_express12.Router)();
 router10.get("/", async (req, res) => {
   try {
-    const monorepoTimePath3 = import_path9.default.join(ROOT3, "monorepotime.json");
+    const monorepoTimePath3 = import_path10.default.join(ROOT3, "monorepotime.json");
     const exists = import_fs_extra8.default.existsSync(monorepoTimePath3);
     if (!exists) {
       try {
-        const scaffoldPath = import_path9.default.join(__dirname, "scaffold", "monorepotime.json");
+        const scaffoldPath = import_path10.default.join(__dirname, "scaffold", "monorepotime.json");
         const defaultContent = await import_fs_extra8.default.readJson(scaffoldPath);
         import_fs_extra8.default.writeJsonSync(monorepoTimePath3, defaultContent, { spaces: 4 });
       } catch (err) {
@@ -1087,9 +1125,9 @@ var firstrun_default = router10;
 // src/routes/notes.ts
 var import_express13 = require("express");
 var import_fs_extra9 = __toESM(require("fs-extra"));
-var import_path10 = __toESM(require("path"));
+var import_path11 = __toESM(require("path"));
 var router11 = (0, import_express13.Router)();
-var monorepoTimePath = import_path10.default.join(ROOT3, "monorepotime.json");
+var monorepoTimePath = import_path11.default.join(ROOT3, "monorepotime.json");
 var ensureFile = async () => {
   if (!import_fs_extra9.default.existsSync(monorepoTimePath)) {
     await import_fs_extra9.default.writeJson(monorepoTimePath, { notes: "", crudtest: [] }, { spaces: 4 });
@@ -1127,9 +1165,9 @@ var notes_default = router11;
 // src/routes/crudtest.ts
 var import_express14 = require("express");
 var import_fs_extra10 = __toESM(require("fs-extra"));
-var import_path11 = __toESM(require("path"));
+var import_path12 = __toESM(require("path"));
 var router12 = (0, import_express14.Router)();
-var monorepoTimePath2 = import_path11.default.join(ROOT3, "monorepotime.json");
+var monorepoTimePath2 = import_path12.default.join(ROOT3, "monorepotime.json");
 var ensureFile2 = async () => {
   if (!import_fs_extra10.default.existsSync(monorepoTimePath2)) {
     await import_fs_extra10.default.writeJson(monorepoTimePath2, { notes: "", crudtest: [] }, { spaces: 4 });
@@ -1187,10 +1225,10 @@ app.use("/" + api_default.turborepoExist, turborepoexist_default);
 app.use("/" + api_default.firstRun, firstrun_default);
 app.use("/" + api_default.notes, notes_default);
 app.use("/" + api_default.crudTest, crudtest_default);
-var frontendPath = import_path12.default.join(__dirname, "../public");
+var frontendPath = import_path13.default.join(__dirname, "../public");
 app.use(import_express15.default.static(frontendPath));
 app.get("*", (req, res) => {
-  res.sendFile(import_path12.default.join(frontendPath, "index.html"));
+  res.sendFile(import_path13.default.join(frontendPath, "index.html"));
 });
 var httpServer = (0, import_http.createServer)(app);
 var io = new import_socket.Server(httpServer, {

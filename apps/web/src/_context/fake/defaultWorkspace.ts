@@ -3,7 +3,6 @@ import type { WorkspaceItem } from "../workspace";
 const workspace: WorkspaceItem[] = [
     {
         isRunningAs: 'dev',
-        consoleOutput: `\n\n\x1b[1;33;40m 33;40  \x1b[1;33;41m 33;41  \x1b[1;33;42m 33;42  \x1b[1;33;43m 33;43  \x1b[1;33;44m 33;44  \x1b[1;33;45m 33;45  \x1b[1;33;46m 33;46  \x1b[1m\x1b[0\n\n\x1b[1;33;42m >> Tests OK\n\n`,
         info: {
             name: 'Power JS',
             path: '/workspace/1',
@@ -20,7 +19,6 @@ const workspace: WorkspaceItem[] = [
     },
     {
         isRunningAs: 'start',
-        consoleOutput: 'running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod . running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. unning me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod . running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod. running me \n\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod.',
         info: {
             name: 'Workspace 2',
             path: '/workspace/2',
@@ -37,7 +35,6 @@ const workspace: WorkspaceItem[] = [
     },
     {
         isRunningAs: null,
-        consoleOutput: null,
         info: {
             name: 'Workspace 3',
             path: '/workspace/3',
@@ -54,7 +51,6 @@ const workspace: WorkspaceItem[] = [
     },
     {
         isRunningAs: null,
-        consoleOutput: null,
         info: {
             name: 'Workspace 4 asd asd asd  asd',
             path: '/workspace/4',
@@ -71,7 +67,6 @@ const workspace: WorkspaceItem[] = [
     },
     {
         isRunningAs: 'start',
-        consoleOutput: null,
         info: {
             name: 'AAA I am last',
             path: '/workspace/6',
@@ -88,7 +83,6 @@ const workspace: WorkspaceItem[] = [
     },
     {
         isRunningAs: 'dev',
-        consoleOutput: 'Running as dev\nLorem ipsum dolor sit amet \n consectetur adipisicing elit. Quisquam, quod.',
         info: {
             name: 'Opps',
             path: '/workspace/6',
