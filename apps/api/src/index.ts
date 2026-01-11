@@ -76,7 +76,7 @@ interactiveTerminalSocket( io );
 //=============================================================================
 httpServer.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
-  open(`http://localhost:${port}`);
+  //open(`http://localhost:${port}`);
 });
 
 export { app, io, httpServer };

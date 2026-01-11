@@ -11,7 +11,8 @@ router.post('/', async (req: Request, res: Response) => {
         if (stopped) {
             res.json({ success: true, message: `Terminated process for workspace ${workspace.name}` });
         } else {
-            res.status(404).json({ success: false, message: `No active terminal process found for workspace ${workspace.name}` });
+            // If not found, it's already stopped. Return success to allow frontend cleanup.
+            res.json({ success: true, message: `No active terminal process found for workspace ${workspace.name} (already stopped)` });
         }
         return;
     }
@@ -21,7 +22,8 @@ router.post('/', async (req: Request, res: Response) => {
         if (stopped) {
             res.json({ success: true, message: `Terminated process for socket ${socketId}` });
         } else {
-            res.status(404).json({ success: false, message: `No active terminal process found for socket ${socketId}` });
+            // If not found, it's already stopped. Return success to allow frontend cleanup.
+             res.json({ success: true, message: `No active terminal process found for socket ${socketId} (already stopped)` });
         }
         return;
     }

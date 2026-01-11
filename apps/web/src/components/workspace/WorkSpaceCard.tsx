@@ -107,7 +107,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                     { !loading && props.isRunningAs == 'crashed' && (
                         <button 
                             onClick={async () => {
-                                await stopInteractiveTerminal(props.info.name);
+                                stopInteractiveTerminal(props.info.name, true);
                                 setWorkSpaceRunningAs(props.info.name, null);
                             }}
                             className="flex-1 py-1 px-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">

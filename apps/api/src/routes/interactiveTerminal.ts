@@ -1,7 +1,6 @@
 import { Request, Response, Router } from "express";
 import { Server, Socket } from "socket.io";
 import { spawn, ChildProcess } from "child_process";
-import { WorkspaceInfo } from "types";
 
 const router = Router();
 

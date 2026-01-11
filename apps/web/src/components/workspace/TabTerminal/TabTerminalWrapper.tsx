@@ -42,7 +42,7 @@ export default function TabTerminalWrapper(props: { workspace: WorkspaceItem, vi
         <div className={`w-full h-full ${props.visible ? 'block' : 'hidden'}`}>
             <InteractiveTerminal
                 ref={terminalRef}
-                isInteractive={true} 
+                isInteractive={false} 
             />
         </div>
     );

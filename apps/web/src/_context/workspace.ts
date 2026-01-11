@@ -53,7 +53,7 @@ interface workspaceContext {
     ///API calls
     //function that calls API
     stopProcess: (workspaceName: string) => Promise<void>;
-    stopInteractiveTerminal: (workspaceName: string) => Promise<void>;
+    stopInteractiveTerminal: (workspaceName: string, skips?: boolean) => Promise<void>;
     listWorkspace: () => Promise<any>;
     createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
     updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
@@ -180,7 +180,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         set({ loadingWorkspace: null });
     },
 
-    stopInteractiveTerminal: async (workspaceName: string) => {
+    stopInteractiveTerminal: async (workspaceName: string, skips?: boolean) => {
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
         set({ loadingWorkspace: workspaceName });
@@ -196,6 +196,9 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             if (!response.ok) {
                 throw new Error('Failed to stop interactive terminal');
             }
+            
+            if(!skips) 
+                await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch (error) {
             console.error('Error stopping interactive terminal:', error);
         }
