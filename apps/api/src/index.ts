@@ -1,7 +1,11 @@
+#!/usr/bin/env node
+
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import apiRoute from 'apiroute';
 import config from 'config';
+import open from 'open';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
@@ -28,6 +32,8 @@ app.use(cors({
 app.use(express.static('public'));
 app.use(express.json());
 
+// Serve frontend static files
+
 //routes=======================================================================
 app.use("/" + apiRoute.scanWorkspace,      apiScanWorkspace);
 app.use("/" + apiRoute.stopProcess,        stopProcess);
@@ -40,6 +46,12 @@ app.use("/" + apiRoute.getRootPath,        rootPath);
 app.use("/" + apiRoute.scaffoldRepo,       scaffoldRepo);
 app.use("/" + apiRoute.turborepoExist,     turborepoExist);
 
+// Serve frontend static files==================================================
+const frontendPath = path.join(__dirname, '../public');
+app.use(express.static(frontendPath));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 // Socket.IO Setup ============================================================
 const httpServer = createServer(app);
@@ -56,6 +68,7 @@ interactiveTerminalSocket( io );
 //=============================================================================
 httpServer.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
+  open(`http://localhost:${port}`);
 });
 
 export { app, io, httpServer };

@@ -1,37 +1,47 @@
 {
-  "name": "api",
-  "version": "1.0.0",
+  "name": "monorepotime",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "build": "tsc",
+    "build": "tsup",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "stop": "npx -y kill-port 3000"
+    "stop": "npx -y kill-port 3000",
+    "copy-frontend": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/"
   },
   "dependencies": {
-    "apiroute": "*",
     "chalk": "^4.1.2",
-    "config": "*",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.3",
-    "socket.io": "^4.8.3",
-    "types": "*"
+    "open": "^11.0.0",
+    "socket.io": "^4.8.3"
   },
   "keywords": [],
-  "author": "",
+  "author": "Anghelo Amir",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "apiroute": "*",
+    "config": "*",
+    "types": "*",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.10.4",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3"
-  }
+  },
+  "bin": {
+    "monorepotime": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "public"
+  ]
 }

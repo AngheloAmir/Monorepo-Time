@@ -1,95 +1,1092 @@
+#!/usr/bin/env node
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.httpServer = exports.io = exports.app = void 0;
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-const apiroute_1 = __importDefault(require("apiroute"));
-const config_1 = __importDefault(require("config"));
-const http_1 = require("http");
-const socket_io_1 = require("socket.io");
-//routers
-const scanworkspace_1 = __importDefault(require("./routes/scanworkspace"));
-const runcmddev_1 = __importDefault(require("./routes/runcmddev"));
-const stopcmd_1 = __importDefault(require("./routes/stopcmd"));
-const listworkspacedirs_1 = __importDefault(require("./routes/listworkspacedirs"));
-const newworkspace_1 = __importDefault(require("./routes/newworkspace"));
-const interactiveTerminal_1 = __importStar(require("./routes/interactiveTerminal"));
-const updateworkspace_1 = __importDefault(require("./routes/updateworkspace"));
-const vscodeHideShow_1 = __importDefault(require("./routes/vscodeHideShow"));
-const rootPath_1 = __importDefault(require("./routes/rootPath"));
-const scafoldrepo_1 = __importDefault(require("./routes/scafoldrepo"));
-const turborepoexist_1 = __importDefault(require("./routes/turborepoexist"));
-const app = (0, express_1.default)();
-exports.app = app;
-const port = config_1.default.apiPort;
-app.use((0, cors_1.default)({
-    origin: true,
-    credentials: true,
-}));
-app.use(express_1.default.static('public'));
-app.use(express_1.default.json());
-//routes=======================================================================
-app.use("/" + apiroute_1.default.scanWorkspace, scanworkspace_1.default);
-app.use("/" + apiroute_1.default.stopProcess, stopcmd_1.default);
-app.use("/" + apiroute_1.default.listWorkspacesDir, listworkspacedirs_1.default);
-app.use("/" + apiroute_1.default.newWorkspace, newworkspace_1.default);
-app.use("/" + apiroute_1.default.interactvTerminal, interactiveTerminal_1.default);
-app.use("/" + apiroute_1.default.updateWorkspace, updateworkspace_1.default);
-app.use("/" + apiroute_1.default.hideShowFileFolder, vscodeHideShow_1.default);
-app.use("/" + apiroute_1.default.getRootPath, rootPath_1.default);
-app.use("/" + apiroute_1.default.scaffoldRepo, scafoldrepo_1.default);
-app.use("/" + apiroute_1.default.turborepoExist, turborepoexist_1.default);
-// Socket.IO Setup ============================================================
-const httpServer = (0, http_1.createServer)(app);
-exports.httpServer = httpServer;
-const io = new socket_io_1.Server(httpServer, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/index.ts
+var index_exports = {};
+__export(index_exports, {
+  app: () => app,
+  default: () => index_default,
+  httpServer: () => httpServer,
+  io: () => io
+});
+module.exports = __toCommonJS(index_exports);
+var import_express11 = __toESM(require("express"));
+var import_cors = __toESM(require("cors"));
+var import_path9 = __toESM(require("path"));
+
+// ../../packages/api/index.ts
+var apiRoute = {
+  /** Scan a workspace 
+   * get request returns  workspace: WorkspaceInfo[]
+  */
+  scanWorkspace: "scanworkspace",
+  /** Run a command in the interactive terminal 
+   * request body: { workspace: WorkspaceInfo; runas: 'dev' | 'start'; }
+  */
+  runCmdDev: "runcmddev",
+  /** Stop a process 
+   * request body: { workspace: WorkspaceInfo }
+  */
+  stopProcess: "stopprocess",
+  /** List all workspaces in the workspace directory 
+   * It is a get request
+   * returns: [{ label: string, path: string }]
+  */
+  listWorkspacesDir: "listworkspacedirs",
+  /** Create a new workspace 
+   * request body: { workspace: WorkspaceInfo }
+  */
+  newWorkspace: "newworkspace",
+  /** Run a command in the interactive terminal 
+   * request body: { path: string, cmd: string }
+  */
+  interactvTerminal: "interactvterminal",
+  /** Hide or show a file or folder in your IDE (VS Code and variant)
+   * it a get request, return true / false
+  */
+  hideShowFileFolder: "hideshowfilefolder",
+  /** Update a workspace 
+   * request body: { workspace: WorkspaceInfo }
+  */
+  updateWorkspace: "updateworkspace",
+  /** Get the root path of the project
+   * It is a get request
+   * returns: { path: string }
+  */
+  getRootPath: "getrootpath",
+  /** Scaffold a new repo 
+   * get request returns { success: boolean }
+  */
+  scaffoldRepo: "scaffoldrepo",
+  /** Check if a turbo repo exists in the rootdir 
+   * get return { exists: boolean }
+  */
+  turborepoExist: "turborepoexist"
+};
+var api_default = apiRoute;
+
+// ../../packages/config/index.ts
+var config = {
+  apiPort: 3e3
+};
+var config_default = config;
+
+// src/index.ts
+var import_open = __toESM(require("open"));
+var import_http = require("http");
+var import_socket = require("socket.io");
+
+// src/routes/scanworkspace.ts
+var import_fs_extra = __toESM(require("fs-extra"));
+var import_path = __toESM(require("path"));
+var import_fast_glob = __toESM(require("fast-glob"));
+var import_express = require("express");
+var START_DIR = process.cwd();
+function findMonorepoRoot(startDir) {
+  let dir = startDir;
+  while (dir !== import_path.default.dirname(dir)) {
+    const pkgPath = import_path.default.join(dir, "package.json");
+    if (import_fs_extra.default.existsSync(pkgPath)) {
+      try {
+        const pkg = import_fs_extra.default.readJsonSync(pkgPath);
+        if (pkg.workspaces) {
+          return dir;
+        }
+      } catch (e) {
+      }
+    }
+    dir = import_path.default.dirname(dir);
+  }
+  return startDir;
+}
+var ROOT = findMonorepoRoot(START_DIR);
+var route = (0, import_express.Router)();
+var IGNORE = [
+  "**/node_modules/**",
+  "**/.git/**",
+  "**/.turbo/**",
+  "**/.next/**",
+  "**/.vercel/**",
+  "**/.cache/**",
+  "**/dist/**",
+  "**/build/**",
+  "**/out/**",
+  "**/coverage/**"
+];
+async function readJSON(file) {
+  try {
+    return await import_fs_extra.default.readJSON(file);
+  } catch {
+    return null;
+  }
+}
+async function isRunnableProject(dir) {
+  const pkgPath = import_path.default.join(dir, "package.json");
+  if (!await import_fs_extra.default.pathExists(pkgPath)) return false;
+  const pkg = await readJSON(pkgPath);
+  if (!(pkg == null ? void 0 : pkg.scripts)) return false;
+  if (pkg.scripts.dev != "object" || pkg.scripts.start != "object") {
+    return true;
+  }
+  return false;
+}
+async function resolveWorkspaceDirs(workspaces) {
+  return (0, import_fast_glob.default)(workspaces.map((w) => w.replace(/\/$/, "") + "/"), {
+    cwd: ROOT,
+    onlyDirectories: true,
+    absolute: true,
+    ignore: IGNORE
+  });
+}
+async function scanWorkspaces(rootPkg) {
+  var _a;
+  let patterns = [];
+  if (Array.isArray(rootPkg.workspaces)) {
+    patterns = rootPkg.workspaces;
+  } else if ((_a = rootPkg.workspaces) == null ? void 0 : _a.packages) {
+    patterns = rootPkg.workspaces.packages;
+  }
+  if (!patterns.length) return [];
+  const dirs = await resolveWorkspaceDirs(patterns);
+  const results = /* @__PURE__ */ new Set();
+  for (const dir of dirs) {
+    if (await isRunnableProject(dir)) {
+      results.add(import_path.default.resolve(dir));
+    }
+  }
+  return [...results];
+}
+async function scanRecursively() {
+  const pkgFiles = await (0, import_fast_glob.default)("**/package.json", {
+    cwd: ROOT,
+    absolute: true,
+    ignore: IGNORE
+  });
+  const results = /* @__PURE__ */ new Set();
+  for (const pkgFile of pkgFiles) {
+    const dir = import_path.default.dirname(pkgFile);
+    if (await isRunnableProject(dir)) {
+      results.add(import_path.default.resolve(dir));
+    }
+  }
+  return [...results];
+}
+route.get("/", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  try {
+    const rootPkgPath = import_path.default.join(ROOT, "package.json");
+    const rootPkg = await readJSON(rootPkgPath);
+    let projects = [];
+    if (rootPkg == null ? void 0 : rootPkg.workspaces) {
+      projects = await scanWorkspaces(rootPkg);
+    } else {
+      projects = await scanRecursively();
+    }
+    const projectInfos = (await Promise.all(projects.map(async (p) => {
+      const pkgPath = import_path.default.join(p, "package.json");
+      const pkg = await readJSON(pkgPath);
+      if (!pkg) return null;
+      return {
+        name: pkg.name || import_path.default.basename(p),
+        path: p,
+        fontawesomeIcon: pkg.fontawesomeIcon != "object" ? pkg.fontawesomeIcon : null,
+        description: pkg.description != "object" ? pkg.description : null,
+        devCommand: pkg.scripts.dev != "object" ? pkg.scripts.dev : null,
+        startCommand: pkg.scripts.start != "object" ? pkg.scripts.start : null,
+        stopCommand: pkg.scripts.stop != "object" ? pkg.scripts.stop : null,
+        buildCommand: pkg.scripts.build != "object" ? pkg.scripts.build : null,
+        cleanCommand: pkg.scripts.clean != "object" ? pkg.scripts.clean : null,
+        lintCommand: pkg.scripts.lint != "object" ? pkg.scripts.lint : null,
+        testCommand: pkg.scripts.test != "object" ? pkg.scripts.test : null
+      };
+    }))).filter(Boolean);
+    res.json({
+      root: ROOT,
+      count: projectInfos.length,
+      workspace: projectInfos
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+var scanworkspace_default = route;
+
+// src/routes/runcmddev.ts
+var import_child_process = require("child_process");
+var import_chalk = __toESM(require("chalk"));
+var activeProcesses = /* @__PURE__ */ new Map();
+var sockets = /* @__PURE__ */ new Map();
+function runCmdDevSocket(io2) {
+  io2.on("connection", (socket) => {
+    socket.on("run", (data) => {
+      sockets.set(data.workspace.name, socket);
+      try {
+        handleOnRun(socket, data);
+      } catch (error) {
+        socket.emit("error", {
+          message: error
+        });
+      }
+    });
+  });
+}
+async function handleOnRun(socket, data) {
+  const { workspace, runas } = data;
+  if (activeProcesses.has(workspace.name))
+    return socket.emit("log", "Attached to already running process...");
+  const commandToRun = runas === "dev" ? workspace.devCommand : workspace.startCommand;
+  if (!commandToRun) throw new Error("No command to run");
+  const baseCMD = commandToRun.split(" ")[0];
+  const args = commandToRun.split(" ").slice(1);
+  socket.emit("log", import_chalk.default.green(`${data.workspace.path}: ${commandToRun}`));
+  const child = (0, import_child_process.spawn)(baseCMD, args, {
+    cwd: workspace.path,
+    env: {
+      ...process.env,
+      TERM: "dumb",
+      FORCE_COLOR: "1"
     },
-    transports: ['websocket', 'polling']
+    stdio: ["ignore", "pipe", "pipe"],
+    shell: true,
+    detached: process.platform !== "win32"
+  });
+  activeProcesses.set(workspace.name, child);
+  child.on("error", (error) => {
+    socket.emit("error", error.message);
+  });
+  child.stdout.on("data", (data2) => {
+    socket.emit("log", data2.toString());
+  });
+  child.stderr.on("data", (data2) => {
+    socket.emit("error", data2.toString());
+  });
+  child.on("exit", (code) => {
+    socket.emit("exit", `Process exited with code ${code}`);
+  });
+}
+
+// src/routes/stopcmd.ts
+var import_express2 = require("express");
+var import_child_process2 = require("child_process");
+var import_util = require("util");
+var import_chalk2 = __toESM(require("chalk"));
+var router = (0, import_express2.Router)();
+router.post("/", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  try {
+    const body = req.body;
+    const workspace = body.workspace;
+    if (!workspace) {
+      return res.status(400).json({ error: "No workspace provided" });
+    }
+    const currentSocket = sockets.get(workspace.name);
+    const currentProcess = activeProcesses.get(workspace.name);
+    if (currentProcess) {
+      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("Stopping active process..."));
+      if (currentProcess.pid) {
+        if (process.platform !== "win32") {
+          await cleanupProcessPorts(currentProcess.pid, currentSocket);
+        }
+      }
+      await new Promise((resolve) => {
+        let resolved = false;
+        const safeResolve = () => {
+          if (!resolved) {
+            resolved = true;
+            resolve();
+          }
+        };
+        const timer = setTimeout(() => {
+          console.log(`Process stop timed out for ${workspace.name}`);
+          safeResolve();
+        }, 5e3);
+        currentProcess.once("exit", () => {
+          clearTimeout(timer);
+          safeResolve();
+        });
+        if (currentProcess.pid) {
+          try {
+            if (process.platform !== "win32") {
+              process.kill(-currentProcess.pid, "SIGINT");
+            } else {
+              currentProcess.kill();
+            }
+          } catch (error) {
+            if (error.code === "ESRCH") {
+              clearTimeout(timer);
+              safeResolve();
+            } else {
+              console.error(`Failed to kill process: ${error.message}`);
+            }
+          }
+        } else {
+          safeResolve();
+        }
+      });
+      activeProcesses.delete(workspace.name);
+    } else {
+      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("No active process found to stop."));
+    }
+    const commandToRun = workspace.stopCommand;
+    if (commandToRun) {
+      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.green(`Running stop command: ${commandToRun}`));
+      const baseCMD = commandToRun.split(" ")[0];
+      const args = commandToRun.split(" ").slice(1);
+      const child = (0, import_child_process2.spawn)(baseCMD, args, {
+        cwd: workspace.path,
+        env: {
+          ...process.env,
+          TERM: "dumb",
+          FORCE_COLOR: "1"
+        },
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: true,
+        detached: process.platform !== "win32"
+      });
+      child.stdout.on("data", (data) => {
+        currentSocket == null ? void 0 : currentSocket.emit("log", data.toString());
+      });
+      child.stderr.on("data", (data) => {
+        currentSocket == null ? void 0 : currentSocket.emit("error", data.toString());
+      });
+      child.on("close", (code) => {
+        currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.green(`Stop command finished with code ${code}`));
+        currentSocket == null ? void 0 : currentSocket.emit("exit", "Process stopped");
+      });
+    } else {
+      currentSocket == null ? void 0 : currentSocket.emit("log", "Process stopped (no stop command defined).");
+      currentSocket == null ? void 0 : currentSocket.emit("exit", "Process stopped");
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1e3));
+    res.end();
+  } catch (e) {
+    console.error("Error in stopcmd:", e);
+    res.status(500).json({ error: e.message });
+  }
 });
-exports.io = io;
-(0, runcmddev_1.default)(io);
-(0, interactiveTerminal_1.interactiveTerminalSocket)(io);
-//=============================================================================
+var stopcmd_default = router;
+var execAsync = (0, import_util.promisify)(import_child_process2.exec);
+async function getProcessTreePids(rootPid) {
+  var _a;
+  try {
+    const { stdout } = await execAsync("ps -e -o pid,ppid --no-headers");
+    const pids = /* @__PURE__ */ new Set();
+    pids.add(rootPid);
+    const tree = /* @__PURE__ */ new Map();
+    const lines = stdout.trim().split("\n");
+    for (const line of lines) {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        const pid = parseInt(parts[0], 10);
+        const ppid = parseInt(parts[1], 10);
+        if (!tree.has(ppid)) tree.set(ppid, []);
+        (_a = tree.get(ppid)) == null ? void 0 : _a.push(pid);
+      }
+    }
+    const queue = [rootPid];
+    while (queue.length > 0) {
+      const current = queue.shift();
+      const children = tree.get(current);
+      if (children) {
+        for (const child of children) {
+          pids.add(child);
+          queue.push(child);
+        }
+      }
+    }
+    return Array.from(pids);
+  } catch (e) {
+    console.error("Error building process tree:", e);
+    return [rootPid];
+  }
+}
+async function cleanupProcessPorts(rootPid, socket) {
+  var _a;
+  try {
+    const pids = await getProcessTreePids(rootPid);
+    const { stdout } = await execAsync("lsof -P -n -iTCP -sTCP:LISTEN -F pn");
+    const lines = stdout.trim().split("\n");
+    let currentPid = -1;
+    const pidPorts = /* @__PURE__ */ new Map();
+    for (const line of lines) {
+      const type = line[0];
+      const content = line.substring(1);
+      if (type === "p") {
+        currentPid = parseInt(content, 10);
+      } else if (type === "n" && currentPid !== -1) {
+        const match = content.match(/:(\d+)$/);
+        if (match) {
+          const port2 = match[1];
+          if (!pidPorts.has(currentPid)) pidPorts.set(currentPid, []);
+          (_a = pidPorts.get(currentPid)) == null ? void 0 : _a.push(port2);
+        }
+      }
+    }
+    for (const pid of pids) {
+      if (pidPorts.has(pid)) {
+        const ports = pidPorts.get(pid);
+        if (ports) {
+          for (const port2 of ports) {
+            socket == null ? void 0 : socket.emit("log", import_chalk2.default.yellow(`Detected active port ${port2} on PID ${pid}. Killing port...`));
+            try {
+              await execAsync(`npx -y kill-port ${port2}`);
+            } catch (err) {
+              socket == null ? void 0 : socket.emit("log", import_chalk2.default.red(`Failed to kill port ${port2}: ${err.message}`));
+            }
+          }
+        }
+      }
+    }
+  } catch (e) {
+  }
+}
+
+// src/routes/listworkspacedirs.ts
+var import_express3 = require("express");
+var import_fs_extra2 = __toESM(require("fs-extra"));
+var import_path2 = __toESM(require("path"));
+var router2 = (0, import_express3.Router)();
+var START_DIR2 = process.cwd();
+var findRoot = async (dir) => {
+  const pkgPath = import_path2.default.join(dir, "package.json");
+  if (await import_fs_extra2.default.pathExists(pkgPath)) {
+    try {
+      const pkg = await import_fs_extra2.default.readJSON(pkgPath);
+      if (pkg.workspaces) {
+        return dir;
+      }
+    } catch {
+    }
+  }
+  const parent = import_path2.default.dirname(dir);
+  if (parent === dir) return START_DIR2;
+  return findRoot(parent);
+};
+router2.get("/", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  try {
+    const rootPath = await findRoot(START_DIR2);
+    const pkgPath = import_path2.default.join(rootPath, "package.json");
+    let workspaceDirs = [];
+    let foundWorkspaces = false;
+    if (await import_fs_extra2.default.pathExists(pkgPath)) {
+      const pkg = await import_fs_extra2.default.readJSON(pkgPath);
+      let globs = [];
+      if (pkg.workspaces) {
+        if (Array.isArray(pkg.workspaces)) {
+          globs = pkg.workspaces;
+        } else if (pkg.workspaces.packages && Array.isArray(pkg.workspaces.packages)) {
+          globs = pkg.workspaces.packages;
+        }
+      }
+      if (globs.length > 0) {
+        foundWorkspaces = true;
+        const uniqueDirs = /* @__PURE__ */ new Set();
+        for (const pattern of globs) {
+          const parts = pattern.split("/");
+          if (parts.length > 0) {
+            const topLevel = parts[0];
+            if (topLevel && topLevel !== "*") {
+              uniqueDirs.add(topLevel);
+            }
+          }
+        }
+        for (const dirName of uniqueDirs) {
+          const fullPath = import_path2.default.join(rootPath, dirName);
+          if (await import_fs_extra2.default.pathExists(fullPath)) {
+            workspaceDirs.push({
+              label: dirName,
+              path: fullPath
+            });
+          }
+        }
+      }
+    }
+    if (!foundWorkspaces) {
+      const items = await import_fs_extra2.default.readdir(rootPath, { withFileTypes: true });
+      workspaceDirs = items.filter((item) => item.isDirectory()).filter((item) => {
+        const name = item.name;
+        if (name === "node_modules") return false;
+        if (name.startsWith(".")) return false;
+        if (name.startsWith("_")) return false;
+        return true;
+      }).map((item) => ({
+        label: item.name,
+        path: import_path2.default.join(rootPath, item.name)
+      }));
+    }
+    return res.json(workspaceDirs);
+  } catch (e) {
+    console.error("Error listing workspaces:", e);
+    res.status(500).json({ error: e.message });
+  }
+});
+var listworkspacedirs_default = router2;
+
+// src/routes/newworkspace.ts
+var import_express4 = require("express");
+var import_fs_extra3 = __toESM(require("fs-extra"));
+var import_path3 = __toESM(require("path"));
+var router3 = (0, import_express4.Router)();
+router3.post("/", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  try {
+    const reqBody = req.body;
+    const targetPath = reqBody.path;
+    if (!targetPath) {
+      return res.status(400).json({ error: "Path is required" });
+    }
+    await import_fs_extra3.default.ensureDir(targetPath);
+    const packageJson = {
+      name: reqBody.name || import_path3.default.basename(targetPath),
+      version: "1.0.0",
+      description: reqBody.description || "",
+      fontawesomeIcon: reqBody.fontawesomeIcon || "",
+      scripts: {
+        dev: reqBody.devCommand || "",
+        start: reqBody.startCommand || void 0,
+        stop: reqBody.stopCommand || void 0,
+        build: reqBody.buildCommand || void 0,
+        clean: reqBody.cleanCommand || void 0,
+        lint: reqBody.lintCommand || void 0,
+        test: reqBody.testCommand || void 0
+      }
+    };
+    Object.keys(packageJson.scripts).forEach(
+      (key) => packageJson.scripts[key] === void 0 && delete packageJson.scripts[key]
+    );
+    await import_fs_extra3.default.writeJSON(import_path3.default.join(targetPath, "package.json"), packageJson, { spaces: 2 });
+    res.json({ message: "Workspace created successfully", path: targetPath });
+  } catch (e) {
+    console.error("Error creating workspace:", e);
+    res.status(500).json({ error: e.message });
+  }
+});
+var newworkspace_default = router3;
+
+// src/routes/interactiveTerminal.ts
+var import_express5 = require("express");
+var import_child_process3 = require("child_process");
+var router4 = (0, import_express5.Router)();
+router4.get("/", async (req, res) => {
+  res.send("Interactive Terminal Route");
+});
+var interactiveTerminal_default = router4;
+var activeTerminals = /* @__PURE__ */ new Map();
+function interactiveTerminalSocket(io2) {
+  io2.on("connection", (socket) => {
+    socket.on("terminal:start", (data) => {
+      var _a, _b, _c, _d;
+      const { path: path10, command } = data;
+      if (activeTerminals.has(socket.id)) {
+        const oldChild = activeTerminals.get(socket.id);
+        if (oldChild) {
+          oldChild.removeAllListeners();
+          (_a = oldChild.stdout) == null ? void 0 : _a.removeAllListeners();
+          (_b = oldChild.stderr) == null ? void 0 : _b.removeAllListeners();
+          oldChild.kill();
+          activeTerminals.delete(socket.id);
+          socket.emit("terminal:log", "\r\n\x1B[33m[System] Previous command terminated.\x1B[0m\r\n");
+        }
+      }
+      try {
+        const env = { ...process.env };
+        delete env.CI;
+        env.TERM = "xterm-256color";
+        env.FORCE_COLOR = "1";
+        env.PROMPT_COMMAND = 'export PS1="\\[\\033[34m\\][PATH] \\[\\033[32m\\]\\w\\[\\033[0m\\]\\n$ ";';
+        let child;
+        if (process.platform === "win32") {
+          socket.emit("terminal:log", "\x1B[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1B[0m\r\n");
+          const baseCMD = command.split(" ")[0];
+          const args = command.split(" ").slice(1);
+          child = (0, import_child_process3.spawn)(baseCMD, args, {
+            cwd: path10,
+            env,
+            shell: true,
+            stdio: ["pipe", "pipe", "pipe"]
+          });
+        } else {
+          env.CMD = command;
+          const pythonScript = `
+import pty, sys, os
+
+try:
+    cmd = os.environ.get('CMD')
+    if not cmd:
+        sys.exit(1)
+
+    # pty.spawn(argv) executes argv and connects stdin/stdout to pty
+    status = pty.spawn(['/bin/bash', '-c', 'stty cols 80 rows 24; ' + cmd])
+
+    if os.WIFEXITED(status):
+        sys.exit(os.WEXITSTATUS(status))
+    else:
+        sys.exit(1)
+except ImportError:
+    sys.exit(127) # Return special code if pty module missing (unlikely on unix)
+except Exception as e:
+    sys.exit(1)
+`;
+          child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
+            cwd: path10,
+            env,
+            stdio: ["pipe", "pipe", "pipe"]
+          });
+        }
+        activeTerminals.set(socket.id, child);
+        (_c = child.stdout) == null ? void 0 : _c.on("data", (chunk) => {
+          socket.emit("terminal:log", chunk.toString());
+        });
+        (_d = child.stderr) == null ? void 0 : _d.on("data", (chunk) => {
+          socket.emit("terminal:log", chunk.toString());
+        });
+        child.on("error", (err) => {
+          if (err.code === "ENOENT" && process.platform !== "win32") {
+            socket.emit("terminal:error", "\r\n\x1B[31mError: Python3 is required for interactive mode on Linux/Mac but was not found.\x1B[0m");
+          } else {
+            socket.emit("terminal:error", `Failed to start command: ${err.message}`);
+          }
+          cleanup(socket.id);
+        });
+        child.on("exit", (code) => {
+          if (code === 127 && process.platform !== "win32") {
+            socket.emit("terminal:error", "\r\n\x1B[31mError: Python PTY module issue.\x1B[0m");
+          } else if (code !== 0) {
+            socket.emit("terminal:error", `\r
+Process exited with code ${code}`);
+          } else {
+          }
+          socket.emit("terminal:exit", code);
+          cleanup(socket.id);
+        });
+      } catch (error) {
+        socket.emit("terminal:error", `Error handling command: ${error.message}`);
+        cleanup(socket.id);
+      }
+    });
+    socket.on("terminal:input", (input) => {
+      const child = activeTerminals.get(socket.id);
+      if (child && child.stdin) {
+        child.stdin.write(input);
+      }
+    });
+    socket.on("disconnect", () => {
+      var _a, _b;
+      const child = activeTerminals.get(socket.id);
+      if (child) {
+        child.removeAllListeners();
+        (_a = child.stdout) == null ? void 0 : _a.removeAllListeners();
+        (_b = child.stderr) == null ? void 0 : _b.removeAllListeners();
+        child.kill();
+        activeTerminals.delete(socket.id);
+      }
+    });
+    function cleanup(socketId) {
+      activeTerminals.delete(socketId);
+    }
+  });
+}
+
+// src/routes/updateworkspace.ts
+var import_express6 = require("express");
+var import_fs_extra4 = __toESM(require("fs-extra"));
+var import_path4 = __toESM(require("path"));
+var router5 = (0, import_express6.Router)();
+router5.post("/", async (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  try {
+    const workspace = req.body;
+    if (!workspace || !workspace.path) {
+      res.status(400).send({ error: "Invalid workspace data" });
+      return;
+    }
+    const packageJsonPath = import_path4.default.join(workspace.path, "package.json");
+    if (!import_fs_extra4.default.existsSync(packageJsonPath)) {
+      res.status(404).send({ error: "package.json not found in workspace path" });
+      return;
+    }
+    const packageJson = await import_fs_extra4.default.readJson(packageJsonPath);
+    if (workspace.name) packageJson.name = workspace.name;
+    if (workspace.description != "object") packageJson.description = workspace.description;
+    if (workspace.devCommand != "object") packageJson.scripts.dev = workspace.devCommand;
+    if (workspace.startCommand != "object") packageJson.scripts.start = workspace.startCommand;
+    if (workspace.buildCommand != "object") packageJson.scripts.build = workspace.buildCommand;
+    if (workspace.testCommand != "object") packageJson.scripts.test = workspace.testCommand;
+    if (workspace.lintCommand != "object") packageJson.scripts.lint = workspace.lintCommand;
+    if (workspace.stopCommand != "object") packageJson.scripts.stop = workspace.stopCommand;
+    if (workspace.cleanCommand != "object") packageJson.scripts.clean = workspace.cleanCommand;
+    await import_fs_extra4.default.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+    res.send({ success: true, message: "Workspace updated successfully" });
+  } catch (error) {
+    console.error("Update workspace error:", error);
+    res.status(500).send({ error: error.message });
+  }
+});
+var updateworkspace_default = router5;
+
+// src/routes/vscodeHideShow.ts
+var import_express7 = require("express");
+var import_fs_extra5 = __toESM(require("fs-extra"));
+var import_path5 = __toESM(require("path"));
+var router6 = (0, import_express7.Router)();
+var EXCLUDE_PATTERNS = {
+  "**/node_modules": true,
+  "**/.git": true,
+  "**/.gitignore": true,
+  "**/.turbo": true,
+  "**/dist": true,
+  "**/_tool": true,
+  "**/package-lock.json": true,
+  "**/Dockerfile": true,
+  "**/docker-compose.yml": true,
+  "**/.dockerignore": true,
+  "**/turbo.json": true,
+  "**/nodemon.json": true,
+  "**/temp.md": true,
+  "**/*postcss*": true,
+  "**/*tailwind*": true,
+  "**/*tsconfig*": true,
+  "**/*eslint*": true,
+  "**/*prettier*": true,
+  "**/*vite*": true,
+  "_temp": true,
+  ".gitignore": true,
+  ".vscode": true,
+  "package.json": true,
+  "README.md": true,
+  ".github": true,
+  ".buildkite": true,
+  ".circleci": true,
+  ".gitlab-ci.yml": true,
+  ".travis.yml": true,
+  "out": true
+};
+var EXCLUDE_PATTERNS_DEFAULT = {
+  "**/.git": true,
+  ".vscode": true,
+  ".turbo": true
+};
+var START_DIR3 = process.cwd();
+function findMonorepoRoot2(startDir) {
+  let dir = startDir;
+  while (dir !== import_path5.default.dirname(dir)) {
+    const pkgPath = import_path5.default.join(dir, "package.json");
+    if (import_fs_extra5.default.existsSync(pkgPath)) {
+      try {
+        const pkg = import_fs_extra5.default.readJsonSync(pkgPath);
+        if (pkg.workspaces) {
+          return dir;
+        }
+      } catch (e) {
+      }
+    }
+    if (import_fs_extra5.default.existsSync(import_path5.default.join(dir, ".vscode"))) {
+      return dir;
+    }
+    dir = import_path5.default.dirname(dir);
+  }
+  return startDir;
+}
+var ROOT2 = findMonorepoRoot2(START_DIR3);
+var getSettingsPath = () => {
+  return import_path5.default.join(ROOT2, ".vscode/settings.json");
+};
+var ensureSettingsFile = async () => {
+  const settingsPath = getSettingsPath();
+  const dir = import_path5.default.dirname(settingsPath);
+  await import_fs_extra5.default.ensureDir(dir);
+  if (!await import_fs_extra5.default.pathExists(settingsPath)) {
+    await import_fs_extra5.default.writeJson(settingsPath, { "files.exclude": {} }, { spaces: 4 });
+  }
+};
+router6.post("/", async (req, res) => {
+  try {
+    const { hide, pathInclude } = req.body;
+    await ensureSettingsFile();
+    const settingsPath = getSettingsPath();
+    const settings = await import_fs_extra5.default.readJson(settingsPath);
+    const newExcludes = { ...EXCLUDE_PATTERNS_DEFAULT };
+    if (hide) {
+      Object.assign(newExcludes, EXCLUDE_PATTERNS);
+      if (Array.isArray(pathInclude)) {
+        pathInclude.forEach((p) => {
+          const relativePath = import_path5.default.relative(ROOT2, p);
+          if (relativePath && !relativePath.startsWith("..") && !import_path5.default.isAbsolute(relativePath)) {
+            newExcludes[relativePath] = true;
+          }
+        });
+      }
+    }
+    settings["files.exclude"] = newExcludes;
+    await import_fs_extra5.default.writeJson(settingsPath, settings, { spaces: 4 });
+    res.json({ success: true, isHidden: hide });
+  } catch (error) {
+    console.error("Error updating VSCode settings:", error);
+    res.status(500).json({ error: "Failed to update VSCode settings" });
+  }
+});
+var vscodeHideShow_default = router6;
+
+// src/routes/rootPath.ts
+var import_fs_extra6 = __toESM(require("fs-extra"));
+var import_path6 = __toESM(require("path"));
+var import_express8 = require("express");
+var START_DIR4 = process.cwd();
+function findMonorepoRoot3(startDir) {
+  let dir = startDir;
+  while (dir !== import_path6.default.dirname(dir)) {
+    const pkgPath = import_path6.default.join(dir, "package.json");
+    if (import_fs_extra6.default.existsSync(pkgPath)) {
+      try {
+        const pkg = import_fs_extra6.default.readJsonSync(pkgPath);
+        if (pkg.workspaces) {
+          return dir;
+        }
+      } catch (e) {
+      }
+    }
+    dir = import_path6.default.dirname(dir);
+  }
+  return startDir;
+}
+var ROOT3 = findMonorepoRoot3(START_DIR4);
+var route2 = (0, import_express8.Router)();
+route2.get("/", async (req, res) => {
+  res.json({ path: ROOT3 });
+});
+var rootPath_default = route2;
+
+// src/routes/scafoldrepo.ts
+var import_express9 = require("express");
+var import_fs_extra7 = __toESM(require("fs-extra"));
+var import_path7 = __toESM(require("path"));
+var import_child_process4 = require("child_process");
+var router7 = (0, import_express9.Router)();
+router7.get("/", async (req, res) => {
+  var _a;
+  try {
+    const packageJsonPath = import_path7.default.join(ROOT3, "package.json");
+    const turboJsonPath = import_path7.default.join(ROOT3, "turbo.json");
+    if (!import_fs_extra7.default.existsSync(packageJsonPath)) {
+      res.status(400).json({ error: "package.json not found in root" });
+      return;
+    }
+    const pkg = import_fs_extra7.default.readJsonSync(packageJsonPath);
+    let pkgChanged = false;
+    if (!pkg.workspaces) {
+      pkg.workspaces = ["apps/*", "packages/*"];
+      pkgChanged = true;
+    }
+    if (pkgChanged) {
+      import_fs_extra7.default.writeJsonSync(packageJsonPath, pkg, { spaces: 2 });
+    }
+    await import_fs_extra7.default.ensureDir(import_path7.default.join(ROOT3, "apps"));
+    await import_fs_extra7.default.ensureDir(import_path7.default.join(ROOT3, "packages"));
+    const monorepoTimePath = import_path7.default.join(ROOT3, "monorepotime.json");
+    if (!import_fs_extra7.default.existsSync(monorepoTimePath)) {
+      const defaultMonorepoTime = [
+        {
+          "category": "Internal CRUD Test",
+          "devurl": "http://localhost:3200",
+          "produrl": "http://superhost:3200",
+          "items": [
+            {
+              "label": "Ping the Tool Server",
+              "route": "/pingme",
+              "methods": "GET",
+              "description": "Ping the tool server to check if it is running.",
+              "sampleInput": "{}",
+              "suggested": [],
+              "expectedOutcome": '# You should see the word "pong" as a message \n\n{\n  "message": "pong"\n}',
+              "availableFor": "public"
+            },
+            {
+              "label": "Check Post",
+              "route": "/pingpost",
+              "methods": "POST",
+              "description": "Send a POST request to check if it sending correctly",
+              "sampleInput": '{\n   "data": "test",\n   "message": "test"\n}',
+              "suggested": [
+                {
+                  "name": "Customer Data",
+                  "urlparams": "",
+                  "content": '{\n    "name": "Demo Customer",\n    "email": "CusRaRa@customer.com",\n    "phone1": "123456789",\n    "phone2": "987654321",\n    "city": "randomw1",\n    "state": "ultra state",\n    "zip": "12345",\n    "country": "mega country",\n    "icon": "test icon",\n    "gender": "female",\n    "delivery_notes": "Make sure that it is packed correctly"\n}'
+                }
+              ],
+              "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
+              "availableFor": "public"
+            },
+            {
+              "label": "Check Stream",
+              "route": "/pingstream",
+              "methods": "STREAM",
+              "description": "Send a stream request to check if it sending correctly",
+              "sampleInput": "{ }",
+              "suggested": [
+                {
+                  "name": "I Wandered Lonely as a Cloud",
+                  "urlparams": "?poem=I%20Wandered%20Lonely%20as%20a%20Cloud",
+                  "content": "{}"
+                },
+                {
+                  "name": "The Sun Has Long Been Set",
+                  "urlparams": "?poem=The%20Sun%20Has%20Long%20Been%20Set",
+                  "content": "{}"
+                }
+              ],
+              "expectedOutcome": "# Note \nYou should see the stream of words",
+              "availableFor": "public"
+            }
+          ]
+        }
+      ];
+      import_fs_extra7.default.writeJsonSync(monorepoTimePath, defaultMonorepoTime, { spaces: 4 });
+    }
+    if (!import_fs_extra7.default.existsSync(turboJsonPath) || !((_a = pkg.devDependencies) == null ? void 0 : _a.turbo)) {
+      if (!import_fs_extra7.default.existsSync(turboJsonPath)) {
+        const defaultTurbo = {
+          "$schema": "https://turbo.build/schema.json",
+          "pipeline": {
+            "build": {
+              "outputs": ["dist/**", ".next/**"]
+            },
+            "lint": {}
+          }
+        };
+        import_fs_extra7.default.writeJsonSync(turboJsonPath, defaultTurbo, { spaces: 2 });
+      }
+      const hasTurbo = pkg.devDependencies && pkg.devDependencies.turbo;
+      if (!hasTurbo) {
+        await runCommand("npm install turbo -D", ROOT3);
+      } else {
+        await runCommand("npm install", ROOT3);
+      }
+    } else {
+      if (pkgChanged) {
+        await runCommand("npm install", ROOT3);
+      }
+    }
+    res.json({ success: true, message: "Scaffolding complete" });
+  } catch (error) {
+    console.error("Scaffolding error:", error);
+    res.status(500).json({
+      error: "Failed to scaffold",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+function runCommand(cmd, cwd) {
+  console.log(`Running: ${cmd} in ${cwd}`);
+  return new Promise((resolve, reject) => {
+    (0, import_child_process4.exec)(cmd, { cwd }, (error, stdout, stderr) => {
+      if (error) {
+        console.error("Exec error:", stderr);
+        reject(error);
+      } else {
+        console.log(stdout);
+        resolve();
+      }
+    });
+  });
+}
+var scafoldrepo_default = router7;
+
+// src/routes/turborepoexist.ts
+var import_express10 = require("express");
+var import_fs = __toESM(require("fs"));
+var import_path8 = __toESM(require("path"));
+var router8 = (0, import_express10.Router)();
+router8.get("/", async (req, res) => {
+  try {
+    let isExist = true;
+    const turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
+    const turboExists = import_fs.default.existsSync(turboJsonPath);
+    if (!turboExists) {
+      isExist = false;
+    }
+    const monorepoJsonPath = import_path8.default.join(ROOT3, "monorepotime.json");
+    const monorepoExists = import_fs.default.existsSync(monorepoJsonPath);
+    if (!monorepoExists) {
+      isExist = false;
+    }
+    res.json({ exists: isExist });
+  } catch (error) {
+    console.error("Error checking turbo.json:", error);
+    res.status(500).json({ error: "Internal server error", exists: false });
+  }
+});
+var turborepoexist_default = router8;
+
+// src/index.ts
+var app = (0, import_express11.default)();
+var port = config_default.apiPort;
+app.use((0, import_cors.default)({
+  origin: true,
+  credentials: true
+}));
+app.use(import_express11.default.static("public"));
+app.use(import_express11.default.json());
+app.use("/" + api_default.scanWorkspace, scanworkspace_default);
+app.use("/" + api_default.stopProcess, stopcmd_default);
+app.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
+app.use("/" + api_default.newWorkspace, newworkspace_default);
+app.use("/" + api_default.interactvTerminal, interactiveTerminal_default);
+app.use("/" + api_default.updateWorkspace, updateworkspace_default);
+app.use("/" + api_default.hideShowFileFolder, vscodeHideShow_default);
+app.use("/" + api_default.getRootPath, rootPath_default);
+app.use("/" + api_default.scaffoldRepo, scafoldrepo_default);
+app.use("/" + api_default.turborepoExist, turborepoexist_default);
+var frontendPath = import_path9.default.join(__dirname, "../public");
+app.use(import_express11.default.static(frontendPath));
+app.get("*", (req, res) => {
+  res.sendFile(import_path9.default.join(frontendPath, "index.html"));
+});
+var httpServer = (0, import_http.createServer)(app);
+var io = new import_socket.Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  },
+  transports: ["websocket", "polling"]
+});
+runCmdDevSocket(io);
+interactiveTerminalSocket(io);
 httpServer.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
+  (0, import_open.default)(`http://localhost:${port}`);
 });
-exports.default = app;
+var index_default = app;
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  app,
+  httpServer,
+  io
+});

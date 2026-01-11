@@ -177,3 +177,26 @@ Or install it globally:
 npm install -g your-tool-name
 your-tool-name
 ```
+
+
+
+
+
+
+Assuming your goal is to publish the web application as a package that executes (or to just deploy the static site):
+
+No, you generally do NOT need tsup for apps/web.
+
+Here is why:
+
+Vite is already a bundler: Unlike the API (which runs in Node.js), the web app runs in the browser. Browsers can't read local files or node_modules directly, so vite build automatically bundles everything (including your local apiroute, config, etc.) into the final .js files in the dist folder.
+It's an App, not a Library: You are likely building a runnable website (index.html + JS), not a library of components for others to import. vite build performs exactly the right job for this.
+However, you DO need to prepare it for publishing if that is your intent:
+If you want to publish apps/web to npm (perhaps so apps/api can depend on a specific version of it, or to distribute the UI separately), you need to change a few things in apps/web/package.json:
+
+Remove Private: Change "private": true to "private": false.
+Move Local Deps: Just like we did for the API, move apiroute, config, and types to devDependencies. This prevents npm install errors for users, since Vite will have already bundled those codes into the distribution.
+Clean Dependencies: Since Vite bundles the production code, you technically should move your runtime dependencies (like react, mantine, etc.) to devDependencies AS WELL, UNLESS you are creating a library provided to other projects.
+If it's just a static site: All deps can be devDependencies.
+If you are publishing a component library: You would need tsup or Vite's build.lib mode, and dependencies would stay in dependencies.
+Recommendation: Since monorepotime seems to be the main tool and it already copies the built web assets into itself (copy-frontend script), you don't need to publish apps/web separately to npm at all. The monorepotime package you just fixed already contains the built frontend! You can keep apps/web private.
