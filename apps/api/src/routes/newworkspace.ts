@@ -3,6 +3,8 @@ import type { WorkspaceInfo } from "types";
 import fs from "fs-extra";
 import path from "path";
 
+import { checkNameExists } from "./_nameExist";
+
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
@@ -14,6 +16,11 @@ router.post("/", async (req: Request, res: Response) => {
 
         if (!targetPath) {
             return res.status(400).json({ error: "Path is required" });
+        }
+
+        const nameToCheck = reqBody.name || path.basename(targetPath);
+        if (await checkNameExists(nameToCheck)) {
+             return res.status(409).json({ error: `Workspace with name "${nameToCheck}" already exists.` });
         }
 
         await fs.ensureDir(targetPath);

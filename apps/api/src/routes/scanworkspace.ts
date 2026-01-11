@@ -25,7 +25,7 @@ function findMonorepoRoot(startDir: string): string {
   return startDir;
 }
 
-const ROOT = findMonorepoRoot(START_DIR);
+export const ROOT = findMonorepoRoot(START_DIR);
 const route = Router();
 
 const IGNORE = [
@@ -44,7 +44,7 @@ const IGNORE = [
 /**
  * Safe JSON reader
  */
-async function readJSON(file: string) {
+export async function readJSON(file: string) {
   try {
     return await fs.readJSON(file);
   } catch {
@@ -86,7 +86,7 @@ async function resolveWorkspaceDirs(workspaces: string[]) {
 /**
  * Scan workspaces
  */
-async function scanWorkspaces(rootPkg: any) {
+export async function scanWorkspaces(rootPkg: any) {
   let patterns: string[] = [];
 
   if (Array.isArray(rootPkg.workspaces)) {
@@ -112,7 +112,7 @@ async function scanWorkspaces(rootPkg: any) {
 /**
  * Deep scan fallback
  */
-async function scanRecursively() {
+export async function scanRecursively() {
   const pkgFiles = await fg("**/package.json", {
     cwd: ROOT,
     absolute: true,

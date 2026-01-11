@@ -9,8 +9,10 @@ export default function WorkspaceOptionModal() {
     const activeWorkspaceOptionModal = useWorkspaceState.use.activeWorkspaceOptionModal();
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
     const updateWorkspace = useWorkspaceState.use.updateWorkspace();
+    const loadWorkspace = useWorkspaceState.use.loadWorkspace();
     const [workspaceCopy, setWorkspaceCopy] = useState<WorkspaceInfo | null>(null);
     const [packageName, setPackageName] = useState<string>('');
+    const [error, setError] = useState<string>('');
 
     useEffect(() => {
         if (activeWorkspaceOptionModal) {
@@ -24,9 +26,18 @@ export default function WorkspaceOptionModal() {
         setPackageName('.');
     }
 
-    function save() {
+    async function save() {
         if (!workspaceCopy) return;
-        if (!updateWorkspace(workspaceCopy)) return;
+        if (workspaceCopy.name.length < 1) {
+            setError('Package name cannot be empty');
+            return;
+        }
+        const updateSuccess = await updateWorkspace(workspaceCopy);
+        if (!updateSuccess) {
+            setError('Failed to update workspace');
+            return;
+        }
+        await loadWorkspace();
         close();
     }
 
@@ -34,8 +45,8 @@ export default function WorkspaceOptionModal() {
     return (
         <ModalBody>
             <ModalHeader close={close} title={packageName} description={workspaceCopy?.path ?? ""} />
-
             <div className="p-3 flex-1 overflow-y-auto text-md">
+                {error && <p className="text-red-500 mb-2">{error}</p>}
                 <div className="grid grid-cols-2 gap-2 mb-2">
                     {(
                         [

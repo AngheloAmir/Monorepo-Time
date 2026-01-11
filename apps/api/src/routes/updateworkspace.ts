@@ -3,17 +3,23 @@ import type { WorkspaceInfo } from 'types';
 import fs from 'fs-extra';
 import path from 'path';
 
+import { checkNameExists } from "./_nameExist";
+
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
     res.header("Access-Control-Allow-Origin", "*");
-
     try {
         const workspace: WorkspaceInfo = req.body; 
         
         if (!workspace || !workspace.path) {
             res.status(400).send({ error: "Invalid workspace data" });
             return;
+        }
+
+        if (workspace.name && await checkNameExists(workspace.name, workspace.path)) {
+             res.status(409).send({ error: `Workspace with name "${workspace.name}" already exists.` });
+             return;
         }
 
         const packageJsonPath = path.join(workspace.path, 'package.json');
