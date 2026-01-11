@@ -84,34 +84,56 @@ export default function Workspace(props: WorkspaceProps) {
                 </div>
             </div>
 
+            {/* Root Terminal Button */}
             <button
                 onClick={() => setShowTerminal(true)}
-                className="p-2 pt-3 fixed bottom-44 right-8 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-110 flex items-center gap-2 z-50 group">
-                <i className="w-8 h-8 fa-solid fa-terminal text-xl"></i>
-                <span className="font-medium pr-2 hidden group-hover:inline-block transition-all duration-300 whitespace-nowrap overflow-hidden">
-                    Root Terminal
-                </span>
+                className="group fixed bottom-44 right-8 z-50 flex items-center justify-end"
+            >
+                <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative flex items-center p-[1px] rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-105">
+                     <div className="relative flex items-center bg-[#0A0A0A] rounded-full px-4 py-3 transition-colors duration-300 group-hover:bg-[#0A0A0A]/80">
+                        <i className="fa-solid fa-terminal text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"></i>
+                         <span className="font-bold ml-0 w-0 overflow-hidden group-hover:ml-3 group-hover:w-auto transition-all duration-300 whitespace-nowrap text-white">
+                            Root Terminal
+                        </span>
+                    </div>
+                </div>
             </button>
 
+            {/* Show/Hide Files Button */}
             <button
                 onClick={showHideFiles}
-                className={ `p-2 pt-3 fixed bottom-26 right-8  ${filesShow ? 'bg-blue-600 hover:bg-blue-500 ' : 'bg-green-600 hover:bg-green-500 ' }text-white rounded-full  shadow-lg shadow-blue-600/30 transition-all hover:scale-110 flex items-center gap-2 z-50 group `}>
-                { filesShow ?
-                    <i className="w-8 h-8 fa-solid fa-eye-slash text-xl"></i> 
-                    :   
-                    <i className="w-8 h-8 fa-solid fa-eye text-xl"></i>
-                }
-                <span className="font-medium pr-2 hidden group-hover:inline-block transition-all duration-300 whitespace-nowrap overflow-hidden">
-                    {filesShow ? 'Hide Files' : 'Show Files'}</span>
+                className="group fixed bottom-26 right-8 z-50 flex items-center justify-end"
+            >
+                <div className={`absolute inset-0 ${filesShow ? 'bg-red-500/20' : 'bg-green-500/20'} blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                <div className={`relative flex items-center p-[1px] rounded-full bg-gradient-to-r ${filesShow ? 'from-red-600 to-pink-600 shadow-red-500/30' : 'from-emerald-600 to-teal-600 shadow-emerald-500/30'} shadow-lg transition-transform duration-300 group-hover:scale-105`}>
+                     <div className="relative flex items-center bg-[#0A0A0A] rounded-full px-4 py-3 transition-colors duration-300 group-hover:bg-[#0A0A0A]/80">
+                        { filesShow ?
+                            <i className="fa-solid fa-eye-slash text-xl bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-pink-400"></i> 
+                            :   
+                            <i className="fa-solid fa-eye text-xl bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-400"></i>
+                        }
+                         <span className="font-bold ml-0 w-0 overflow-hidden group-hover:ml-3 group-hover:w-auto transition-all duration-300 whitespace-nowrap text-white">
+                            {filesShow ? 'Hide Files' : 'Show Files'}
+                        </span>
+                    </div>
+                </div>
             </button>
 
+            {/* Add Workspace Button */}
             <button
                 onClick={() => setShowWorkspaceNew(true)}
-                className="p-2 pt-3 fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-110 flex items-center gap-2 z-50 group">
-                <i className="w-8 h-8 fa-solid fa-plus text-xl"></i>
-                <span className="font-medium pr-2 hidden group-hover:inline-block transition-all duration-300 whitespace-nowrap overflow-hidden">
-                    Add Workspace
-                </span>
+                className="group fixed bottom-8 right-8 z-50 flex items-center justify-end"
+            >
+                <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative flex items-center p-[1px] rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-105">
+                     <div className="relative flex items-center bg-[#0A0A0A] rounded-full px-4 py-3 transition-colors duration-300 group-hover:bg-[#0A0A0A]/80">
+                        <i className="fa-solid fa-plus text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"></i>
+                         <span className="font-bold ml-0 w-0 overflow-hidden group-hover:ml-3 group-hover:w-auto transition-all duration-300 whitespace-nowrap text-white">
+                            Add Workspace
+                        </span>
+                    </div>
+                </div>
             </button>
 
             <WorkspaceOptionModal />
