@@ -1,6 +1,6 @@
 {
   "name": "monorepotime",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "stop": "npx -y kill-port 3000",
-    "copy-frontend": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/"
+    "copy-frontend": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/",
+    "publish": "npm publish --access public"
   },
   "dependencies": {
     "chalk": "^4.1.2",
