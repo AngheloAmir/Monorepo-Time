@@ -13,7 +13,6 @@ export default function HeaderItem(props: HeaderItemProps) {
     const [loading, setLoading] = useState(false);
     const activeTerminal = useWorkspaceState.use.activeTerminal();
 
-
     async function handleStop() {
         if (loading || !activeTerminal) return;
         try {

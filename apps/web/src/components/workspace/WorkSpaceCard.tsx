@@ -7,7 +7,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
     const setActiveTerminal             = useWorkspaceState.use.setActiveTerminal();
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
     const setShowNewTerminalWindow      = useWorkspaceState.use.setShowNewTerminalWindow();
-    const stopProcess                   = useWorkspaceState.use.stopProcess();
+    const stopInteractiveTerminal       = useWorkspaceState.use.stopInteractiveTerminal();
     const loadingWorkspace              = useWorkspaceState.use.loadingWorkspace();
     const [loading, setLoading]         = useState(false);
 
@@ -56,7 +56,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                     { !loading && props.isRunningAs == 'start' && (
                         <button 
                             onClick={ async () => {
-                                await stopProcess(props.info.name);
+                                await stopInteractiveTerminal(props.info.name);
                                 setWorkSpaceRunningAs(props.info.name, null);
                             }}
                             className="flex-1 py-1 px-2 rounded-lg bg-orange-700 text-white hover:bg-orange-500 transition-colors shadow-lg shadow-orange-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
@@ -67,7 +67,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                     { !loading && props.isRunningAs == 'dev' && (
                         <button 
                             onClick={async () => {
-                                await stopProcess(props.info.name);
+                                await stopInteractiveTerminal(props.info.name);
                                 setWorkSpaceRunningAs(props.info.name, null);
                             }}
                             className="flex-1 py-1 px-2 rounded-lg bg-red-800 text-white hover:bg-red-600 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
@@ -75,7 +75,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                             Stop Dev
                         </button>
                     )}
-                    { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.startCommand && (
+                    { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.isRunningAs != 'crashed' && props.info.startCommand && (
                         <button 
                             onClick={() => {
                                 setLoading(true);
@@ -88,7 +88,8 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                             Start
                         </button>
                     )}
-                    { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.info.devCommand && (
+                    
+                    { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.isRunningAs != 'crashed' && props.info.devCommand && (
                         <button 
                             onClick={() => {
                                 setLoading(true);
@@ -99,6 +100,19 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                             className="flex-1 py-1 px-2 rounded-lg bg-blue-800 text-white hover:bg-blue-600 transition-colors shadow-lg shadow-blue-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
                             <i className="opacity-70 fas fa-play text-lg"></i>
                             Start Dev
+                        </button>
+                    )}
+
+                    {/* CRASHED  */}
+                    { !loading && props.isRunningAs == 'crashed' && (
+                        <button 
+                            onClick={async () => {
+                                await stopInteractiveTerminal(props.info.name);
+                                setWorkSpaceRunningAs(props.info.name, null);
+                            }}
+                            className="flex-1 py-1 px-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in">
+                            <i className="opacity-70 fas fa-exclamation-triangle text-lg"></i>
+                            Close Terminal
                         </button>
                     )}
                 </div>

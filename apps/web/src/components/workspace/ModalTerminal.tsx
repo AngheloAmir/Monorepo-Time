@@ -19,7 +19,7 @@ export default function ModalTerminal() {
     useEffect(() => {
         if (showNewTerminalWindow && terminalRef.current) {
             const timeoutId = setTimeout(() => {
-                terminalRef.current?.connect(showNewTerminalWindow.path);
+                terminalRef.current?.connect(showNewTerminalWindow.path, "bash", showNewTerminalWindow.name);
                 terminalRef.current?.focus();
             }, 50);
             return () => clearTimeout(timeoutId);

@@ -10,7 +10,7 @@ export default function TabTerminal() {
         <div className="w-full h-full flex flex-col">
             <header className="flex-none w-full pt-1 flex bg-gray-800 min-h-6 flex-wrap gap-1 select-none px-2">
                 {workspace.map((item) => {
-                    if (item.isRunningAs === 'dev' || item.isRunningAs === 'start') 
+                    if (item.isRunningAs != null) 
                         return <HeaderItem key={item.info.name}  workspace={item} />
                 })}
             </header>
@@ -30,8 +30,7 @@ export default function TabTerminal() {
                         key={ item.info.name }
                         workspace={item}
                         visible={
-                            activeTerminal == item.info.name &&
-                            (item.isRunningAs == 'dev' || item.isRunningAs == 'start' || false)
+                            activeTerminal == item.info.name && item.isRunningAs != null
                         }
                     />
                 ))}

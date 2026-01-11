@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
-import { type WorkspaceItem } from "../../../_context/workspace";
+import useWorkspaceState, { type WorkspaceItem } from "../../../_context/workspace";
 import InteractiveTerminal, { type InteractiveTerminalRef } from "../../InteractiveTerminal";
-import { useState } from "react";
 
 export default function TabTerminalWrapper(props: { workspace: WorkspaceItem, visible: boolean }) {
-    const terminalRef  = useRef<InteractiveTerminalRef>(null);
-    const [isRunning, setIsRunning] = useState(false);
+    const setWorkSpaceRunningAs = useWorkspaceState.use.setWorkSpaceRunningAs();
+    const terminalRef           = useRef<InteractiveTerminalRef>(null);
 
     useEffect(() => {
         return () => {
@@ -16,22 +15,25 @@ export default function TabTerminalWrapper(props: { workspace: WorkspaceItem, vi
     }, []); 
 
     useEffect(() => {
-        if( props.workspace.isRunningAs != null ) {
-            if( terminalRef.current ) {
-                if( isRunning ) return;
-                setIsRunning(true);
+        const runAs = props.workspace.isRunningAs;
 
-                if(props.workspace.isRunningAs == 'dev' || props.workspace.isRunningAs == 'start') {
-                    terminalRef.current.connect(props.workspace.info.path);
-                    terminalRef.current.clear();
-                    terminalRef.current.onClose(() => {
-                        console.log('server crash')
-                    });
-                    setTimeout(() => {
-                        terminalRef.current?.input('npm run ' + props.workspace.isRunningAs );
-                        setIsRunning(false);
-                    }, 100);
-                }
+        if (runAs === 'dev' || runAs === 'start') {
+            if (terminalRef.current) {
+                terminalRef.current.connect(props.workspace.info.path, `npm run ${runAs}`, props.workspace.info.name);
+                terminalRef.current.onCrash(() => {
+                    setWorkSpaceRunningAs(props.workspace.info.name, 'crashed');
+                });
+            }
+        } 
+        else if( runAs == 'crashed') {
+            if(terminalRef.current) {
+                terminalRef.current.disconnect();
+            }
+        }
+        else {
+            if(terminalRef.current) {
+                terminalRef.current.disconnect();
+                terminalRef.current.clear();
             }
         }
     }, [ props.workspace.isRunningAs ]);
@@ -40,10 +42,7 @@ export default function TabTerminalWrapper(props: { workspace: WorkspaceItem, vi
         <div className={`w-full h-full ${props.visible ? 'block' : 'hidden'}`}>
             <InteractiveTerminal
                 ref={terminalRef}
-                isInteractive={false}
-                onExit={() => {
-                    console.log('server crash')
-                }}
+                isInteractive={true} 
             />
         </div>
     );

@@ -13,33 +13,57 @@ router.get("/", async (req: Request, res: Response) => {
 export default router;
 
 // Map to store active terminal processes for each socket
-const activeTerminals = new Map<string, ChildProcess>();
+export const activeTerminals = new Map<string, { child: ChildProcess, workspaceName?: string }>();
 
 interface StartTerminalPayload {
     path: string;
     command: string;
+    workspaceName?: string;
+}
+
+/**
+ * Manually stops a terminal process associated with a specific socket ID.
+ * @param socketId The ID of the socket whose process should be stopped.
+ * @returns true if a process was found and stopped, false otherwise.
+ */
+export function stopTerminalProcess(socketId: string): boolean {
+    const session = activeTerminals.get(socketId);
+    if (session) {
+        const { child } = session;
+        // Remove active listeners to prevent side effects during kill
+        child.removeAllListeners();
+        child.stdout?.removeAllListeners();
+        child.stderr?.removeAllListeners();
+
+        child.kill(); 
+        activeTerminals.delete(socketId);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Manually stops a terminal process associated with a specific workspace name.
+ * @param workspaceName The name of the workspace.
+ * @returns true if a process was found and stopped, false otherwise.
+ */
+export function stopTerminalProcessByName(workspaceName: string): boolean {
+    for (const [socketId, session] of activeTerminals.entries()) {
+        if (session.workspaceName === workspaceName) {
+            return stopTerminalProcess(socketId);
+        }
+    }
+    return false;
 }
 
 export function interactiveTerminalSocket(io: Server) {
     io.on('connection', (socket: Socket) => {
         
         socket.on('terminal:start', (data: StartTerminalPayload) => {
-            const { path, command } = data;
+            const { path, command, workspaceName } = data;
 
-            if (activeTerminals.has(socket.id)) {
-                const oldChild = activeTerminals.get(socket.id);
-                if (oldChild) {
-                    // Remove all listeners to prevent 'exit' or 'data' events from the old process
-                    // interfering with the new one or sending confusing logs.
-                    oldChild.removeAllListeners();
-                    oldChild.stdout?.removeAllListeners();
-                    oldChild.stderr?.removeAllListeners();
-                    
-                    oldChild.kill();
-                    activeTerminals.delete(socket.id);
-                    socket.emit('terminal:log', '\r\n\x1b[33m[System] Previous command terminated.\x1b[0m\r\n');
-                }
-            }
+            // Kill existing process for this socket if it exists
+            stopTerminalProcess(socket.id);
 
             try {
                 const env: NodeJS.ProcessEnv = { ...process.env };
@@ -102,7 +126,7 @@ except Exception as e:
                     });
                 }
 
-                activeTerminals.set(socket.id, child);
+                activeTerminals.set(socket.id, { child, workspaceName });
 
                 child.stdout?.on('data', (chunk) => {
                     socket.emit('terminal:log', chunk.toString());
@@ -141,24 +165,15 @@ except Exception as e:
         });
 
         socket.on('terminal:input', (input: string) => {
-            const child = activeTerminals.get(socket.id);
-            if (child && child.stdin) {
+            const session = activeTerminals.get(socket.id);
+            if (session && session.child.stdin) {
                 // With PTY bridge, we send raw input. PTY handles newlines/signals.
-                child.stdin.write(input);
+                session.child.stdin.write(input);
             }
         });
 
         socket.on('disconnect', () => {
-            const child = activeTerminals.get(socket.id);
-            if (child) {
-                // Remove listeners so we don't try to emit 'exit' or 'error' to a disconnected socket
-                child.removeAllListeners();
-                child.stdout?.removeAllListeners();
-                child.stderr?.removeAllListeners();
-
-                child.kill(); // Kill the process if client disconnects
-                activeTerminals.delete(socket.id);
-            }
+             stopTerminalProcess(socket.id);
         });
 
         function cleanup(socketId: string) {

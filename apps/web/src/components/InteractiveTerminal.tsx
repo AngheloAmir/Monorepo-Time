@@ -14,6 +14,8 @@ export interface InteractiveTerminalRef {
     onData: (callback: (data: string) => void) => void;
     /** Registers a callback to be called when the terminal process closes */
     onClose: (callback: () => void) => void;
+    /** Registers a callback to be called when the terminal process crashes (exit code != 0) */
+    onCrash: (callback: (code: number) => void) => void;
     /** Triggers the fit addon to resize the terminal to its container */
     fit: () => void;
     /** Clears the terminal buffer */
@@ -21,7 +23,7 @@ export interface InteractiveTerminalRef {
     /** Focuses the terminal input */
     focus: () => void;
     /** Manually initiates a connection to a terminal process */
-    connect: (path: string, command?: string) => void;
+    connect: (path: string, command?: string, workspaceName?: string) => void;
     /** Manually disconnects the socket connection */
     disconnect: () => void;
 }
@@ -37,6 +39,8 @@ interface InteractiveTerminalProps {
     isInteractive?: boolean;
     /** Callback function called when the process exits */
     onExit?: () => void;
+    /** Callback function called when the process crashes (non-zero exit) */
+    onCrash?: (code: number) => void;
 }
 
 /** An interactive terminal
@@ -83,6 +87,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     // Callbacks exposed to parent via the Ref interface
     const onDataCallbackRef = useRef<((data: string) => void) | null>(null);
     const onCloseCallbackRef = useRef<(() => void) | null>(null);
+    const onCrashCallbackRef = useRef<((code: number) => void) | null>(null);
 
     // Helper to disconnect socket
     const disconnectSocket = () => {
@@ -93,7 +98,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     };
 
     // Helper to connect socket
-    const connectSocket = (path: string, command: string = 'bash') => {
+    const connectSocket = (path: string, command: string = 'bash', workspaceName?: string) => {
         disconnectSocket();
         const url      = props.socketUrl || 'http://localhost:3000';
         const socket   = io(url, {
@@ -111,7 +116,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
                 terminalRef.current?.write(`\x1b[34m${path}\x1b[0m: ${command}\r\n`);
             }
 
-            socket.emit('terminal:start', { path, command });
+            socket.emit('terminal:start', { path, command, workspaceName });
             terminalRef.current?.focus();
             
             // Try fitting again after connection
@@ -130,6 +135,16 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
 
         socket.on('terminal:exit', (code: number) => {
             terminalRef.current?.write(`\r\n\x1b[33mProcess exited with code ${code}\x1b[0m\r\n`);
+            
+            if (code !== 0) {
+                if (onCrashCallbackRef.current) {
+                    onCrashCallbackRef.current(code);
+                }
+                if (props.onCrash) {
+                    props.onCrash(code);
+                }
+            }
+
             if (onCloseCallbackRef.current) {
                 onCloseCallbackRef.current();
             }
@@ -163,6 +178,9 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         onClose: (callback: () => void) => {
             onCloseCallbackRef.current = callback;
         },
+        onCrash: (callback: (code: number) => void) => {
+            onCrashCallbackRef.current = callback;
+        },
         fit: () => {
             consoleComponentRef.current?.fit();
         },
@@ -172,8 +190,8 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         focus: () => {
             terminalRef.current?.focus();
         },
-        connect: (path: string, command: string = 'bash') => {
-            connectSocket(path, command);
+        connect: (path: string, command: string = 'bash', workspaceName?: string) => {
+            connectSocket(path, command, workspaceName);
         },
         disconnect: () => {
             disconnectSocket();

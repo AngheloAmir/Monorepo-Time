@@ -6,7 +6,7 @@ import config from 'config';
 import defaultWorkspace from './fake/defaultWorkspace';
 
 export interface WorkspaceItem {
-    isRunningAs: 'dev' | 'start' | null;
+    isRunningAs: 'dev' | 'start' | 'crashed' | null;
     info: WorkspaceInfo;
 }
 
@@ -36,7 +36,7 @@ interface workspaceContext {
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => void;
 
     /** set workspace running as */
-    setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | null) => void;
+    setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | 'crashed' | null) => void;
 
     /** loading */
     loading: boolean;
@@ -53,6 +53,7 @@ interface workspaceContext {
     ///API calls
     //function that calls API
     stopProcess: (workspaceName: string) => Promise<void>;
+    stopInteractiveTerminal: (workspaceName: string) => Promise<void>;
     listWorkspace: () => Promise<any>;
     createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
     updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
@@ -174,6 +175,29 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             }
         } catch (error) {
             console.error('Error stopping process:', error);
+        }
+
+        set({ loadingWorkspace: null });
+    },
+
+    stopInteractiveTerminal: async (workspaceName: string) => {
+        const isLoading = get().loadingWorkspace;
+        if (isLoading == workspaceName) return;
+        set({ loadingWorkspace: workspaceName });
+
+        try {
+            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.stopInteractiveTerminal}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ workspace: { name: workspaceName } })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to stop interactive terminal');
+            }
+        } catch (error) {
+            console.error('Error stopping interactive terminal:', error);
         }
 
         set({ loadingWorkspace: null });
