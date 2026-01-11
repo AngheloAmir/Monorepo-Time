@@ -21,13 +21,16 @@ export default function CrudInputEditor({ title, initialValue = '{}', onChange, 
     };
 
     return (
-        <div className="flex flex-col h-full bg-transparent text-xs font-mono border border-gray-700/50 rounded-md overflow-hidden">
-            <div className="bg-gray-800 px-3 h-9 flex items-center flex-none mb-0 border-b border-gray-700">
-                <span className="text-gray-400 font-bold uppercase tracking-wider text-xs">{title}</span>
+        <div className="flex flex-col h-full bg-[#0F0F0F] border border-gray-800 rounded-xl overflow-hidden shadow-sm transition-all hover:border-gray-700 group">
+            <div className="px-4 h-10 flex items-center flex-none bg-gray-900/50 border-b border-gray-800 group-hover:bg-gray-900 transition-colors">
+                <span className="text-gray-500 font-bold uppercase tracking-widest text-[10px] group-hover:text-gray-300 transition-colors flex items-center gap-2">
+                    <i className="fas fa-code text-[10px]"></i>
+                    {title}
+                </span>
             </div>
-            <div className="flex-1 relative bg-gray-900/50">
+            <div className="flex-1 relative">
                 <textarea
-                    className="absolute inset-0 w-full h-full bg-transparent text-gray-300 p-2 resize-none outline-none font-mono text-[13px] leading-relaxed custom-scrollbar"
+                    className="absolute inset-0 w-full h-full bg-transparent text-gray-300 p-3 resize-none outline-none font-mono text-[12px] leading-relaxed custom-scrollbar selection:bg-blue-500/30"
                     value={value}
                     onChange={handleChange}
                     spellCheck={false}

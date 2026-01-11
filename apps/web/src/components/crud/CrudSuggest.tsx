@@ -25,12 +25,11 @@ export default function CrudSuggest({ value, onToggleSize, isMinimized = false }
                 .replace(/>/g, '&gt;');
 
             if (result.trim().startsWith('#')) {
-                return `<span class="text-blue-500 font-bold">${result}</span>`;
+                return `<span class="text-blue-400 font-bold opacity-80">${result}</span>`;
             } else {
-                // Apply normal highlighting
                 let hl = result;
-                hl = hl.replace(/"([^"]+)":/g, '<span class="text-green-500">"$1"</span>:');
-                hl = hl.replace(/([{}\[\],])/g, '<span class="text-orange-500">$1</span>');
+                hl = hl.replace(/"([^"]+)":/g, '<span class="text-green-400">"$1"</span>:');
+                hl = hl.replace(/([{}\[\],])/g, '<span class="text-gray-500">$1</span>');
                 return hl;
             }
         }).join('\n');
@@ -39,10 +38,11 @@ export default function CrudSuggest({ value, onToggleSize, isMinimized = false }
     }, [value]);
 
     return (
-        <div className="flex flex-col h-full bg-transparent text-sm font-mono transition-all duration-300 border border-gray-700/50 rounded-md overflow-hidden">
-            <div className={`flex items-center ${isMinimized ? 'justify-center px-0' : 'justify-between px-3'} h-9 flex-none border-b border-gray-700 bg-gray-800 transition-all`}>
+        <div className="flex flex-col h-full bg-[#0F0F0F] border border-gray-800 rounded-xl overflow-hidden shadow-sm transition-all hover:border-gray-700 group">
+            <div className={`flex items-center ${isMinimized ? 'justify-center px-0' : 'justify-between px-4'} h-10 flex-none border-b border-gray-800 bg-gray-900/50 group-hover:bg-gray-900 transition-colors`}>
                 {!isMinimized && (
-                    <span className="text-gray-400 font-bold uppercase tracking-wider text-xs whitespace-nowrap">
+                    <span className="text-gray-500 font-bold uppercase tracking-widest text-[10px] group-hover:text-gray-300 transition-colors flex items-center gap-2">
+                        <i className="fas fa-lightbulb text-[10px]"></i>
                         Expected Outcome
                     </span>
                 )}
@@ -58,9 +58,9 @@ export default function CrudSuggest({ value, onToggleSize, isMinimized = false }
             </div>
             
             {!isMinimized && (
-                <div className="flex-1 overflow-auto custom-scrollbar p-2 bg-gray-900/50">
+                <div className="flex-1 overflow-auto custom-scrollbar p-3">
                     <pre 
-                        className="w-full text-white whitespace-pre-wrap leading-tight text-[13px]" 
+                        className="w-full text-gray-400 whitespace-pre-wrap leading-relaxed text-[12px] font-mono" 
                         dangerouslySetInnerHTML={{ __html: htmlContent }}
                     ></pre>
                 </div>
