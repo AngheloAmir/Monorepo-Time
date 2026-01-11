@@ -1,5 +1,8 @@
 //import Undercontsruct from "../components/Undercontsruct"
 import AccordionNav from "../components/crud/AccordionNav";
+import CrudInputEditor from "../components/crud/CrudInputEditor";
+import CrudOutput from "../components/crud/CrudOutput";
+import CrudSuggest from "../components/crud/CrudSuggest";
 
 interface CRUDTesterProps {
     isVisible: boolean
@@ -46,20 +49,26 @@ export default function CRUDTester(props: CRUDTesterProps) {
 
                     {/* Moved Info Elements: Avail -> Method -> Route */}
                     <div className="flex items-center gap-3">
-                        <span id="crud-info-avail" className="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-gray-700 text-gray-400"></span>
-                        <span id="crud-info-method" className="font-black text-sm"></span>
-                        <span id="crud-info-route" className="font-mono text-xs text-blue-300 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded"></span>
+                        <span id="crud-info-avail" className="px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-gray-700 text-gray-400">
+                            METHOD
+                        </span>
+                        <span id="crud-info-method" className="font-black text-sm">
+                            LOCALHOST://
+                        </span>
+                        <span id="crud-info-route" className="font-mono text-xs text-blue-300 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded">
+                            public
+                        </span>
                     </div>
                 </div>
 
                 {/* Empty State */}
-                <div id="crud-empty-state" className="relative z-10 flex-1 flex items-center justify-center text-gray-500 flex-col gap-4 opacity-40 select-none">
+                {/* <div id="crud-empty-state" className="relative z-10 flex-1 flex items-center justify-center text-gray-500 flex-col gap-4 opacity-40 select-none">
                     <i className="fas fa-microscope text-6xl"></i>
                     <p className="text-lg font-medium">Select an endpoint to test</p>
-                </div>
+                </div> */}
 
                 {/* Active State (Hidden by default) */}
-                <div id="crud-active-state" className="relative z-10 flex-1 flex flex-col overflow-hidden hidden">
+                <div id="crud-active-state" className="relative z-10 flex-1 flex flex-col overflow-hidden">
 
                     {/* Info Block (Redesigned) */}
                     <div className="py-2 px-4 bg-gray-800/40 backdrop-blur-md flex flex-col gap-4 relative z-20">
@@ -93,9 +102,13 @@ export default function CRUDTester(props: CRUDTesterProps) {
                                 </button>
 
                                 {/* Dropdown Menu */}
-                                <div id="crud-presets-menu" className="hidden absolute top-full left-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-md shadow-xl z-[100] overflow-hidden flex flex-col py-1 animate-fade-in-down">
-                                    {/* Items injected here */}
+                                <div id="crud-presets-menu" className=" absolute top-full left-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-md shadow-xl z-[100] overflow-hidden flex flex-col py-1 animate-fade-in-down">
+                                    <i className="fas fa-file-code text-gray-500 group-hover:text-green-400"></i>
+                                    <span className="font-medium">
+                                        dasdas
+                                    </span>
                                 </div>
+                                
                             </div>
 
                             {/* 3. Params Input (Expands) */}
@@ -118,18 +131,37 @@ export default function CRUDTester(props: CRUDTesterProps) {
                     <div id="crud-grid-layout" className="flex-1 grid grid-cols-3 gap-0 min-h-0 transition-all duration-300">
                         {/* Col 1: Inputs */}
                         <div className="grid grid-rows-12 grid-cols-1 h-full bg-gray-900 p-2 gap-2 min-h-0">
-                            <div id="input-header-container" className="row-span-4 min-h-0"></div>
-                            <div id="input-body-container" className="row-span-8 min-h-0"></div>
+                            <div id="input-header-container" className="row-span-4 min-h-0">
+                                <CrudInputEditor title="Request" initialValue="{}" />
+                            </div>
+                            <div id="input-body-container" className="row-span-8 min-h-0">
+                                <CrudInputEditor title="Body" initialValue="{}" />
+                            </div>
                         </div>
 
                         {/* Col 2: Output */}
                         <div className=" flex flex-col h-full bg-gray-900 p-2 min-h-0">
-                            <div id="output-container" className="h-full"></div>
+                            <div id="output-container" className="h-full">
+                                <CrudOutput output={undefined} />
+                            </div>
                         </div>
-
+ 
                         {/* Col 3: Suggested */}
                         <div className="flex flex-col h-full bg-gray-900 p-2 min-h-0">
-                            <div id="suggest-container-wrapper" className="h-full transition-all"></div>
+                            <div id="suggest-container-wrapper" className="h-full transition-all">
+                                <CrudSuggest value={[
+                        {
+                            "name": "I Wandered Lonely as a Cloud",
+                            "urlparams": "?poem=I%20Wandered%20Lonely%20as%20a%20Cloud",
+                            "content": "{}"
+                        },
+                        {
+                            "name": "The Sun Has Long Been Set",
+                            "urlparams": "?poem=The%20Sun%20Has%20Long%20Been%20Set",
+                            "content": "{}"
+                        }
+                    ]} />
+                            </div>
                         </div>
                     </div>
                 </div>
