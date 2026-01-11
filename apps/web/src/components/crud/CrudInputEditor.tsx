@@ -21,7 +21,7 @@ export default function CrudInputEditor({ title, initialValue = '{}', onChange, 
     };
 
     return (
-        <div className="flex flex-col h-full bg-[#0F0F0F] border border-gray-800 rounded-xl overflow-hidden shadow-sm transition-all hover:border-gray-700 group">
+        <div className="flex flex-col h-full bg-[#0F0F0F] overflow-hidden shadow-sm transition-all hover:border-gray-700 group">
             <div className="px-4 h-10 flex items-center flex-none bg-gray-900/50 border-b border-gray-800 group-hover:bg-gray-900 transition-colors">
                 <span className="text-gray-500 font-bold uppercase tracking-widest text-[10px] group-hover:text-gray-300 transition-colors flex items-center gap-2">
                     <i className="fas fa-code text-[10px]"></i>
