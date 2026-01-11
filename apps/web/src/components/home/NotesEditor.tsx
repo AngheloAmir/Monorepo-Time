@@ -5,7 +5,6 @@ import config from 'config';
 export default function NotesEditor() {
     const [notes, setNotes] = useState('');
     const [status, setStatus] = useState<'saved' | 'saving' | 'error' | ''>('');
-    const [isExpanded, setIsExpanded] = useState(false);
 
     // Fetch notes on load
     useEffect(() => {
@@ -50,8 +49,8 @@ export default function NotesEditor() {
 
 
     return (
-        <div className={`transition-all duration-300 flex flex-col ${isExpanded ? 'fixed inset-4 z-50 bg-gray-900 shadow-2xl rounded-2xl border border-gray-700' : 'bg-gray-800 rounded-2xl border border-gray-700 shadow-lg h-full'}`}>
-            <div className="flex items-center justify-between p-4 border-b border-gray-700/50 bg-gray-800/50 rounded-t-2xl backdrop-blur-sm">
+        <div className="h-[420px] overflow-y-auto flex flex-col">
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center">
                         <i className="fas fa-sticky-note text-yellow-500"></i>
@@ -61,12 +60,6 @@ export default function NotesEditor() {
                     {status === 'saved' && <span className="text-xs text-green-400">Saved</span>}
                     {status === 'error' && <span className="text-xs text-red-400">Error saving</span>}
                 </div>
-                <button 
-                    onClick={() => setIsExpanded(!isExpanded)}
-                    className="w-8 h-8 rounded-lg hover:bg-gray-700 flex items-center justify-center text-gray-400 transition-colors"
-                >
-                    <i className={`fas fa-${isExpanded ? 'compress' : 'expand'}`}></i>
-                </button>
             </div>
             
             <textarea
@@ -76,12 +69,6 @@ export default function NotesEditor() {
                 className="flex-1 w-full p-4 bg-transparent border-none outline-none resize-none text-gray-300 placeholder-gray-600 font-mono text-sm leading-relaxed"
                 spellCheck={false}
             />
-            
-            {isExpanded && (
-                <div className="p-2 border-t border-gray-800 text-center">
-                   <button onClick={() => setIsExpanded(false)} className="text-xs text-gray-500 hover:text-gray-300">Close Fullscreen</button>
-                </div>
-            )}
         </div>
     );
 }

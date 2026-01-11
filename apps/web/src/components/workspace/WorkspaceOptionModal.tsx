@@ -45,7 +45,7 @@ export default function WorkspaceOptionModal() {
     return (
         <ModalBody>
             <ModalHeader close={close} title={packageName} description={workspaceCopy?.path ?? ""} />
-            <div className="p-3 flex-1 overflow-y-auto text-md">
+            <div className="p-4 flex-1 overflow-y-auto text-md">
                 {error && <p className="text-red-500 mb-2">{error}</p>}
                 <div className="grid grid-cols-2 gap-2 mb-2">
                     {(
@@ -124,8 +124,25 @@ export default function WorkspaceOptionModal() {
             </div>
 
             <footer className="p-2 border-t border-gray-600 flex justify-end gap-4">
-                <button onClick={close} className="w-32 bg-gray-700 hover:bg-gray-600 transition-colors p-1 rounded">Cancel</button>
-                <button onClick={save} className="w-40 bg-blue-500 hover:bg-blue-600 transition-colors p-1 rounded">Save</button>
+                <button 
+                    onClick={close} 
+                    className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden"
+                >
+                    <span className="relative z-10">Cancel</span>
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </button>
+                
+                <button 
+                    onClick={save} 
+                    className="group relative px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
+                    <span className="relative z-10 flex items-center gap-2">
+                        <i className="fas fa-save"></i>
+                        Save
+                    </span>
+                </button>
             </footer>
         </ModalBody>
     )

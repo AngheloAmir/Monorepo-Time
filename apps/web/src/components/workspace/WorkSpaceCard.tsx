@@ -20,7 +20,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
     }, [loadingWorkspace]);
     
     return (
-        <div className="relative group rounded-xl p-[1px] bg-gradient-to-br from-gray-800 to-gray-900 hover:from-blue-500 hover:to-purple-600 transition-all duration-300 shadow-xl hover:shadow-blue-900/20">
+        <div className="relative group rounded-xl p-[1px] bg-gradient-to-br from-gray-800 to-gray-900">
             <div className="bg-[#0A0A0A] rounded-[11px] h-full flex flex-col overflow-hidden">
                 <header className="p-3 flex items-start gap-4 bg-gradient-to-b from-white/5 to-transparent">
                     <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center border border-white/10 group-hover:border-blue-500/50 transition-colors">

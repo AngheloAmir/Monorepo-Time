@@ -7,7 +7,7 @@ interface ModalHeaderProps {
 
 export default function ModalHeader({ close, title, description, icon }: ModalHeaderProps) {
     return (
-        <header className="px-5 py-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+        <header className="px-3 py-1 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
             <div className="text-md font-bold text-white flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
                     <i className={icon || "fas fa-cube text-white text-lg"}></i>

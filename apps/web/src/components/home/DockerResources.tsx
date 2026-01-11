@@ -12,7 +12,7 @@ export default function DockerResources() {
     }, []);
 
     return (
-        <>
+        <div className="h-[420px] overflow-hidden">
             <div className="flex items-center justify-between mb-4">
                 <i className="fab fa-docker text-blue-400"></i>
                 <div className="flex items-center gap-3">
@@ -58,6 +58,6 @@ export default function DockerResources() {
                 ))}
 
             </div>
-        </>
+        </div>
     )
 }

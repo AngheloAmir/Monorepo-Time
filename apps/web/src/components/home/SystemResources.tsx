@@ -15,7 +15,7 @@ export default function SystemResources() {
     }, []);
 
     return (
-        <>
+        <div className="h-[420px]">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
                     <i className="fas fa-chart-line text-blue-500"></i>
@@ -72,6 +72,6 @@ export default function SystemResources() {
                     ))}
                 </div>
             </div>
-        </>
+        </div>
     )
 }

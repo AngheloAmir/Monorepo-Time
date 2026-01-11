@@ -1,7 +1,7 @@
 import BaseCard from "../components/BaseCard"
 import DockerResources from "../components/home/DockerResources"
 import SystemResources from "../components/home/SystemResources"
-import NotesEditor from '../components/NotesEditor';
+import NotesEditor from '../components/home/NotesEditor';
 
 import { useEffect } from 'react';
 import config from 'config';
@@ -59,7 +59,9 @@ export default function Home(props: HomeProps) {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     
                     <div className="lg:col-span-4 flex flex-col gap-6 h-[400px]">
+                        <BaseCard>
                             <NotesEditor />
+                        </BaseCard>
                     </div>
 
                     {/* <!-- Real-time Monitor Card --> */}
