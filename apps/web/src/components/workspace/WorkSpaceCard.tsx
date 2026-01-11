@@ -51,10 +51,10 @@ export default function WorkspaceCard(props: WorkspaceItem) {
 
                     <div className="flex-1 flex gap-2">
                         { loading && (
-                            <button  className="flex-1 py-1 px-2 rounded-lg bg-gray-800 text-gray-400 border border-white/5 text-xs font-medium flex items-center justify-center gap-2 cursor-wait">
+                            <div className="flex-1 py-1.5 px-3 rounded-lg bg-gray-900 border border-gray-800 text-gray-400 text-xs font-medium flex items-center justify-center gap-2 cursor-wait">
                                 <i className="fas fa-spinner animate-spin"></i>
                                 Loading...
-                            </button>
+                            </div>
                         )}
                         { !loading && props.isRunningAs == 'start' && (
                             <button 
@@ -62,9 +62,14 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                                     await stopInteractiveTerminal(props.info.name);
                                     setWorkSpaceRunningAs(props.info.name, null);
                                 }}
-                                className="flex-1 py-1.5 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all shadow-[0_0_10px_-4px_rgba(16,185,129,0.3)] text-xs font-bold flex items-center justify-center gap-2">
-                                <i className="fas fa-check-circle"></i>
-                                Online
+                                className="group/btn relative flex-1 py-1.5 px-3 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_15px_-5px_rgba(16,185,129,0.5)]"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-20 group-hover/btn:opacity-30 transition-opacity"></div>
+                                <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-emerald-500 to-teal-400"></div>
+                                <div className="relative z-10 flex items-center justify-center gap-2 text-emerald-400 font-bold text-xs">
+                                    <i className="fas fa-check-circle"></i>
+                                    Online
+                                </div>
                             </button>
                         )}
                         { !loading && props.isRunningAs == 'dev' && (
@@ -73,9 +78,14 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                                     await stopInteractiveTerminal(props.info.name);
                                     setWorkSpaceRunningAs(props.info.name, null);
                                 }}
-                                className="flex-1 py-1.5 px-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500/40 transition-all shadow-[0_0_10px_-4px_rgba(245,158,11,0.3)] text-xs font-bold flex items-center justify-center gap-2">
-                                <i className="fas fa-stop"></i>
-                                Stop Dev
+                                className="group/btn relative flex-1 py-1.5 px-3 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_15px_-5px_rgba(245,158,11,0.5)]"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-600 opacity-20 group-hover/btn:opacity-30 transition-opacity"></div>
+                                <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-amber-500 to-orange-400"></div>
+                                <div className="relative z-10 flex items-center justify-center gap-2 text-amber-400 font-bold text-xs">
+                                    <i className="fas fa-stop"></i>
+                                    Stop Dev
+                                </div>
                             </button>
                         )}
                         { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.isRunningAs != 'crashed' && props.info.startCommand && (
@@ -86,12 +96,14 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                                     setActiveTerminal(props.info.name);
                                     setTimeout(() => setLoading(false), 1000);
                                 }}
-                                className="flex-1 py-1.5 px-3 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white hover:border-white/20 transition-all text-xs font-medium flex items-center justify-center gap-2">
-                                <i className="fas fa-play text-[10px]"></i>
-                                Start
+                                className="group/btn relative flex-1 py-1.5 px-3 rounded-lg transition-all duration-300 bg-gray-900 border border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white"
+                            >
+                                <div className="flex items-center justify-center gap-2 text-xs font-medium">
+                                    <i className="fas fa-play text-[10px]"></i>
+                                    Start
+                                </div>
                             </button>
                         )}
-                        
                         { !loading && props.isRunningAs != 'dev' && props.isRunningAs != 'start' && props.isRunningAs != 'crashed' && props.info.devCommand && (
                             <button 
                                 onClick={() => {
@@ -100,9 +112,14 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                                     setActiveTerminal(props.info.name);
                                     setTimeout(() => setLoading(false), 1000);
                                 }}
-                                className="flex-1 py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 transition-all text-xs font-bold flex items-center justify-center gap-2 border border-transparent">
-                                <i className="fas fa-code text-[10px]"></i>
-                                Dev
+                                className="group/btn relative flex-1 py-1.5 px-3 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_15px_-5px_rgba(59,130,246,0.5)]"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg opacity-100"></div>
+                                <div className="absolute inset-[1px] bg-gray-900 rounded-[7px] group-hover/btn:bg-gray-800 transition-colors"></div>
+                                <div className="relative z-10 flex items-center justify-center gap-2 text-white font-bold text-xs group-hover/btn:text-blue-100">
+                                    <i className="fas fa-code text-[10px]"></i>
+                                    Dev
+                                </div>
                             </button>
                         )}
 
@@ -113,9 +130,14 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                                     stopInteractiveTerminal(props.info.name, true);
                                     setWorkSpaceRunningAs(props.info.name, null);
                                 }}
-                                className="flex-1 py-1.5 px-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20 hover:border-red-500/40 transition-all shadow-[0_0_10px_-4px_rgba(239,68,68,0.3)] text-xs font-bold flex items-center justify-center gap-2">
-                                <i className="fas fa-exclamation-triangle"></i>
-                                Crashed
+                                className="group/btn relative flex-1 py-1.5 px-3 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_15px_-5px_rgba(239,68,68,0.5)]"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-rose-600 opacity-20 group-hover/btn:opacity-30 transition-opacity"></div>
+                                <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-red-500 to-rose-400"></div>
+                                <div className="relative z-10 flex items-center justify-center gap-2 text-red-400 font-bold text-xs">
+                                    <i className="fas fa-exclamation-triangle"></i>
+                                    Crashed
+                                </div>
                             </button>
                         )}
                     </div>

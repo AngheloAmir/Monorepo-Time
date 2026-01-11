@@ -37,21 +37,31 @@ export default function Flash({ onComplete }: FlashProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 text-white overflow-hidden">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-xl overflow-hidden">
              {/* Background Effects */}
             <div className="absolute top-0 right-0 w-[500px] h-[450px] bg-blue-600/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-600/10 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+            
+            {/* Grid Pattern Overlay */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
 
             <div className="relative z-10 w-full max-w-4xl p-6">
                 
                 {step === 'intro' && (
-                    <div className="space-y-12 animate-fade-in">
-                        <div className="text-center space-y-4">
-                            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight">
-                                Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Monorepo TIME!</span>
+                    <div className="space-y-12 animate-fade-in relative">
+                        <div className="text-center space-y-6">
+                            <div className="inline-block p-1 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/5 mb-4">
+                                <div className="px-4 py-1 rounded-xl bg-black/50 backdrop-blur-md">
+                                    <span className="text-sm font-medium text-blue-300">v1.0.0 Alpha</span>
+                                </div>
+                            </div>
+                            
+                            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
+                                Welcome to <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]">Monorepo TIME!</span>
                             </h1>
-                            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-                                The ultimate dashboard for managing your modern monorepo architectures.
+                            <p className="text-xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+                                The ultimate dashboard for managing your <span className="text-white font-medium">modern monorepo architectures</span> with speed and elegance.
                             </p>
                         </div>
 
@@ -61,12 +71,19 @@ export default function Flash({ onComplete }: FlashProps) {
                                 { icon: 'fa-terminal', title: 'Web Terminal', desc: 'Run commands directly in your browser without leaving the UI.' },
                                 { icon: 'fa-bolt', title: 'Turbocharged', desc: 'Built-in support for Turborepo to speed up your workflows.' },
                             ].map((feature, idx) => (
-                                <div key={idx} className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 p-6 rounded-2xl hover:bg-gray-800 transition-colors duration-300">
-                                    <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center mb-4">
-                                        <i className={`fas ${feature.icon} text-2xl text-blue-400`}></i>
+                                <div key={idx} className="group relative p-[1px] rounded-2xl transition-all duration-300 hover:-translate-y-1">
+                                    {/* Gradient Border */}
+                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 group-hover:from-blue-600 group-hover:to-purple-600 transition-colors duration-300"></div>
+                                    
+                                    <div className="relative h-full bg-[#0A0A0A] p-6 rounded-[15px] overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-bl-full -mr-10 -mt-10"></div>
+                                        
+                                        <div className="w-12 h-12 bg-gray-900 rounded-xl border border-white/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-blue-500/10">
+                                            <i className={`fas ${feature.icon} text-2xl text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-purple-400`}></i>
+                                        </div>
+                                        <h3 className="text-xl font-bold mb-2 text-white group-hover:text-blue-200 transition-colors">{feature.title}</h3>
+                                        <p className="text-sm text-gray-500 leading-relaxed group-hover:text-gray-400 transition-colors">{feature.desc}</p>
                                     </div>
-                                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                                    <p className="text-sm text-gray-400">{feature.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -74,10 +91,14 @@ export default function Flash({ onComplete }: FlashProps) {
                         <div className="flex justify-center pt-8">
                             <button 
                                 onClick={() => setStep('prompt')}
-                                className="group px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-full font-bold text-lg shadow-lg shadow-blue-500/25 transition-all flex items-center gap-2"
+                                className="group relative px-10 py-4 rounded-xl font-bold text-lg text-white shadow-2xl shadow-blue-600/20 overflow-hidden transition-all hover:scale-105"
                             >
-                                Get Started
-                                <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl"></div>
+                                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+                                <div className="relative z-10 flex items-center gap-3">
+                                    Get Started
+                                    <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                                </div>
                             </button>
                         </div>
                     </div>
@@ -87,87 +108,92 @@ export default function Flash({ onComplete }: FlashProps) {
                     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in-up">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                             {/* Left Column: Text & Context */}
-                            <div className="text-left space-y-6">
-                                <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center rotate-3">
-                                    <i className="fas fa-hammer text-3xl text-blue-400"></i>
+                            <div className="text-left space-y-8">
+                                <div className="w-20 h-20 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-3xl flex items-center justify-center rotate-3 shadow-[0_0_30px_-5px_rgba(59,130,246,0.3)]">
+                                    <i className="fas fa-hammer text-4xl text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-purple-400"></i>
                                 </div>
                                 
-                                <div>
-                                    <h2 className="text-3xl font-bold mb-3">Recommended Setup</h2>
-                                    <p className="text-gray-300 text-lg leading-relaxed">
+                                <div className="space-y-4">
+                                    <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">Recommended Setup</h2>
+                                    <p className="text-gray-400 text-lg leading-relaxed font-light">
                                         We detected that this might be a new project. 
                                         We can scaffold a folder structure recommended by
-                                        <a href="https://turborepo.org/" target="_blank" rel="noopener noreferrer" className="p-2 text-blue-400 hover:underline">
+                                        <a href="https://turborepo.org/" target="_blank" rel="noopener noreferrer" className="mx-1.5 px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/10">
                                             Turborepo.js
                                         </a> 
                                         for you to get up and running instantly.
                                     </p>
                                 </div>
 
-                                <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-200 text-sm">
-                                    <i className="fas fa-info-circle mr-2"></i>
-                                    This will create a <strong>packages/types</strong> folder and configure <strong>Turborepo</strong> for build orchestration.
+                                <div className="p-5 rounded-xl bg-blue-500/5 border border-blue-500/20 text-blue-200 text-sm flex gap-4 items-start">
+                                    <i className="fas fa-info-circle mt-0.5 text-blue-400 text-lg"></i>
+                                    <p>This will create a <strong className="text-white">packages/types</strong> folder and configure <strong className="text-white">Turborepo</strong> for build orchestration.</p>
                                 </div>
                             </div>
 
                             {/* Right Column: Visual Folder Structure */}
-                            <div className="bg-gray-950 rounded-xl border border-gray-800 p-6 shadow-2xl font-mono text-sm text-gray-400 relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 p-4 opacity-50">
-                                    <i className="fas fa-folder-tree text-6xl text-gray-800"></i>
+                            <div className="bg-[#0A0A0A] rounded-2xl border border-white/5 p-8 shadow-2xl font-mono text-sm text-gray-400 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none group-hover:opacity-20 transition-opacity duration-500">
+                                    <i className="fas fa-folder-tree text-9xl text-white"></i>
                                 </div>
 
-                                <div className="space-y-2 relative z-10">
-                                    <div className="flex items-center gap-2">
+                                <div className="space-y-3 relative z-10">
+                                    <div className="flex items-center gap-3">
                                         <i className="fas fa-folder text-blue-500"></i>
-                                        <span>root</span>
+                                        <span className="text-gray-200">root</span>
                                     </div>
-                                    <div className="pl-6 flex items-center gap-2 pb-1 relative">
-                                        <div className="absolute left-[11px] top-0 bottom-1/2 w-px bg-gray-700"></div>
-                                        <div className="absolute left-[11px] top-1/2 w-3 h-px bg-gray-700"></div>
+                                    <div className="pl-6 flex items-center gap-3 pb-1 relative">
+                                        <div className="absolute left-[11px] top-0 bottom-1/2 w-px bg-gray-800"></div>
+                                        <div className="absolute left-[11px] top-1/2 w-4 h-px bg-gray-800"></div>
                                         <i className="fas fa-folder text-yellow-500"></i>
                                         <span>apps</span>
                                     </div>
-                                    <div className="pl-6 flex items-center gap-2 pb-1 relative">
-                                        <div className="absolute left-[11px] top-0 bottom-0 w-px bg-gray-700"></div>
-                                        <div className="absolute left-[11px] top-1/2 w-3 h-px bg-gray-700"></div>
+                                    <div className="pl-6 flex items-center gap-3 pb-1 relative">
+                                        <div className="absolute left-[11px] top-0 bottom-0 w-px bg-gray-800"></div>
+                                        <div className="absolute left-[11px] top-1/2 w-4 h-px bg-gray-800"></div>
                                         <i className="fas fa-folder text-green-500"></i>
-                                        <span className="text-green-400 font-bold">packages</span> 
-                                        <span className="text-xs ml-2 bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">New</span>
+                                        <span className="text-green-400 font-bold bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20">packages</span> 
+                                        <span className="text-[10px] ml-1 bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-bold shadow-lg shadow-blue-500/50">NEW</span>
                                     </div>
-                                    <div className="pl-12 flex items-center gap-2 pb-1 relative">
-                                        <div className="absolute left-[35px] top-0 bottom-1/2 w-px bg-gray-700"></div>
-                                        <div className="absolute left-[35px] top-1/2 w-3 h-px bg-gray-700"></div>
+                                    <div className="pl-12 flex items-center gap-3 pb-1 relative">
+                                        <div className="absolute left-[35px] top-0 bottom-1/2 w-px bg-gray-800"></div>
+                                        <div className="absolute left-[35px] top-1/2 w-4 h-px bg-gray-800"></div>
                                         <i className="fas fa-folder text-green-500"></i>
-                                        <span className="text-green-400">types</span>
+                                        <span className="text-green-400 bg-green-500/5 px-2 py-0.5 rounded">types</span>
                                     </div>
-                                    <div className="pl-6 flex items-center gap-2 pb-1 relative">
-                                        <div className="absolute left-[11px] top-0 bottom-0 w-px bg-gray-700"></div>
-                                        <div className="absolute left-[11px] top-1/2 w-3 h-px bg-gray-700"></div>
+                                    <div className="pl-6 flex items-center gap-3 pb-1 relative">
+                                        <div className="absolute left-[11px] top-0 bottom-0 w-px bg-gray-800"></div>
+                                        <div className="absolute left-[11px] top-1/2 w-4 h-px bg-gray-800"></div>
                                         <i className="fas fa-file-code text-red-400"></i>
                                         <span>package.json</span>
                                     </div>
-                                    <div className="pl-6 flex items-center gap-2 relative">
-                                        <div className="absolute left-[11px] top-0 bottom-1/2 w-px bg-gray-700"></div>
-                                        <div className="absolute left-[11px] top-1/2 w-3 h-px bg-gray-700"></div>
+                                    <div className="pl-6 flex items-center gap-3 relative">
+                                        <div className="absolute left-[11px] top-0 bottom-1/2 w-px bg-gray-800"></div>
+                                        <div className="absolute left-[11px] top-1/2 w-4 h-px bg-gray-800"></div>
                                         <i className="fas fa-file-code text-purple-400"></i>
-                                        <span className="text-purple-400 font-bold">turbo.json</span>
-                                        <span className="text-xs ml-2 bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full">New</span>
+                                        <span className="text-purple-400 font-bold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">turbo.json</span>
+                                        <span className="text-[10px] ml-1 bg-blue-600 text-white px-1.5 py-0.5 rounded-full font-bold shadow-lg shadow-blue-500/50">NEW</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row gap-4 justify-center pt-4">
+                        <div className="flex flex-col md:flex-row gap-4 justify-center pt-8">
                             <button 
                                 onClick={handleScaffold}
-                                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-white shadow-lg shadow-blue-500/25 transition-all"
+                                className="group relative px-8 py-3 rounded-xl font-bold text-white shadow-xl shadow-blue-600/20 overflow-hidden transition-all hover:scale-105"
                             >
-                                <i className="fas fa-magic mr-2"></i>
-                                Yes, Scaffold & Install
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl"></div>
+                                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+                                <div className="relative z-10 flex items-center gap-2">
+                                    <i className="fas fa-magic"></i>
+                                    Yes, Scaffold & Install
+                                </div>
                             </button>
+                            
                             <button 
                                 onClick={onComplete}
-                                className="px-8 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl font-semibold text-gray-300 transition-all"
+                                className="px-8 py-3 rounded-xl font-semibold text-gray-400 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 transition-all"
                             >
                                 Skip for now
                             </button>
@@ -176,33 +202,48 @@ export default function Flash({ onComplete }: FlashProps) {
                 )}
 
                 {step === 'scaffolding' && (
-                    <div className="max-w-xl mx-auto text-center space-y-8 animate-pulse">
-                        <div className="w-20 h-20 mx-auto rounded-full border-4 border-blue-500/30 border-t-blue-500 animate-spin"></div>
+                    <div className="max-w-xl mx-auto text-center space-y-12 animate-fade-in py-12">
+                        <div className="relative w-24 h-24 mx-auto">
+                            <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <i className="fas fa-cog text-3xl text-blue-500 animate-pulse"></i>
+                            </div>
+                        </div>
                         
-                        <div>
-                            <h2 className="text-2xl font-bold mb-2">Setting things up...</h2>
-                            <p className="text-gray-400">{scaffoldStatus}</p>
+                        <div className="space-y-4">
+                            <h2 className="text-3xl font-bold text-white">Setting things up...</h2>
+                            <p className="text-gray-400 text-lg animate-pulse">{scaffoldStatus}</p>
                         </div>
                     </div>
                 )}
 
                 {step === 'success' && (
-                    <div className="max-w-xl mx-auto text-center space-y-8 animate-bounce-in">
-                        <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i className="fas fa-check text-5xl text-green-400"></i>
+                    <div className="max-w-xl mx-auto text-center space-y-8 animate-bounce-in py-12">
+                        <div className="w-28 h-28 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-[0_0_50px_-10px_rgba(16,185,129,0.3)] ring-1 ring-green-500/30">
+                            <i className="fas fa-check text-5xl text-green-400 drop-shadow-md"></i>
                         </div>
                         
-                        <h2 className="text-3xl font-bold">All Set!</h2>
-                        <p className="text-gray-300">
-                            Your workspace has been successfully scaffolded and is now ready for action.
-                        </p>
+                        <div className="space-y-4">
+                            <h2 className="text-4xl font-bold text-white">All Set!</h2>
+                            <p className="text-gray-400 text-lg leading-relaxed">
+                                Your workspace has been successfully scaffolded and is now ready for action.
+                            </p>
+                        </div>
 
-                        <button 
-                            onClick={onComplete}
-                            className="px-10 py-3 bg-green-600 hover:bg-green-500 rounded-xl font-bold text-white shadow-lg shadow-green-500/25 transition-all"
-                        >
-                            Enter Dashboard 
-                        </button>
+                        <div className="pt-8">
+                             <button 
+                                onClick={onComplete}
+                                className="group relative px-10 py-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-green-600/20 overflow-hidden transition-all hover:scale-105"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl"></div>
+                                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+                                <div className="relative z-10 flex items-center gap-3">
+                                    Enter Dashboard
+                                    <i className="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 )}
 
