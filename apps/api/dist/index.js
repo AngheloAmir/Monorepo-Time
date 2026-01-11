@@ -37,9 +37,9 @@ __export(index_exports, {
   io: () => io
 });
 module.exports = __toCommonJS(index_exports);
-var import_express11 = __toESM(require("express"));
+var import_express15 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
-var import_path9 = __toESM(require("path"));
+var import_path12 = __toESM(require("path"));
 
 // ../../packages/api/index.ts
 var apiRoute = {
@@ -68,6 +68,7 @@ var apiRoute = {
    * request body: { path: string, cmd: string }
   */
   interactvTerminal: "interactvterminal",
+  stopInteractiveTerminal: "stopinteractiveterminal",
   /** Hide or show a file or folder in your IDE (VS Code and variant)
    * it a get request, return true / false
   */
@@ -88,7 +89,21 @@ var apiRoute = {
   /** Check if a turbo repo exists in the rootdir 
    * get return { exists: boolean }
   */
-  turborepoExist: "turborepoexist"
+  turborepoExist: "turborepoexist",
+  /** Check if it is the first run
+   * get return { isFirstTime: boolean }
+  */
+  firstRun: "firstrun",
+  /** Get/Set notes
+   * get returns { notes: string }
+   * post body { notes: string } returns { success: boolean }
+  */
+  notes: "notes",
+  /** Get/Set crudtest
+   * get returns { crudtest: any[] }
+   * post body { crudtest: any[] } returns { success: boolean }
+  */
+  crudTest: "crudtest"
 };
 var api_default = apiRoute;
 
@@ -99,7 +114,6 @@ var config = {
 var config_default = config;
 
 // src/index.ts
-var import_open = __toESM(require("open"));
 var import_http = require("http");
 var import_socket = require("socket.io");
 
@@ -600,22 +614,34 @@ router4.get("/", async (req, res) => {
 });
 var interactiveTerminal_default = router4;
 var activeTerminals = /* @__PURE__ */ new Map();
+function stopTerminalProcess(socketId) {
+  var _a, _b;
+  const session = activeTerminals.get(socketId);
+  if (session) {
+    const { child } = session;
+    child.removeAllListeners();
+    (_a = child.stdout) == null ? void 0 : _a.removeAllListeners();
+    (_b = child.stderr) == null ? void 0 : _b.removeAllListeners();
+    child.kill();
+    activeTerminals.delete(socketId);
+    return true;
+  }
+  return false;
+}
+function stopTerminalProcessByName(workspaceName) {
+  for (const [socketId, session] of activeTerminals.entries()) {
+    if (session.workspaceName === workspaceName) {
+      return stopTerminalProcess(socketId);
+    }
+  }
+  return false;
+}
 function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
     socket.on("terminal:start", (data) => {
-      var _a, _b, _c, _d;
-      const { path: path10, command } = data;
-      if (activeTerminals.has(socket.id)) {
-        const oldChild = activeTerminals.get(socket.id);
-        if (oldChild) {
-          oldChild.removeAllListeners();
-          (_a = oldChild.stdout) == null ? void 0 : _a.removeAllListeners();
-          (_b = oldChild.stderr) == null ? void 0 : _b.removeAllListeners();
-          oldChild.kill();
-          activeTerminals.delete(socket.id);
-          socket.emit("terminal:log", "\r\n\x1B[33m[System] Previous command terminated.\x1B[0m\r\n");
-        }
-      }
+      var _a, _b;
+      const { path: path13, command, workspaceName } = data;
+      stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
         delete env.CI;
@@ -628,7 +654,7 @@ function interactiveTerminalSocket(io2) {
           const baseCMD = command.split(" ")[0];
           const args = command.split(" ").slice(1);
           child = (0, import_child_process3.spawn)(baseCMD, args, {
-            cwd: path10,
+            cwd: path13,
             env,
             shell: true,
             stdio: ["pipe", "pipe", "pipe"]
@@ -656,16 +682,16 @@ except Exception as e:
     sys.exit(1)
 `;
           child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
-            cwd: path10,
+            cwd: path13,
             env,
             stdio: ["pipe", "pipe", "pipe"]
           });
         }
-        activeTerminals.set(socket.id, child);
-        (_c = child.stdout) == null ? void 0 : _c.on("data", (chunk) => {
+        activeTerminals.set(socket.id, { child, workspaceName });
+        (_a = child.stdout) == null ? void 0 : _a.on("data", (chunk) => {
           socket.emit("terminal:log", chunk.toString());
         });
-        (_d = child.stderr) == null ? void 0 : _d.on("data", (chunk) => {
+        (_b = child.stderr) == null ? void 0 : _b.on("data", (chunk) => {
           socket.emit("terminal:log", chunk.toString());
         });
         child.on("error", (err) => {
@@ -693,21 +719,13 @@ Process exited with code ${code}`);
       }
     });
     socket.on("terminal:input", (input) => {
-      const child = activeTerminals.get(socket.id);
-      if (child && child.stdin) {
-        child.stdin.write(input);
+      const session = activeTerminals.get(socket.id);
+      if (session && session.child.stdin) {
+        session.child.stdin.write(input);
       }
     });
     socket.on("disconnect", () => {
-      var _a, _b;
-      const child = activeTerminals.get(socket.id);
-      if (child) {
-        child.removeAllListeners();
-        (_a = child.stdout) == null ? void 0 : _a.removeAllListeners();
-        (_b = child.stderr) == null ? void 0 : _b.removeAllListeners();
-        child.kill();
-        activeTerminals.delete(socket.id);
-      }
+      stopTerminalProcess(socket.id);
     });
     function cleanup(socketId) {
       activeTerminals.delete(socketId);
@@ -715,12 +733,39 @@ Process exited with code ${code}`);
   });
 }
 
-// src/routes/updateworkspace.ts
+// src/routes/stopInteractiveTerminal.ts
 var import_express6 = require("express");
-var import_fs_extra4 = __toESM(require("fs-extra"));
-var import_path4 = __toESM(require("path"));
 var router5 = (0, import_express6.Router)();
 router5.post("/", async (req, res) => {
+  const { socketId, workspace } = req.body;
+  if (workspace && workspace.name) {
+    const stopped = stopTerminalProcessByName(workspace.name);
+    if (stopped) {
+      res.json({ success: true, message: `Terminated process for workspace ${workspace.name}` });
+    } else {
+      res.json({ success: true, message: `No active terminal process found for workspace ${workspace.name} (already stopped)` });
+    }
+    return;
+  }
+  if (socketId) {
+    const stopped = stopTerminalProcess(socketId);
+    if (stopped) {
+      res.json({ success: true, message: `Terminated process for socket ${socketId}` });
+    } else {
+      res.json({ success: true, message: `No active terminal process found for socket ${socketId} (already stopped)` });
+    }
+    return;
+  }
+  res.status(400).json({ message: "Missing socketId or workspace.name" });
+});
+var stopInteractiveTerminal_default = router5;
+
+// src/routes/updateworkspace.ts
+var import_express7 = require("express");
+var import_fs_extra4 = __toESM(require("fs-extra"));
+var import_path4 = __toESM(require("path"));
+var router6 = (0, import_express7.Router)();
+router6.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   try {
     const workspace = req.body;
@@ -750,13 +795,13 @@ router5.post("/", async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-var updateworkspace_default = router5;
+var updateworkspace_default = router6;
 
 // src/routes/vscodeHideShow.ts
-var import_express7 = require("express");
+var import_express8 = require("express");
 var import_fs_extra5 = __toESM(require("fs-extra"));
 var import_path5 = __toESM(require("path"));
-var router6 = (0, import_express7.Router)();
+var router7 = (0, import_express8.Router)();
 var EXCLUDE_PATTERNS = {
   "**/node_modules": true,
   "**/.git": true,
@@ -827,7 +872,7 @@ var ensureSettingsFile = async () => {
     await import_fs_extra5.default.writeJson(settingsPath, { "files.exclude": {} }, { spaces: 4 });
   }
 };
-router6.post("/", async (req, res) => {
+router7.post("/", async (req, res) => {
   try {
     const { hide, pathInclude } = req.body;
     await ensureSettingsFile();
@@ -853,12 +898,12 @@ router6.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to update VSCode settings" });
   }
 });
-var vscodeHideShow_default = router6;
+var vscodeHideShow_default = router7;
 
 // src/routes/rootPath.ts
 var import_fs_extra6 = __toESM(require("fs-extra"));
 var import_path6 = __toESM(require("path"));
-var import_express8 = require("express");
+var import_express9 = require("express");
 var START_DIR4 = process.cwd();
 function findMonorepoRoot3(startDir) {
   let dir = startDir;
@@ -878,19 +923,19 @@ function findMonorepoRoot3(startDir) {
   return startDir;
 }
 var ROOT3 = findMonorepoRoot3(START_DIR4);
-var route2 = (0, import_express8.Router)();
+var route2 = (0, import_express9.Router)();
 route2.get("/", async (req, res) => {
   res.json({ path: ROOT3 });
 });
 var rootPath_default = route2;
 
 // src/routes/scafoldrepo.ts
-var import_express9 = require("express");
+var import_express10 = require("express");
 var import_fs_extra7 = __toESM(require("fs-extra"));
 var import_path7 = __toESM(require("path"));
 var import_child_process4 = require("child_process");
-var router7 = (0, import_express9.Router)();
-router7.get("/", async (req, res) => {
+var router8 = (0, import_express10.Router)();
+router8.get("/", async (req, res) => {
   var _a;
   try {
     const packageJsonPath = import_path7.default.join(ROOT3, "package.json");
@@ -910,65 +955,27 @@ router7.get("/", async (req, res) => {
     }
     await import_fs_extra7.default.ensureDir(import_path7.default.join(ROOT3, "apps"));
     await import_fs_extra7.default.ensureDir(import_path7.default.join(ROOT3, "packages"));
-    const monorepoTimePath = import_path7.default.join(ROOT3, "monorepotime.json");
-    if (!import_fs_extra7.default.existsSync(monorepoTimePath)) {
-      const defaultMonorepoTime = [
-        {
-          "category": "Internal CRUD Test",
-          "devurl": "http://localhost:3200",
-          "produrl": "http://superhost:3200",
-          "items": [
-            {
-              "label": "Ping the Tool Server",
-              "route": "/pingme",
-              "methods": "GET",
-              "description": "Ping the tool server to check if it is running.",
-              "sampleInput": "{}",
-              "suggested": [],
-              "expectedOutcome": '# You should see the word "pong" as a message \n\n{\n  "message": "pong"\n}',
-              "availableFor": "public"
-            },
-            {
-              "label": "Check Post",
-              "route": "/pingpost",
-              "methods": "POST",
-              "description": "Send a POST request to check if it sending correctly",
-              "sampleInput": '{\n   "data": "test",\n   "message": "test"\n}',
-              "suggested": [
-                {
-                  "name": "Customer Data",
-                  "urlparams": "",
-                  "content": '{\n    "name": "Demo Customer",\n    "email": "CusRaRa@customer.com",\n    "phone1": "123456789",\n    "phone2": "987654321",\n    "city": "randomw1",\n    "state": "ultra state",\n    "zip": "12345",\n    "country": "mega country",\n    "icon": "test icon",\n    "gender": "female",\n    "delivery_notes": "Make sure that it is packed correctly"\n}'
-                }
-              ],
-              "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
-              "availableFor": "public"
-            },
-            {
-              "label": "Check Stream",
-              "route": "/pingstream",
-              "methods": "STREAM",
-              "description": "Send a stream request to check if it sending correctly",
-              "sampleInput": "{ }",
-              "suggested": [
-                {
-                  "name": "I Wandered Lonely as a Cloud",
-                  "urlparams": "?poem=I%20Wandered%20Lonely%20as%20a%20Cloud",
-                  "content": "{}"
-                },
-                {
-                  "name": "The Sun Has Long Been Set",
-                  "urlparams": "?poem=The%20Sun%20Has%20Long%20Been%20Set",
-                  "content": "{}"
-                }
-              ],
-              "expectedOutcome": "# Note \nYou should see the stream of words",
-              "availableFor": "public"
-            }
-          ]
-        }
-      ];
-      import_fs_extra7.default.writeJsonSync(monorepoTimePath, defaultMonorepoTime, { spaces: 4 });
+    const SCAFFOLD_DIR = import_path7.default.join(__dirname, "scaffold");
+    const typesPackagePath = import_path7.default.join(ROOT3, "packages", "types");
+    if (!import_fs_extra7.default.existsSync(typesPackagePath)) {
+      await import_fs_extra7.default.ensureDir(typesPackagePath);
+      try {
+        const indexContent = await import_fs_extra7.default.readFile(import_path7.default.join(SCAFFOLD_DIR, "index.ts"), "utf-8");
+        const packageJsonContent = await import_fs_extra7.default.readJson(import_path7.default.join(SCAFFOLD_DIR, "package.json"));
+        await import_fs_extra7.default.writeFile(import_path7.default.join(typesPackagePath, "index.ts"), indexContent);
+        await import_fs_extra7.default.writeJson(import_path7.default.join(typesPackagePath, "package.json"), packageJsonContent, { spaces: 4 });
+      } catch (err) {
+        console.error("Error reading scaffold files for types package:", err);
+      }
+    }
+    const monorepoTimePath3 = import_path7.default.join(ROOT3, "monorepotime.json");
+    if (!import_fs_extra7.default.existsSync(monorepoTimePath3)) {
+      try {
+        const defaultMonorepoTime = await import_fs_extra7.default.readJson(import_path7.default.join(SCAFFOLD_DIR, "monorepotime.json"));
+        import_fs_extra7.default.writeJsonSync(monorepoTimePath3, defaultMonorepoTime, { spaces: 4 });
+      } catch (err) {
+        console.error("Error reading scaffold file for monorepotime.json:", err);
+      }
     }
     if (!import_fs_extra7.default.existsSync(turboJsonPath) || !((_a = pkg.devDependencies) == null ? void 0 : _a.turbo)) {
       if (!import_fs_extra7.default.existsSync(turboJsonPath)) {
@@ -1017,14 +1024,14 @@ function runCommand(cmd, cwd) {
     });
   });
 }
-var scafoldrepo_default = router7;
+var scafoldrepo_default = router8;
 
 // src/routes/turborepoexist.ts
-var import_express10 = require("express");
+var import_express11 = require("express");
 var import_fs = __toESM(require("fs"));
 var import_path8 = __toESM(require("path"));
-var router8 = (0, import_express10.Router)();
-router8.get("/", async (req, res) => {
+var router9 = (0, import_express11.Router)();
+router9.get("/", async (req, res) => {
   try {
     let isExist = true;
     const turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
@@ -1043,31 +1050,147 @@ router8.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal server error", exists: false });
   }
 });
-var turborepoexist_default = router8;
+var turborepoexist_default = router9;
+
+// src/routes/firstrun.ts
+var import_express12 = require("express");
+var import_fs_extra8 = __toESM(require("fs-extra"));
+var import_path9 = __toESM(require("path"));
+var router10 = (0, import_express12.Router)();
+router10.get("/", async (req, res) => {
+  try {
+    const monorepoTimePath3 = import_path9.default.join(ROOT3, "monorepotime.json");
+    const exists = import_fs_extra8.default.existsSync(monorepoTimePath3);
+    if (!exists) {
+      try {
+        const scaffoldPath = import_path9.default.join(__dirname, "scaffold", "monorepotime.json");
+        const defaultContent = await import_fs_extra8.default.readJson(scaffoldPath);
+        import_fs_extra8.default.writeJsonSync(monorepoTimePath3, defaultContent, { spaces: 4 });
+      } catch (err) {
+        console.error("Error reading scaffold file for firstrun:", err);
+        import_fs_extra8.default.writeJsonSync(monorepoTimePath3, { notes: "", crudtest: [] }, { spaces: 4 });
+      }
+      res.json({ isFirstTime: true });
+    } else {
+      res.json({ isFirstTime: false });
+    }
+  } catch (error) {
+    console.error("First run check error:", error);
+    res.status(500).json({
+      error: "Failed to check first run status",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+var firstrun_default = router10;
+
+// src/routes/notes.ts
+var import_express13 = require("express");
+var import_fs_extra9 = __toESM(require("fs-extra"));
+var import_path10 = __toESM(require("path"));
+var router11 = (0, import_express13.Router)();
+var monorepoTimePath = import_path10.default.join(ROOT3, "monorepotime.json");
+var ensureFile = async () => {
+  if (!import_fs_extra9.default.existsSync(monorepoTimePath)) {
+    await import_fs_extra9.default.writeJson(monorepoTimePath, { notes: "", crudtest: [] }, { spaces: 4 });
+  }
+};
+router11.get("/", async (req, res) => {
+  try {
+    await ensureFile();
+    const data = await import_fs_extra9.default.readJson(monorepoTimePath);
+    res.json({ notes: data.notes || "" });
+  } catch (error) {
+    console.error("Error reading notes:", error);
+    res.status(500).json({ error: "Failed to read notes" });
+  }
+});
+router11.post("/", async (req, res) => {
+  try {
+    const { notes } = req.body;
+    if (typeof notes !== "string") {
+      res.status(400).json({ error: "Invalid notes format" });
+      return;
+    }
+    await ensureFile();
+    const data = await import_fs_extra9.default.readJson(monorepoTimePath);
+    data.notes = notes;
+    await import_fs_extra9.default.writeJson(monorepoTimePath, data, { spaces: 4 });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error saving notes:", error);
+    res.status(500).json({ error: "Failed to save notes" });
+  }
+});
+var notes_default = router11;
+
+// src/routes/crudtest.ts
+var import_express14 = require("express");
+var import_fs_extra10 = __toESM(require("fs-extra"));
+var import_path11 = __toESM(require("path"));
+var router12 = (0, import_express14.Router)();
+var monorepoTimePath2 = import_path11.default.join(ROOT3, "monorepotime.json");
+var ensureFile2 = async () => {
+  if (!import_fs_extra10.default.existsSync(monorepoTimePath2)) {
+    await import_fs_extra10.default.writeJson(monorepoTimePath2, { notes: "", crudtest: [] }, { spaces: 4 });
+  }
+};
+router12.get("/", async (req, res) => {
+  try {
+    await ensureFile2();
+    const data = await import_fs_extra10.default.readJson(monorepoTimePath2);
+    res.json({ crudtest: data.crudtest || [] });
+  } catch (error) {
+    console.error("Error reading crudtest:", error);
+    res.status(500).json({ error: "Failed to read crudtest" });
+  }
+});
+router12.post("/", async (req, res) => {
+  try {
+    const { crudtest } = req.body;
+    if (!Array.isArray(crudtest)) {
+      res.status(400).json({ error: "Invalid crudtest format, must be an array" });
+      return;
+    }
+    await ensureFile2();
+    const data = await import_fs_extra10.default.readJson(monorepoTimePath2);
+    data.crudtest = crudtest;
+    await import_fs_extra10.default.writeJson(monorepoTimePath2, data, { spaces: 4 });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error saving crudtest:", error);
+    res.status(500).json({ error: "Failed to save crudtest" });
+  }
+});
+var crudtest_default = router12;
 
 // src/index.ts
-var app = (0, import_express11.default)();
+var app = (0, import_express15.default)();
 var port = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express11.default.static("public"));
-app.use(import_express11.default.json());
+app.use(import_express15.default.static("public"));
+app.use(import_express15.default.json());
 app.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app.use("/" + api_default.stopProcess, stopcmd_default);
 app.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
 app.use("/" + api_default.newWorkspace, newworkspace_default);
 app.use("/" + api_default.interactvTerminal, interactiveTerminal_default);
+app.use("/" + api_default.stopInteractiveTerminal, stopInteractiveTerminal_default);
 app.use("/" + api_default.updateWorkspace, updateworkspace_default);
 app.use("/" + api_default.hideShowFileFolder, vscodeHideShow_default);
 app.use("/" + api_default.getRootPath, rootPath_default);
 app.use("/" + api_default.scaffoldRepo, scafoldrepo_default);
 app.use("/" + api_default.turborepoExist, turborepoexist_default);
-var frontendPath = import_path9.default.join(__dirname, "../public");
-app.use(import_express11.default.static(frontendPath));
+app.use("/" + api_default.firstRun, firstrun_default);
+app.use("/" + api_default.notes, notes_default);
+app.use("/" + api_default.crudTest, crudtest_default);
+var frontendPath = import_path12.default.join(__dirname, "../public");
+app.use(import_express15.default.static(frontendPath));
 app.get("*", (req, res) => {
-  res.sendFile(import_path9.default.join(frontendPath, "index.html"));
+  res.sendFile(import_path12.default.join(frontendPath, "index.html"));
 });
 var httpServer = (0, import_http.createServer)(app);
 var io = new import_socket.Server(httpServer, {
@@ -1081,7 +1204,6 @@ runCmdDevSocket(io);
 interactiveTerminalSocket(io);
 httpServer.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
-  (0, import_open.default)(`http://localhost:${port}`);
 });
 var index_default = app;
 // Annotate the CommonJS export names for ESM import in node:

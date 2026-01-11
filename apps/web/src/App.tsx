@@ -11,9 +11,8 @@ import useAppState from './_context/app';
 import { useEffect, useState } from 'react';
 import Flash from './contents/Flash';
 import Loading from './contents/_Loading';
+import Turborepo from './contents/Turborepo';
 
-
-// import Turborepo from './contents/Turborepo';
 // import CRUDTester from './contents/CRUDTester';
 // import Setting from './contents/Setting';
 
@@ -61,7 +60,9 @@ function App() {
                     <div id="app-content" className="w-full h-full p-2">
                         <Home isVisible={currentPage === "dashboard"}/>
                         <Workspace isVisible={currentPage === "workspace"}/>
-                        {/* <Turborepo isVisible={currentPage === "turborepo"}/>
+                        <Turborepo isVisible={currentPage === "turborepo"}/>
+
+                        {/* 
                         <CRUDTester isVisible={currentPage === "crud"}/>
                         <Setting isVisible={currentPage === "settings"}/> */}
                     </div>
