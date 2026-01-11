@@ -1,66 +1,26 @@
 import { useState } from 'react';
-import type { CrudItem, CrudCategory } from './types';
+import type { CrudCategory } from './types';
 
-const CRUD_DATA: CrudCategory[] = [
-  {
-    "category": "Internal CRUD Test",
-    "devurl": "http://localhost:3200",
-    "produrl": "",
-    "items": [
-      {
-        "label": "Ping the Tool Server",
-        "route": "/pingme",
-        "methods": "GET",
-        "description": "Ping the tool server to check if it is running.",
-        "sampleInput": "{}",
-        "suggested": [],
-        "expectedOutcome": "# You should see the word \"pong\" as a message \n\n{\n  \"message\": \"pong\"\n}",
-        "availableFor": "public"
-      },
-      {
-        "label": "Check Post",
-        "route": "/pingpost",
-        "methods": "POST",
-        "description": "Send a POST request to check if it sending correctly",
-        "sampleInput": "{\n   \"data\": \"test\",\n   \"message\": \"test\"\n}",
-        "suggested": [
-          {
-            "name": "Customer Data",
-            "urlparams": "",
-            "content": "{\n    \"name\": \"Demo Customer\",\n    \"email\": \"demo@test.com\",\n    \"phone\": \"123456789\",\n    \"icon\": \"test icon\"\n}"
-          }
-        ],
-        "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
-        "availableFor": "public"
-      },
-      {
-        "label": "Check Stream",
-        "route": "/pingstream",
-        "methods": "STREAM",
-        "description": "Send a stream request to check if it sending correctly",
-        "sampleInput": "{ }",
-        "suggested": [
-          {
-            "name": "I Wandered Lonely as a Cloud",
-            "urlparams": "?poem=I%20Wandered%20Lonely%20as%20a%20Cloud",
-            "content": "{}"
-          },
-          {
-            "name": "The Sun Has Long Been Set",
-            "urlparams": "?poem=The%20Sun%20Has%20Long%20Been%20Set",
-            "content": "{}"
-          }
-        ],
-        "expectedOutcome": "# Note \nYou should see the stream of words",
-        "availableFor": "public"
-      }
-    ]
-  }
-];
+interface AccordionNavProps {
+    categories: CrudCategory[];
+    selectedCategoryIndex: number | null;
+    selectedItemIndex: number | null;
+    onSelect: (categoryIndex: number, itemIndex: number) => void;
+    onAddRoute: (categoryIndex: number) => void;
+    onEditRoute: (categoryIndex: number, itemIndex: number) => void;
+    onManageCategories: () => void;
+}
 
-export default function AccordionNav() {
-  const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
-  const [selectedItem, setSelectedItem] = useState<CrudItem | null>(null);
+export default function AccordionNav({
+    categories,
+    selectedCategoryIndex,
+    selectedItemIndex,
+    onSelect,
+    onAddRoute,
+    onEditRoute,
+    onManageCategories
+}: AccordionNavProps) {
+  const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set([0]));
 
   const toggleCategory = (index: number) => {
     const newExpanded = new Set(expandedCategories);
@@ -86,7 +46,7 @@ export default function AccordionNav() {
 
   return (
     <div className="w-full flex flex-col gap-2">
-      {CRUD_DATA.map((category, catIndex) => (
+      {categories.map((category, catIndex) => (
         <div key={catIndex} className="accordion-category flex flex-col gap-1">
           {/* Header */}
           <div
@@ -111,7 +71,7 @@ export default function AccordionNav() {
           {/* Content */}
           <div className={`accordion-content flex flex-col gap-1 pl-4 border-l border-gray-700/50 ml-3 ${expandedCategories.has(catIndex) ? '' : 'hidden'}`}>
             {category.items.map((item, itemIndex) => {
-              const isActive = selectedItem === item;
+              const isActive = selectedCategoryIndex === catIndex && selectedItemIndex === itemIndex;
               return (
                 <div
                   key={itemIndex}
@@ -120,7 +80,7 @@ export default function AccordionNav() {
                       ? 'bg-blue-600/20 text-blue-200 border border-blue-500/30 shadow-sm'
                       : 'text-gray-400 hover:bg-gray-800 hover:text-gray-100 border border-transparent'
                   }`}
-                  onClick={() => setSelectedItem(item)}
+                  onClick={() => onSelect(catIndex, itemIndex)}
                 >
                   <span className={`font-black font-mono w-10 flex-none text-[12px] opacity-90 ${getMethodColor(item.methods)}`}>
                     {item.methods.toUpperCase()}
@@ -133,7 +93,7 @@ export default function AccordionNav() {
                     title="Edit"
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('Edit clicked', catIndex, itemIndex);
+                      onEditRoute(catIndex, itemIndex);
                     }}
                   >
                     <i className="fas fa-pen text-[12px]"></i>
@@ -147,7 +107,7 @@ export default function AccordionNav() {
                 className="mt-2 flex items-center gap-2 px-2 py-1.5 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-md transition-all group border border-dashed border-gray-700 hover:border-blue-500/50 add-route-btn"
                 onClick={(e) => {
                     e.stopPropagation();
-                    console.log('Add Route clicked', catIndex);
+                    onAddRoute(catIndex);
                 }}
             >
                 <i className="fas fa-plus text-[14px]"></i>
@@ -161,7 +121,7 @@ export default function AccordionNav() {
       <div className="mt-4 px-2 mb-8">
         <button
             className="w-full border border-dashed border-gray-700 hover:border-blue-500/50 text-gray-500 hover:text-blue-400 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 group bg-gray-800/20 hover:bg-blue-500/5"
-            onClick={() => console.log('Manage clicked')}
+            onClick={onManageCategories}
         >
             <i className="fas fa-cog group-hover:rotate-90 transition-transform"></i>
             Manage
