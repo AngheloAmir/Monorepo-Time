@@ -20,7 +20,7 @@ export default function Navigation() {
                 })}
             </div>
 
-            <div className="mt-auto pb-12">
+            {/* <div className="mt-auto pb-12">
                 <NavButton
                     isSelected={ currentPage === 'settings' }
                     icon="fa fa-cog"
@@ -29,7 +29,7 @@ export default function Navigation() {
                         navAction.setCurrentPage('settings')
                     }}
                 />
-            </div>
+            </div> */}
         </nav>
     )
 }
