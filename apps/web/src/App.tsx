@@ -30,9 +30,9 @@ function App() {
                     <div id="app-content" className="w-full h-full p-2">
                         <Home isVisible={currentPage === "home"}/>
                         <Workspace isVisible={currentPage === "workspace"}/>
-                        <Turborepo isVisible={currentPage === "turborepo"}/>
+                        {/* <Turborepo isVisible={currentPage === "turborepo"}/>
                         <CRUDTester isVisible={currentPage === "crud"}/>
-                        <Setting isVisible={currentPage === "settings"}/>
+                        <Setting isVisible={currentPage === "settings"}/> */}
                     </div>
                 </main>
             </div>

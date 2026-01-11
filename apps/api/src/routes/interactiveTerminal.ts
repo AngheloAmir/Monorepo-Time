@@ -46,6 +46,13 @@ export function interactiveTerminalSocket(io: Server) {
                 delete env.CI;
                 env.TERM = 'xterm-256color';
                 env.FORCE_COLOR = '1';
+                
+                // Use PROMPT_COMMAND to force the PS1 prompt. 
+                // This overrides any PS1 set by .bashrc which is sourced by the interactive shell.
+                // Format: [PATH] /current/path (newline) $ 
+                // \033[34m = Blue, \033[32m = Green, \033[0m = Reset
+                // We use \033 (octal) which is standard for bash PS1.
+                env.PROMPT_COMMAND = 'export PS1="\\[\\033[34m\\][PATH] \\[\\033[32m\\]\\w\\[\\033[0m\\]\\n$ ";';
 
                 let child: ChildProcess;
 

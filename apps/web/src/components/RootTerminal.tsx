@@ -1,25 +1,25 @@
 import { useEffect, useState, useRef } from "react";
 import config   from 'config';
-import { io, Socket } from "socket.io-client";
 import ModalBody from "./workspace/ModalBody";
 import ModalHeader from "./workspace/ModalHeader";
-import Console from "./Console";
 import apiRoute from 'apiroute';
 import useAppState from "../_context/app";
+
+import InteractiveTerminal, { type InteractiveTerminalRef } from "./InteractiveTerminal";
 
 export default function RootTerminal() {
     const showTerminal    = useAppState.use.showTerminal();
     const setShowTerminal = useAppState.use.setShowTerminal();
-    const [processActive, setProcessActive] = useState(false);
     const [rootPath, setRootPath] = useState<string | null>(null);
     
-    // We use a ref to access the xterm instance directly for writing data
-    const terminalRef = useRef<any>(null); // Type 'any' or 'Terminal' if available
-    const socketRef   = useRef<Socket | null>(null);
+    // Use the InteractiveTerminalRef
+    const terminalRef = useRef<InteractiveTerminalRef>(null);
 
+    // Fetch root path when terminal opens
     useEffect(() => {
         if (showTerminal) {
             const port = config.apiPort || 3000;
+            // Only fetch if we haven't already (or fetch every time if you prefer freshness)
             fetch(`http://localhost:${port}/${apiRoute.getRootPath}`)
                 .then(res => res.json())
                 .then(data => setRootPath(data.path))
@@ -27,106 +27,46 @@ export default function RootTerminal() {
         }
     }, [showTerminal]);
 
+    // Connect the terminal when rootPath is available and terminal is shown
     useEffect(() => {
-        if (showTerminal && rootPath) {
-            const port = config.apiPort || 3000;
-            socketRef.current = io(`http://localhost:${port}`, {
-                transports: ['websocket']
-            });
+        if (showTerminal && rootPath && terminalRef.current) {
+            // Wait a tick for the component to mount/ref to attach if needed, 
+            // though useEffect runs after render so ref should be populated.
+            // Connect to the root path
+            terminalRef.current.connect(rootPath);
 
-            socketRef.current.on('connect', () => {
-                const firstLine  = `\x1b[34m[PATH]\x1b[0m \x1b[32m${rootPath}\x1b[0m`;
-                const prompt     = `\r\n$ `;
-                terminalRef.current?.write(`${firstLine}${prompt}`);
+            // Optional: Register a close handler if the backend process exits (e.g. typing 'exit')
+            terminalRef.current.onClose(() => {
+                setShowTerminal(false);
             });
-
-            socketRef.current.on('terminal:log', (data: string) => {
-                terminalRef.current?.write(data);
-            });
-
-            socketRef.current.on('terminal:error', (data: string) => {
-                 terminalRef.current?.write(`\x1b[31m${data}\x1b[0m`);
-            });
-
-            socketRef.current.on('terminal:exit', (code: number) => {
-                setProcessActive(false);
-                if (code === 0) {
-                    terminalRef.current?.write(`\n$ `);
-                } else {
-                    terminalRef.current?.write(`\r\n\x1b[31mCommand failed with exit code ${code}.\x1b[0m\r\n$ `);
-                }
-            });
-
-            return () => {
-                if (socketRef.current) {
-                    socketRef.current.disconnect();
-                }
-            };
         }
     }, [showTerminal, rootPath]);
 
     const close = () => {
-        if(socketRef.current) {
-            socketRef.current.disconnect();
+        if(terminalRef.current) {
+            terminalRef.current.disconnect();
         }
         setShowTerminal(false);
     };
 
-    // Buffer to hold current command line input for local echo before sending
-    const commandLineBuffer = useRef("");
-
-    const handleTerminalData = (data: string) => {
-        if (!processActive) {
-            // "Shell" mode emulation
-            // We need to implement basic line editing for the 'shell' prompt ($ )
-            if (data === '\r') { // Enter
-                const cmd = commandLineBuffer.current;
-                terminalRef.current?.write('\r\n');
-                
-                if (cmd.trim()) {
-                    setProcessActive(true);
-                    socketRef.current?.emit('terminal:start', {
-                        path: rootPath || "",
-                        command: cmd.trim()
-                    });
-                } else {
-                   terminalRef.current?.write('$ ');
-                }
-                commandLineBuffer.current = "";
-            } else if (data === '\u007F') { // Backspace
-                if (commandLineBuffer.current.length > 0) {
-                    commandLineBuffer.current = commandLineBuffer.current.slice(0, -1);
-                    terminalRef.current?.write('\b \b');
-                }
-            } else if (data >= ' ' && data <= '~') { // Printable characters
-                commandLineBuffer.current += data;
-                terminalRef.current?.write(data);
-            }
-            // Ignore other keys (arrows, etc) in this simple shell prompt
-        } else {
-            // "Interactive" mode: raw passthrough to backend PTY
-            // PTY handles echo, so we usually don't echo locally unless PTY is dumb
-            // With python pty, it echoes.
-            socketRef.current?.emit('terminal:input', data);
-        }
-    };
-
     if (!showTerminal) return null;
+
     return (
         <ModalBody>
-            <ModalHeader
+             <ModalHeader
                 close={close}
                 title={"Root Terminal"}
                 description={"Execute commands in the project root"}
                 icon="fas fa-terminal text-blue-500 text-xl"
             />
-
+            
             <div className="flex-1 overflow-hidden p-3 bg-gray-900">
-                <Console
-                    terminalRef={terminalRef}
-                    onData={handleTerminalData}
+                <InteractiveTerminal 
+                    ref={terminalRef}
+                    isInteractive={true}
+                    className="h-full"
                 />
             </div>
         </ModalBody>
-    );
+    )
 }
