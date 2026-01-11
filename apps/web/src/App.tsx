@@ -49,13 +49,14 @@ function App() {
             <div className="flex flex-1 overflow-hidden ">
                 <Navigation />
 
-                <main className="flex-1 relative overflow-hidden bg-gray-900">
+                <main className="flex-1 relative overflow-hidden bg-black">
                     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
-                        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
+                         <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[128px]"></div>
+                         <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[128px]"></div>
+                        <div className="absolute -bottom-[25%] -right-[10%] w-[50%] h-[50%] bg-fuchsia-600/20 rounded-full blur-[128px]"></div>
                     </div>
 
-                    <div id="app-content" className="w-full h-full p-2">
+                    <div id="app-content" className="w-full h-full p-2 relative z-10">
                         <Home isVisible={currentPage === "dashboard"}/>
                         <Workspace isVisible={currentPage === "workspace"}/>
                         <Turborepo isVisible={currentPage === "turborepo"}/>

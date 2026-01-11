@@ -101,49 +101,55 @@ export default function Turborepo(props: TurborepoProps) {
                 </div>
             </div>
 
-            <div className="bg-[#111827] relative flex-1 h-full min-h-0 min-w-0 overflow-hidden flex flex-col">
-                <header className="px-4 py-2 border-gray-700 flex justify-between items-center bg-gray-800/50 flex-none">
-                    <div className="text-md font-bold text-white flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                            <i className="fas fa-rocket text-white text-sm"></i>
+            <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col p-[1px] rounded-xl overflow-hidden shadow-[0_0_100px_-20px_rgba(168,85,247,0.3)]">
+                {/* Gradient Border */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 opacity-50"></div>
+                
+                {/* Content Container */}
+                <div className="relative flex-1 h-full flex flex-col bg-[#0A0A0A] rounded-xl overflow-hidden">
+                    <header className="px-4 py-2 border-b border-white/10 flex justify-between items-center bg-black/20 flex-none backdrop-blur-sm">
+                        <div className="text-md font-bold text-white flex items-center gap-4">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                                <i className="fas fa-rocket text-white text-sm"></i>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 font-bold">
+                                    Non Interactive Terminal
+                                </span>
+                                <span className="text-gray-400 font-normal text-sm truncate w-full text-xs">
+                                    Execute
+                                    <a 
+                                        href="https://turborepo.org/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-1 text-blue-500 hover:underline">
+                                            Turborepo.js
+                                    </a>
+                                    commands
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-xl">
-                                Non Interactive Terminal
-                            </span>
-                            <span className="text-gray-400 font-normal text-sm truncate w-full text-xs">
-                                Execute
-                                <a 
-                                    href="https://turborepo.org/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-1 text-blue-500 hover:underline">
-                                        Turborepo.js
-                                </a>
-                                commands
-                            </span>
-                        </div>
+
+                        <button onClick={handleStop} 
+                            className={`text-gray-400 transition-colors flex items-center gap-2 ${isRunning ? 'text-red-500' : 'text-gray-400'}`}>
+                            <li className="fas fa-stop text-lg"></li>
+                            STOP
+                        </button>
+                    </header>
+
+                    <div className="w-full flex-1 min-h-0 p-1">
+                        <InteractiveTerminal
+                            ref={terminalRef}
+                            isInteractive={false}
+                            className="h-full w-full"
+                            onExit={() => {
+                                setIsRunning(false);
+                            }}
+                            onCrash={() => {
+                                setIsRunning(false);
+                            }}
+                        />
                     </div>
-
-                    <button onClick={handleStop} 
-                        className={`text-gray-400 transition-colors flex items-center gap-2 ${isRunning ? 'text-red-500' : 'text-gray-400'}`}>
-                        <li className="fas fa-stop text-lg"></li>
-                        STOP
-                    </button>
-                </header>
-
-                <div className="w-full flex-1 min-h-0 p-1">
-                    <InteractiveTerminal
-                        ref={terminalRef}
-                        isInteractive={false}
-                        className="h-full w-full"
-                        onExit={() => {
-                            setIsRunning(false);
-                        }}
-                        onCrash={() => {
-                            setIsRunning(false);
-                        }}
-                    />
                 </div>
             </div>
         </div>
