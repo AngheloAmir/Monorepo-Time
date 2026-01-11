@@ -26,6 +26,6 @@ This will:
 2. Open the dashboard in your default browser.
 3. Allow you to interact with your workspaces immediately.
 
-## 📄 License
+## License
 
 ISC © [Anghelo Amir](https://github.com/AngheloAmir)

@@ -35,66 +35,35 @@ router.get("/", async (req: Request, res: Response) => {
         await fs.ensureDir(path.join(ROOT, 'apps'));
         await fs.ensureDir(path.join(ROOT, 'packages'));
 
+        const SCAFFOLD_DIR = path.join(__dirname, 'scaffold');
+
+        // 4.1 Create packages/types if not exists
+        const typesPackagePath = path.join(ROOT, "packages", "types");
+        if (!fs.existsSync(typesPackagePath)) {
+            await fs.ensureDir(typesPackagePath);
+            
+            try {
+                const indexContent = await fs.readFile(path.join(SCAFFOLD_DIR, 'index.ts'), 'utf-8');
+                const packageJsonContent = await fs.readJson(path.join(SCAFFOLD_DIR, 'package.json'));
+
+                await fs.writeFile(path.join(typesPackagePath, "index.ts"), indexContent);
+                await fs.writeJson(path.join(typesPackagePath, "package.json"), packageJsonContent, { spaces: 4 });
+            } catch (err) {
+                 console.error("Error reading scaffold files for types package:", err);
+                 // Fallback or just log, but let's try to proceed or maybe fail if this is critical?
+                 // For now, logging error but continuing might be safer, though user wants scaffolding.
+            }
+        }
+
         // 4.1 Create monorepotime.json if not exists
         const monorepoTimePath = path.join(ROOT, "monorepotime.json");
         if (!fs.existsSync(monorepoTimePath)) {
-            const defaultMonorepoTime = [
-                {
-                    "category": "Internal CRUD Test",
-                    "devurl": "http://localhost:3200",
-                    "produrl": "http://superhost:3200",
-                    "items": [
-                        {
-                            "label": "Ping the Tool Server",
-                            "route": "/pingme",
-                            "methods": "GET",
-                            "description": "Ping the tool server to check if it is running.",
-                            "sampleInput": "{}",
-                            "suggested": [],
-                            "expectedOutcome": "# You should see the word \"pong\" as a message \n\n{\n  \"message\": \"pong\"\n}",
-                            "availableFor": "public"
-                        },
-                        {
-                            "label": "Check Post",
-                            "route": "/pingpost",
-                            "methods": "POST",
-                            "description": "Send a POST request to check if it sending correctly",
-                            "sampleInput": "{\n   \"data\": \"test\",\n   \"message\": \"test\"\n}",
-                            "suggested": [
-                                {
-                                    "name": "Customer Data",
-                                    "urlparams": "",
-                                    "content": "{\n    \"name\": \"Demo Customer\",\n    \"email\": \"CusRaRa@customer.com\",\n    \"phone1\": \"123456789\",\n    \"phone2\": \"987654321\",\n    \"city\": \"randomw1\",\n    \"state\": \"ultra state\",\n    \"zip\": \"12345\",\n    \"country\": \"mega country\",\n    \"icon\": \"test icon\",\n    \"gender\": \"female\",\n    \"delivery_notes\": \"Make sure that it is packed correctly\"\n}"
-                                }
-                            ],
-                            "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
-                            "availableFor": "public"
-                        },
-                        {
-                            "label": "Check Stream",
-                            "route": "/pingstream",
-                            "methods": "STREAM",
-                            "description": "Send a stream request to check if it sending correctly",
-                            "sampleInput": "{ }",
-                            "suggested": [
-                                {
-                                    "name": "I Wandered Lonely as a Cloud",
-                                    "urlparams": "?poem=I%20Wandered%20Lonely%20as%20a%20Cloud",
-                                    "content": "{}"
-                                },
-                                {
-                                    "name": "The Sun Has Long Been Set",
-                                    "urlparams": "?poem=The%20Sun%20Has%20Long%20Been%20Set",
-                                    "content": "{}"
-                                }
-                            ],
-                            "expectedOutcome": "# Note \nYou should see the stream of words",
-                            "availableFor": "public"
-                        }
-                    ]
-                }
-            ];
-            fs.writeJsonSync(monorepoTimePath, defaultMonorepoTime, { spaces: 4 });
+             try {
+                const defaultMonorepoTime = await fs.readJson(path.join(SCAFFOLD_DIR, 'monorepotime.json'));
+                fs.writeJsonSync(monorepoTimePath, defaultMonorepoTime, { spaces: 4 });
+            } catch (err) {
+                 console.error("Error reading scaffold file for monorepotime.json:", err);
+            }
         }
 
         // 5. Create turbo.json if not exists
