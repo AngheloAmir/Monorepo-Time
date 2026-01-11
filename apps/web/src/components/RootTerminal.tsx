@@ -19,17 +19,16 @@ export default function RootTerminal() {
     };
 
     useEffect(() => {
-        if (showTerminal) {
-            //terminalRef.current?.focus();
+        if (showTerminal && rootDir && terminalRef.current) {
+            // Wait slightly for the terminal to be ready in the DOM
+            const timeoutId = setTimeout(() => {
+                terminalRef.current?.connect(rootDir);
+                terminalRef.current?.focus();
+            }, 50);
 
-            setTimeout(() => {
-                terminalRef.current?.write('hello\n')
-            }, 1000);
-             setTimeout(() => {
-                terminalRef.current?.input('git branch')
-            }, 2000);
+            return () => clearTimeout(timeoutId);
         }
-    }, [showTerminal]);
+    }, [showTerminal, rootDir]);
 
     if (!showTerminal) return null;
     return (
@@ -46,7 +45,6 @@ export default function RootTerminal() {
                     ref={terminalRef}
                     isInteractive={true}
                     className="h-full"
-                    path={rootDir}
                     onExit={() => setShowTerminal(false)}
                 />
             </div>

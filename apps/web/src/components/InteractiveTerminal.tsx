@@ -6,27 +6,76 @@ import { WebLinksAddon } from "xterm-addon-web-links";
 import "xterm/css/xterm.css";
 
 export interface InteractiveTerminalRef {
+    /** Writes data directly to the xterm instance */
     write: (data: string) => void;
+    /** Sends input data to the connected socket terminal process */
     input: (data: string) => void;
+    /** Registers a callback to receive data events from the terminal */
     onData: (callback: (data: string) => void) => void;
+    /** Registers a callback to be called when the terminal process closes */
     onClose: (callback: () => void) => void;
+    /** Triggers the fit addon to resize the terminal to its container */
     fit: () => void;
+    /** Clears the terminal buffer */
     clear: () => void;
+    /** Focuses the terminal input */
     focus: () => void;
+    /** Manually initiates a connection to a terminal process */
     connect: (path: string, command?: string) => void;
+    /** Manually disconnects the socket connection */
     disconnect: () => void;
 }
 
 interface InteractiveTerminalProps {
+    /** CSS class names for the container */
     className?: string;
+    /** Initial text to display in the terminal before connection */
     startingText?: string;
+    /** Custom socket.io URL (default: http://localhost:3000) */
     socketUrl?: string;
+    /** Whether the terminal accepts user input (default: true) */
     isInteractive?: boolean;
+    /** The working directory path to start the terminal process in */
     path?: string;
+    /** The command to execute (e.g. 'bash') */
     command?: string;
+    /** Callback function called when the process exits */
     onExit?: () => void;
 }
 
+/** An interactive terminal
+ * 
+ * @example
+ * ```tsx
+ * import InteractiveTerminal, { type InteractiveTerminalRef } from "./InteractiveTerminal";
+ *
+ * export default function MyTerminal() {
+ *     const terminalRef = useRef<InteractiveTerminalRef>(null);
+ *     useEffect(() => {
+ *         if (terminalRef.current) {
+ *             setTimeout(() => {
+ *                 terminalRef.current?.connect(rootDir);
+ *                 terminalRef.current?.focus();
+ *             }, 50);
+ *             return () => {
+ *                 if(terminalRef.current) {
+ *                     terminalRef.current.disconnect();
+ *                 }
+ *             }
+ *         }
+ *     }, []);
+ *
+ *     return (
+ *         <InteractiveTerminal 
+ *             ref={terminalRef}
+ *             isInteractive={true}
+ *             className="h-full"
+ *             onExit={() => console.log("Terminal exited")}
+ *         />
+ *     )
+ * }
+ * ```
+ */
 const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTerminalProps>((props, ref) => {
     // We hold the Terminal instance here to control it directly
     const terminalRef = useRef<Terminal | null>(null);
@@ -139,24 +188,12 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         }
     }, [props.startingText]);
 
-    // Handle Props-based connection
+    // Cleanup on unmount
     useEffect(() => {
-        let timeoutId: ReturnType<typeof setTimeout>;
-
-        // Clean up previous socket if path changes
-        disconnectSocket();
-
-        if (props.path) {
-            timeoutId = setTimeout(() => {
-                connectSocket(props.path!, props.command);
-            }, 100);
-        }
-        
         return () => {
-            clearTimeout(timeoutId);
-            disconnectSocket();
+            disconnectSocket(); 
         };
-    }, [props.path, props.command, props.socketUrl]);
+    }, []);
 
     // Handle interactivity changes
     useEffect(() => {
