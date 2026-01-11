@@ -62,6 +62,18 @@ const apiRoute = {
      * get return { isFirstTime: boolean }
     */
     firstRun: 'firstrun',
+
+    /** Get/Set notes
+     * get returns { notes: string }
+     * post body { notes: string } returns { success: boolean }
+    */
+    notes: 'notes',
+
+    /** Get/Set crudtest
+     * get returns { crudtest: any[] }
+     * post body { crudtest: any[] } returns { success: boolean }
+    */
+    crudTest: 'crudtest',
 }
 
 export default apiRoute;

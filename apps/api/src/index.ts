@@ -22,6 +22,8 @@ import rootPath          from './routes/rootPath';
 import scaffoldRepo      from './routes/scafoldrepo';
 import turborepoExist    from './routes/turborepoexist';
 import firstRunRoute     from './routes/firstrun';
+import notesRoute        from './routes/notes';
+import crudTestRoute     from './routes/crudtest';
 
 const app = express();
 const port = config.apiPort;
@@ -47,6 +49,8 @@ app.use("/" + apiRoute.getRootPath,        rootPath);
 app.use("/" + apiRoute.scaffoldRepo,       scaffoldRepo);
 app.use("/" + apiRoute.turborepoExist,     turborepoExist);
 app.use("/" + apiRoute.firstRun,           firstRunRoute);
+app.use("/" + apiRoute.notes,              notesRoute);
+app.use("/" + apiRoute.crudTest,           crudTestRoute);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');
