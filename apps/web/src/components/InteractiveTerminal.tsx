@@ -1,8 +1,8 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import { io, Socket } from "socket.io-client";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
-import { io, Socket } from "socket.io-client";
 import "xterm/css/xterm.css";
 
 export interface InteractiveTerminalRef {
@@ -22,33 +22,87 @@ interface InteractiveTerminalProps {
     startingText?: string;
     socketUrl?: string;
     isInteractive?: boolean;
+    path?: string;
+    command?: string;
+    onExit?: () => void;
 }
 
 const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTerminalProps>((props, ref) => {
-    const divRef = useRef<HTMLDivElement>(null);
-    const xtermRef = useRef<Terminal | null>(null);
-    const fitAddonRef = useRef<FitAddon | null>(null);
+    // We hold the Terminal instance here to control it directly
+    const terminalRef = useRef<Terminal | null>(null);
+    // Reference to the Console component (mainly for fit())
+    const consoleComponentRef = useRef<ConsoleRef | null>(null);
+    
     const socketRef = useRef<Socket | null>(null);
     
-    // Callbacks exposed to parent
+    // Callbacks exposed to parent via the Ref interface
     const onDataCallbackRef = useRef<((data: string) => void) | null>(null);
     const onCloseCallbackRef = useRef<(() => void) | null>(null);
 
+    // Helper to disconnect socket
+    const disconnectSocket = () => {
+        if (socketRef.current) {
+            socketRef.current.disconnect();
+            socketRef.current = null;
+        }
+    };
+
+    // Helper to connect socket
+    const connectSocket = (path: string, command: string = 'bash') => {
+        disconnectSocket();
+
+        const url = props.socketUrl || 'http://localhost:3000';
+        const socket = io(url, {
+            transports: ['websocket'],
+            forceNew: true // Important for connection stability
+        });
+
+        socketRef.current = socket;
+
+        socket.on('connect', () => {
+            terminalRef.current?.clear();
+            // Start the terminal process on the backend
+            socket.emit('terminal:start', { path, command });
+            terminalRef.current?.focus();
+            
+            // Try fitting again after connection
+            setTimeout(() => {
+                consoleComponentRef.current?.fit();
+            }, 100);
+        });
+
+        socket.on('terminal:log', (data: string) => {
+            terminalRef.current?.write(data);
+        });
+
+        socket.on('terminal:error', (data: string) => {
+            terminalRef.current?.write(`\x1b[31m${data}\x1b[0m`);
+        });
+
+        socket.on('terminal:exit', (code: number) => {
+            terminalRef.current?.write(`\r\n\x1b[33mProcess exited with code ${code}\x1b[0m\r\n`);
+            if (onCloseCallbackRef.current) {
+                onCloseCallbackRef.current();
+            }
+            if (props.onExit) {
+                props.onExit();
+            }
+        });
+    };
+
     useImperativeHandle(ref, () => ({
         write: (data: string) => {
-            xtermRef.current?.write(data);
+            terminalRef.current?.write(data);
         },
         input: (data: string) => {
              // If socket is active, send to socket
              if (socketRef.current && socketRef.current.connected) {
                  // Programmatic input usually implies a command execution, so we ensure a newline if strictly just a command
-                 // But strictly speaking 'input' just sends data. 
-                 // However, user said "myRef.input(..command..) will execute the command".
-                 // So we append \r.
                  const commandToSend = data.endsWith('\r') ? data : data + '\r';
                  socketRef.current.emit('terminal:input', commandToSend);
              } else {
                  // Simulate user input by sending data/command to the registered onData handler local callback
+                 // This effectively loops it back to the terminal if someone's listening
                  if (onDataCallbackRef.current) {
                      onDataCallbackRef.current(data + '\r');
                  }
@@ -61,65 +115,120 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
             onCloseCallbackRef.current = callback;
         },
         fit: () => {
+            consoleComponentRef.current?.fit();
+        },
+        clear: () => {
+            terminalRef.current?.clear();
+        },
+        focus: () => {
+            terminalRef.current?.focus();
+        },
+        connect: (path: string, command: string = 'bash') => {
+            connectSocket(path, command);
+        },
+        disconnect: () => {
+            disconnectSocket();
+        }
+    }));
+
+    // Handle initial text
+    useEffect(() => {
+        if (props.startingText && terminalRef.current) {
+            terminalRef.current.write(props.startingText);
+        }
+    }, [props.startingText]);
+
+    // Handle Props-based connection
+    useEffect(() => {
+        if (props.path) {
+            connectSocket(props.path, props.command);
+        }
+        return () => {
+            disconnectSocket();
+        };
+    }, [props.path, props.command, props.socketUrl]);
+
+    // Handle interactivity changes
+    useEffect(() => {
+        const term = terminalRef.current;
+        if (!term) return;
+        
+        const interactive = props.isInteractive ?? true;
+        
+        term.options.disableStdin = !interactive;
+        term.options.cursorBlink = interactive;
+        term.options.cursorStyle = interactive ? 'block' : 'underline';
+        
+        if (!interactive) {
+            term.options.theme = {
+                ...term.options.theme,
+                cursor: 'transparent'
+            };
+        } else {
+            term.options.theme = {
+                ...term.options.theme,
+                cursor: '#ffffff'
+            };
+        }
+
+    }, [props.isInteractive]);
+
+    const handleData = (data: string) => {
+        // Forward input to socket if connected
+        if (socketRef.current && socketRef.current.connected) {
+            socketRef.current.emit('terminal:input', data);
+        }
+        // Also trigger local callback (for parents listening to raw input)
+        if (onDataCallbackRef.current) {
+            onDataCallbackRef.current(data);
+        }
+    };
+
+    return (
+        <div className={`h-full w-full ${props.className || ''}`}>
+            <Console 
+                ref={consoleComponentRef}
+                terminalRef={terminalRef}
+                onData={handleData}
+            />
+        </div>
+    );
+});
+
+InteractiveTerminal.displayName = "InteractiveTerminal";
+export default InteractiveTerminal;
+
+interface ConsoleProps {
+    className?: string;
+    onData?: (data: string) => void;
+    terminalRef?: React.MutableRefObject<Terminal | null>;
+}
+
+export interface ConsoleRef {
+    fit: () => void;
+}
+
+const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
+    const divRef = useRef<HTMLDivElement>(null);
+    const xtermRef = useRef<Terminal | null>(null);
+    const fitAddonRef = useRef<FitAddon | null>(null);
+    
+    // Store the latest onData callback in a ref to avoid stale closures in the xterm listener
+    const onDataRef = useRef(props.onData);
+
+    useImperativeHandle(ref, () => ({
+        fit: () => {
              try {
                 fitAddonRef.current?.fit();
              } catch (e) {
-                 // ignore fit errors (e.g. if container is hidden)
+                 // ignore
              }
-        },
-        clear: () => {
-            xtermRef.current?.clear();
-        },
-        focus: () => {
-            xtermRef.current?.focus();
-        },
-        connect: (path: string, command: string = 'bash') => {
-            // Disconnect if already connected
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-            }
-
-            const url = props.socketUrl || 'http://localhost:3000';
-            const socket = io(url, {
-                transports: ['websocket']
-            });
-
-            socketRef.current = socket;
-
-            socket.on('connect', () => {
-                xtermRef.current?.clear();
-                // Start the terminal process on the backend
-                socket.emit('terminal:start', { path, command });
-                xtermRef.current?.focus();
-                try {
-                    fitAddonRef.current?.fit();
-                } catch (e) {
-                    // ignore
-                }
-            });
-
-            socket.on('terminal:log', (data: string) => {
-                xtermRef.current?.write(data);
-            });
-
-            socket.on('terminal:error', (data: string) => {
-                xtermRef.current?.write(`\x1b[31m${data}\x1b[0m`);
-            });
-
-            socket.on('terminal:exit', (code: number) => {
-                xtermRef.current?.write(`\r\n\x1b[33mProcess exited with code ${code}\x1b[0m\r\n`);
-                if (onCloseCallbackRef.current) {
-                    onCloseCallbackRef.current();
-                }
-            });
-        },
-        disconnect: () => {
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
-            }
         }
     }));
+    
+    useEffect(() => {
+        onDataRef.current = props.onData;
+    }, [props.onData]);
 
     useEffect(() => {
         if (!divRef.current) return;
@@ -128,10 +237,10 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         const term = new Terminal({
             cursorBlink: true,
             fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-            fontSize: 14,
+            fontSize: 15,
             theme: {
-                background: '#111827', // bg-gray-900
-                foreground: '#f3f4f6', // text-gray-100
+                background: '#111827', // matching bg-gray-900 roughly
+                foreground: '#f3f4f6',
                 cursor: '#ffffff',
                 selectionBackground: '#374151'
             },
@@ -148,99 +257,46 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         // This fixes the "can't access property dimensions" error when opening inside a modal
         const initTimeout = setTimeout(() => {
             if (divRef.current) {
-                 term.open(divRef.current);
-                 try {
-                     fitAddon.fit();
-                 } catch (e) {
-                     console.warn("Fit failed on init:", e);
-                 }
-                 
-                 // Initial text
-                 if (props.startingText) {
-                    term.write(props.startingText);
-                 }
+                term.open(divRef.current);
+                try {
+                    fitAddon.fit();
+                } catch (e) {
+                    console.warn("Fit failed on init:", e);
+                }
             }
         }, 0);
 
         xtermRef.current = term;
         fitAddonRef.current = fitAddon;
+        
+        if (props.terminalRef) {
+            props.terminalRef.current = term;
+        }
 
-        // Handle user typing
         term.onData((data) => {
-            // Forward input to socket if connected
-            if (socketRef.current && socketRef.current.connected) {
-                socketRef.current.emit('terminal:input', data);
-            }
-            // Also trigger local callback
-            if (onDataCallbackRef.current) {
-                onDataCallbackRef.current(data);
+            if (onDataRef.current) {
+                onDataRef.current(data);
             }
         });
 
-        // Resize observer to keep terminal fitting the container
+        // Resize observer to refit
         const resizeObserver = new ResizeObserver(() => {
             try {
                 fitAddon.fit();
             } catch (e) {
-                // ignore
+                // Ignore fit errors during resize (e.g. if hidden)
             }
         });
         resizeObserver.observe(divRef.current);
 
-        // Cleanup
         return () => {
             clearTimeout(initTimeout);
             resizeObserver.disconnect();
-            
-            // Trigger onClose callback if registered
-            if (onCloseCallbackRef.current) {
-                onCloseCallbackRef.current();
-            }
-
-            if (socketRef.current) {
-                socketRef.current.disconnect();
-            }
-
             term.dispose();
         };
-    }, []); // Run once on mount
-
-    // Update terminal options based on isInteractive prop
-    useEffect(() => {
-        if (!xtermRef.current) return;
-        
-        const interactive = props.isInteractive ?? true;
-        
-        xtermRef.current.options.disableStdin = !interactive;
-        xtermRef.current.options.cursorBlink = interactive;
-        xtermRef.current.options.cursorStyle = interactive ? 'block' : 'underline'; // visually distinguish or hide
-        
-        // If not interactive, we might want to hide the cursor entirely, 
-        // but xterm doesn't have "hidden" cursor style easily without CSS.
-        // We can set cursorInactiveStyle or just rely on blink/style.
-        // Actually, setting theme cursor to transparent works best for hiding.
-        if (!interactive) {
-            xtermRef.current.options.theme = {
-                ...xtermRef.current.options.theme,
-                cursor: 'transparent'
-            };
-        } else {
-            xtermRef.current.options.theme = {
-                ...xtermRef.current.options.theme,
-                cursor: '#ffffff'
-            };
-        }
-
-    }, [props.isInteractive]);
+    }, []);
 
     return (
-        <div 
-            className={`h-full w-full overflow-hidden bg-gray-900 p-1 ${props.className || ''}`} 
-            ref={divRef} 
-        />
+        <div className="h-full w-full overflow-hidden bg-gray-900 p-1" ref={divRef} />
     );
 });
-
-InteractiveTerminal.displayName = "InteractiveTerminal";
-
-export default InteractiveTerminal;

@@ -151,6 +151,11 @@ except Exception as e:
         socket.on('disconnect', () => {
             const child = activeTerminals.get(socket.id);
             if (child) {
+                // Remove listeners so we don't try to emit 'exit' or 'error' to a disconnected socket
+                child.removeAllListeners();
+                child.stdout?.removeAllListeners();
+                child.stderr?.removeAllListeners();
+
                 child.kill(); // Kill the process if client disconnects
                 activeTerminals.delete(socket.id);
             }

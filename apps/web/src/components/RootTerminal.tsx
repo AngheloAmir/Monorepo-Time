@@ -28,19 +28,9 @@ export default function RootTerminal() {
     }, [showTerminal]);
 
     // Connect the terminal when rootPath is available and terminal is shown
-    useEffect(() => {
-        if (showTerminal && rootPath && terminalRef.current) {
-            // Wait a tick for the component to mount/ref to attach if needed, 
-            // though useEffect runs after render so ref should be populated.
-            // Connect to the root path
-            terminalRef.current.connect(rootPath);
-
-            // Optional: Register a close handler if the backend process exits (e.g. typing 'exit')
-            terminalRef.current.onClose(() => {
-                setShowTerminal(false);
-            });
-        }
-    }, [showTerminal, rootPath]);
+    // We now handle this declaratively via props on the InteractiveTerminal component
+    // but we can keep the effect for other side effects if needed.
+    // For now, we don't need an effect to trigger connection.
 
     const close = () => {
         if(terminalRef.current) {
@@ -65,6 +55,8 @@ export default function RootTerminal() {
                     ref={terminalRef}
                     isInteractive={true}
                     className="h-full"
+                    path={rootPath || undefined}
+                    onExit={() => setShowTerminal(false)}
                 />
             </div>
         </ModalBody>
