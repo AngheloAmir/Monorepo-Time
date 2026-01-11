@@ -54,7 +54,8 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         const url = props.socketUrl || 'http://localhost:3000';
         const socket = io(url, {
             transports: ['websocket'],
-            forceNew: true // Important for connection stability
+            forceNew: true, // Important for connection stability
+            reconnection: false // We manage lifecycle manually, so disable auto-reconnect to avoid race conditions
         });
 
         socketRef.current = socket;
@@ -140,10 +141,19 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
 
     // Handle Props-based connection
     useEffect(() => {
+        let timeoutId: ReturnType<typeof setTimeout>;
+
+        // Clean up previous socket if path changes
+        disconnectSocket();
+
         if (props.path) {
-            connectSocket(props.path, props.command);
+            timeoutId = setTimeout(() => {
+                connectSocket(props.path!, props.command);
+            }, 100);
         }
+        
         return () => {
+            clearTimeout(timeoutId);
             disconnectSocket();
         };
     }, [props.path, props.command, props.socketUrl]);

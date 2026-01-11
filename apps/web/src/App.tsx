@@ -4,15 +4,26 @@ import Home from './contents/Home'
 
 import useNavState from "./_context/navigation";
 import Workspace from './contents/Workspace';
-import Turborepo from './contents/Turborepo';
-import CRUDTester from './contents/CRUDTester';
-import Setting from './contents/Setting';
+
 import Modal from './modal';
 import RootTerminal from './components/RootTerminal';
+import useAppState from './_context/app';
+import { useEffect } from 'react';
 
+
+// import Turborepo from './contents/Turborepo';
+// import CRUDTester from './contents/CRUDTester';
+// import Setting from './contents/Setting';
 
 function App() {
     const currentPage = useNavState.use.currentPage();
+    const loadRootDir = useAppState.use.loadRootDir();
+
+    useEffect(() => {
+        setTimeout(() => {
+            loadRootDir();
+        }, 10);
+    }, []);
 
     return (
         <div className='w-screen h-screen overflow-hidden'>
