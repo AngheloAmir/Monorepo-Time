@@ -21,9 +21,9 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
         <div className="flex-1 flex gap-2">
             <Button
                 onClick={() => { }}
-                name={"loading"}
-                description={"loading"}
-                color="from-blue-500 to-indigo-600"
+                name={"Loading"}
+                description={"..."}
+                color="blueIndigo"
                 icon="fas fa-check-circle"
                 disabled={true}
                 render={loading}
@@ -34,9 +34,9 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                     await stopInteractiveTerminal(props.info.name);
                     setWorkSpaceRunningAs(props.info.name, null);
                 }}
-                name={"running"}
-                description={"running"}
-                color="from-blue-500 to-indigo-600"
+                name={"App is Running"}
+                description={"Click to stop"}
+                color="orangePurple"
                 icon="fas fa-check-circle"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'start'}
@@ -47,12 +47,13 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                     await stopInteractiveTerminal(props.info.name);
                     setWorkSpaceRunningAs(props.info.name, null);
                 }}
-                name={"Stop dev"}
-                description={"Stop dev"}
-                color="from-blue-500 to-indigo-600"
+                name={"Development Server"}
+                description={"Click to stop"}
+                color="emeraldTeal"
                 icon="fas fa-check-circle"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'dev'}
+                bordered={ props.isRunningAs == 'dev' }
             />
 
             <Button
@@ -64,7 +65,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 }}
                 name={"Start"}
                 description={"npm run start"}
-                color="from-blue-500 to-indigo-600"
+                color="orangePurple"
                 icon="fas fa-play"
                 disabled={false}
 
@@ -87,7 +88,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 }}
                 name={"Dev"}
                 description={"npm run dev"}
-                color="from-blue-500 to-indigo-600"
+                color="blueIndigo"
                 icon="fas fa-code"
                 disabled={false}
                 render={(
@@ -106,10 +107,11 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 }}
                 name={"Crashed"}
                 description={"Crashed"}
-                color="from-blue-500 to-indigo-600"
+                color="red"
                 icon="fas fa-code"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'crashed'}
+                bordered={true}
             />
         </div>
     )

@@ -10,16 +10,16 @@ interface TurborepoProps {
 }
 
 export const commands = [
-    { label: 'Install', cmd: 'npm install', icon: 'fa-download', color: 'from-blue-500 to-indigo-600' },
-    { label: 'Build', cmd: 'turbo build', icon: 'fa-hammer', color: 'from-emerald-500 to-teal-600' },
-    { label: 'Lint', cmd: 'turbo lint', icon: 'fa-check-double', color: 'from-yellow-500 to-orange-600' },
-    { label: 'Test', cmd: 'turbo test', icon: 'fa-vial', color: 'from-pink-500 to-rose-600' },
-    { label: 'Clean', cmd: 'turbo clean', icon: 'fa-broom', color: 'from-gray-500 to-gray-600' },
+    { label: 'Install', cmd: 'npm install', icon: 'fa-download', color: 'blueIndigo' },
+    { label: 'Build', cmd: 'turbo build', icon: 'fa-hammer', color: 'emeraldTeal' },
+    { label: 'Lint', cmd: 'turbo lint', icon: 'fa-check-double', color: 'yellowOrange' },
+    { label: 'Test', cmd: 'turbo test', icon: 'fa-vial', color: 'pinkRose' },
+    { label: 'Clean', cmd: 'turbo clean', icon: 'fa-broom', color: 'gray' },
     { label: 'Summary', cmd: 'turbo run build --dry-run', icon: 'fa-list-alt' },
-    { label: 'Prune', cmd: 'turbo prune', icon: 'fa-scissors', color: 'from-red-500 to-red-600' },
-    { label: 'Docker', cmd: 'turbo prune --docker', icon: 'fa-docker', color: 'from-blue-400 to-blue-500' },
-    { label: 'Remote', cmd: 'npx turbo link', icon: 'fa-cloud', color: 'from-cyan-500 to-blue-600' },
-    { label: 'Cache', cmd: 'rm -rf node_modules/.cache/turbo .turbo', icon: 'fa-trash-alt', color: 'from-red-600 to-red-700' },
+    { label: 'Prune', cmd: 'turbo prune', icon: 'fa-scissors', color: 'red' },
+    { label: 'Docker', cmd: 'turbo prune --docker', icon: 'fa-docker', color: 'skyBlue' },
+    { label: 'Remote', cmd: 'npx turbo link', icon: 'fa-cloud', color: 'cyanBlue' },
+    { label: 'Cache', cmd: 'rm -rf node_modules/.cache/turbo .turbo', icon: 'fa-trash-alt', color: 'darkRed' },
 ];
 
 export default function Turborepo(props: TurborepoProps) {
