@@ -20,10 +20,10 @@ const colorVariants = {
 export type ColorVariant = keyof typeof colorVariants;
 interface ButtonFloatingProps {
     onClick: () => void;
-    top?:    string;
-    right?:  string;
-    bottom?: string;
-    left?:   string;
+    top?:    number;
+    right?:  number;
+    bottom?: number;
+    left?:   number;
     icon?:   string;
     text?:   string;
     color?: ColorVariant | (string & {});
@@ -31,10 +31,6 @@ interface ButtonFloatingProps {
 }
 
 export default function ButtonFloating(props: ButtonFloatingProps) {
-    const Yposition = props.top   || props.bottom;
-    const YPos      = props.top   ? `top-${Yposition}` : `bottom-${Yposition}`;
-    const Xposition = props.right || props.left;
-    const XPos      = props.right ? `right-${Xposition}` : `left-${Xposition}`;
     const spanTo    = props.spanTo ?? "toLeft";
 
     // Resolve color: Check if it's a known variant, otherwise use as raw string, fallback to default
@@ -68,9 +64,17 @@ export default function ButtonFloating(props: ButtonFloatingProps) {
     };
 
     const dir = directionClasses[spanTo] || directionClasses.toLeft;
-
     return (
-        <button onClick = {props.onClick} className = {`group fixed ${YPos} ${XPos} z-50 flex items-center ${dir.btnFlex}`}>
+        <button
+            onClick = {props.onClick}
+            className ={`group fixed z-50 flex items-center ${dir.btnFlex}`}
+            style={{
+                top:   props.top,
+                right: props.right,
+                bottom: props.bottom,
+                left: props.left,
+            }}
+        >
                 <div className={`relative flex items-center ${dir.contentFlex} p-[1px] rounded-xl bg-gradient-to-r ${color} transition-transform duration-300 group-hover:scale-105`}>
                      <div className={`relative flex items-center ${dir.contentFlex} bg-[#0A0A0A] rounded-xl px-4 py-3 transition-colors duration-300 group-hover:bg-[#0A0A0A]/80`}>
                         <i className= { props.icon + " w-6 h-6 text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"}></i>

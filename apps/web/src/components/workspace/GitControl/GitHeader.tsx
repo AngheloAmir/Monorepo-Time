@@ -10,7 +10,9 @@ export default function GitHeader() {
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
                     <i className="fab fa-git-alt text-white text-sm"></i>
                 </div>
-                <h2 className="text-white font-bold tracking-tight">Git Control</h2>
+                <h2 className="text-white font-bold tracking-tight">
+                    Git Workflow Helper
+                </h2>
             </div>
             <button
                 onClick={fetchData}
