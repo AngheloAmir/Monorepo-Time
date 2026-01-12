@@ -9,12 +9,17 @@ interface appContext {
     rootDir: string;
     loadRootDir: ()      => Promise<void>;
     checkIfFirstTime: () => Promise<boolean>;
+    showAboutModal: boolean;
+    setShowAboutModal: (show: boolean) => void;
 }
 
 const appstate = create<appContext>()((set, get) => ({
     showTerminal: false,
     setShowTerminal: (show: boolean) => set({ showTerminal: show }),
     rootDir: '',
+    showAboutModal: false,
+    setShowAboutModal: (show: boolean) => set({ showAboutModal: show }),
+    
     loadRootDir: async () => {
         if (get().rootDir.length > 0) return;
         const port     = config.apiPort || 3000;

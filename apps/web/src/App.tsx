@@ -13,11 +13,14 @@ import Flash from './contents/Flash';
 import Loading from './contents/_Loading';
 import Turborepo from './contents/Turborepo';
 import CRUDTester from './contents/CrudTester';
+import AboutModal from './components/AboutModal';
 
 function App() {
     const currentPage      = useNavState.use.currentPage();
     const loadRootDir      = useAppState.use.loadRootDir();
     const checkIfFirstTime = useAppState.use.checkIfFirstTime();
+    const showAboutModal    = useAppState.use.showAboutModal();
+    const setShowAboutModal = useAppState.use.setShowAboutModal();
     const [isFlashVisible, setIsFlashVisible] = useState(false);
     const [loading, setLoading]               = useState(true);
 
@@ -69,6 +72,7 @@ function App() {
             
             <Modal />
             <RootTerminal />
+            <AboutModal isOpen={showAboutModal} setIsOpen={() => setShowAboutModal(false)} />
         </div>
     )
 }
