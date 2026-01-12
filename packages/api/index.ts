@@ -75,6 +75,14 @@ const apiRoute = {
      * post body { crudtest: any[] } returns { success: boolean }
     */
     crudTest: 'crudtest',
+    
+    /** Git Control
+     * get history
+     * get current branch
+     * post revert
+     * post push
+     */
+    gitControl: 'gitcontrol'
 }
 
 export default apiRoute;

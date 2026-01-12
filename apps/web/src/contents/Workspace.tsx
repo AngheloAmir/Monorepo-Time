@@ -32,8 +32,8 @@ export default function Workspace(props: WorkspaceProps) {
     return (
         <div className={`relative flex flex-col w-full h-[calc(100vh-68px)] ${props.isVisible ? '' : 'hidden'}`}>
             <div className="grid grid-rows-5 h-full min-h-0 gap-2">
-                <div className="row-span-3 min-h-0 overflow-y-auto grid grid-cols-4 gap-2 ">
-                    <div className="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 p-2">
+                <div className="row-span-3 min-h-0 grid grid-cols-4 gap-2 overflow-hidden">
+                    <div className="col-span-3 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 p-2">
                         {workspace.map((item) => (
                             <div key={item.info.name}>
                                 <WorkspaceCard {...item} />
@@ -41,7 +41,7 @@ export default function Workspace(props: WorkspaceProps) {
                         ))}
                     </div>
 
-                    <div className="col-span-1">
+                    <div className="col-span-1 h-full overflow-hidden">
                         <GitControl />
                     </div>
                 </div>

@@ -25,6 +25,7 @@ import turborepoExist    from './routes/turborepoexist';
 import firstRunRoute     from './routes/firstrun';
 import notesRoute        from './routes/notes';
 import crudTestRoute     from './routes/crudtest';
+import gitControlHelper  from './routes/gitControlHelper';
 
 const app = express();
 const port = config.apiPort;
@@ -53,6 +54,7 @@ app.use("/" + apiRoute.turborepoExist,     turborepoExist);
 app.use("/" + apiRoute.firstRun,           firstRunRoute);
 app.use("/" + apiRoute.notes,              notesRoute);
 app.use("/" + apiRoute.crudTest,           crudTestRoute);
+app.use("/" + apiRoute.gitControl,         gitControlHelper);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');

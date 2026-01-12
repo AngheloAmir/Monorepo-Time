@@ -56,7 +56,7 @@ function App() {
                         <div className="absolute -bottom-[25%] -right-[10%] w-[50%] h-[50%] bg-fuchsia-600/20 rounded-full blur-[128px]"></div>
                     </div>
 
-                    <div id="app-content" className="w-full h-full p-2 relative z-10">
+                    <div id="app-content" className="w-full max-w-[2100px] mx-auto h-full p-2 relative z-10">
                         <Home isVisible={currentPage === "dashboard"}/>
                         <Workspace isVisible={currentPage === "workspace"}/>
                         <Turborepo isVisible={currentPage === "turborepo"}/>
