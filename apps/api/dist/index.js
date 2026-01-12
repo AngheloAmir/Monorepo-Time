@@ -37,7 +37,7 @@ __export(index_exports, {
   io: () => io
 });
 module.exports = __toCommonJS(index_exports);
-var import_express15 = __toESM(require("express"));
+var import_express17 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
 var import_path13 = __toESM(require("path"));
 
@@ -103,7 +103,14 @@ var apiRoute = {
    * get returns { crudtest: any[] }
    * post body { crudtest: any[] } returns { success: boolean }
   */
-  crudTest: "crudtest"
+  crudTest: "crudtest",
+  /** Git Control
+   * get history
+   * get current branch
+   * post revert
+   * post push
+   */
+  gitControl: "gitcontrol"
 };
 var api_default = apiRoute;
 
@@ -117,11 +124,103 @@ var config_default = config;
 var import_http = require("http");
 var import_socket = require("socket.io");
 
+// src/routes/tester.ts
+var import_express = require("express");
+var router = (0, import_express.Router)();
+router.get("/ping", async (req, res) => {
+  res.json({
+    message: "pong"
+  });
+});
+router.post("/post", async (req, res) => {
+  const body = req.body;
+  const header = req.headers;
+  const query = req.query;
+  const params = req.params;
+  res.json({
+    body,
+    header,
+    query,
+    params
+  });
+});
+router.get("/stream", async (req, res) => {
+  const poem1 = `[I Wandered Lonely as a Cloud]
+
+I wandered lonely as a cloud
+That floats on high o'er vales and hills,
+When all at once I saw a crowd,
+A host, of golden daffodils;
+Beside the lake, beneath the trees,
+Fluttering and dancing in the breeze.
+
+Continuous as the stars that shine
+And twinkle on the milky way,
+They stretched in never-ending line
+Along the margin of a bay:
+Ten thousand saw I at a glance,
+Tossing their heads in sprightly dance.
+
+The waves beside them danced; but they
+Out-did the sparkling waves in glee:
+A poet could not but be gay,
+In such a jocund company:
+I gazed\u2014and gazed\u2014but little thought
+What wealth the show to me had brought:
+ 
+For oft, when on my couch I lie
+In vacant or in pensive mood,
+They flash upon that inward eye
+Which is the bliss of solitude;
+And then my heart with pleasure fills,
+And dances with the daffodils.
+`;
+  const poem2 = `[The Sun Has Long Been Set]
+
+The sun has long been set,
+The stars are out by twos and threes,
+The little birds are piping yet
+Among the bushes and trees;
+There's a cuckoo, and one or two thrushes,
+And a far-off wind that rushes,
+And a sound of water that gushes,
+And the cuckoo's sovereign cry
+Fills all the hollow of the sky.
+Who would "go parading"
+In London, "and masquerading,"
+On such a night of June
+With that beautiful soft half-moon,
+And all these innocent blisses?
+On such a night as this is!
+`;
+  res.writeHead(200, {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Transfer-Encoding": "chunked",
+    "X-Content-Type-Options": "nosniff"
+  });
+  const whichPoem = req.query.poem;
+  let poem;
+  if (whichPoem === "I Wandered Lonely as a Cloud") {
+    poem = poem1;
+  } else if (whichPoem === "The Sun Has Long Been Set") {
+    poem = poem2;
+  } else {
+    poem = "No poem provided or unknown title. Try ?poem=... with the exact title.";
+  }
+  const words = poem.split(" ");
+  for (const word of words) {
+    res.write(word + " ");
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  res.end();
+});
+var tester_default = router;
+
 // src/routes/scanworkspace.ts
 var import_fs_extra = __toESM(require("fs-extra"));
 var import_path = __toESM(require("path"));
 var import_fast_glob = __toESM(require("fast-glob"));
-var import_express = require("express");
+var import_express2 = require("express");
 var START_DIR = process.cwd();
 function findMonorepoRoot(startDir) {
   let dir = startDir;
@@ -141,7 +240,7 @@ function findMonorepoRoot(startDir) {
   return startDir;
 }
 var ROOT = findMonorepoRoot(START_DIR);
-var route = (0, import_express.Router)();
+var route = (0, import_express2.Router)();
 var IGNORE = [
   "**/node_modules/**",
   "**/.git/**",
@@ -307,12 +406,12 @@ async function handleOnRun(socket, data) {
 }
 
 // src/routes/stopcmd.ts
-var import_express2 = require("express");
+var import_express3 = require("express");
 var import_child_process2 = require("child_process");
 var import_util = require("util");
 var import_chalk2 = __toESM(require("chalk"));
-var router = (0, import_express2.Router)();
-router.post("/", async (req, res) => {
+var router2 = (0, import_express3.Router)();
+router2.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   try {
     const body = req.body;
@@ -405,7 +504,7 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-var stopcmd_default = router;
+var stopcmd_default = router2;
 var execAsync = (0, import_util.promisify)(import_child_process2.exec);
 async function getProcessTreePids(rootPid) {
   var _a;
@@ -483,10 +582,10 @@ async function cleanupProcessPorts(rootPid, socket) {
 }
 
 // src/routes/listworkspacedirs.ts
-var import_express3 = require("express");
+var import_express4 = require("express");
 var import_fs_extra2 = __toESM(require("fs-extra"));
 var import_path2 = __toESM(require("path"));
-var router2 = (0, import_express3.Router)();
+var router3 = (0, import_express4.Router)();
 var START_DIR2 = process.cwd();
 var findRoot = async (dir) => {
   const pkgPath = import_path2.default.join(dir, "package.json");
@@ -503,7 +602,7 @@ var findRoot = async (dir) => {
   if (parent === dir) return START_DIR2;
   return findRoot(parent);
 };
-router2.get("/", async (req, res) => {
+router3.get("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   try {
     const rootPath = await findRoot(START_DIR2);
@@ -562,10 +661,10 @@ router2.get("/", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-var listworkspacedirs_default = router2;
+var listworkspacedirs_default = router3;
 
 // src/routes/newworkspace.ts
-var import_express4 = require("express");
+var import_express5 = require("express");
 var import_fs_extra3 = __toESM(require("fs-extra"));
 var import_path4 = __toESM(require("path"));
 
@@ -598,8 +697,8 @@ async function checkNameExists(name, excludePath) {
 }
 
 // src/routes/newworkspace.ts
-var router3 = (0, import_express4.Router)();
-router3.post("/", async (req, res) => {
+var router4 = (0, import_express5.Router)();
+router4.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   try {
     const reqBody = req.body;
@@ -637,16 +736,16 @@ router3.post("/", async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-var newworkspace_default = router3;
+var newworkspace_default = router4;
 
 // src/routes/interactiveTerminal.ts
-var import_express5 = require("express");
+var import_express6 = require("express");
 var import_child_process3 = require("child_process");
-var router4 = (0, import_express5.Router)();
-router4.get("/", async (req, res) => {
+var router5 = (0, import_express6.Router)();
+router5.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
 });
-var interactiveTerminal_default = router4;
+var interactiveTerminal_default = router5;
 var activeTerminals = /* @__PURE__ */ new Map();
 function stopTerminalProcess(socketId) {
   var _a, _b;
@@ -768,9 +867,9 @@ Process exited with code ${code}`);
 }
 
 // src/routes/stopInteractiveTerminal.ts
-var import_express6 = require("express");
-var router5 = (0, import_express6.Router)();
-router5.post("/", async (req, res) => {
+var import_express7 = require("express");
+var router6 = (0, import_express7.Router)();
+router6.post("/", async (req, res) => {
   const { socketId, workspace } = req.body;
   if (workspace && workspace.name) {
     const stopped = stopTerminalProcessByName(workspace.name);
@@ -792,14 +891,14 @@ router5.post("/", async (req, res) => {
   }
   res.status(400).json({ message: "Missing socketId or workspace.name" });
 });
-var stopInteractiveTerminal_default = router5;
+var stopInteractiveTerminal_default = router6;
 
 // src/routes/updateworkspace.ts
-var import_express7 = require("express");
+var import_express8 = require("express");
 var import_fs_extra4 = __toESM(require("fs-extra"));
 var import_path5 = __toESM(require("path"));
-var router6 = (0, import_express7.Router)();
-router6.post("/", async (req, res) => {
+var router7 = (0, import_express8.Router)();
+router7.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   try {
     const workspace = req.body;
@@ -833,13 +932,13 @@ router6.post("/", async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 });
-var updateworkspace_default = router6;
+var updateworkspace_default = router7;
 
 // src/routes/vscodeHideShow.ts
-var import_express8 = require("express");
+var import_express9 = require("express");
 var import_fs_extra5 = __toESM(require("fs-extra"));
 var import_path6 = __toESM(require("path"));
-var router7 = (0, import_express8.Router)();
+var router8 = (0, import_express9.Router)();
 var EXCLUDE_PATTERNS = {
   "**/node_modules": true,
   "**/.git": true,
@@ -910,7 +1009,7 @@ var ensureSettingsFile = async () => {
     await import_fs_extra5.default.writeJson(settingsPath, { "files.exclude": {} }, { spaces: 4 });
   }
 };
-router7.post("/", async (req, res) => {
+router8.post("/", async (req, res) => {
   try {
     const { hide, pathInclude } = req.body;
     await ensureSettingsFile();
@@ -936,12 +1035,12 @@ router7.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to update VSCode settings" });
   }
 });
-var vscodeHideShow_default = router7;
+var vscodeHideShow_default = router8;
 
 // src/routes/rootPath.ts
 var import_fs_extra6 = __toESM(require("fs-extra"));
 var import_path7 = __toESM(require("path"));
-var import_express9 = require("express");
+var import_express10 = require("express");
 var START_DIR4 = process.cwd();
 function findMonorepoRoot3(startDir) {
   let dir = startDir;
@@ -961,19 +1060,19 @@ function findMonorepoRoot3(startDir) {
   return startDir;
 }
 var ROOT3 = findMonorepoRoot3(START_DIR4);
-var route2 = (0, import_express9.Router)();
+var route2 = (0, import_express10.Router)();
 route2.get("/", async (req, res) => {
   res.json({ path: ROOT3 });
 });
 var rootPath_default = route2;
 
 // src/routes/scafoldrepo.ts
-var import_express10 = require("express");
+var import_express11 = require("express");
 var import_fs_extra7 = __toESM(require("fs-extra"));
 var import_path8 = __toESM(require("path"));
 var import_child_process4 = require("child_process");
-var router8 = (0, import_express10.Router)();
-router8.get("/", async (req, res) => {
+var router9 = (0, import_express11.Router)();
+router9.get("/", async (req, res) => {
   var _a;
   try {
     const packageJsonPath = import_path8.default.join(ROOT3, "package.json");
@@ -1062,14 +1161,14 @@ function runCommand(cmd, cwd) {
     });
   });
 }
-var scafoldrepo_default = router8;
+var scafoldrepo_default = router9;
 
 // src/routes/turborepoexist.ts
-var import_express11 = require("express");
+var import_express12 = require("express");
 var import_fs = __toESM(require("fs"));
 var import_path9 = __toESM(require("path"));
-var router9 = (0, import_express11.Router)();
-router9.get("/", async (req, res) => {
+var router10 = (0, import_express12.Router)();
+router10.get("/", async (req, res) => {
   try {
     let isExist = true;
     const turboJsonPath = import_path9.default.join(ROOT3, "turbo.json");
@@ -1088,14 +1187,17 @@ router9.get("/", async (req, res) => {
     res.status(500).json({ error: "Internal server error", exists: false });
   }
 });
-var turborepoexist_default = router9;
+var turborepoexist_default = router10;
 
 // src/routes/firstrun.ts
-var import_express12 = require("express");
+var import_express13 = require("express");
 var import_fs_extra8 = __toESM(require("fs-extra"));
 var import_path10 = __toESM(require("path"));
-var router10 = (0, import_express12.Router)();
-router10.get("/", async (req, res) => {
+var import_child_process5 = require("child_process");
+var import_util2 = require("util");
+var execAsync2 = (0, import_util2.promisify)(import_child_process5.exec);
+var router11 = (0, import_express13.Router)();
+router11.get("/", async (req, res) => {
   try {
     const monorepoTimePath3 = import_path10.default.join(ROOT3, "monorepotime.json");
     const exists = import_fs_extra8.default.existsSync(monorepoTimePath3);
@@ -1107,6 +1209,56 @@ router10.get("/", async (req, res) => {
       } catch (err) {
         console.error("Error reading scaffold file for firstrun:", err);
         import_fs_extra8.default.writeJsonSync(monorepoTimePath3, { notes: "", crudtest: [] }, { spaces: 4 });
+      }
+      const gitIgnorePath = import_path10.default.join(ROOT3, ".gitignore");
+      if (!import_fs_extra8.default.existsSync(gitIgnorePath)) {
+        const gitIgnoreContent = `# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+package-lock.json
+out
+.turbo`;
+        try {
+          import_fs_extra8.default.writeFileSync(gitIgnorePath, gitIgnoreContent);
+          console.log("Created .gitignore");
+        } catch (err) {
+          console.error("Failed to create .gitignore:", err);
+        }
+      }
+      const gitPath = import_path10.default.join(ROOT3, ".git");
+      if (!import_fs_extra8.default.existsSync(gitPath)) {
+        try {
+          console.log("Initializing git repository...");
+          await execAsync2("git init", { cwd: ROOT3 });
+          await execAsync2("git add .", { cwd: ROOT3 });
+          await execAsync2("git branch -M master", { cwd: ROOT3 });
+          await execAsync2('git commit -m "init"', { cwd: ROOT3 });
+          console.log("Git initialized successfully");
+        } catch (gitError) {
+          console.error("Failed to initialize git:", gitError);
+        }
       }
       res.json({ isFirstTime: true });
     } else {
@@ -1120,20 +1272,20 @@ router10.get("/", async (req, res) => {
     });
   }
 });
-var firstrun_default = router10;
+var firstrun_default = router11;
 
 // src/routes/notes.ts
-var import_express13 = require("express");
+var import_express14 = require("express");
 var import_fs_extra9 = __toESM(require("fs-extra"));
 var import_path11 = __toESM(require("path"));
-var router11 = (0, import_express13.Router)();
+var router12 = (0, import_express14.Router)();
 var monorepoTimePath = import_path11.default.join(ROOT3, "monorepotime.json");
 var ensureFile = async () => {
   if (!import_fs_extra9.default.existsSync(monorepoTimePath)) {
     await import_fs_extra9.default.writeJson(monorepoTimePath, { notes: "", crudtest: [] }, { spaces: 4 });
   }
 };
-router11.get("/", async (req, res) => {
+router12.get("/", async (req, res) => {
   try {
     await ensureFile();
     const data = await import_fs_extra9.default.readJson(monorepoTimePath);
@@ -1143,7 +1295,7 @@ router11.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to read notes" });
   }
 });
-router11.post("/", async (req, res) => {
+router12.post("/", async (req, res) => {
   try {
     const { notes } = req.body;
     if (typeof notes !== "string") {
@@ -1160,20 +1312,20 @@ router11.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to save notes" });
   }
 });
-var notes_default = router11;
+var notes_default = router12;
 
 // src/routes/crudtest.ts
-var import_express14 = require("express");
+var import_express15 = require("express");
 var import_fs_extra10 = __toESM(require("fs-extra"));
 var import_path12 = __toESM(require("path"));
-var router12 = (0, import_express14.Router)();
+var router13 = (0, import_express15.Router)();
 var monorepoTimePath2 = import_path12.default.join(ROOT3, "monorepotime.json");
 var ensureFile2 = async () => {
   if (!import_fs_extra10.default.existsSync(monorepoTimePath2)) {
     await import_fs_extra10.default.writeJson(monorepoTimePath2, { notes: "", crudtest: [] }, { spaces: 4 });
   }
 };
-router12.get("/", async (req, res) => {
+router13.get("/", async (req, res) => {
   try {
     await ensureFile2();
     const data = await import_fs_extra10.default.readJson(monorepoTimePath2);
@@ -1183,7 +1335,7 @@ router12.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to read crudtest" });
   }
 });
-router12.post("/", async (req, res) => {
+router13.post("/", async (req, res) => {
   try {
     const { crudtest } = req.body;
     if (!Array.isArray(crudtest)) {
@@ -1200,17 +1352,100 @@ router12.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to save crudtest" });
   }
 });
-var crudtest_default = router12;
+var crudtest_default = router13;
+
+// src/routes/gitControlHelper.ts
+var import_express16 = require("express");
+var import_child_process6 = require("child_process");
+var import_util3 = require("util");
+var execAsync3 = (0, import_util3.promisify)(import_child_process6.exec);
+var router14 = (0, import_express16.Router)();
+async function runGit(command) {
+  const { stdout, stderr } = await execAsync3(command, { cwd: ROOT3 });
+  if (stderr) {
+    console.log("Git Output (stderr):", stderr);
+  }
+  return stdout.trim();
+}
+router14.get("/history", async (req, res) => {
+  try {
+    const output = await runGit('git log -n 10 --pretty=format:"%h|%s|%ar"');
+    const history = output.split("\n").filter(Boolean).map((line) => {
+      const parts = line.split("|");
+      return {
+        hash: parts[0],
+        message: parts[1],
+        date: parts[2]
+      };
+    });
+    res.json({ history });
+  } catch (error) {
+    console.error("Git History Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.get("/branch", async (req, res) => {
+  try {
+    const branch = await runGit("git branch --show-current");
+    res.json({ branch });
+  } catch (error) {
+    console.error("Git Branch Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.post("/revert", async (req, res) => {
+  try {
+    const { hash } = req.body;
+    if (!hash) {
+      res.status(400).json({ error: "Hash is required" });
+      return;
+    }
+    const currentHead = await runGit("git rev-parse HEAD");
+    const newCommitHash = await runGit(`git commit-tree ${hash}^{tree} -p ${currentHead} -m "Reverted to ${hash}"`);
+    await runGit(`git reset --hard ${newCommitHash}`);
+    res.json({ success: true, message: `Reverted to ${hash}` });
+  } catch (error) {
+    console.error("Git Revert Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.post("/push", async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message) {
+      res.status(400).json({ error: "Message is required" });
+      return;
+    }
+    try {
+      await runGit("git add .");
+      const safeMessage = message.replace(/"/g, '\\"');
+      await runGit(`git commit -m "${safeMessage}"`);
+    } catch (e) {
+      if (e.stdout && e.stdout.includes("nothing to commit")) {
+      } else if (e.message && e.message.includes("nothing to commit")) {
+      } else {
+        throw e;
+      }
+    }
+    await runGit("git push");
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Git Push Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+var gitControlHelper_default = router14;
 
 // src/index.ts
-var app = (0, import_express15.default)();
+var app = (0, import_express17.default)();
 var port = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express15.default.static("public"));
-app.use(import_express15.default.json());
+app.use(import_express17.default.static("public"));
+app.use(import_express17.default.json());
+app.use("/", tester_default);
 app.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app.use("/" + api_default.stopProcess, stopcmd_default);
 app.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
@@ -1225,8 +1460,9 @@ app.use("/" + api_default.turborepoExist, turborepoexist_default);
 app.use("/" + api_default.firstRun, firstrun_default);
 app.use("/" + api_default.notes, notes_default);
 app.use("/" + api_default.crudTest, crudtest_default);
+app.use("/" + api_default.gitControl, gitControlHelper_default);
 var frontendPath = import_path13.default.join(__dirname, "../public");
-app.use(import_express15.default.static(frontendPath));
+app.use(import_express17.default.static(frontendPath));
 app.get("*", (req, res) => {
   res.sendFile(import_path13.default.join(frontendPath, "index.html"));
 });

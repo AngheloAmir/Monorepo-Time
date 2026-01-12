@@ -27,7 +27,7 @@ interface ButtonFloatingProps {
     icon?:   string;
     text?:   string;
     color?: ColorVariant | (string & {});
-    spanTo: "toLeft" | "toRight" | "toTop" | "toBottom";
+    spanTo?: "toLeft" | "toRight" | "toTop" | "toBottom";
 }
 
 export default function ButtonFloating(props: ButtonFloatingProps) {
