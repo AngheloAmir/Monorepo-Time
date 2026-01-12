@@ -1,4 +1,4 @@
-import BaseCard from "../components/BaseCard"
+import BaseCard from "../components/ui/BaseCard"
 import DockerResources from "../components/home/DockerResources"
 import SystemResources from "../components/home/SystemResources"
 import NotesEditor from '../components/home/NotesEditor';
