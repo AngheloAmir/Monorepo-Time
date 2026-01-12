@@ -8,7 +8,7 @@ export default function TabTerminal() {
 
     return (
         <div className="w-full h-full flex flex-col">
-            <header className="flex-none w-full pt-1 flex bg-gray-800 min-h-6 flex-wrap gap-1 select-none px-2">
+            <header className="flex-none w-full pt-1 flex bg-gray-800 min-h-6 flex-wrap select-none px-2">
                 {workspace.map((item) => {
                     if (item.isRunningAs != null) 
                         return <HeaderItem key={item.info.name}  workspace={item} />
