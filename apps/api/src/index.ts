@@ -10,6 +10,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 //routers
+import tester            from './routes/tester';
 import apiScanWorkspace  from './routes/scanworkspace';
 import runCmdDevSocket   from './routes/runcmddev';
 import stopProcess       from './routes/stopcmd';
@@ -37,9 +38,8 @@ app.use(cors({
 app.use(express.static('public'));
 app.use(express.json());
 
-// Serve frontend static files
-
 //routes=======================================================================
+app.use("/", tester);
 app.use("/" + apiRoute.scanWorkspace,      apiScanWorkspace);
 app.use("/" + apiRoute.stopProcess,        stopProcess);
 app.use("/" + apiRoute.listWorkspacesDir,  listWorkspacesDir);
