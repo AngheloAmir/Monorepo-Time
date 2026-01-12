@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useWorkspaceState from "../../_context/workspace";
 import { type WorkspaceInfo } from "types";
-import InputField from "../InputField";
+import InputField from "../ui/InputField";
 import ModalHeader from "./ModalHeader";
 import ModalBody from "./ModalBody";
 

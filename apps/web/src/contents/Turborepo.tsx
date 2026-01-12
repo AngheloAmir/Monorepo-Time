@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "../components/Button";
+import Button from "../components/ui/Button";
 import InteractiveTerminal, { type InteractiveTerminalRef } from "../components/InteractiveTerminal";
 import useAppState from "../_context/app";
 import useModal from "../modal/modals";
