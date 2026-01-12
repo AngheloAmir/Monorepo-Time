@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import apiRoute from 'apiroute';
-import config   from 'config';
+import config from 'config';
 
 interface appContext {
     showTerminal: boolean;
     setShowTerminal: (show: boolean) => void;
     rootDir: string;
-    loadRootDir: ()      => Promise<void>;
+    loadRootDir: () => Promise<void>;
     checkIfFirstTime: () => Promise<boolean>;
     showAboutModal: boolean;
     setShowAboutModal: (show: boolean) => void;
@@ -19,19 +19,27 @@ const appstate = create<appContext>()((set, get) => ({
     rootDir: '',
     showAboutModal: false,
     setShowAboutModal: (show: boolean) => set({ showAboutModal: show }),
-    
+
     loadRootDir: async () => {
         if (get().rootDir.length > 0) return;
-        const port     = config.apiPort || 3000;
-        const response = await fetch(`http://localhost:${port}/${apiRoute.getRootPath}`);
-        const data     = await response.json();
-        set({ rootDir: data.path });
+        try {
+            const port = config.apiPort || 3000;
+            const response = await fetch(`http://localhost:${port}/${apiRoute.getRootPath}`);
+            const data = await response.json();
+            set({ rootDir: data.path });
+        } catch(err) {
+            
+        }
     },
     checkIfFirstTime: async () => {
-        const port     = config.apiPort || 3000;
-        const response = await fetch(`http://localhost:${port}/${apiRoute.firstRun}`);
-        const data     = await response.json();
-        return data.isFirstTime;
+        try {
+            const port = config.apiPort || 3000;
+            const response = await fetch(`http://localhost:${port}/${apiRoute.firstRun}`);
+            const data = await response.json();
+            return data.isFirstTime;
+        } catch (error) {
+            return false;
+        }
     }
 }));
 
