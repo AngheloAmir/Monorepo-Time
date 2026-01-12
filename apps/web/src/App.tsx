@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import Flash from './contents/Flash';
 import Loading from './contents/_Loading';
 import Turborepo from './contents/Turborepo';
-import CRUDTester from './contents/CRUDTester';
+import CRUDTester from './contents/CrudTester';
 
 function App() {
     const currentPage      = useNavState.use.currentPage();

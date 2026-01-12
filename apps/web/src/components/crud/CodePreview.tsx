@@ -102,27 +102,37 @@ export default function CodePreview() {
     if (!isCodePreviewOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-            <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90%] flex flex-col">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-md animate-fade-in">
+             {/* Gradient Background Border */}
+             <div className="absolute inset-0 bg-transparent pointer-events-none"></div>
+             
+            <div className="relative bg-[#0A0A0A] border border-gray-800 rounded-2xl shadow-2xl w-[900px] max-h-[90vh] flex flex-col overflow-hidden">
+                {/* Neon Glow */}
+                 <div className="absolute inset-0 bg-blue-500/5 pointer-events-none"></div>
+
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800 rounded-t-lg">
-                    <div className="flex items-center gap-2">
-                        <i className="fas fa-code text-blue-400"></i>
-                        <h3 className="text-white font-bold text-lg">Code Preview</h3>
-                    </div>
-                    <button onClick={() => setIsCodePreviewOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-800 bg-[#0A0A0A] relative z-10">
+                    <h3 className="font-bold text-white text-xl flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                            <i className="fas fa-code"></i>
+                        </div>
+                        Code Preview
+                    </h3>
+                    <button onClick={() => setIsCodePreviewOpen(false)} className="text-gray-500 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5">
                         <i className="fas fa-times text-lg"></i>
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-auto p-4 custom-scrollbar bg-gray-950">
-                    <pre className="font-mono text-sm text-gray-300 whitespace-pre leading-relaxed" dangerouslySetInnerHTML={{ __html: codeHtml }}>
-                    </pre>
+                <div className="flex-1 p-0 overflow-hidden relative z-10 bg-[#050505]">
+                    <div className="h-full overflow-auto custom-scrollbar p-6">
+                        <pre className="font-mono text-sm text-gray-300 whitespace-pre leading-relaxed" dangerouslySetInnerHTML={{ __html: codeHtml }}>
+                        </pre>
+                    </div>
                 </div>
 
                 {/* Footer */}
-                <div className="px-4 py-3 border-t border-gray-700 bg-gray-800 flex justify-end rounded-b-lg">
+                <div className="px-8 py-5 border-t border-gray-800 bg-[#0A0A0A] flex justify-end items-center relative z-10 box-border">
                     <button 
                         onClick={() => {
                             const tempDiv = document.createElement('div');
@@ -131,10 +141,14 @@ export default function CodePreview() {
                             navigator.clipboard.writeText(text);
                             // Could show toast here
                         }}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium flex items-center gap-2 transition-colors"
+                        className="group relative px-6 py-2.5 rounded-xl text-sm font-bold text-white overflow-hidden transition-all hover:scale-105 shadow-lg shadow-blue-600/25"
                     >
-                        <i className="fas fa-copy"></i>
-                        Copy to Clipboard
+                         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+                         <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                         <span className="relative z-10 flex items-center gap-2">
+                             <i className="fas fa-copy"></i>
+                             Copy to Clipboard
+                         </span>
                     </button>
                 </div>
             </div>

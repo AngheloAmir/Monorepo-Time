@@ -10,6 +10,9 @@
           ".vercel/output/**"
         ]
      },
+     "dev": {
+        "dependsOn": ["^lint"]
+     },
     "lint": {
       "dependsOn": ["^lint"]
     },
