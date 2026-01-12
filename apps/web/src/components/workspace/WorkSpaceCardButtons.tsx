@@ -53,7 +53,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 icon="fas fa-check-circle"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'dev'}
-                bordered={ props.isRunningAs == 'dev' }
+                bg={ props.isRunningAs == 'dev' }
             />
 
             <Button
@@ -111,7 +111,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 icon="fas fa-code"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'crashed'}
-                bordered={true}
+                bg={true}
             />
         </div>
     )
