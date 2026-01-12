@@ -1,26 +1,9 @@
-const colorVariants = {
-    blueIndigo:     'from-blue-500 to-indigo-600',
-    emeraldTeal:    'from-emerald-500 to-teal-600',
-    yellowOrange:   'from-yellow-500 to-orange-600',
-    pinkRose:       'from-pink-500 to-rose-600',
-    gray:           'from-gray-500 to-gray-600',
-    red:            'from-red-500 to-red-600',
-    skyBlue:        'from-blue-400 to-blue-500',
-    cyanBlue:       'from-cyan-500 to-blue-600',
-    darkRed:        'from-red-600 to-red-700',
-    orangePurple:   'from-orange-500 to-purple-600',
-    purplePink:     'from-purple-500 to-pink-500',
-    indigoFuchsia:  'from-indigo-500 to-fuchsia-500',
-    tealLime:       'from-teal-500 to-lime-500',
-    bluePurple:     'from-blue-500 to-purple-600',
-} as const;
-
-export type ColorVariant = keyof typeof colorVariants;
+import { borderColorVariants, type BorderColorVariant } from "./_color";
 
 interface ButtonProps {
     name: string;
     description: string;
-    color?: ColorVariant | (string & {});
+    color?: BorderColorVariant | (string & {});
     icon?: string;
     disabled?: boolean;
     isNotRendered?: boolean;
@@ -42,11 +25,11 @@ export default function Button(props: ButtonProps) {
 }
 
 function ButtonSkeleton(props: ButtonProps) {
-    const defaultColor  = colorVariants.blueIndigo;
-    const gradientColor = 
-        props.color && (colorVariants as Record<string, string>)[props.color] ? 
-        (colorVariants as Record<string, string>)[props.color] : (props.color || defaultColor);
-
+    const defaultColor  = borderColorVariants.blueIndigo;
+    const borderColor = 
+        props.color && (borderColorVariants as Record<string, string>)[props.color] ? 
+        (borderColorVariants as Record<string, string>)[props.color] : (props.color || defaultColor);
+    
     return (
         <button
             key={props.name}
@@ -63,9 +46,9 @@ function ButtonSkeleton(props: ButtonProps) {
             {!props.disabled && (
                 <>
                     {/* Outer Glow */}
-                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${gradientColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
                     {/* Sharp Border Gradient */}
-                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${gradientColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 </>
             )}
 
@@ -77,14 +60,14 @@ function ButtonSkeleton(props: ButtonProps) {
             `}>
                 {/* Active Low-Opacity Background Overlay */}
                 {props.bg && (
-                    <div className={`absolute inset-0 bg-gradient-to-r ${gradientColor} opacity-20`} />
+                    <div className={`absolute inset-0 bg-gradient-to-r ${borderColor} opacity-20`} />
                 )}
 
                 {/* Icon Container */}
                 <div className={`
                     relative z-10
                     w-9 h-9 rounded-lg flex items-center justify-center shrink-0
-                    bg-gradient-to-br ${gradientColor} text-white shadow-lg
+                    bg-gradient-to-br ${borderColor} text-white shadow-lg
                     ${props.disabled ? 'opacity-40' : 'opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300'}
                 `}>
                     <i className={`fas ${props.icon || 'fa-circle'} text-sm drop-shadow-md`}></i>
