@@ -1,13 +1,9 @@
-import type { GitHistory } from "../GitControl";
+import useGitControlContext from "../../../_context/gitcontrol";
 
-interface RevertModalProps {
-    selectedCommit: GitHistory | null;
-    setSelectedCommit: (commit: GitHistory | null) => void;
-    handleRevert: () => void;
-}
-
-export default function RevertModal(props: RevertModalProps) {
-    const { selectedCommit, setSelectedCommit, handleRevert } = props;
+export default function RevertModal() {
+    const selectedCommit    = useGitControlContext.use.selectedCommit();
+    const setSelectedCommit = useGitControlContext.use.setSelectedCommit();
+    const handleRevert      = useGitControlContext.use.handleRevert();
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">

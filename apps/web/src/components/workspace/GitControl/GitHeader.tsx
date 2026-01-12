@@ -1,10 +1,9 @@
-interface GitHeaderProps {
-    loading: boolean;
-    fetchData: () => void;
-}
+import useGitControlContext from "../../../_context/gitcontrol";
 
-export default function GitHeader(props: GitHeaderProps) {
-    const { loading, fetchData } = props;
+export default function GitHeader() {
+    const loading   = useGitControlContext.use.loading();
+    const fetchData = useGitControlContext.use.fetchData();
+
     return (
         <header className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-white/5 backdrop-blur-sm">
             <div className="flex items-center gap-3">

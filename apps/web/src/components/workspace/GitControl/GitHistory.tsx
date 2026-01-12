@@ -1,13 +1,9 @@
-import type { GitHistory } from "../GitControl";
+import useGitControlContext from "../../../_context/gitcontrol";
 
-interface GitHistoryProps {
-    isLoading: boolean;
-    history: GitHistory[];
-    setSelectedCommit: (commit: GitHistory) => void;
-}
-
-export default function GitHistory( props :GitHistoryProps ) {
-    const { isLoading, history, setSelectedCommit } = props;
+export default function GitHistory() {
+    const isLoading         = useGitControlContext.use.loading();
+    const history           = useGitControlContext.use.history();
+    const setSelectedCommit = useGitControlContext.use.setSelectedCommit();
 
     return (
         <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">

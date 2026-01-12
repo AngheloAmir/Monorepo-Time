@@ -1,14 +1,11 @@
-interface GitInputProps {
-    branch: string;
-    commitMessage: string;
-    loading: boolean;
-    handleCommit: (e: React.FormEvent) => void;
-    setCommitMessage: (message: string) => void;
-}
+import useGitControlContext from "../../../_context/gitcontrol";
 
-
-export default function GitInput(props: GitInputProps) {
-    const { branch, commitMessage, loading, handleCommit, setCommitMessage } = props;
+export default function GitInput() {
+    const branch           = useGitControlContext.use.branch();
+    const commitMessage    = useGitControlContext.use.commitMessage();
+    const loading          = useGitControlContext.use.loading();
+    const handleCommit     = useGitControlContext.use.handleCommit();
+    const setCommitMessage = useGitControlContext.use.setCommitMessage();
     
     return (
         <div className="p-4 bg-[#0A0A0A] border-t border-white/5">
