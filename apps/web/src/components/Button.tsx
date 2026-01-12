@@ -4,10 +4,25 @@ interface ButtonProps {
     color?: string;
     icon?: string;
     disabled?: boolean;
+    isNotRendered?: boolean;
+    render?: boolean;
     onClick: () => void
 }
 
 export default function Button(props: ButtonProps) {
+    if (props.isNotRendered)
+        return null;
+
+    if (props.render != undefined) {
+        if (props.render == false)
+            return null;
+    }
+
+    return <ButtonSkeleton {...props} />
+}
+
+
+function ButtonSkeleton(props: ButtonProps) {
     const defaultColor = 'from-blue-500 to-purple-600';
     const gradientColor = props.color || defaultColor;
 
@@ -18,29 +33,26 @@ export default function Button(props: ButtonProps) {
             onClick={props.disabled ? undefined : () => props.onClick()}
             className={`
                 group relative w-full rounded p-[1px] transition-all duration-300
-                ${props.disabled 
-                    ? 'opacity-50 cursor-not-allowed grayscale' 
+                ${props.disabled
+                    ? 'opacity-70 cursor-not-allowed grayscale'
                     : 'cursor-pointer hover:-translate-y-1 hover:shadow-lg'}
             `}
         >
-            {/* Background Layer for Border (Default) */}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-gray-700 to-gray-800 transition-opacity duration-300" />
-
             {/* Background Layer for Border (Hover - Colored) */}
             {!props.disabled && (
                 <>
                     {/* Outer Glow */}
-                    <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${gradientColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${gradientColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
                     {/* Sharp Border Gradient */}
-                    <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${gradientColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${gradientColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 </>
             )}
 
             {/* Inner Content Container */}
             <div className={`
-                relative h-full w-full rounded-[10px] bg-[#0A0A0A] p-3 flex items-center gap-3 overflow-hidden
+                relative h-full w-full rounded-[10px] bg-[#212121] p-2 flex items-center gap-3 overflow-hidden
                 transition-colors duration-300
-                ${!props.disabled ? 'group-hover:bg-[#0A0A0A]/90' : ''}
+                ${!props.disabled ? 'group-hover:bg-[#212121]/70' : ''}
             `}>
                 {/* Icon Container */}
                 <div className={`
@@ -54,15 +66,16 @@ export default function Button(props: ButtonProps) {
                 {/* Text Content */}
                 <div className="flex flex-col min-w-0 text-left">
                     <span className={`
-                        font-bold text-sm truncate transition-colors duration-300
+                        font-bold text-md truncate transition-colors duration-300
                         ${props.disabled ? 'text-gray-500' : 'text-gray-300 group-hover:text-white'}
-                    `}>
+                    `}
+                    >
                         {props.name}
                     </span>
                     <span className={`
-                        text-[10px] font-mono truncate block w-full transition-opacity duration-300
+                        text-[12px] font-mono truncate block w-full transition-opacity duration-300
                         ${props.disabled ? 'text-gray-600' : 'text-gray-500 group-hover:text-gray-400'}
-                    `}>
+                    `} style={{ lineHeight: 1 }}>
                         {props.description}
                     </span>
                 </div>
