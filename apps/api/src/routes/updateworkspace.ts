@@ -29,7 +29,8 @@ router.post("/", async (req: Request, res: Response) => {
         } 
 
         const packageJson = await fs.readJson(packageJsonPath);
-        if (workspace.name) packageJson.name = workspace.name;
+        if (workspace.name)            packageJson.name            = workspace.name;
+        if (workspace.fontawesomeIcon) packageJson.fontawesomeIcon = workspace.fontawesomeIcon;
         if (workspace.description   != typeof null) packageJson.description = workspace.description;
         if (workspace.devCommand    != typeof null) packageJson.scripts.dev = workspace.devCommand;
         if (workspace.startCommand  != typeof null) packageJson.scripts.start = workspace.startCommand;
