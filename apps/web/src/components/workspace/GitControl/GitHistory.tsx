@@ -6,7 +6,7 @@ export default function GitHistory() {
     const setSelectedCommit = useGitControlContext.use.setSelectedCommit();
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-2">
                     <i className="fas fa-circle-notch fa-spin"></i>
@@ -17,13 +17,18 @@ export default function GitHistory() {
                     <button
                         key={item.hash}
                         onClick={() => setSelectedCommit(item)}
-                        className="w-full text-left group flex flex-col gap-1 p-3 rounded-lg border border-white/5 bg-white/[0.02] hover:bg-white/[0.08] hover:border-blue-500/30 transition-all duration-200"
+                        className={`
+                            w-full text-left group flex flex-col gap-1 p-2
+                            rounded border border-white/5 opacity-70
+                            hover:opacity-100 bg-gradient-to-r hover:from-blue-500/50 hover:to-indigo-600/50
+                            transition-all duration-200
+                        `}
                     >
                         <div className="flex items-start justify-between gap-4">
-                            <span className="text-sm text-gray-200 font-medium line-clamp-1 group-hover:text-white">
+                            <span className="text-sm text-white font-medium ">
                                 {item.message}
                             </span>
-                            <span className="text-[10px] font-mono text-gray-500 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
+                            <span className="text-[12px] font-mono text-white px-1.5 py-0.5 border border-white/5">
                                 {item.hash}
                             </span>
                         </div>

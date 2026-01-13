@@ -8,7 +8,7 @@ export default function GitInput() {
     const setCommitMessage = useGitControlContext.use.setCommitMessage();
     
     return (
-        <div className="p-4 bg-[#0A0A0A] border-t border-white/5">
+        <div className="">
             <div className="flex items-center gap-2 mb-3 px-1">
                 <i className="fas fa-code-branch text-xs text-purple-400"></i>
                 <span className="text-xs text-gray-400">Current Branch:</span>
@@ -23,15 +23,14 @@ export default function GitInput() {
                     value={commitMessage}
                     onChange={(e) => setCommitMessage(e.target.value)}
                     placeholder="Commit message & push..."
-                    className="flex-1 bg-[#1A1A1A] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
+                    className="flex-1 border border-white/10 rounded px-2 py-1 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
                 />
                 <button
                     type="submit"
                     disabled={loading || !commitMessage.trim()}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-medium shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none"
+                    className="px-4 py-2 hover:bg-white/10 rounded opacity-60 hover:opacity-100 transition-all"
                 >
-                    <i className="fas fa-paper-plane mr-2"></i>
-                    Commit
+                    <i className="fas fa-paper-plane text-xl text-blue-500 "></i>
                 </button>
             </form>
         </div>

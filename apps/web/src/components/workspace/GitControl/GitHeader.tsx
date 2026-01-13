@@ -5,18 +5,18 @@ export default function GitHeader() {
     const fetchData = useGitControlContext.use.fetchData();
 
     return (
-        <header className="flex items-center justify-between px-5 py-4 border-b border-white/5 bg-white/5 backdrop-blur-sm">
+        <header className="flex items-center justify-between py-1 px-4 ">
             <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
                     <i className="fab fa-git-alt text-white text-sm"></i>
                 </div>
-                <h2 className="text-white font-bold tracking-tight">
+                <h2 className="font-bold tracking-tight opacity-80">
                     Git Workflow Helper
                 </h2>
             </div>
             <button
                 onClick={fetchData}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all ${loading ? "animate-spin" : ""}`}
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all ${loading ? "animate-spin" : ""}`}
                 title="Refresh"
             >
                 <i className="fas fa-sync-alt text-xs"></i>

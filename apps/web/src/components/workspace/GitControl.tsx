@@ -15,8 +15,8 @@ export default function GitControl() {
 
     return (
         <>
-            <div className="w-full h-full p-[1px] rounded-xl bg-gradient-to-br from-blue-600/30 to-purple-600/30">
-                <div className="flex flex-col w-full h-full bg-[#09090b] rounded-xl overflow-hidden">
+            <div className="w-full h-full">
+                <div className="flex flex-col w-full h-full overflow-hidden">
                     <GitHeader />
                     <GitHistory />
                     <GitInput />

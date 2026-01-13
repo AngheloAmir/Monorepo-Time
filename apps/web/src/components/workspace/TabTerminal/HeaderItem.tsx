@@ -33,7 +33,7 @@ export default function HeaderItem(props: HeaderItemProps) {
         <div
             onClick={() => setActiveTerminal(props.workspace.info.name)}
             className={`
-                group relative flex items-center justify-between w-48 h-10 px-3 
+                group relative flex items-center justify-between w-48 w-7 px-3 
                 cursor-pointer transition-all duration-300 select-none
                 rounded-t-md
                 ${isActive 

@@ -300,10 +300,11 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
         // Initialize xterm
         const term = new Terminal({
             cursorBlink: true,
+            allowTransparency: true,
             fontFamily: 'Menlo, Monaco, "Courier New", monospace',
             fontSize: 15,
             theme: {
-                background: '#111827', // matching bg-gray-900 roughly
+                background: '#00000000', // transparent
                 foreground: '#f3f4f6',
                 cursor: '#ffffff',
                 selectionBackground: '#374151'
@@ -361,6 +362,6 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
     }, []);
 
     return (
-        <div className="h-full w-full overflow-hidden bg-gray-900 p-1" ref={divRef} />
+        <div className="h-full w-full overflow-hidden bg-transparent p-1" ref={divRef} />
     );
 });
