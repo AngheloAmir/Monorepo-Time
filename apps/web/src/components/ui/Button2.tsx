@@ -12,7 +12,7 @@ interface ButtonProps {
     onClick: () => void;
 }
 
-export default function Button(props: ButtonProps) {
+export default function ButtonNeon(props: ButtonProps) {
     if (props.isNotRendered)
         return null;
 
@@ -21,10 +21,10 @@ export default function Button(props: ButtonProps) {
             return null;
     }
 
-    return <ButtonSkeleton {...props} />
+    return <Button2 {...props} />
 }
 
-function ButtonSkeleton(props: ButtonProps) {
+function Button2(props: ButtonProps) {
     const defaultColor  = borderColorVariants.blueIndigo;
     const borderColor = 
         props.color && (borderColorVariants as Record<string, string>)[props.color] ? 
@@ -54,7 +54,7 @@ function ButtonSkeleton(props: ButtonProps) {
 
             {/* Inner Content Container */}
             <div className={`
-                relative h-full w-full rounded bg-[#212121] p-2 flex items-center gap-3 overflow-hidden
+                relative h-full w-full rounded bg-[#0A0A0A]/80 p-2 flex items-center gap-3 overflow-hidden
                 transition-colors duration-300
                 ${!props.disabled && !props.bg ? 'group-hover:bg-[#212121]/70' : ''}
             `}>

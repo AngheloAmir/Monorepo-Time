@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "../components/ui/Button";
+import Button2 from "../components/ui/Button2";
 import InteractiveTerminal, { type InteractiveTerminalRef } from "../components/InteractiveTerminal";
 import useAppState from "../_context/app";
 import useModal from "../modal/modals";
@@ -88,7 +88,7 @@ export default function Turborepo(props: TurborepoProps) {
             <div className="w-[500px] flex-none h-full flex flex-col align-center mt-8">
                 <div className="grid grid-cols-2 gap-3">
                     {commands.map((c) => (
-                        <Button
+                        <Button2
                             key={c.label}
                             onClick={() => handleCommand(c.cmd)}
                             name={c.label}

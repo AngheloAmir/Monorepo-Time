@@ -917,6 +917,7 @@ router7.post("/", async (req, res) => {
     }
     const packageJson = await import_fs_extra4.default.readJson(packageJsonPath);
     if (workspace.name) packageJson.name = workspace.name;
+    if (workspace.fontawesomeIcon) packageJson.fontawesomeIcon = workspace.fontawesomeIcon;
     if (workspace.description != "object") packageJson.description = workspace.description;
     if (workspace.devCommand != "object") packageJson.scripts.dev = workspace.devCommand;
     if (workspace.startCommand != "object") packageJson.scripts.start = workspace.startCommand;

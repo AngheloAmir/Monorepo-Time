@@ -24,7 +24,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 name={"Loading"}
                 description={"..."}
                 color="blueIndigo"
-                icon="fas fa-check-circle"
+                icon="fas fa-spinner animate-spin"
                 disabled={true}
                 render={loading}
             />
