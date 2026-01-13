@@ -8,6 +8,7 @@ import config from 'config';
 import open from 'open';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import net from 'net';
 
 //routers
 import tester            from './routes/tester';
@@ -28,7 +29,7 @@ import notesRoute        from './routes/notes';
 import crudTestRoute     from './routes/crudtest';
 import gitControlHelper  from './routes/gitControlHelper';
 
-const app = express();
+const app  = express();
 const port = config.apiPort;
 
 app.use(cors({
@@ -76,9 +77,37 @@ runCmdDevSocket( io );
 interactiveTerminalSocket( io );
 
 //=============================================================================
-httpServer.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-  //open(`http://localhost:${port}`);
+// Helper to find an available port
+const findAvailablePort = (startPort: number): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on('error', (err: any) => {
+      if (err.code === 'EADDRINUSE') {
+        // Port is in use, try the next one
+        resolve(findAvailablePort(startPort + 1));
+      } else {
+        reject(err);
+      }
+    });
+    server.listen(startPort, () => {
+      server.close(() => {
+        // Port is available
+        resolve(startPort);
+      });
+    });
+  });
+};
+
+// Start the server with a free port
+findAvailablePort(port).then((availablePort) => {
+  httpServer.listen(availablePort, () => {
+    console.log(`Server running at http://localhost:${availablePort}`);
+    //open(`http://localhost:${availablePort}`);
+  });
+}).catch((err) => {
+  console.error("Failed to find an available port:", err);
+  process.exit(1);
 });
 
 export { app, io, httpServer };

@@ -123,6 +123,7 @@ var config_default = config;
 // src/index.ts
 var import_http = require("http");
 var import_socket = require("socket.io");
+var import_net = __toESM(require("net"));
 
 // src/routes/tester.ts
 var import_express = require("express");
@@ -1477,8 +1478,31 @@ var io = new import_socket.Server(httpServer, {
 });
 runCmdDevSocket(io);
 interactiveTerminalSocket(io);
-httpServer.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+var findAvailablePort = (startPort) => {
+  return new Promise((resolve, reject) => {
+    const server = import_net.default.createServer();
+    server.unref();
+    server.on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        resolve(findAvailablePort(startPort + 1));
+      } else {
+        reject(err);
+      }
+    });
+    server.listen(startPort, () => {
+      server.close(() => {
+        resolve(startPort);
+      });
+    });
+  });
+};
+findAvailablePort(port).then((availablePort) => {
+  httpServer.listen(availablePort, () => {
+    console.log(`Server running at http://localhost:${availablePort}`);
+  });
+}).catch((err) => {
+  console.error("Failed to find an available port:", err);
+  process.exit(1);
 });
 var index_default = app;
 // Annotate the CommonJS export names for ESM import in node:
