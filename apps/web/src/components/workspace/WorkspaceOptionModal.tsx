@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import useWorkspaceState from "../../_context/workspace";
 import { type WorkspaceInfo } from "types";
 import InputField from "../ui/InputField";
-import ModalHeader from "./ModalHeader";
-import ModalBody from "./ModalBody";
+import ModalHeader from "../ui/ModalHeader";
+import ModalBody from "../ui/ModalBody";
 
 export default function WorkspaceOptionModal() {
     const activeWorkspaceOptionModal = useWorkspaceState.use.activeWorkspaceOptionModal();
@@ -123,7 +123,7 @@ export default function WorkspaceOptionModal() {
                 </div>
             </div>
 
-            <footer className="p-2 border-t border-gray-600 flex justify-end gap-4">
+            <footer className="p-2 px-6 flex justify-end gap-4">
                 <button 
                     onClick={close} 
                     className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden"

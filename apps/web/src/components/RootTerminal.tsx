@@ -1,6 +1,6 @@
 import {useEffect, useRef } from "react";
-import ModalBody from "./workspace/ModalBody";
-import ModalHeader from "./workspace/ModalHeader";
+import ModalBody from "./ui/ModalBody";
+import ModalHeader from "./ui/ModalHeader";
 import useAppState from "../_context/app";
 
 import InteractiveTerminal, { type InteractiveTerminalRef } from "./InteractiveTerminal";
@@ -39,7 +39,7 @@ export default function RootTerminal() {
                 icon="fas fa-terminal text-blue-500 text-xl"
             />
             
-            <div className="flex-1 overflow-hidden p-2 bg-gray-900">
+            <div className="flex-1 overflow-hidden p-2">
                 <InteractiveTerminal 
                     ref={terminalRef}
                     isInteractive={true}

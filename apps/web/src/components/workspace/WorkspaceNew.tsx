@@ -5,8 +5,8 @@ import SelectField from "../SelectField";
 import { useEffect, useState } from "react";
 import config from "config";
 import apiRoute from "apiroute";
-import ModalHeader from "./ModalHeader";
-import ModalBody from "./ModalBody";
+import ModalHeader from "../ui/ModalHeader";
+import ModalBody from "../ui/ModalBody";
 
 const clearInfo: WorkspaceInfo = {
     name: '', path: '', fontawesomeIcon: '', description: '', devCommand: '', startCommand: '', stopCommand: '', buildCommand: '', cleanCommand: '', lintCommand: '', testCommand: '',
@@ -172,7 +172,7 @@ export default function WorkspaceNew() {
                 </div>
             </div>
 
-            <footer className="p-2 border-t border-gray-600 flex justify-end gap-4">
+            <footer className="p-2 px-6 flex justify-end gap-4">
                 <button 
                     onClick={close} 
                     className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden"
