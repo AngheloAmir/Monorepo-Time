@@ -75,7 +75,7 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
             });
             
             set({ commitMessage: "" });
-            set({ loading: false });
+            set({ loading: true });
             await get().fetchData();
 
         } catch (error) {
