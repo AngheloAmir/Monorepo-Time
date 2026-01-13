@@ -15,6 +15,7 @@ interface gitControlContext {
     branch: string;
     commitMessage: string;
     selectedCommit: GitHistory | null;
+    commitLoading: boolean;
 
     setLoading: (loading: boolean) => void;
     setCommitMessage: (message: string) => void;
@@ -31,7 +32,8 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
     branch: "",
     commitMessage: "",
     selectedCommit: null,
-
+    commitLoading: false,
+    
     setLoading: (loading) => set({ loading }),
     setCommitMessage: (message) => set({ commitMessage: message }),
     setSelectedCommit: (commit) => set({ selectedCommit: commit }),
@@ -63,19 +65,24 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
         const { commitMessage } = get();
         if (!commitMessage.trim()) return;
 
-        set({ loading: true });
+        set({ commitLoading: true });
+
         try {
             await fetch(`http://localhost:${config.apiPort}/${apiRoute.gitControl}/push`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: commitMessage }),
             });
+            
             set({ commitMessage: "" });
+            set({ loading: false });
             await get().fetchData();
+
         } catch (error) {
             console.error("Failed to commit and push", error);
             alert("Failed to commit and push");
         } finally {
+            set({ commitLoading: false });
             set({ loading: false });
         }
     },
