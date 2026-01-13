@@ -9,11 +9,12 @@ export default function GitInput() {
     
     return (
         <div className="">
-            <div className="flex items-center gap-2 mb-3 px-1">
-                <i className="fas fa-code-branch text-xs text-purple-400"></i>
-                <span className="text-xs text-gray-400">Current Branch:</span>
-                <span className="text-xs font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
-                    {branch || "..."}
+            <div className="flex items-center gap-2 my-1 px-1">
+                <span className="text-xs font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                    Commiting to branch:
+                    <span className="mx-1 text-blue-500">
+                        {branch || "..."}
+                    </span>
                 </span>
             </div>
 
