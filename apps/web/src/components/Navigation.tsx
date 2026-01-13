@@ -5,7 +5,7 @@ export default function Navigation() {
     const navAction = useNavState.use.action();
 
     return (
-        <nav id="main-nav" className="w-16 h-full flex flex-col items-center py-4 bg-black/40 backdrop-blur-md border-r border-white/10 z-50">
+        <nav id="main-nav" className="w-16 h-full flex flex-col items-center py-4">
             <div className="flex flex-col gap-2 w-full px-2">
                 {NavigationalPages.map((item) => {
                     return (

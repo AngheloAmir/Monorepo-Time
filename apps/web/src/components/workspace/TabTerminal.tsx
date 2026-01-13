@@ -15,7 +15,7 @@ export default function TabTerminal() {
                 })}
             </header>
 
-            <div className="flex-1 overflow-hidden bg-gray-900 p-0 relative">
+            <div className="flex-1 overflow-hidden px-4 py-1 border-t border-gray-900/80 relative">
                 {(!activeTerminal || !workspace.some(w => w.info.name === activeTerminal && (w.isRunningAs === 'dev' || w.isRunningAs === 'start'))) && (
                     <div className="absolute inset-0 flex flex-col gap-4 items-center justify-center opacity-40 select-none pointer-events-none">
                         <div className="w-16 h-16  rounded-full flex items-center justify-center shadow-inner">

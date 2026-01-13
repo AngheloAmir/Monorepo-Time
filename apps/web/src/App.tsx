@@ -40,13 +40,13 @@ export default function App() {
         return <Flash onComplete={() => setIsFlashVisible(false)} />
 
     return (
-        <div className='w-screen h-screen overflow-hidden'>
+        <div className='w-screen h-screen overflow-hidden bg-black relative'>
             <Header />
 
             <div className="flex flex-1 overflow-hidden h-full w-full ">
                 <Navigation />
 
-                <main className="flex-1 relative overflow-hidden bg-black">
+                <main className="flex-1 relative overflow-hidden">
                     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                         <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[128px]"></div>
                         <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[128px]"></div>
