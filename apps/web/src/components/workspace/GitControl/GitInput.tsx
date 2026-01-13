@@ -28,13 +28,25 @@ export default function GitInput() {
                     placeholder="Commit message & push"
                     className="flex-1 border border-white/10 rounded px-2 py-1 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
                 />
-                <button
-                    type="submit"
-                    disabled={loading || commitLoading || !commitMessage.trim()}
-                    className="px-4 py-2 hover:bg-white/10 rounded opacity-60 hover:opacity-100 transition-all"
-                >
-                    <i className="fas fa-paper-plane text-xl text-blue-500 "></i>
-                </button>
+                {
+                    commitLoading ? (
+                        <button
+                            type="button"
+                            disabled
+                            className="px-4 py-2 hover:bg-white/10 rounded opacity-60 hover:opacity-100 transition-all"
+                        >
+                            <i className="fas fa-spinner animate-spin text-xl text-blue-500"></i>
+                        </button>
+                    ) : (
+                        <button
+                            type="submit"
+                            disabled={loading || commitLoading || !commitMessage.trim()}
+                            className="px-4 py-2 hover:bg-white/10 rounded opacity-60 hover:opacity-100 transition-all"
+                        >
+                            <i className="fas fa-paper-plane text-xl text-blue-500 "></i>
+                        </button>
+                    )
+                }
             </form>
         </div>
     );
