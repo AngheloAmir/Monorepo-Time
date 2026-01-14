@@ -3,12 +3,12 @@ import type { CrudCategory } from "types";
 const INITIAL_CRUD_DATA: CrudCategory[] = [
     {
         "category": "Internal CRUD Test",
-        "devurl": "http://localhost:3200",
+        "devurl": "http://localhost:3000",
         "produrl": "",
         "items": [
             {
                 "label": "Ping the Tool Server",
-                "route": "/pingme",
+                "route": "/ping",
                 "methods": "GET",
                 "description": "Ping the tool server to check if it is running.",
                 "sampleInput": "{}",

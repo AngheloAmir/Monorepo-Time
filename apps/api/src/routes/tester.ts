@@ -4,6 +4,7 @@ const router = Router();
 router.get("/ping", async (req: Request, res: Response) => {
     res.json({
         message: "pong",
+        time: Date.now(),
     });
 });
 

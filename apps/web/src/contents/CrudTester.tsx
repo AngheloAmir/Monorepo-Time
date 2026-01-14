@@ -8,7 +8,7 @@ interface CRUDTesterProps {
 export default function CRUDTester(props: CRUDTesterProps) {
 
     return (
-        <div className={`flex h-full w-full ${props.isVisible ? 'block' : 'hidden'}`}>
+        <div className={`flex h-full w-full pb-8 px-4 ${props.isVisible ? 'block' : 'hidden'}`}>
             <Sidebar />
             <div id="crud-main-content" className="flex-1 flex flex-col relative overflow-hidden">
                 <MainContent />
