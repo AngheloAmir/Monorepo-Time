@@ -86,7 +86,3 @@ export default function ButtonFloating(props: ButtonFloatingProps) {
             </button >
     )
 }
-
-//this one set the bg:
-// <div className="relative flex items-center p-[1px] rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-105">
-// <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
