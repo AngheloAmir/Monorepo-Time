@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState, } from 'react';
-import useCrudState from '../../_context/crud';
+import { useState, useEffect, useRef } from "react";
+import useCrudState from "../../_context/crud";
+import CodeExample from "./CodeExample";
 
 export default function CrudOutput() {
-    const output = useCrudState.use.output();  
+    const output = useCrudState.use.output();
     const contentRef    = useRef<HTMLPreElement>(null);
     const [content, setContent] = useState<string>('');
+    const [showCode, setShowCode] = useState(false);
 
     useEffect(() => {
         setValue(output);
@@ -95,9 +97,7 @@ export default function CrudOutput() {
                         <i className="fas fa-upload"></i>
                     </button>
                     <button
-                        onClick={() =>  {
-                            
-                        }}
+                        onClick={() => setShowCode(true)}
                         className="p-1 text-md text-blue-500 hover:text-blue-400 transition-colors flex items-center gap-1"
                     >
                         <i className="fas fa-code"></i>
@@ -109,9 +109,12 @@ export default function CrudOutput() {
                 <pre
                     ref={contentRef}
                     className="w-full text-gray-300 whitespace-pre-wrap leading-relaxed text-[14px] font-mono"
+                    style={{ lineHeight: "1.1" }}
                     dangerouslySetInnerHTML={{ __html: content }}
                 ></pre>
             </div>
+            
+            <CodeExample isOpen={showCode} onClose={() => setShowCode(false)} />
         </div>
     );
 }

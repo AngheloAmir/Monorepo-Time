@@ -17,7 +17,7 @@ const INITIAL_CRUD_DATA: CrudCategory[] = [
             },
             {
                 "label": "Check Post",
-                "route": "/pingpost",
+                "route": "/post",
                 "methods": "POST",
                 "description": "Send a POST request to check if it sending correctly",
                 "sampleInput": "{\n   \"data\": \"test\",\n   \"message\": \"test\"\n}",
@@ -28,11 +28,11 @@ const INITIAL_CRUD_DATA: CrudCategory[] = [
                         "content": "{\n    \"name\": \"Demo Customer\",\n    \"email\": \"demo@test.com\",\n    \"phone\": \"123456789\",\n    \"icon\": \"test icon\"\n}"
                     }
                 ],
-                "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
+                "expectedOutcome": "# Note \nYou should see the mirror of your inputs"
             },
             {
                 "label": "Check Stream",
-                "route": "/pingstream",
+                "route": "/stream",
                 "methods": "STREAM",
                 "description": "Send a stream request to check if it sending correctly",
                 "sampleInput": "{ }",
@@ -48,7 +48,7 @@ const INITIAL_CRUD_DATA: CrudCategory[] = [
                         "content": "{}"
                     }
                 ],
-                "expectedOutcome": "# Note \nYou should see the stream of words",
+                "expectedOutcome": "# Note \nYou should see the stream of words"
             }
         ]
     }

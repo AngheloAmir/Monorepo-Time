@@ -36,12 +36,15 @@ interface CrudContext {
     isFetching: boolean;
     executionTime: number;
     sendRequest: () => Promise<void>;
+    
+    setCrudData: (data: CrudCategory[]) => void;
 }
 
 const crudState = create<CrudContext>()((set, get) => ({
     crudData: INITIAL_CRUD_DATA,
-    currentCategoryIndex: 0,
-    currentCrudIndex: 0,
+    setCrudData: (data) => set({ crudData: data }),
+    currentCategoryIndex: -1,
+    currentCrudIndex: -1,
     useDevURL: true,
     devURL:  "http://localhost:3000",
     prodURL: "",
