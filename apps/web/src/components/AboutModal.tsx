@@ -36,11 +36,11 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                     </p>
 
                     {/* Footer / Links */}
-                    <div className="flex gap-4 text-sm">
+                    {/* <div className="flex gap-4 text-sm">
                         <a href="https://github.com/AngheloAmir/Monorepo-Time" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
                             <i className="fab fa-github"></i> Repository
                         </a>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             
