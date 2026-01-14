@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import useCrudState from '../../_context/crud';
+import useCrudState from '../../../_context/crud';
 import type { CrudCategory } from './types';
 
 export default function ManageCategories() {
