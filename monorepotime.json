@@ -41,12 +41,12 @@
                     "suggested": [
                         {
                             "name": "I Wandered Lonely as a Cloud",
-                            "urlparams": "?poem=I Wandered Lonely as a Cloud",
+                            "urlparams": "poem=I Wandered Lonely as a Cloud",
                             "content": "{}"
                         },
                         {
                             "name": "The Sun Has Long Been Set",
-                            "urlparams": "?poem=The Sun Has Long Been Set",
+                            "urlparams": "poem=The Sun Has Long Been Set",
                             "content": "{}"
                         }
                     ],

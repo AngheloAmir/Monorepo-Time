@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import useCrudState from "../../_context/crud";
 import type { CrudCategory } from "types";
+import ModalHeader from "../ui/ModalHeader";
+import ModalBody from "../ui/ModalBody";
+import InputField from "../ui/InputField";
 
 interface CategoryEditProps {
     isOpen: boolean;
@@ -38,7 +41,7 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
 
     const handleSave = () => {
         const newData = [...crudData];
-        
+
         if (categoryIndex === -1) {
             const newCategory: CrudCategory = {
                 category: categoryName,
@@ -55,7 +58,7 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
                 produrl: prodUrl
             };
         }
-        
+
         setCrudData(newData);
         onClose();
     };
@@ -63,7 +66,7 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
     const handleDelete = () => {
         const newData = [...crudData];
         newData.splice(categoryIndex, 1);
-        
+
         // Update selection state if needed
         if (categoryIndex === currentCategoryIndex) {
             setCurrentCategoryIndex(-1);
@@ -79,81 +82,73 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-[#111111] border border-white/10 rounded-xl w-full max-w-md flex flex-col">
-                <div className="flex items-center justify-between p-4 border-b border-white/5">
-                    <h3 className="text-lg font-bold text-white">
-                        {categoryIndex === -1 ? 'Add New Category' : 'Edit Category'}
-                    </h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
-                        <i className="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div className="p-6 space-y-4">
-                    {/* Category Name */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category Name</label>
-                        <input 
-                            type="text" 
-                            className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                            value={categoryName}
-                            onChange={(e) => setCategoryName(e.target.value)}
-                            placeholder="e.g., User Management"
-                        />
-                    </div>
+        <ModalBody>
+            <ModalHeader
+                title={categoryIndex === -1 ? 'Add New Category' : 'Edit Category'}
+                description={categoryIndex === -1 ? 'Add a new category' : 'Edit an existing category'}
+                icon={categoryIndex === -1 ? 'fas fa-plus' : 'fas fa-edit'}
+                close={onClose}
+            />
+            <div className="p-4 flex-1 overflow-y-auto text-md">
+                <div className="flex flex-col gap-4">
+                    <InputField
+                        label="Category"
+                        icon="fas fa-info"
+                        placeholder="Category Name"
+                        value={categoryName}
+                        onChange={(e) => {
+                            setCategoryName(e.target.value)
+                        }}
+                    />
 
-                    {/* Dev URL */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Dev URL</label>
-                        <input 
-                            type="text" 
-                            className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                    <div className="flex gap-4">
+                        <InputField
+                            label="Dev URL"
+                            icon="fas fa-info"
+                            placeholder="Dev URL"
                             value={devUrl}
                             onChange={(e) => setDevUrl(e.target.value)}
-                            placeholder="http://localhost:3000"
                         />
-                    </div>
-
-                    {/* Prod URL */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Prod URL</label>
-                        <input 
-                            type="text" 
-                            className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+                        <InputField
+                            label="Prod URL"
+                            icon="fas fa-info"
+                            placeholder="Prod URL"
                             value={prodUrl}
                             onChange={(e) => setProdUrl(e.target.value)}
-                            placeholder="https://api.example.com"
                         />
                     </div>
                 </div>
 
-                <div className="p-4 border-t border-white/5 flex justify-between gap-2">
-                    {categoryIndex !== -1 ? (
+                <footer className="mt-4 flex justify-between px-4">
+                    { categoryIndex !== -1 ? <button
+                        onClick={handleDelete}
+                        className="group relative px-6 py-2 rounded-lg font-medium text-sm text-red-400 hover:text-red-600 transition-colors overflow-hidden" >
+                        Delete
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </button> : <div></div> 
+                    }
+
+                    <div className="flex gap-6">
                         <button
-                            onClick={handleDelete}
-                            className="px-4 py-2 rounded-lg text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors font-medium"
-                        >
-                            Delete Category
-                        </button>
-                    ) : <div></div>}
-                    
-                    <div className="flex gap-2">
-                        <button 
                             onClick={onClose}
-                            className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                            Cancel
+                            className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden">
+                            <span className="relative z-10">Cancel</span>
+                            <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </button>
-                        <button 
+
+                        <button
                             onClick={handleSave}
-                            className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
-                        >
-                            Save
+                            className="group relative px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
+                            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
+                            <span className="relative z-10 flex items-center gap-2">
+                                <i className="fas fa-save"></i>
+                                Save
+                            </span>
                         </button>
                     </div>
-                </div>
+                </footer>
             </div>
-        </div>
-    );
+        </ModalBody>
+    )
 }

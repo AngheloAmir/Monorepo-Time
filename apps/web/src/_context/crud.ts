@@ -38,18 +38,18 @@ interface CrudContext {
     isFetching: boolean;
     executionTime: number;
     sendRequest: () => Promise<void>;
-    
+
     setCrudData: (data: CrudCategory[]) => void;
 }
 
 const crudState = create<CrudContext>()((set, get) => ({
-    noData:   true,
+    noData: true,
     crudData: [],
     setCrudData: (data) => set({ crudData: data }),
     currentCategoryIndex: -1,
     currentCrudIndex: -1,
     useDevURL: true,
-    devURL:  "http://localhost:3000",
+    devURL: "http://localhost:3000",
     prodURL: "",
     params: "",
 
@@ -98,15 +98,15 @@ example:
 
     loadCrudData: async () => {
         try {
-            const port     = config.apiPort || 3000;
+            const port = config.apiPort || 3000;
             const response = await fetch(`http://localhost:${port}/${apiRoute.crudTest}`);
-            
+
             if (!response.ok) {
                 set({ noData: true });
                 return;
             }
 
-            const data     = await response.json();
+            const data = await response.json();
             set({ crudData: data.crudtest, noData: false });
         } catch (error) {
             set({ noData: true });
@@ -146,12 +146,18 @@ example:
                     set((state) => ({ output: state.output + chunk }));
                 }
                 set({ isFetching: false, executionTime: Date.now() - startTime });
-            } catch (error) {
-                set({ output: JSON.stringify(error), isFetching: false, executionTime: Date.now() - startTime });
+            } catch (error :any) {
+                let str = "";
+                try {
+                    str = error.toString();
+                } catch (e) {
+                    str = "Error: " + e;
+                }
+                set({ output: str, isFetching: false, executionTime: Date.now() - startTime });
             }
             return;
         }
-        
+
         try {
             const options: RequestInit = {
                 method,
@@ -167,8 +173,13 @@ example:
 
             set({ output: data, isFetching: false, executionTime: Date.now() - startTime });
         } catch (error: any) {
-            console.error(error);
-            set({ output: error, isFetching: false, executionTime: Date.now() - startTime });
+            let str = "";
+            try {
+                str = error.toString();
+            } catch (e) {
+                str = "Error: " + e;
+            }
+            set({ output: str, isFetching: false, executionTime: Date.now() - startTime });
         }
     }
 }));

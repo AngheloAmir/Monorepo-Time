@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import useCrudState from "../../_context/crud";
 import type { CrudItem } from "types";
+import ModalBody from "../ui/ModalBody";
+import ModalHeader from "../ui/ModalHeader";
+import InputField from "../ui/InputField";
+import TextInput from "../ui/TextInput";
 
 interface CrudEditProps {
     isOpen: boolean;
@@ -62,13 +66,13 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
         };
 
         if (itemIndex === -1) {
-             if (!newData[categoryIndex].items) newData[categoryIndex].items = [];
-             newData[categoryIndex].items.push(newItem);
+            if (!newData[categoryIndex].items) newData[categoryIndex].items = [];
+            newData[categoryIndex].items.push(newItem);
         } else {
-             const existing = newData[categoryIndex].items[itemIndex];
-             newData[categoryIndex].items[itemIndex] = { ...existing, ...newItem };
+            const existing = newData[categoryIndex].items[itemIndex];
+            newData[categoryIndex].items[itemIndex] = { ...existing, ...newItem };
         }
-        
+
         setCrudData(newData);
         onClose();
     };
@@ -77,16 +81,16 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
         const newData = [...crudData];
         if (newData[categoryIndex] && newData[categoryIndex].items) {
             newData[categoryIndex].items.splice(itemIndex, 1);
-            
+
             // Update selection if needed and if we are in the same category
             if (categoryIndex === currentCategoryIndex) {
                 if (itemIndex === currentCrudIndex) {
                     setCurrentCrudIndex(-1);
                 } else if (itemIndex < currentCrudIndex) {
-                     setCurrentCrudIndex(currentCrudIndex - 1);
+                    setCurrentCrudIndex(currentCrudIndex - 1);
                 }
             }
-            
+
             setCrudData(newData);
             onClose();
         }
@@ -107,152 +111,146 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
         newSuggested.splice(index, 1);
         setSuggested(newSuggested);
     };
-    
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-[#111111] border border-white/10 rounded-xl w-full max-w-2xl flex flex-col max-h-[90vh]">
-                <div className="flex items-center justify-between p-4 border-b border-white/5">
-                    <h3 className="text-lg font-bold text-white">{itemIndex === -1 ? 'Add New Item' : 'Edit CRUD Item'}</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
-                        <i className="fas fa-times"></i>
-                    </button>
+        <ModalBody width="800px" >
+            <ModalHeader
+                title={itemIndex === -1 ? 'Add New Item' : 'Edit CRUD Item'}
+                description={itemIndex === -1 ? 'Add a new item' : 'Edit an existing item'}
+                icon={itemIndex === -1 ? 'fas fa-plus' : 'fas fa-edit'}
+                close={onClose}
+            />
+            <div className="p-4 flex-1 flex flex-col gap-3 max-h-[60vh] overflow-y-auto text-md">
+                <div className="flex gap-4">
+                    <InputField
+                        label="Label"
+                        icon="fas fa-info"
+                        placeholder="(optional) Description"
+                        value={label}
+                        onChange={(e) => setLabel(e.target.value)}
+                    />
+                    <InputField
+                        label="Description"
+                        icon="fas fa-info"
+                        placeholder="(optional) Description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
                 </div>
-                
-                <div className="p-6 overflow-y-auto space-y-4 custom-scrollbar">
-                    {/* Label */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Label</label>
-                        <input 
-                            type="text" 
-                            className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                            value={label}
-                            onChange={(e) => setLabel(e.target.value)}
-                        />
-                    </div>
+                <div className="flex gap-4">
+                    <InputField
+                        label="Route"
+                        icon="fas fa-info"
+                        placeholder="(optional) Description"
+                        value={route}
+                        onChange={(e) => setRoute(e.target.value)}
+                    />
+                    <InputField
+                        label="Method"
+                        icon="fas fa-info"
+                        placeholder="(optional) Description"
+                        value={method}
+                        onChange={(e) => setMethod(e.target.value)}
+                    />
+                </div>
+                <div className="flex gap-4">
+                    <TextInput
+                        label="Sample Input"
+                        placeholder="{}"
+                        value={sampleInput}
+                        onChange={(e) => setSampleInput(e.target.value)}
+                        rows={5}
+                    />
+                    <TextInput
+                        label="Expected Outcome"
+                        placeholder="{}"
+                        value={expectedOutcome}
+                        onChange={(e) => setExpectedOutcome(e.target.value)}
+                        rows={5}
+                    />
+                </div>
 
-                    <div className="grid grid-cols-3 gap-4">
-                         {/* Route */}
-                        <div className="col-span-2 flex flex-col gap-1">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Route</label>
-                            <input 
-                                type="text" 
-                                className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                value={route}
-                                onChange={(e) => setRoute(e.target.value)}
-                            />
-                        </div>
-                        {/* Method */}
-                        <div className="col-span-1 flex flex-col gap-1">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Method</label>
-                            <input 
-                                type="text" 
-                                className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
-                                value={method}
-                                onChange={(e) => setMethod(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Description</label>
-                        <textarea 
-                            className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors h-20 resize-none"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </div>
-
-                    {/* Sample Input */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Sample Input (JSON)</label>
-                        <textarea 
-                            className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-colors h-32 resize-none"
-                            value={sampleInput}
-                            onChange={(e) => setSampleInput(e.target.value)}
-                        />
-                    </div>
-
-                    {/* Expected Outcome */}
-                    <div className="flex flex-col gap-1">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Expected Outcome (Markdown)</label>
-                        <textarea 
-                            className="bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-blue-500 transition-colors h-32 resize-none"
-                            value={expectedOutcome}
-                            onChange={(e) => setExpectedOutcome(e.target.value)}
-                        />
-                    </div>
-                    
-                    {/* Suggested Presets */}
-                    <div className="flex flex-col gap-2 pt-4 border-t border-white/5">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Suggested Presets</label>
-                        <div className="space-y-3">
-                            {suggested.map((item, idx) => (
-                                <div key={idx} className="bg-white/5 rounded-lg p-3 border border-white/10 space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="text"
+                {/* Suggested Presets */}
+                <div className="flex flex-col gap-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Suggested Presets</label>
+                    <div className="space-y-3">
+                        {suggested.map((item, idx) => (
+                            <div key={idx} className="flex flex-row gap-3">
+                                <div className="w-[50%] flex flex-col gap-2">
+                                    <div className="flex flex-row gap-2">
+                                        <InputField
+                                            label="Preset Name"
+                                            icon="fas fa-info"
                                             placeholder="Preset Name"
-                                            className="flex-1 bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500"
                                             value={item.name}
                                             onChange={(e) => updateSuggestion(idx, 'name', e.target.value)}
                                         />
-                                        <input
-                                            type="text"
-                                            placeholder="URL Params"
-                                            className="flex-1 bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500"
-                                            value={item.urlparams}
-                                            onChange={(e) => updateSuggestion(idx, 'urlparams', e.target.value)}
-                                        />
                                         <button onClick={() => deleteSuggestion(idx)} className="text-red-400 hover:text-red-300 px-2">
-                                            <i className="fas fa-trash"></i>
+                                            <i className="pt-6 fas fa-trash"></i>
                                         </button>
                                     </div>
-                                    <textarea
-                                        placeholder="Body Content (JSON)"
-                                        className="w-full bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white font-mono focus:outline-none focus:border-blue-500 h-16 resize-none"
-                                        value={item.content}
-                                        onChange={(e) => updateSuggestion(idx, 'content', e.target.value)}
+
+                                    <InputField
+                                        label="URL Params"
+                                        icon="fas fa-info"
+                                        placeholder="URL Params"
+                                        value={item.urlparams}
+                                        onChange={(e) => updateSuggestion(idx, 'urlparams', e.target.value)}
                                     />
                                 </div>
-                            ))}
-                            <button
-                                onClick={addSuggestion}
-                                className="w-full py-2 bg-white/5 border border-dashed border-white/20 rounded-lg text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                            >
-                                + Add Preset
-                            </button>
-                        </div>
+                                <div className="w-[50%]">
+                                    <TextInput
+                                        label="Body Content"
+                                        placeholder="{}"
+                                        value={item.content}
+                                        onChange={(e) => updateSuggestion(idx, 'content', e.target.value)}
+                                        rows={5}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                        <button
+                            onClick={addSuggestion}
+                            className="w-full py-2 bg-white/5 border border-dashed border-white/20 rounded-lg text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                            + Add Preset
+                        </button>
                     </div>
                 </div>
 
-                <div className="p-4 border-t border-white/5 flex justify-between gap-2">
-                    {itemIndex !== -1 ? (
-                        <button
-                            onClick={handleDelete}
-                            className="px-4 py-2 rounded-lg text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors font-medium"
-                        >
-                            Delete Item
-                        </button>
-                    ) : <div></div>}
-                    <div className="flex gap-2">
-                        <button 
-                            onClick={onClose}
-                            className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                            Cancel
-                        </button>
-                        <button 
-                            onClick={handleSave}
-                            className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
-                        >
-                            Save Changes
-                        </button>
-                    </div>
-                </div>
             </div>
-        </div>
-    );
+
+            <footer className="mt-2 mb-4 flex justify-between px-4">
+                {categoryIndex !== -1 ? <button
+                    onClick={handleDelete}
+                    className="group relative px-6 py-2 rounded-lg font-medium text-sm text-red-400 hover:text-red-600 transition-colors overflow-hidden" >
+                    Delete
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </button> : <div></div>
+                }
+
+                <div className="flex gap-6">
+                    <button
+                        onClick={onClose}
+                        className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden">
+                        <span className="relative z-10">Cancel</span>
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    </button>
+
+                    <button
+                        onClick={handleSave}
+                        className="group relative px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
+                        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
+                        <span className="relative z-10 flex items-center gap-2">
+                            <i className="fas fa-save"></i>
+                            Save
+                        </span>
+                    </button>
+                </div>
+            </footer>
+        </ModalBody>
+    )
 }

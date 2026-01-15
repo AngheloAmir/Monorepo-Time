@@ -28,14 +28,13 @@ export default function ModalTerminal() {
 
     if (!showNewTerminalWindow) return null;
     return (
-        <ModalBody>
+        <ModalBody width="700px">
             <ModalHeader
                 close={close}
                 title={showNewTerminalWindow.name || ""}
                 description={showNewTerminalWindow.description || ""}
                 icon="fas fa-terminal text-blue-500 text-xl"
             />
-
             <div className="flex-1 overflow-hidden p-2">
                 <InteractiveTerminal
                     ref={terminalRef}

@@ -31,20 +31,18 @@ export default function RootTerminal() {
 
     if (!showTerminal) return null;
     return (
-        <ModalBody>
+       <ModalBody width="700px">
              <ModalHeader
                 close={close}
                 title={"Root Terminal"}
                 description={"Execute commands in the project root"}
                 icon="fas fa-terminal text-blue-500 text-xl"
             />
-            
             <div className="flex-1 overflow-hidden p-2">
                 <InteractiveTerminal 
                     ref={terminalRef}
                     isInteractive={true}
                     className="h-full"
-                    //onExit={() => setShowTerminal(false)}
                 />
             </div>
         </ModalBody>

@@ -1,13 +1,11 @@
 interface ModalBodyProps {
     children: React.ReactNode | null;
-    height?: string;
     width?:  string;
 }
 
 export default function ModalBody( props: ModalBodyProps ) {
-    const { children, height, width } = props;
+    const { children, width } = props;
     const modalWidth  = width  || "650px";
-    const modalHeight = height || "80vh";
 
     return (
         <>
@@ -19,7 +17,6 @@ export default function ModalBody( props: ModalBodyProps ) {
                         pointer-events-auto
                         relative flex flex-col
                         w-[95%] md:w-[${modalWidth}]
-                        h-[${modalHeight}]
                         rounded-2xl overflow-hidden 
                         shadow-2xl shadow-blue-900/20 
                         animate-fade-in-up

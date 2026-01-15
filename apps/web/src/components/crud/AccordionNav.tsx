@@ -17,8 +17,8 @@ export default function AccordionNav() {
     const setExpectedOutput = useCrudState.use.setExpectedOutput();
     const setOutput = useCrudState.use.setOutput();
 
-    const [openCategories, setOpenCategories] = useState<Record<number, boolean>>({ 0: true });
-    const [editModal, setEditModal] = useState({ isOpen: false, categoryIndex: 0, itemIndex: 0 });
+    const [openCategories, setOpenCategories] = useState<Record<number, boolean>>({ 0: false });
+    const [editModal, setEditModal]           = useState({ isOpen: false, categoryIndex: 0, itemIndex: 0 });
     const [categoryEditModal, setCategoryEditModal] = useState({ isOpen: false, categoryIndex: -1 });
 
     const toggleCategory = (index: number) => {
@@ -108,7 +108,7 @@ export default function AccordionNav() {
                             })}
                             <button
                                 onClick={() => setEditModal({ isOpen: true, categoryIndex: catIndex, itemIndex: -1 })}
-                                className="w-full py-1 mt-1 text-xs text-gray-500 hover:text-white border border-dashed border-gray-700 hover:border-gray-500 rounded-lg transition-all flex items-center justify-center gap-2"
+                                className="w-full py-1 mt-1 text-xs text-gray-500 hover:text-white transition-all flex gap-2"
                             >
                                 <i className="fas fa-plus"></i>
                                 Add Route
@@ -120,7 +120,7 @@ export default function AccordionNav() {
 
             <button
                 onClick={() => setCategoryEditModal({ isOpen: true, categoryIndex: -1 })}
-                className="w-full py-3 border border-dashed border-white/10 hover:border-white/20 rounded-xl text-xs font-bold text-gray-500 hover:text-white transition-all flex items-center justify-center gap-2 group"
+                className="w-full py-2 hover:border-white/20 text-xs font-bold text-gray-500 hover:text-white transition-all flex gap-2"
             >
                 <i className="fas fa-folder-plus group-hover:scale-110 transition-transform"></i>
                 Add Category
