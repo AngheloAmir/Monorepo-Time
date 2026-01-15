@@ -26,6 +26,10 @@ This will:
 2. Open the dashboard in your default browser.
 3. Allow you to interact with your workspaces immediately.
 
+## Demo
+![Architecture](./preview1.jpg)
+![Architecture](./preview2.jpg)
+
 ## License
 
 ISC © [Anghelo Amir](https://github.com/AngheloAmir)

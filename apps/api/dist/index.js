@@ -37,9 +37,9 @@ __export(index_exports, {
   io: () => io
 });
 module.exports = __toCommonJS(index_exports);
-var import_express17 = __toESM(require("express"));
+var import_express18 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
-var import_path13 = __toESM(require("path"));
+var import_path14 = __toESM(require("path"));
 
 // ../../packages/api/index.ts
 var apiRoute = {
@@ -110,7 +110,11 @@ var apiRoute = {
    * post revert
    * post push
    */
-  gitControl: "gitcontrol"
+  gitControl: "gitcontrol",
+  /** Initialize monorepotime.json
+   * get request returns { success: boolean }
+   */
+  initMonorepoTime: "initmtime"
 };
 var api_default = apiRoute;
 
@@ -125,7 +129,7 @@ var import_http = require("http");
 var import_socket = require("socket.io");
 var import_net = __toESM(require("net"));
 
-// src/routes/tester.ts
+// src/routes/_tester.ts
 var import_express = require("express");
 var router = (0, import_express.Router)();
 router.get("/ping", async (req, res) => {
@@ -775,7 +779,7 @@ function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
     socket.on("terminal:start", (data) => {
       var _a, _b;
-      const { path: path14, command, workspaceName } = data;
+      const { path: path15, command, workspaceName } = data;
       stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
@@ -789,7 +793,7 @@ function interactiveTerminalSocket(io2) {
           const baseCMD = command.split(" ")[0];
           const args = command.split(" ").slice(1);
           child = (0, import_child_process3.spawn)(baseCMD, args, {
-            cwd: path14,
+            cwd: path15,
             env,
             shell: true,
             stdio: ["pipe", "pipe", "pipe"]
@@ -817,7 +821,7 @@ except Exception as e:
     sys.exit(1)
 `;
           child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
-            cwd: path14,
+            cwd: path15,
             env,
             stdio: ["pipe", "pipe", "pipe"]
           });
@@ -912,12 +916,12 @@ router7.post("/", async (req, res) => {
       res.status(409).send({ error: `Workspace with name "${workspace.name}" already exists.` });
       return;
     }
-    const packageJsonPath = import_path5.default.join(workspace.path, "package.json");
-    if (!import_fs_extra4.default.existsSync(packageJsonPath)) {
+    const packageJsonPath2 = import_path5.default.join(workspace.path, "package.json");
+    if (!import_fs_extra4.default.existsSync(packageJsonPath2)) {
       res.status(404).send({ error: "package.json not found in workspace path" });
       return;
     }
-    const packageJson = await import_fs_extra4.default.readJson(packageJsonPath);
+    const packageJson = await import_fs_extra4.default.readJson(packageJsonPath2);
     if (workspace.name) packageJson.name = workspace.name;
     if (workspace.fontawesomeIcon) packageJson.fontawesomeIcon = workspace.fontawesomeIcon;
     if (workspace.description != "object") packageJson.description = workspace.description;
@@ -928,7 +932,7 @@ router7.post("/", async (req, res) => {
     if (workspace.lintCommand != "object") packageJson.scripts.lint = workspace.lintCommand;
     if (workspace.stopCommand != "object") packageJson.scripts.stop = workspace.stopCommand;
     if (workspace.cleanCommand != "object") packageJson.scripts.clean = workspace.cleanCommand;
-    await import_fs_extra4.default.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+    await import_fs_extra4.default.writeJson(packageJsonPath2, packageJson, { spaces: 2 });
     res.send({ success: true, message: "Workspace updated successfully" });
   } catch (error) {
     console.error("Update workspace error:", error);
@@ -1075,72 +1079,17 @@ var import_fs_extra7 = __toESM(require("fs-extra"));
 var import_path8 = __toESM(require("path"));
 var import_child_process4 = require("child_process");
 var router9 = (0, import_express11.Router)();
+var packageJsonPath = import_path8.default.join(ROOT3, "package.json");
+var turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
+var SCAFFOLD_DIR = import_path8.default.join(__dirname, "scaffold");
 router9.get("/", async (req, res) => {
-  var _a;
   try {
-    const packageJsonPath = import_path8.default.join(ROOT3, "package.json");
-    const turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
-    if (!import_fs_extra7.default.existsSync(packageJsonPath)) {
-      res.status(400).json({ error: "package.json not found in root" });
-      return;
-    }
-    const pkg = import_fs_extra7.default.readJsonSync(packageJsonPath);
-    let pkgChanged = false;
-    if (!pkg.workspaces) {
-      pkg.workspaces = ["apps/*", "packages/*"];
-      pkgChanged = true;
-    }
-    if (pkgChanged) {
-      import_fs_extra7.default.writeJsonSync(packageJsonPath, pkg, { spaces: 2 });
-    }
-    await import_fs_extra7.default.ensureDir(import_path8.default.join(ROOT3, "apps"));
-    await import_fs_extra7.default.ensureDir(import_path8.default.join(ROOT3, "packages"));
-    const SCAFFOLD_DIR = import_path8.default.join(__dirname, "scaffold");
-    const typesPackagePath = import_path8.default.join(ROOT3, "packages", "types");
-    if (!import_fs_extra7.default.existsSync(typesPackagePath)) {
-      await import_fs_extra7.default.ensureDir(typesPackagePath);
-      try {
-        const indexContent = await import_fs_extra7.default.readFile(import_path8.default.join(SCAFFOLD_DIR, "index.ts"), "utf-8");
-        const packageJsonContent = await import_fs_extra7.default.readJson(import_path8.default.join(SCAFFOLD_DIR, "package.json"));
-        await import_fs_extra7.default.writeFile(import_path8.default.join(typesPackagePath, "index.ts"), indexContent);
-        await import_fs_extra7.default.writeJson(import_path8.default.join(typesPackagePath, "package.json"), packageJsonContent, { spaces: 4 });
-      } catch (err) {
-        console.error("Error reading scaffold files for types package:", err);
-      }
-    }
-    const monorepoTimePath3 = import_path8.default.join(ROOT3, "monorepotime.json");
-    if (!import_fs_extra7.default.existsSync(monorepoTimePath3)) {
-      try {
-        const defaultMonorepoTime = await import_fs_extra7.default.readJson(import_path8.default.join(SCAFFOLD_DIR, "monorepotime.json"));
-        import_fs_extra7.default.writeJsonSync(monorepoTimePath3, defaultMonorepoTime, { spaces: 4 });
-      } catch (err) {
-        console.error("Error reading scaffold file for monorepotime.json:", err);
-      }
-    }
-    if (!import_fs_extra7.default.existsSync(turboJsonPath) || !((_a = pkg.devDependencies) == null ? void 0 : _a.turbo)) {
-      if (!import_fs_extra7.default.existsSync(turboJsonPath)) {
-        const defaultTurbo = {
-          "$schema": "https://turbo.build/schema.json",
-          "pipeline": {
-            "build": {
-              "outputs": ["dist/**", ".next/**"]
-            },
-            "lint": {}
-          }
-        };
-        import_fs_extra7.default.writeJsonSync(turboJsonPath, defaultTurbo, { spaces: 2 });
-      }
-      const hasTurbo = pkg.devDependencies && pkg.devDependencies.turbo;
-      if (!hasTurbo) {
-        await runCommand("npm install turbo -D", ROOT3);
-      } else {
-        await runCommand("npm install", ROOT3);
-      }
-    } else {
-      if (pkgChanged) {
-        await runCommand("npm install", ROOT3);
-      }
-    }
+    await CreatePackageJsonIfNotExist();
+    await AddWorkspaceToPackageJsonIfNotExist();
+    await InstallTurborepoIfNotYet();
+    await AddTurboJsonIfNotExist();
+    await CreateWorkSpaceDirsIfNotExist();
+    await InitializeGitIfNotExist();
     res.json({ success: true, message: "Scaffolding complete" });
   } catch (error) {
     console.error("Scaffolding error:", error);
@@ -1150,6 +1099,146 @@ router9.get("/", async (req, res) => {
     });
   }
 });
+async function CreatePackageJsonIfNotExist() {
+  if (!import_fs_extra7.default.existsSync(packageJsonPath)) {
+    const rootDirName = import_path8.default.basename(ROOT3);
+    const pkgName = rootDirName.toLowerCase().replace(/\s+/g, "-");
+    const defaultPkg = {
+      name: pkgName,
+      version: "1.0.0",
+      private: true,
+      scripts: {
+        "build": "turbo run build",
+        "dev": "monorepotime",
+        "lint": "turbo run lint"
+      },
+      devDependencies: {
+        "monorepotime": "*"
+      },
+      workspaces: []
+    };
+    await import_fs_extra7.default.writeJson(packageJsonPath, defaultPkg, { spaces: 2 });
+    console.log("[scafoldrepo] Created package.json");
+  }
+}
+async function AddWorkspaceToPackageJsonIfNotExist() {
+  const pkg = await import_fs_extra7.default.readJson(packageJsonPath);
+  let changed = false;
+  if (!pkg.workspaces || Array.isArray(pkg.workspaces) && pkg.workspaces.length === 0) {
+    pkg.workspaces = ["apps/*", "packages/*"];
+    changed = true;
+  }
+  if (changed) {
+    await import_fs_extra7.default.writeJson(packageJsonPath, pkg, { spaces: 2 });
+    console.log("[scafoldrepo] Updated package.json workspaces");
+  }
+}
+async function InstallTurborepoIfNotYet() {
+  const pkg = await import_fs_extra7.default.readJson(packageJsonPath);
+  const hasTurbo = pkg.devDependencies && pkg.devDependencies.turbo;
+  if (!hasTurbo) {
+    await runCommand("npm install turbo -D", ROOT3);
+  } else {
+    await runCommand("npm install", ROOT3);
+  }
+}
+async function AddTurboJsonIfNotExist() {
+  if (!import_fs_extra7.default.existsSync(turboJsonPath)) {
+    try {
+      const scaffoldTurboPath = import_path8.default.join(SCAFFOLD_DIR, "turbo.json");
+      let turboContent;
+      if (import_fs_extra7.default.existsSync(scaffoldTurboPath)) {
+        turboContent = await import_fs_extra7.default.readJson(scaffoldTurboPath);
+      } else {
+        console.warn("[scafoldrepo] scaffold/turbo.json not found, using default.");
+        turboContent = {
+          "$schema": "https://turbo.build/schema.json",
+          "tasks": {
+            "build": {
+              "dependsOn": ["^build"],
+              "outputs": ["dist/**", ".next/**", "build/**", ".vercel/output/**"]
+            },
+            "lint": {
+              "dependsOn": ["^lint"]
+            },
+            "test": {
+              "dependsOn": ["^test"]
+            },
+            "clean": {
+              "cache": false,
+              "persistent": true
+            }
+          }
+        };
+      }
+      await import_fs_extra7.default.writeJson(turboJsonPath, turboContent, { spaces: 2 });
+      console.log("[scafoldrepo] Created turbo.json");
+    } catch (error) {
+      console.error("Error creating turbo.json:", error);
+    }
+  }
+}
+async function CreateWorkSpaceDirsIfNotExist() {
+  if (!import_fs_extra7.default.existsSync(packageJsonPath)) return;
+  const pkg = await import_fs_extra7.default.readJson(packageJsonPath);
+  const workspaces = Array.isArray(pkg.workspaces) ? pkg.workspaces : [];
+  const shouldCreateApps = workspaces.some((w) => w.startsWith("apps/") || w === "apps");
+  const shouldCreatePackages = workspaces.some((w) => w.startsWith("packages/") || w === "packages");
+  if (shouldCreateApps) {
+    await import_fs_extra7.default.ensureDir(import_path8.default.join(ROOT3, "apps"));
+  }
+  if (shouldCreatePackages) {
+    await import_fs_extra7.default.ensureDir(import_path8.default.join(ROOT3, "packages"));
+    const typesPackagePath = import_path8.default.join(ROOT3, "packages", "types");
+    if (!import_fs_extra7.default.existsSync(typesPackagePath)) {
+      await import_fs_extra7.default.ensureDir(typesPackagePath);
+      try {
+        if (import_fs_extra7.default.existsSync(import_path8.default.join(SCAFFOLD_DIR, "index.ts"))) {
+          const indexContent = await import_fs_extra7.default.readFile(import_path8.default.join(SCAFFOLD_DIR, "index.ts"), "utf-8");
+          await import_fs_extra7.default.writeFile(import_path8.default.join(typesPackagePath, "index.ts"), indexContent);
+        } else {
+          await import_fs_extra7.default.writeFile(import_path8.default.join(typesPackagePath, "index.ts"), "export type {};");
+        }
+        if (import_fs_extra7.default.existsSync(import_path8.default.join(SCAFFOLD_DIR, "package.json"))) {
+          const pkgContent = await import_fs_extra7.default.readJson(import_path8.default.join(SCAFFOLD_DIR, "package.json"));
+          await import_fs_extra7.default.writeJson(import_path8.default.join(typesPackagePath, "package.json"), pkgContent, { spaces: 4 });
+        } else {
+          await import_fs_extra7.default.writeJson(import_path8.default.join(typesPackagePath, "package.json"), {
+            name: "types",
+            version: "0.0.0",
+            private: true,
+            main: "./index.ts",
+            types: "./index.ts"
+          }, { spaces: 4 });
+        }
+        console.log("[scafoldrepo] Created packages/types");
+      } catch (err) {
+        console.error("Error creating types package:", err);
+      }
+    }
+  }
+}
+async function InitializeGitIfNotExist() {
+  try {
+    await runCommand("git --version", ROOT3);
+  } catch (e) {
+    console.warn("Git is not installed or not in PATH. Skipping git initialization.");
+    return;
+  }
+  const gitPath = import_path8.default.join(ROOT3, ".git");
+  if (!import_fs_extra7.default.existsSync(gitPath)) {
+    try {
+      console.log("[scafoldrepo] Initializing git repository...");
+      await runCommand("git init", ROOT3);
+      await runCommand("git branch -M master", ROOT3);
+      await runCommand("git add .", ROOT3);
+      await runCommand('git commit -m "init"', ROOT3);
+      console.log("[scafoldrepo] Git initialized successfully");
+    } catch (gitError) {
+      console.error("Failed to initialize git:", gitError);
+    }
+  }
+}
 function runCommand(cmd, cwd) {
   console.log(`Running: ${cmd} in ${cwd}`);
   return new Promise((resolve, reject) => {
@@ -1174,8 +1263,8 @@ var router10 = (0, import_express12.Router)();
 router10.get("/", async (req, res) => {
   try {
     let isExist = true;
-    const turboJsonPath = import_path9.default.join(ROOT3, "turbo.json");
-    const turboExists = import_fs.default.existsSync(turboJsonPath);
+    const turboJsonPath2 = import_path9.default.join(ROOT3, "turbo.json");
+    const turboExists = import_fs.default.existsSync(turboJsonPath2);
     if (!turboExists) {
       isExist = false;
     }
@@ -1196,77 +1285,12 @@ var turborepoexist_default = router10;
 var import_express13 = require("express");
 var import_fs_extra8 = __toESM(require("fs-extra"));
 var import_path10 = __toESM(require("path"));
-var import_child_process5 = require("child_process");
-var import_util2 = require("util");
-var execAsync2 = (0, import_util2.promisify)(import_child_process5.exec);
 var router11 = (0, import_express13.Router)();
 router11.get("/", async (req, res) => {
   try {
-    const monorepoTimePath3 = import_path10.default.join(ROOT3, "monorepotime.json");
-    const exists = import_fs_extra8.default.existsSync(monorepoTimePath3);
-    if (!exists) {
-      try {
-        const scaffoldPath = import_path10.default.join(__dirname, "scaffold", "monorepotime.json");
-        const defaultContent = await import_fs_extra8.default.readJson(scaffoldPath);
-        import_fs_extra8.default.writeJsonSync(monorepoTimePath3, defaultContent, { spaces: 4 });
-      } catch (err) {
-        console.error("Error reading scaffold file for firstrun:", err);
-        import_fs_extra8.default.writeJsonSync(monorepoTimePath3, { notes: "", crudtest: [] }, { spaces: 4 });
-      }
-      const gitIgnorePath = import_path10.default.join(ROOT3, ".gitignore");
-      if (!import_fs_extra8.default.existsSync(gitIgnorePath)) {
-        const gitIgnoreContent = `# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-package-lock.json
-out
-.turbo`;
-        try {
-          import_fs_extra8.default.writeFileSync(gitIgnorePath, gitIgnoreContent);
-          console.log("Created .gitignore");
-        } catch (err) {
-          console.error("Failed to create .gitignore:", err);
-        }
-      }
-      const gitPath = import_path10.default.join(ROOT3, ".git");
-      if (!import_fs_extra8.default.existsSync(gitPath)) {
-        try {
-          console.log("Initializing git repository...");
-          await execAsync2("git init", { cwd: ROOT3 });
-          await execAsync2("git add .", { cwd: ROOT3 });
-          await execAsync2("git branch -M master", { cwd: ROOT3 });
-          await execAsync2('git commit -m "init"', { cwd: ROOT3 });
-          console.log("Git initialized successfully");
-        } catch (gitError) {
-          console.error("Failed to initialize git:", gitError);
-        }
-      }
-      res.json({ isFirstTime: true });
-    } else {
-      res.json({ isFirstTime: false });
-    }
+    const turboJsonPath2 = import_path10.default.join(ROOT3, "turbo.json");
+    const exists = import_fs_extra8.default.existsSync(turboJsonPath2);
+    res.json({ isFirstTime: !exists });
   } catch (error) {
     console.error("First run check error:", error);
     res.status(500).json({
@@ -1283,18 +1307,15 @@ var import_fs_extra9 = __toESM(require("fs-extra"));
 var import_path11 = __toESM(require("path"));
 var router12 = (0, import_express14.Router)();
 var monorepoTimePath = import_path11.default.join(ROOT3, "monorepotime.json");
-var ensureFile = async () => {
-  if (!import_fs_extra9.default.existsSync(monorepoTimePath)) {
-    await import_fs_extra9.default.writeJson(monorepoTimePath, { notes: "", crudtest: [] }, { spaces: 4 });
-  }
-};
 router12.get("/", async (req, res) => {
+  if (!import_fs_extra9.default.existsSync(monorepoTimePath)) {
+    res.status(404).json({ error: "monorepotime.json not found" });
+    return;
+  }
   try {
-    await ensureFile();
     const data = await import_fs_extra9.default.readJson(monorepoTimePath);
     res.json({ notes: data.notes || "" });
   } catch (error) {
-    console.error("Error reading notes:", error);
     res.status(500).json({ error: "Failed to read notes" });
   }
 });
@@ -1305,13 +1326,11 @@ router12.post("/", async (req, res) => {
       res.status(400).json({ error: "Invalid notes format" });
       return;
     }
-    await ensureFile();
     const data = await import_fs_extra9.default.readJson(monorepoTimePath);
     data.notes = notes;
     await import_fs_extra9.default.writeJson(monorepoTimePath, data, { spaces: 4 });
     res.json({ success: true });
   } catch (error) {
-    console.error("Error saving notes:", error);
     res.status(500).json({ error: "Failed to save notes" });
   }
 });
@@ -1323,14 +1342,12 @@ var import_fs_extra10 = __toESM(require("fs-extra"));
 var import_path12 = __toESM(require("path"));
 var router13 = (0, import_express15.Router)();
 var monorepoTimePath2 = import_path12.default.join(ROOT3, "monorepotime.json");
-var ensureFile2 = async () => {
-  if (!import_fs_extra10.default.existsSync(monorepoTimePath2)) {
-    await import_fs_extra10.default.writeJson(monorepoTimePath2, { notes: "", crudtest: [] }, { spaces: 4 });
-  }
-};
 router13.get("/", async (req, res) => {
+  if (!import_fs_extra10.default.existsSync(monorepoTimePath2)) {
+    res.status(404).json({ error: "monorepotime.json not found" });
+    return;
+  }
   try {
-    await ensureFile2();
     const data = await import_fs_extra10.default.readJson(monorepoTimePath2);
     res.json({ crudtest: data.crudtest || [] });
   } catch (error) {
@@ -1345,7 +1362,6 @@ router13.post("/", async (req, res) => {
       res.status(400).json({ error: "Invalid crudtest format, must be an array" });
       return;
     }
-    await ensureFile2();
     const data = await import_fs_extra10.default.readJson(monorepoTimePath2);
     data.crudtest = crudtest;
     await import_fs_extra10.default.writeJson(monorepoTimePath2, data, { spaces: 4 });
@@ -1359,12 +1375,12 @@ var crudtest_default = router13;
 
 // src/routes/gitControlHelper.ts
 var import_express16 = require("express");
-var import_child_process6 = require("child_process");
-var import_util3 = require("util");
-var execAsync3 = (0, import_util3.promisify)(import_child_process6.exec);
+var import_child_process5 = require("child_process");
+var import_util2 = require("util");
+var execAsync2 = (0, import_util2.promisify)(import_child_process5.exec);
 var router14 = (0, import_express16.Router)();
 async function runGit(command) {
-  const { stdout, stderr } = await execAsync3(command, { cwd: ROOT3 });
+  const { stdout, stderr } = await execAsync2(command, { cwd: ROOT3 });
   if (stderr) {
     console.log("Git Output (stderr):", stderr);
   }
@@ -1439,15 +1455,46 @@ router14.post("/push", async (req, res) => {
 });
 var gitControlHelper_default = router14;
 
+// src/routes/initmonorepotime.ts
+var import_express17 = require("express");
+var import_fs_extra11 = __toESM(require("fs-extra"));
+var import_path13 = __toESM(require("path"));
+var router15 = (0, import_express17.Router)();
+router15.get("/", async (req, res) => {
+  try {
+    const sourcePath = import_path13.default.join(__dirname, "scaffold", "monorepotime.json");
+    const destPath = import_path13.default.join(ROOT3, "monorepotime.json");
+    if (import_fs_extra11.default.existsSync(destPath)) {
+      res.status(400).json({ success: false, message: "monorepotime.json already exists" });
+      return;
+    }
+    if (!import_fs_extra11.default.existsSync(sourcePath)) {
+      await import_fs_extra11.default.writeJson(destPath, { notes: "", crudtest: [] }, { spaces: 4 });
+      res.json({ success: true, message: "Created monorepotime.json with default content (scaffold missing)" });
+      return;
+    }
+    await import_fs_extra11.default.copy(sourcePath, destPath);
+    res.json({ success: true, message: "Successfully initialized monorepotime.json" });
+  } catch (error) {
+    console.error("Error initializing monorepotime.json:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to initialize monorepotime.json",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+var initmonorepotime_default = router15;
+
 // src/index.ts
-var app = (0, import_express17.default)();
+var app = (0, import_express18.default)();
 var port = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express17.default.static("public"));
-app.use(import_express17.default.json());
+app.use(import_express18.default.static("public"));
+app.use(import_express18.default.json());
 app.use("/", tester_default);
 app.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app.use("/" + api_default.stopProcess, stopcmd_default);
@@ -1464,10 +1511,11 @@ app.use("/" + api_default.firstRun, firstrun_default);
 app.use("/" + api_default.notes, notes_default);
 app.use("/" + api_default.crudTest, crudtest_default);
 app.use("/" + api_default.gitControl, gitControlHelper_default);
-var frontendPath = import_path13.default.join(__dirname, "../public");
-app.use(import_express17.default.static(frontendPath));
+app.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
+var frontendPath = import_path14.default.join(__dirname, "../public");
+app.use(import_express18.default.static(frontendPath));
 app.get("*", (req, res) => {
-  res.sendFile(import_path13.default.join(frontendPath, "index.html"));
+  res.sendFile(import_path14.default.join(frontendPath, "index.html"));
 });
 var httpServer = (0, import_http.createServer)(app);
 var io = new import_socket.Server(httpServer, {
