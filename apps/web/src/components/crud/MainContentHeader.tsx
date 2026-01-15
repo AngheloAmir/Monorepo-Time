@@ -39,7 +39,7 @@ export default function MainContentHeader() {
                         {method}
                     </span>
                     <span className="text-gray-500 font-mono text-md">
-                        { `${useDevURL ? devURL : prodURL}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${params ? `?${params}` : ""}` }
+                        { `${useDevURL ? devURL : prodURL}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${params ? encodeURI(params.startsWith('?') ? params : `?${params}`) : ""}` }
                     </span>
                 </div>
 
