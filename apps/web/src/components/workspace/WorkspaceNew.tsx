@@ -105,7 +105,7 @@ export default function WorkspaceNew() {
                     <SelectField
                         label="Path"
                         icon="fas fa-folder"
-                        placeholder="Select a path"
+                        placeholder="Select a workspace path"
                         value={workspaceCopy?.path || ''}
                         onChange={(e) => {
                             if (!workspaceCopy) return;

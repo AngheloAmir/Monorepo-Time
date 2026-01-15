@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { CrudCategory } from 'types';
-import INITIAL_CRUD_DATA from './fake/defaultCurd';
+import apiRoute from 'apiroute';
+import config from 'config';
 
 interface CrudContext {
+    noData: boolean;
     crudData: CrudCategory[];
     useDevURL: boolean;
     devURL: string;
@@ -41,7 +43,8 @@ interface CrudContext {
 }
 
 const crudState = create<CrudContext>()((set, get) => ({
-    crudData: INITIAL_CRUD_DATA,
+    noData:   true,
+    crudData: [],
     setCrudData: (data) => set({ crudData: data }),
     currentCategoryIndex: -1,
     currentCrudIndex: -1,
@@ -85,7 +88,6 @@ example:
     setOutput: (output: string) => set({ output }),
     setExpectedOutput: (expectedOutput: string) => set({ expectedOutput }),
 
-    loadCrudData: async () => set({ crudData: INITIAL_CRUD_DATA }),
     setUseDevURL: (useDevURL: boolean) => set({ useDevURL }),
     setURL: (devURL: string, prodURL: string) => set({ devURL, prodURL }),
     setParams: (params: string) => set({ params }),
@@ -93,6 +95,23 @@ example:
 
     setCurrentCategoryIndex: (index: number) => set({ currentCategoryIndex: index }),
     setCurrentCrudIndex: (index: number) => set({ currentCrudIndex: index }),
+
+    loadCrudData: async () => {
+        try {
+            const port     = config.apiPort || 3000;
+            const response = await fetch(`http://localhost:${port}/${apiRoute.crudTest}`);
+            
+            if (!response.ok) {
+                set({ noData: true });
+                return;
+            }
+
+            const data     = await response.json();
+            set({ crudData: data.crudtest, noData: false });
+        } catch (error) {
+            set({ noData: true });
+        }
+    },
 
     sendRequest: async () => {
         const { useDevURL, devURL, prodURL, params, method, crudData, currentCategoryIndex, currentCrudIndex } = get();

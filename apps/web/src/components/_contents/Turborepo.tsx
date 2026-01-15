@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import Button2 from "../components/ui/Button2";
-import InteractiveTerminal, { type InteractiveTerminalRef } from "../components/InteractiveTerminal";
-import useAppState from "../_context/app";
-import useModal from "../modal/modals";
-import useWorkspaceState from "../_context/workspace";
+import Button2 from "../ui/Button2";
+import InteractiveTerminal, { type InteractiveTerminalRef } from "../InteractiveTerminal";
+import useAppState from "../../_context/app";
+import useModal from "../../modal/modals";
+import useWorkspaceState from "../../_context/workspace";
 
 interface TurborepoProps {
     isVisible: boolean

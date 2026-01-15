@@ -40,6 +40,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 icon="fas fa-check-circle"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'start'}
+                bg={ props.isRunningAs == 'start' }
             />
 
             <Button

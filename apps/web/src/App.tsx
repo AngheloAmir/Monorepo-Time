@@ -1,18 +1,18 @@
 import Header from './components/Header'
 import Navigation from './components/ui/Navigation'
-import Home from './contents/Home'
+import Home from './components/_contents/Home'
 
 import useNavState from "./_context/navigation";
-import Workspace from './contents/Workspace';
+import Workspace from './components/_contents/Workspace';
 
 import Modal from './modal';
 import RootTerminal from './components/RootTerminal';
 import useAppState from './_context/app';
 import { useEffect, useState } from 'react';
-import Flash from './contents/Flash';
-import Loading from './contents/_Loading';
-import Turborepo from './contents/Turborepo';
-import CRUDTester from './contents/CrudTester';
+import Flash from './components/_contents/Flash';
+import Loading from './components/_contents/_Loading';
+import Turborepo from './components/_contents/Turborepo';
+import CRUDTester from './components/_contents/CrudTester';
 import AboutModal from './components/AboutModal';
 
 export default function App() {

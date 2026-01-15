@@ -6,16 +6,13 @@ import { ROOT } from "./rootPath";
 const router = Router();
 const monorepoTimePath = path.join(ROOT, "monorepotime.json");
 
-// Ensure file exists helper
-const ensureFile = async () => {
-    if (!fs.existsSync(monorepoTimePath)) {
-        await fs.writeJson(monorepoTimePath, { notes: "", crudtest: [] }, { spaces: 4 });
-    }
-};
-
 router.get("/", async (req: Request, res: Response) => {
+    if (!fs.existsSync(monorepoTimePath)) {
+        res.status(404).json({ error: "monorepotime.json not found" });
+        return;
+    }
+
     try {
-        await ensureFile();
         const data = await fs.readJson(monorepoTimePath);
         res.json({ crudtest: data.crudtest || [] });
     } catch (error) {
@@ -32,12 +29,8 @@ router.post("/", async (req: Request, res: Response) => {
             return;
         }
 
-        await ensureFile();
         const data = await fs.readJson(monorepoTimePath);
-        
-        // Update only the crudtest field
         data.crudtest = crudtest;
-        
         await fs.writeJson(monorepoTimePath, data, { spaces: 4 });
         res.json({ success: true });
     } catch (error) {

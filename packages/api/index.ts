@@ -82,7 +82,12 @@ const apiRoute = {
      * post revert
      * post push
      */
-    gitControl: 'gitcontrol'
+    gitControl: 'gitcontrol',
+
+    /** Initialize monorepotime.json
+     * get request returns { success: boolean }
+     */
+    initMonorepoTime: 'initmtime'
 }
 
 export default apiRoute;

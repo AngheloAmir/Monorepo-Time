@@ -11,7 +11,7 @@ import { Server } from 'socket.io';
 import net from 'net';
 
 //routers
-import tester            from './routes/tester';
+import tester            from './routes/_tester';
 import apiScanWorkspace  from './routes/scanworkspace';
 import runCmdDevSocket   from './routes/runcmddev';
 import stopProcess       from './routes/stopcmd';
@@ -28,6 +28,7 @@ import firstRunRoute     from './routes/firstrun';
 import notesRoute        from './routes/notes';
 import crudTestRoute     from './routes/crudtest';
 import gitControlHelper  from './routes/gitControlHelper';
+import initMonorepoTime  from './routes/initmonorepotime';
 
 const app  = express();
 const port = config.apiPort;
@@ -56,6 +57,7 @@ app.use("/" + apiRoute.firstRun,           firstRunRoute);
 app.use("/" + apiRoute.notes,              notesRoute);
 app.use("/" + apiRoute.crudTest,           crudTestRoute);
 app.use("/" + apiRoute.gitControl,         gitControlHelper);
+app.use("/" + apiRoute.initMonorepoTime,   initMonorepoTime);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');

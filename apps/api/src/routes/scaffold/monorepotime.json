@@ -8,7 +8,7 @@
             "items": [
                 {
                     "label": "Ping the Tool Server",
-                    "route": "/pingme",
+                    "route": "/ping",
                     "methods": "GET",
                     "description": "Ping the tool server to check if it is running.",
                     "sampleInput": "{}",
@@ -18,7 +18,7 @@
                 },
                 {
                     "label": "Check Post",
-                    "route": "/pingpost",
+                    "route": "/post",
                     "methods": "POST",
                     "description": "Send a POST request to check if it sending correctly",
                     "sampleInput": "{\n   \"data\": \"test\",\n   \"message\": \"test\"\n}",
@@ -34,7 +34,7 @@
                 },
                 {
                     "label": "Check Stream",
-                    "route": "/pingstream",
+                    "route": "/stream",
                     "methods": "STREAM",
                     "description": "Send a stream request to check if it sending correctly",
                     "sampleInput": "{ }",

@@ -108,7 +108,7 @@ export default function AccordionNav() {
                             })}
                             <button
                                 onClick={() => setEditModal({ isOpen: true, categoryIndex: catIndex, itemIndex: -1 })}
-                                className="w-full py-2 mt-1 text-xs text-gray-500 hover:text-white border border-dashed border-gray-700 hover:border-gray-500 rounded-lg transition-all flex items-center justify-center gap-2"
+                                className="w-full py-1 mt-1 text-xs text-gray-500 hover:text-white border border-dashed border-gray-700 hover:border-gray-500 rounded-lg transition-all flex items-center justify-center gap-2"
                             >
                                 <i className="fas fa-plus"></i>
                                 Add Route

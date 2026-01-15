@@ -1,33 +1,27 @@
 import { useEffect } from "react";
-import useWorkspaceState from "../_context/workspace"
-import TabTerminal from "../components/workspace/TabTerminal";
-import WorkspaceCard from "../components/workspace/WorkSpaceCard";
-import WorkspaceOptionModal from "../components/workspace/WorkspaceOptionModal";
-import WorkspaceNew from "../components/workspace/WorkspaceNew";
-import ModalTerminal from "../components/workspace/ModalTerminal";
-import FloatingBtn from "../components/workspace/FloatingBtn";
-import GitControl from "../components/workspace/GitControl";
+import useWorkspaceState from "../../_context/workspace"
+import TabTerminal from "../workspace/TabTerminal";
+import WorkspaceCard from "../workspace/WorkSpaceCard";
+import WorkspaceOptionModal from "../workspace/WorkspaceOptionModal";
+import WorkspaceNew from "../workspace/WorkspaceNew";
+import ModalTerminal from "../workspace/ModalTerminal";
+import FloatingBtn from "../workspace/FloatingBtn";
+import GitControl from "../workspace/GitControl";
 
 interface WorkspaceProps {
     isVisible: boolean
 }
 
-declare global {
-    interface Window {
-        isWorkSpaceLoaded: boolean;
-    }
-}
 
 export default function Workspace(props: WorkspaceProps) {
     const workspace           = useWorkspaceState.use.workspace();
     const loadWorkspace       = useWorkspaceState.use.loadWorkspace();
 
     useEffect(() => {
-        if (!window.isWorkSpaceLoaded) {
-            window.isWorkSpaceLoaded = true;
+        if (props.isVisible) {
             loadWorkspace();
         }
-    }, []);
+    }, [props.isVisible]);
 
     return (
         <div className={`relative flex flex-col w-full h-[calc(100vh-54px)] ${props.isVisible ? '' : 'hidden'}`}>

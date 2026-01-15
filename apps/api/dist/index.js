@@ -130,7 +130,8 @@ var import_express = require("express");
 var router = (0, import_express.Router)();
 router.get("/ping", async (req, res) => {
   res.json({
-    message: "pong"
+    message: "pong",
+    time: Date.now()
   });
 });
 router.post("/post", async (req, res) => {

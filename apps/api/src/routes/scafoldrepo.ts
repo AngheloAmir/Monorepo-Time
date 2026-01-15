@@ -5,114 +5,192 @@ import { exec } from "child_process";
 import { ROOT } from "./rootPath";
 
 const router = Router();
+const packageJsonPath = path.join(ROOT, "package.json");
+const turboJsonPath = path.join(ROOT, "turbo.json");
+const SCAFFOLD_DIR = path.join(__dirname, 'scaffold');
 
 router.get("/", async (req: Request, res: Response) => {
     try {
-        const packageJsonPath = path.join(ROOT, "package.json");
-        const turboJsonPath = path.join(ROOT, "turbo.json");
+        await CreatePackageJsonIfNotExist();
+        await AddWorkspaceToPackageJsonIfNotExist();
+        await InstallTurborepoIfNotYet();
+        await AddTurboJsonIfNotExist();
+        await CreateWorkSpaceDirsIfNotExist();
+        await InitializeGitIfNotExist();
 
-        // 1. Read package.json
-        if (!fs.existsSync(packageJsonPath)) {
-             res.status(400).json({ error: "package.json not found in root" });
-             return; // Stop execution
+        res.json({ success: true, message: "Scaffolding complete" });
+    } catch (error) {
+        console.error("Scaffolding error:", error);
+        res.status(500).json({
+            error: "Failed to scaffold",
+            details: error instanceof Error ? error.message : String(error)
+        });
+    }
+});
+
+async function CreatePackageJsonIfNotExist() {
+    if (!fs.existsSync(packageJsonPath)) {
+        const rootDirName = path.basename(ROOT);
+        const pkgName = rootDirName.toLowerCase().replace(/\s+/g, '-');
+
+        const defaultPkg = {
+            name: pkgName,
+            version: "1.0.0",
+            private: true,
+            scripts: {
+                "build": "turbo run build",
+                "dev": "monorepotime",
+                "lint": "turbo run lint"
+            },
+            devDependencies: {
+                "monorepotime": "*"
+            },
+            workspaces: []
+        };
+        await fs.writeJson(packageJsonPath, defaultPkg, { spaces: 2 });
+        console.log("[scafoldrepo] Created package.json");
+    }
+}
+
+async function AddWorkspaceToPackageJsonIfNotExist() {
+    const pkg = await fs.readJson(packageJsonPath);
+    let changed = false;
+
+    if (!pkg.workspaces || (Array.isArray(pkg.workspaces) && pkg.workspaces.length === 0)) {
+        pkg.workspaces = ["apps/*", "packages/*"];
+        changed = true;
+    }
+
+    if (changed) {
+        await fs.writeJson(packageJsonPath, pkg, { spaces: 2 });
+        console.log("[scafoldrepo] Updated package.json workspaces");
+    }
+}
+
+async function InstallTurborepoIfNotYet() {
+    const pkg = await fs.readJson(packageJsonPath);
+    const hasTurbo = pkg.devDependencies && pkg.devDependencies.turbo;
+
+    if (!hasTurbo) {
+        await runCommand("npm install turbo -D", ROOT);
+    } else {
+        await runCommand("npm install", ROOT);
+    }
+}
+
+async function AddTurboJsonIfNotExist() {
+    if (!fs.existsSync(turboJsonPath)) {
+        try {
+            const scaffoldTurboPath = path.join(SCAFFOLD_DIR, "turbo.json");
+            let turboContent;
+
+            if (fs.existsSync(scaffoldTurboPath)) {
+                turboContent = await fs.readJson(scaffoldTurboPath);
+            } else {
+                console.warn("[scafoldrepo] scaffold/turbo.json not found, using default.");
+                turboContent = {
+                    "$schema": "https://turbo.build/schema.json",
+                    "tasks": {
+                        "build": {
+                            "dependsOn": ["^build"],
+                            "outputs": ["dist/**", ".next/**", "build/**", ".vercel/output/**"]
+                        },
+                        "lint": {
+                            "dependsOn": ["^lint"]
+                        },
+                        "test": {
+                            "dependsOn": ["^test"]
+                        },
+                        "clean": {
+                            "cache": false,
+                            "persistent": true
+                        }
+                    }
+                };
+            }
+
+            await fs.writeJson(turboJsonPath, turboContent, { spaces: 2 });
+            console.log("[scafoldrepo] Created turbo.json");
+        } catch (error) {
+            console.error("Error creating turbo.json:", error);
         }
-        
-        const pkg = fs.readJsonSync(packageJsonPath);
-        let pkgChanged = false;
+    }
+}
 
-        // 2. Check Workspaces
-        if (!pkg.workspaces) {
-            pkg.workspaces = ["apps/*", "packages/*"];
-            pkgChanged = true;
-        }
+async function CreateWorkSpaceDirsIfNotExist() {
+    if (!fs.existsSync(packageJsonPath)) return;
 
-        // 3. Save package.json if workspaces changed (before install)
-        if (pkgChanged) {
-            fs.writeJsonSync(packageJsonPath, pkg, { spaces: 2 });
-        }
+    const pkg = await fs.readJson(packageJsonPath);
+    const workspaces = Array.isArray(pkg.workspaces) ? pkg.workspaces : [];
 
-        // 4. Create directories
+    // Check configuration to determine if folders should be created
+    const shouldCreateApps = workspaces.some((w: string) => w.startsWith("apps/") || w === "apps");
+    const shouldCreatePackages = workspaces.some((w: string) => w.startsWith("packages/") || w === "packages");
+
+    if (shouldCreateApps) {
         await fs.ensureDir(path.join(ROOT, 'apps'));
+    }
+
+    if (shouldCreatePackages) {
         await fs.ensureDir(path.join(ROOT, 'packages'));
 
-        const SCAFFOLD_DIR = path.join(__dirname, 'scaffold');
-
-        // 4.1 Create packages/types if not exists
+        // Create types package only if packages directory is valid/created
         const typesPackagePath = path.join(ROOT, "packages", "types");
         if (!fs.existsSync(typesPackagePath)) {
             await fs.ensureDir(typesPackagePath);
             
             try {
-                const indexContent = await fs.readFile(path.join(SCAFFOLD_DIR, 'index.ts'), 'utf-8');
-                const packageJsonContent = await fs.readJson(path.join(SCAFFOLD_DIR, 'package.json'));
+                // Try to use scaffold files if available
+                if (fs.existsSync(path.join(SCAFFOLD_DIR, 'index.ts'))) {
+                    const indexContent = await fs.readFile(path.join(SCAFFOLD_DIR, 'index.ts'), 'utf-8');
+                    await fs.writeFile(path.join(typesPackagePath, "index.ts"), indexContent);
+                } else {
+                    await fs.writeFile(path.join(typesPackagePath, "index.ts"), "export type {};");
+                }
 
-                await fs.writeFile(path.join(typesPackagePath, "index.ts"), indexContent);
-                await fs.writeJson(path.join(typesPackagePath, "package.json"), packageJsonContent, { spaces: 4 });
+                if (fs.existsSync(path.join(SCAFFOLD_DIR, 'package.json'))) {
+                    const pkgContent = await fs.readJson(path.join(SCAFFOLD_DIR, 'package.json'));
+                    await fs.writeJson(path.join(typesPackagePath, "package.json"), pkgContent, { spaces: 4 });
+                } else {
+                    await fs.writeJson(path.join(typesPackagePath, "package.json"), {
+                        name: "types",
+                        version: "0.0.0",
+                        private: true,
+                        main: "./index.ts",
+                        types: "./index.ts"
+                    }, { spaces: 4 });
+                }
+                console.log("[scafoldrepo] Created packages/types");
             } catch (err) {
-                 console.error("Error reading scaffold files for types package:", err);
-                 // Fallback or just log, but let's try to proceed or maybe fail if this is critical?
-                 // For now, logging error but continuing might be safer, though user wants scaffolding.
+                console.error("Error creating types package:", err);
             }
         }
-
-        // 4.1 Create monorepotime.json if not exists
-        const monorepoTimePath = path.join(ROOT, "monorepotime.json");
-        if (!fs.existsSync(monorepoTimePath)) {
-             try {
-                const defaultMonorepoTime = await fs.readJson(path.join(SCAFFOLD_DIR, 'monorepotime.json'));
-                fs.writeJsonSync(monorepoTimePath, defaultMonorepoTime, { spaces: 4 });
-            } catch (err) {
-                 console.error("Error reading scaffold file for monorepotime.json:", err);
-            }
-        }
-
-        // 5. Create turbo.json if not exists
-        if (!fs.existsSync(turboJsonPath) || !pkg.devDependencies?.turbo) {
-            
-            if (!fs.existsSync(turboJsonPath)) {
-                const defaultTurbo = {
-                    "$schema": "https://turbo.build/schema.json",
-                    "pipeline": {
-                        "build": {
-                            "outputs": ["dist/**", ".next/**"]
-                        },
-                        "lint": {}
-                    }
-                };
-                fs.writeJsonSync(turboJsonPath, defaultTurbo, { spaces: 2 });
-            }
-        
-             // 6. Commands
-             // Check if turbo is in devDependencies
-            const hasTurbo = pkg.devDependencies && pkg.devDependencies.turbo;
-            
-            if (!hasTurbo) {
-                 // installing turbo will install deps
-                 await runCommand("npm install turbo -D", ROOT);
-            } else {
-                 // just install to ensure workspaces are linked
-                 await runCommand("npm install", ROOT); 
-            }
-        } else {
-             // If everything existed, user requested "then npm install" implies we might still want to ensure state?
-             // But the prompt says: "if so [missing turbo.json or turbo dep], then ... then npm install".
-             // It also says "if the root package.json has no 'workspaces'... then npm install".
-             // To be safe, let's run npm install if we changed workspaces OR if we entered the 'turbo missing' block.
-             if (pkgChanged) {
-                 await runCommand("npm install", ROOT);
-             }
-        }
-
-        res.json({ success: true, message: "Scaffolding complete" });
-
-    } catch (error) {
-        console.error("Scaffolding error:", error);
-        res.status(500).json({ 
-            error: "Failed to scaffold", 
-            details: error instanceof Error ? error.message : String(error) 
-        });
     }
-});
+}
+
+async function InitializeGitIfNotExist() {
+    // Check if git is installed in the environment
+    try {
+        await runCommand("git --version", ROOT);
+    } catch (e) {
+        console.warn("Git is not installed or not in PATH. Skipping git initialization.");
+        return;
+    }
+
+    const gitPath = path.join(ROOT, ".git");
+    if (!fs.existsSync(gitPath)) {
+        try {
+            console.log("[scafoldrepo] Initializing git repository...");
+            await runCommand("git init", ROOT);
+            await runCommand("git branch -M master", ROOT);
+            await runCommand("git add .", ROOT);
+            await runCommand('git commit -m "init"', ROOT);
+            console.log("[scafoldrepo] Git initialized successfully");
+        } catch (gitError) {
+            console.error("Failed to initialize git:", gitError);
+        }
+    }
+}
 
 function runCommand(cmd: string, cwd: string): Promise<void> {
     console.log(`Running: ${cmd} in ${cwd}`);
@@ -122,7 +200,7 @@ function runCommand(cmd: string, cwd: string): Promise<void> {
                 console.error("Exec error:", stderr);
                 reject(error);
             } else {
-                console.log(stdout); // Log output
+                console.log(stdout);
                 resolve();
             }
         });

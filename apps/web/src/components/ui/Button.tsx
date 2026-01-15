@@ -9,6 +9,7 @@ interface ButtonProps {
     isNotRendered?: boolean;
     render?: boolean;
     bg?: boolean;
+    className?: string;
     onClick: () => void;
 }
 
@@ -40,6 +41,7 @@ function ButtonSkeleton(props: ButtonProps) {
                 ${props.disabled
                     ? 'opacity-70 cursor-not-allowed'
                     : 'cursor-pointer hover:-translate-y-1 hover:shadow-lg'}
+                ${props.className || ''}
             `}
         >
             {/* Background Layer for Border (Hover - Colored) */}

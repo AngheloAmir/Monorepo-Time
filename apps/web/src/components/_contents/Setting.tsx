@@ -1,4 +1,4 @@
-import Undercontsruct from "../components/Undercontsruct"
+import Undercontsruct from "../Undercontsruct"
 
 interface SettingProps {
     isVisible : boolean
