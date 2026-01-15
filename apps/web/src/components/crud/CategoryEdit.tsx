@@ -11,6 +11,9 @@ interface CategoryEditProps {
 export default function CategoryEdit({ isOpen, onClose, categoryIndex }: CategoryEditProps) {
     const crudData = useCrudState.use.crudData();
     const setCrudData = useCrudState.use.setCrudData();
+    const currentCategoryIndex = useCrudState.use.currentCategoryIndex();
+    const setCurrentCategoryIndex = useCrudState.use.setCurrentCategoryIndex();
+    const setCurrentCrudIndex = useCrudState.use.setCurrentCrudIndex();
 
     const [categoryName, setCategoryName] = useState("");
     const [devUrl, setDevUrl] = useState("http://localhost:3000");
@@ -53,6 +56,22 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
             };
         }
         
+        setCrudData(newData);
+        onClose();
+    };
+
+    const handleDelete = () => {
+        const newData = [...crudData];
+        newData.splice(categoryIndex, 1);
+        
+        // Update selection state if needed
+        if (categoryIndex === currentCategoryIndex) {
+            setCurrentCategoryIndex(-1);
+            setCurrentCrudIndex(-1);
+        } else if (categoryIndex < currentCategoryIndex) {
+            setCurrentCategoryIndex(currentCategoryIndex - 1);
+        }
+
         setCrudData(newData);
         onClose();
     };
@@ -109,19 +128,30 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
                     </div>
                 </div>
 
-                <div className="p-4 border-t border-white/5 flex justify-end gap-2">
-                    <button 
-                        onClick={onClose}
-                        className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        onClick={handleSave}
-                        className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
-                    >
-                        Save
-                    </button>
+                <div className="p-4 border-t border-white/5 flex justify-between gap-2">
+                    {categoryIndex !== -1 ? (
+                        <button
+                            onClick={handleDelete}
+                            className="px-4 py-2 rounded-lg text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors font-medium"
+                        >
+                            Delete Category
+                        </button>
+                    ) : <div></div>}
+                    
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={onClose}
+                            className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={handleSave}
+                            className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
+                        >
+                            Save
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

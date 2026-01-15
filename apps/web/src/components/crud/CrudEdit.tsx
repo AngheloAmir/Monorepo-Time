@@ -12,6 +12,9 @@ interface CrudEditProps {
 export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: CrudEditProps) {
     const crudData = useCrudState.use.crudData();
     const setCrudData = useCrudState.use.setCrudData();
+    const currentCategoryIndex = useCrudState.use.currentCategoryIndex();
+    const currentCrudIndex = useCrudState.use.currentCrudIndex();
+    const setCurrentCrudIndex = useCrudState.use.setCurrentCrudIndex();
 
     const [label, setLabel] = useState("");
     const [route, setRoute] = useState("");
@@ -19,6 +22,7 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
     const [description, setDescription] = useState("");
     const [sampleInput, setSampleInput] = useState("");
     const [expectedOutcome, setExpectedOutcome] = useState("");
+    const [suggested, setSuggested] = useState<any[]>([]);
 
     useEffect(() => {
         if (isOpen) {
@@ -30,6 +34,7 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
                 setDescription("");
                 setSampleInput("{}");
                 setExpectedOutcome("");
+                setSuggested([]);
             } else if (crudData[categoryIndex] && crudData[categoryIndex].items[itemIndex]) {
                 // Edit mode
                 const item = crudData[categoryIndex].items[itemIndex];
@@ -39,6 +44,7 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
                 setDescription(item.description);
                 setSampleInput(item.sampleInput);
                 setExpectedOutcome(item.expectedOutcome);
+                setSuggested(item.suggested || []);
             }
         }
     }, [isOpen, crudData, categoryIndex, itemIndex]);
@@ -52,7 +58,7 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
             description,
             sampleInput,
             expectedOutcome,
-            suggested: [],
+            suggested,
         };
 
         if (itemIndex === -1) {
@@ -65,6 +71,41 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
         
         setCrudData(newData);
         onClose();
+    };
+
+    const handleDelete = () => {
+        const newData = [...crudData];
+        if (newData[categoryIndex] && newData[categoryIndex].items) {
+            newData[categoryIndex].items.splice(itemIndex, 1);
+            
+            // Update selection if needed and if we are in the same category
+            if (categoryIndex === currentCategoryIndex) {
+                if (itemIndex === currentCrudIndex) {
+                    setCurrentCrudIndex(-1);
+                } else if (itemIndex < currentCrudIndex) {
+                     setCurrentCrudIndex(currentCrudIndex - 1);
+                }
+            }
+            
+            setCrudData(newData);
+            onClose();
+        }
+    };
+
+    const addSuggestion = () => {
+        setSuggested([...suggested, { name: "New Preset", urlparams: "", content: "{}" }]);
+    };
+
+    const updateSuggestion = (index: number, field: string, value: string) => {
+        const newSuggested = [...suggested];
+        newSuggested[index] = { ...newSuggested[index], [field]: value };
+        setSuggested(newSuggested);
+    };
+
+    const deleteSuggestion = (index: number) => {
+        const newSuggested = [...suggested];
+        newSuggested.splice(index, 1);
+        setSuggested(newSuggested);
     };
     
     if (!isOpen) return null;
@@ -143,21 +184,73 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
                             onChange={(e) => setExpectedOutcome(e.target.value)}
                         />
                     </div>
+                    
+                    {/* Suggested Presets */}
+                    <div className="flex flex-col gap-2 pt-4 border-t border-white/5">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Suggested Presets</label>
+                        <div className="space-y-3">
+                            {suggested.map((item, idx) => (
+                                <div key={idx} className="bg-white/5 rounded-lg p-3 border border-white/10 space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Preset Name"
+                                            className="flex-1 bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            value={item.name}
+                                            onChange={(e) => updateSuggestion(idx, 'name', e.target.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="URL Params"
+                                            className="flex-1 bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            value={item.urlparams}
+                                            onChange={(e) => updateSuggestion(idx, 'urlparams', e.target.value)}
+                                        />
+                                        <button onClick={() => deleteSuggestion(idx)} className="text-red-400 hover:text-red-300 px-2">
+                                            <i className="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <textarea
+                                        placeholder="Body Content (JSON)"
+                                        className="w-full bg-black/20 border border-white/10 rounded px-2 py-1 text-xs text-white font-mono focus:outline-none focus:border-blue-500 h-16 resize-none"
+                                        value={item.content}
+                                        onChange={(e) => updateSuggestion(idx, 'content', e.target.value)}
+                                    />
+                                </div>
+                            ))}
+                            <button
+                                onClick={addSuggestion}
+                                className="w-full py-2 bg-white/5 border border-dashed border-white/20 rounded-lg text-xs text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                            >
+                                + Add Preset
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="p-4 border-t border-white/5 flex justify-end gap-2">
-                    <button 
-                        onClick={onClose}
-                        className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        onClick={handleSave}
-                        className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
-                    >
-                        Save Changes
-                    </button>
+                <div className="p-4 border-t border-white/5 flex justify-between gap-2">
+                    {itemIndex !== -1 ? (
+                        <button
+                            onClick={handleDelete}
+                            className="px-4 py-2 rounded-lg text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 transition-colors font-medium"
+                        >
+                            Delete Item
+                        </button>
+                    ) : <div></div>}
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={onClose}
+                            className="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={handleSave}
+                            className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
+                        >
+                            Save Changes
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
