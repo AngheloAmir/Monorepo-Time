@@ -6,11 +6,23 @@ export default function NotesEditor({ isVisible }: { isVisible: boolean }) {
     const noteNotFound = useAppState.use.noteNotFound();
     const loadNotes    = useAppState.use.loadNotes();
     const setNotes     = useAppState.use.setNotes();
+    const saveNotes    = useAppState.use.saveNotes();
    
     useEffect(() => {
         if(isVisible)
             loadNotes();
     }, [isVisible])
+
+    // Auto-save logic
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (!noteNotFound) {
+                saveNotes();
+            }
+        }, 2000);
+
+        return () => clearTimeout(timeoutId);
+    }, [notes, noteNotFound, saveNotes]);
 
     if(noteNotFound) {
         return (

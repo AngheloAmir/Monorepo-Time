@@ -67,6 +67,12 @@ const appstate = create<appContext>()((set, get) => ({
         try {
             const port = config.apiPort || 3000;
             const response = await fetch(`http://localhost:${port}/${apiRoute.notes}`);
+            
+            if (!response.ok) {
+                set({ noteNotFound: true });
+                return;
+            }
+
             const data = await response.json();
             set({ notes: data.notes, noteNotFound: false });
         } catch (error) {
@@ -74,21 +80,20 @@ const appstate = create<appContext>()((set, get) => ({
         }
     },
     saveNotes: async () => {
-        // try {
-        //     const port = config.apiPort || 3000;
-        //     await fetch(`http://localhost:${port}/${apiRoute.saveNotes}`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({ notes: get().notes }),
-        //     });
-        // } catch (error) {
-        //     console.error('Error saving notes:', error);
-        // }
+        try {
+            const port = config.apiPort || 3000;
+            await fetch(`http://localhost:${port}/${apiRoute.notes}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ notes: get().notes }),
+            });
+        } catch (error) {
+            console.error('Error saving notes:', error);
+        }
     }
 }));
 
 const useAppState = createSelectors(appstate);
 export default useAppState;
-
