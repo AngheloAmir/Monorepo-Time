@@ -146,10 +146,10 @@ example:
         }
 
         const { useDevURL, devURL, prodURL, params, method, crudData, currentCategoryIndex, currentCrudIndex } = get();
-        const queryString = params ? (params.startsWith('?') ? params : `?${params}`) : "";
+        const queryString        = params ? (params.startsWith('?') ? params : `?${params}`) : "";
         const encodedQueryString = encodeURI(queryString);
-        const url = `${useDevURL ? devURL : prodURL}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${encodedQueryString}`;
-        const startTime = Date.now();
+        const url                = `${useDevURL ? devURL : prodURL}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${encodedQueryString}`;
+        const startTime          = Date.now();
 
         set({ isFetching: true, requestStartTime: startTime, executionTime: 0 });
 

@@ -8,7 +8,11 @@ import ModalHeader from "../ui/ModalHeader";
 import ModalBody   from "../ui/ModalBody";
 
 const clearInfo: WorkspaceInfo = {
-    name: '', path: '', fontawesomeIcon: '', description: '', devCommand: '', startCommand: '', stopCommand: '', buildCommand: '', cleanCommand: '', lintCommand: '', testCommand: '',
+    name: '',
+    path: '',
+    fontawesomeIcon: '',
+    description: '',
+    devCommand: ''
 }
 
 export default function WorkspaceNew() {
@@ -17,11 +21,11 @@ export default function WorkspaceNew() {
     const [error, setError] = useState('');
     const showWorkspaceNew = useWorkspaceState.use.showWorkspaceNew();
     const workspace = useWorkspaceState.use.workspace();
-    const createNewWorkspace = useWorkspaceState.use.createNewWorkspace();
-    const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
+    const createNewWorkspace       = useWorkspaceState.use.createNewWorkspace();
+    const setShowWorkspaceNew      = useWorkspaceState.use.setShowWorkspaceNew();
     const setShowNewTerminalWindow = useWorkspaceState.use.setShowNewTerminalWindow();
-    const loadWorkspace = useWorkspaceState.use.loadWorkspace();
-    const listWorkspaceDir = useWorkspaceState.use.listWorkspace();
+    const loadWorkspace            = useWorkspaceState.use.loadWorkspace();
+    const listWorkspaceDir         = useWorkspaceState.use.listWorkspace();
 
     useEffect(() => {
         if (showWorkspaceNew) {
@@ -52,17 +56,11 @@ export default function WorkspaceNew() {
         }
 
         const newWorkspaceToAdd: WorkspaceInfo = {
-            name: workspaceCopy.name,
-            path: workspaceCopy.path + "/" + workspaceCopy.name,
-            devCommand: workspaceCopy.devCommand,
-            fontawesomeIcon: workspaceCopy.fontawesomeIcon || undefined,
-            description: workspaceCopy.description || undefined,
-            startCommand: workspaceCopy.startCommand || undefined,
-            stopCommand: workspaceCopy.stopCommand || undefined,
-            buildCommand: workspaceCopy.buildCommand || undefined,
-            cleanCommand: workspaceCopy.cleanCommand || undefined,
-            lintCommand: workspaceCopy.lintCommand || undefined,
-            testCommand: workspaceCopy.testCommand || undefined,
+            name:              workspaceCopy.name,
+            path:              workspaceCopy.path + "/" + workspaceCopy.name,
+            devCommand:        workspaceCopy.devCommand,
+            fontawesomeIcon:   workspaceCopy.fontawesomeIcon || undefined,
+            description:       workspaceCopy.description || undefined,
         };
 
         try {
@@ -141,34 +139,6 @@ export default function WorkspaceNew() {
                     ))}
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                    {(
-                        [
-                            { pkg: "devCommand", label: "Dev Command", icon: "fas fa-code", placeholder: "ex: nodemon index.js" },
-                            { pkg: "startCommand", label: "Start Command", icon: "fas fa-code", placeholder: "ex: node index.js" },
-                            { pkg: "stopCommand", label: "Stop Command", icon: "fas fa-code", placeholder: "ex: npx -y kill-port 3000" },
-                            { pkg: "buildCommand", label: "Build Command", icon: "fas fa-code", placeholder: "ex: tsc" },
-                            { pkg: "cleanCommand", label: "Clean Command", icon: "fas fa-code", placeholder: "ex: rm -rf dist" },
-                            { pkg: "lintCommand", label: "Lint Command", icon: "fas fa-code", placeholder: "ex: lint ." },
-                            { pkg: "testCommand", label: "Test Command", icon: "fas fa-code", placeholder: "ex: jest" }
-                        ] as Array<{ pkg: keyof WorkspaceInfo, label: string, icon: string, placeholder: string }>
-                    ).map((item) => (
-                        <InputField
-                            key={item.pkg}
-                            label={item.label}
-                            icon={item.icon}
-                            placeholder={item.placeholder}
-                            value={workspaceCopy?.[item.pkg] || ''}
-                            onChange={(e) => {
-                                if (!workspaceCopy) return;
-                                setWorkspaceCopy({
-                                    ...workspaceCopy,
-                                    [item.pkg]: e.target.value
-                                })
-                            }}
-                        />
-                    ))}
-                </div>
             </div>
 
             <footer className="p-2 px-6 flex justify-end gap-4">

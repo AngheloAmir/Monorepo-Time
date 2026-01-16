@@ -5,6 +5,14 @@ import apiRoute from 'apiroute';
 import config from 'config';
 import defaultWorkspace from './demo/defaultWorkspace';
 
+export interface WorkspaceTemplate {
+    name: string;
+    description: string;
+    template: {
+        
+    }
+}
+
 export interface WorkspaceItem {
     isRunningAs: 'dev' | 'start' | 'crashed' | null;
     info: WorkspaceInfo;
@@ -52,12 +60,12 @@ interface workspaceContext {
 
     ///API calls
     //function that calls API
-    stopProcess: (workspaceName: string) => Promise<void>;
+    stopProcess:          (workspaceName: string) => Promise<void>;
     stopInteractiveTerminal: (workspaceName: string, skips?: boolean) => Promise<void>;
-    listWorkspace: () => Promise<any>;
-    createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
-    updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
-
+    listWorkspace:        () => Promise<any>;
+    createNewWorkspace:   (workspaceName: WorkspaceInfo) => Promise<boolean>;
+    updateWorkspace:      (workspaceName: WorkspaceInfo) => Promise<boolean>;
+    setWorkspaceTemplate: (workspaceName: WorkspaceInfo, template: string) => Promise<void>;
 }
 
 const workspaceState = create<workspaceContext>()((set, get) => ({
@@ -262,7 +270,14 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         }
     },
 
+    setWorkspaceTemplate: async (workspace: WorkspaceInfo, template: string) => {
+        if(config.useDemo) return;
+
+       
+    },
+
 }));
+
 
 const useWorkspaceState = createSelectors(workspaceState);
 export default useWorkspaceState;

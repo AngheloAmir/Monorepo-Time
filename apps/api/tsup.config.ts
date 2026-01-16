@@ -6,5 +6,5 @@ export default defineConfig({
   format: ['cjs'],
   clean: true,
   // Bundle these local workspace packages so consumers don't need to find them in a registry
-  noExternal: ['apiroute', 'config', 'types'], 
+  noExternal: ['apiroute', 'config', 'types', 'template'], 
 });
