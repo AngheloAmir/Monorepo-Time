@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useGitControlContext from "../../_context/gitcontrol";
+import useGitControlContext from "../../appstates/gitcontrol";
 import GitHistory from "./GitControl/GitHistory";
 import GitHeader from "./GitControl/GitHeader";
 import GitInput from "./GitControl/GitInput";

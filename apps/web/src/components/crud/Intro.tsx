@@ -1,6 +1,6 @@
 import Button from "../ui/Button";
-import useAppState from "../../_context/app";
-import useCrudState from "../../_context/crud";
+import useAppState from "../../appstates/app";
+import useCrudState from "../../appstates/crud";
 
 export default function Intro() {
     const initMonorepoTime = useAppState.use.initMonorepoTime();

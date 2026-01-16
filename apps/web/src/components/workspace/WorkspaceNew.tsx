@@ -1,5 +1,5 @@
 import type { WorkspaceInfo } from "types";
-import useWorkspaceState from "../../_context/workspace";
+import useWorkspaceState from "../../appstates/workspace";
 import InputField from "../ui/InputField";
 import SelectField from "../SelectField";
 import { useEffect, useState } from "react";

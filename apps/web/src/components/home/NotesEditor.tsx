@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useAppState from "../../_context/app";
+import useAppState from "../../appstates/app";
 
 export default function NotesEditor({ isVisible }: { isVisible: boolean }) {
     const notes        = useAppState.use.notes();

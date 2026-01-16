@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { WorkspaceItem } from "../../../_context/workspace";
-import useWorkspaceState from "../../../_context/workspace";
+import type { WorkspaceItem } from "../../../appstates/workspace";
+import useWorkspaceState from "../../../appstates/workspace";
 
 interface HeaderItemProps {
     workspace: WorkspaceItem;

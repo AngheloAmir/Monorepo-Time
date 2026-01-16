@@ -33,3 +33,8 @@ To prepare this for distribution as an npm package:
 1. Ensure the `build` task copies the `apps/web/dist` folder to `apps/api/public` (or similar).
 2. Configure `apps/api` to serve static files from that folder in production mode.
 3. Publish `apps/api` (or a dedicated `packages/cli`) as your npm package.
+
+## Demo
+![Architecture](./docs/preview1.jpg)
+![Architecture](./docs/preview2.jpg)
+![Architecture](./docs/preview3.jpg)

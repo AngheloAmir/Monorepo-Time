@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useDockerProcessInfoState from "../../_context/dockerprocessInfo"
+import useDockerProcessInfoState from "../../appstates/dockerprocessInfo"
 
 export default function DockerResources() {
     const dockerprocessInfo = useDockerProcessInfoState.use.dockerprocessInfo();

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import useWorkspaceState, { type WorkspaceItem } from "../../../_context/workspace";
+import useWorkspaceState, { type WorkspaceItem } from "../../../appstates/workspace";
 import InteractiveTerminal, { type InteractiveTerminalRef } from "../../InteractiveTerminal";
 
 export default function TabTerminalWrapper(props: { workspace: WorkspaceItem, visible: boolean }) {

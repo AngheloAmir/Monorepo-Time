@@ -1,4 +1,4 @@
-import useCrudState from "../../_context/crud"
+import useCrudState from "../../appstates/crud"
 import { useState, useEffect } from "react";
 
 export default function MainContentInput() {

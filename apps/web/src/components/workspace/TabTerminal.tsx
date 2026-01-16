@@ -1,4 +1,4 @@
-import useWorkspaceState  from "../../_context/workspace";
+import useWorkspaceState  from "../../appstates/workspace";
 import TabTerminalWrapper from "./TabTerminal/TabTerminalWrapper";
 import HeaderItem         from "./TabTerminal/HeaderItem";
 

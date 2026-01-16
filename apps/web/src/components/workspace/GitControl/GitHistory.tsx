@@ -1,4 +1,4 @@
-import useGitControlContext from "../../../_context/gitcontrol";
+import useGitControlContext from "../../../appstates/gitcontrol";
 
 export default function GitHistory() {
     const isLoading         = useGitControlContext.use.loading();

@@ -1,7 +1,7 @@
 import {useEffect, useRef } from "react";
 import ModalBody from "./ui/ModalBody";
 import ModalHeader from "./ui/ModalHeader";
-import useAppState from "../_context/app";
+import useAppState from "../appstates/app";
 
 import InteractiveTerminal, { type InteractiveTerminalRef } from "./InteractiveTerminal";
 

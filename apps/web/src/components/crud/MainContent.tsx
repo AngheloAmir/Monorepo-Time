@@ -5,7 +5,7 @@ import HeaderInput from "./HeaderInput";
 import MainContentHeader from "./MainContentHeader";
 import MainContentInput from "./MainContentInput";
 
-import useCrudState from "../../_context/crud";
+import useCrudState from "../../appstates/crud";
 
 export default function MainContent() {
     const currentCategoryIndex = useCrudState.use.currentCategoryIndex();

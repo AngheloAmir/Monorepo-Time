@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import useChildProcessInfoState from "../../_context/childprocessInfo";
+import useChildProcessInfoState from "../../appstates/childprocessInfo";
 
 export default function SystemResources() {
     const childprocessInfo = useChildProcessInfoState.use.childprocessInfo();

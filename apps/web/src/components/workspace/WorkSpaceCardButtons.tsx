@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useWorkspaceState, { type WorkspaceItem } from "../../_context/workspace";
+import useWorkspaceState, { type WorkspaceItem } from "../../appstates/workspace";
 import Button from "../ui/Button";
 
 export default function WorkSpaceCardButtons(props: WorkspaceItem) {

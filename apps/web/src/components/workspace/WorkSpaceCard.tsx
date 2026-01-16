@@ -1,5 +1,5 @@
-import type { WorkspaceItem } from "../../_context/workspace";
-import useWorkspaceState from "../../_context/workspace";
+import type { WorkspaceItem } from "../../appstates/workspace";
+import useWorkspaceState from "../../appstates/workspace";
 import GradientBody from "../ui/GradientBody";
 import WorkSpaceCardButtons from "./WorkSpaceCardButtons";
 

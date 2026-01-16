@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useWorkspaceState from "../../_context/workspace"
+import useWorkspaceState from "../../appstates/workspace"
 import TabTerminal from "../workspace/TabTerminal";
 import WorkspaceCard from "../workspace/WorkSpaceCard";
 import WorkspaceOptionModal from "../workspace/WorkspaceOptionModal";

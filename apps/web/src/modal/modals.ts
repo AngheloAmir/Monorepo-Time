@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createSelectors } from '../_context/zustandSelector';
+import { createSelectors } from '../appstates/zustandSelector';
 
 type ModalType   = 'alert'   | 'confirm' | 'prompt' | 'selection' | null;
 type ModalBanner = 'success' | 'warning' | 'error' | null;

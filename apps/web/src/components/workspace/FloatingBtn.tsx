@@ -1,6 +1,6 @@
 import { useState } from "react";
-import useAppState from "../../_context/app";
-import useWorkspaceState from "../../_context/workspace";
+import useAppState from "../../appstates/app";
+import useWorkspaceState from "../../appstates/workspace";
 import config   from "config";
 import apiRoute from "apiroute";
 import ButtonFloating from "../ui/ButtonFloating";
@@ -10,7 +10,7 @@ export default function FloatingBtn() {
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
     const setShowTerminal = useAppState.use.setShowTerminal();
     const [filesShow, setFilesShow] = useState(true);
-    async function showHideFiles() {
+    async function showHideFiles() {    
         try {
             //count the number of running workspace
             let pathInclude: string[] = [];
