@@ -3,7 +3,7 @@
     "crudtest": [
         {
             "category": "Internal CRUD Test",
-            "devurl": "",
+            "devurl": "http://localhost:4793",
             "produrl": "",
             "items": [
                 {

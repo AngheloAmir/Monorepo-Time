@@ -1,3 +1,4 @@
+import awsTemplate from "./aws";
 import { ProjectTemplate } from ".";
 
 const templates: ProjectTemplate[] = [
@@ -20,5 +21,6 @@ const templates: ProjectTemplate[] = [
             }
         ]
     },
+    awsTemplate
 ];
 export default templates;

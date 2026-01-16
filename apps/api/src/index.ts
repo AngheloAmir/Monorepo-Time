@@ -31,6 +31,7 @@ import gitControlHelper  from './routes/gitControlHelper';
 import initMonorepoTime  from './routes/initmonorepotime';
 import processTree       from './routes/processUsage';
 import apiDocker         from './routes/apidocker';
+import availableTemplates from './routes/availabletemplates';
 
 const app  = express();
 const port = config.apiPort;
@@ -62,6 +63,7 @@ app.use("/" + apiRoute.gitControl,         gitControlHelper);
 app.use("/" + apiRoute.initMonorepoTime,   initMonorepoTime);
 app.use("/" + apiRoute.processTree,        processTree);
 app.use("/" + apiRoute.docker,             apiDocker);
+app.use("/availabletemplates",             availableTemplates);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');
