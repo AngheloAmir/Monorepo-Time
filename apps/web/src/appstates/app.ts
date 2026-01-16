@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import apiRoute from 'apiroute';
-import config from 'config';
+import { path } from './_relative';
 
 interface appContext {
     showTerminal: boolean;
@@ -14,11 +14,14 @@ interface appContext {
 
     initMonorepoTime: () => Promise<void>;
 
-    notes:        string;
+    notes: string;
     noteNotFound: boolean;
     setNotes: (notes: string) => void;
     loadNotes: () => Promise<void>;
     saveNotes: () => Promise<void>;
+
+    scaffoldRepo: () => Promise<{ success: boolean; error?: string }>;
+    hideShowFileFolder: (filesShow: boolean, pathInclude: string[]) => Promise<{ isHidden: boolean }>;
 }
 
 const appstate = create<appContext>()((set, get) => ({
@@ -31,19 +34,17 @@ const appstate = create<appContext>()((set, get) => ({
     loadRootDir: async () => {
         if (get().rootDir.length > 0) return;
         try {
-            const port = config.apiPort || 3000;
-            const response = await fetch(`http://localhost:${port}/${apiRoute.getRootPath}`);
+            const response = await fetch(`${path}${apiRoute.getRootPath}`);
             const data = await response.json();
             set({ rootDir: data.path });
-        } catch(err) {
-            
+        } catch (err) {
+
         }
     },
 
     checkIfFirstTime: async () => {
         try {
-            const port = config.apiPort || 3000;
-            const response = await fetch(`http://localhost:${port}/${apiRoute.firstRun}`);
+            const response = await fetch(`${path}${apiRoute.firstRun}`);
             const data = await response.json();
             return data.isFirstTime;
         } catch (error) {
@@ -53,8 +54,7 @@ const appstate = create<appContext>()((set, get) => ({
 
     initMonorepoTime: async () => {
         try {
-            const port = config.apiPort || 3000;
-            await fetch(`http://localhost:${port}/${apiRoute.initMonorepoTime}`);
+            await fetch(`${path}${apiRoute.initMonorepoTime}`);
         } catch (error) {
             console.error('Error initializing Monorepo Time:', error);
         }
@@ -65,9 +65,8 @@ const appstate = create<appContext>()((set, get) => ({
     setNotes: (notes: string) => set({ notes }),
     loadNotes: async () => {
         try {
-            const port = config.apiPort || 3000;
-            const response = await fetch(`http://localhost:${port}/${apiRoute.notes}`);
-            
+            const response = await fetch(`${path}${apiRoute.notes}`);
+
             if (!response.ok) {
                 set({ noteNotFound: true });
                 return;
@@ -81,8 +80,7 @@ const appstate = create<appContext>()((set, get) => ({
     },
     saveNotes: async () => {
         try {
-            const port = config.apiPort || 3000;
-            await fetch(`http://localhost:${port}/${apiRoute.notes}`, {
+            await fetch(`${path}${apiRoute.notes}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,6 +90,27 @@ const appstate = create<appContext>()((set, get) => ({
         } catch (error) {
             console.error('Error saving notes:', error);
         }
+    },
+
+    scaffoldRepo: async () => {
+        const response = await fetch(`${path}${apiRoute.scaffoldRepo}`);
+        const data = await response.json();
+        return data;
+    },
+
+    hideShowFileFolder: async (filesShow: boolean, pathInclude: string[]) => {
+        const response = await fetch(`${path}${apiRoute.hideShowFileFolder}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                hide: filesShow,
+                pathInclude: pathInclude
+            }),
+        });
+        const data = await response.json();
+        return data;
     }
 }));
 

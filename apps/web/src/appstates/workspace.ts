@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { WorkspaceInfo } from 'types';
 import apiRoute from 'apiroute';
-import config from 'config';
+import { path } from './_relative';
 import defaultWorkspace from './fake/defaultWorkspace';
 
 export interface WorkspaceItem {
@@ -108,7 +108,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         set({ loading: true });
 
         try {
-            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.scanWorkspace}`);
+            const response = await fetch(`${path}${apiRoute.scanWorkspace}`);
             let workspaceResponse: {
                 root: string;
                 count: number;
@@ -163,7 +163,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         set({ loadingWorkspace: workspaceName });
 
         try {
-            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.stopProcess}`, {
+            const response = await fetch(`${path}${apiRoute.stopProcess}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -186,7 +186,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         set({ loadingWorkspace: workspaceName });
 
         try {
-            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.stopInteractiveTerminal}`, {
+            const response = await fetch(`${path}${apiRoute.stopInteractiveTerminal}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -205,10 +205,10 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
         set({ loadingWorkspace: null });
     },
-
+ 
     listWorkspace: async () => {
         try {
-            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.listWorkspacesDir}`);
+            const response = await fetch(`${path}${apiRoute.listWorkspacesDir}`);
             if (!response.ok) {
                 throw new Error('Failed to list workspace');
             }
@@ -221,7 +221,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
     createNewWorkspace: async (workspaceName: WorkspaceInfo) => {
         try {
-            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.newWorkspace}`, {
+            const response = await fetch(`${path}${apiRoute.newWorkspace}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -237,7 +237,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     
     updateWorkspace: async (workspace: WorkspaceInfo) => {
         try {
-            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.updateWorkspace}`, {
+            const response = await fetch(`${path}${apiRoute.updateWorkspace}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import apiRoute from 'apiroute';
-import config   from 'config';
+import { path } from './_relative';
 
 export interface GitHistory {
     hash: string;
@@ -42,8 +42,8 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
         set({ loading: true });
         try {
             const [historyRes, branchRes] = await Promise.all([
-                fetch(`http://localhost:${config.apiPort}/${apiRoute.gitControl}/history`),
-                fetch(`http://localhost:${config.apiPort}/${apiRoute.gitControl}/branch`)
+                fetch(`${path}${apiRoute.gitControl}/history`),
+                fetch(`${path}${apiRoute.gitControl}/branch`)
             ]);
 
             const historyData = await historyRes.json();
@@ -68,7 +68,7 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
         set({ commitLoading: true });
 
         try {
-            await fetch(`http://localhost:${config.apiPort}/${apiRoute.gitControl}/push`, {
+            await fetch(`${path}${apiRoute.gitControl}/push`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: commitMessage }),
@@ -93,7 +93,7 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
         
         set({ loading: true });
         try {
-            await fetch(`http://localhost:${config.apiPort}/${apiRoute.gitControl}/revert`, {
+            await fetch(`${path}${apiRoute.gitControl}/revert`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ hash: selectedCommit.hash }),

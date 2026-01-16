@@ -3,10 +3,9 @@ import useWorkspaceState from "../../appstates/workspace";
 import InputField from "../ui/InputField";
 import SelectField from "../SelectField";
 import { useEffect, useState } from "react";
-import config from "config";
-import apiRoute from "apiroute";
+
 import ModalHeader from "../ui/ModalHeader";
-import ModalBody from "../ui/ModalBody";
+import ModalBody   from "../ui/ModalBody";
 
 const clearInfo: WorkspaceInfo = {
     name: '', path: '', fontawesomeIcon: '', description: '', devCommand: '', startCommand: '', stopCommand: '', buildCommand: '', cleanCommand: '', lintCommand: '', testCommand: '',
@@ -22,13 +21,13 @@ export default function WorkspaceNew() {
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
     const setShowNewTerminalWindow = useWorkspaceState.use.setShowNewTerminalWindow();
     const loadWorkspace = useWorkspaceState.use.loadWorkspace();
+    const listWorkspaceDir = useWorkspaceState.use.listWorkspace();
 
     useEffect(() => {
         if (showWorkspaceNew) {
             setWorkspaceCopy(clearInfo);
             const loadPaths = async () => {
-                const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.listWorkspacesDir}`);
-                const data = await response.json();
+                const data = await listWorkspaceDir();
                 setpaths(data);
             }
             loadPaths();

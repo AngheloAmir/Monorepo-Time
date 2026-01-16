@@ -1,44 +1,25 @@
 import { useState } from "react";
 import useAppState from "../../appstates/app";
 import useWorkspaceState from "../../appstates/workspace";
-import config   from "config";
-import apiRoute from "apiroute";
 import ButtonFloating from "../ui/ButtonFloating";
 
 export default function FloatingBtn() {
+    const hideShowFileFolder  = useAppState.use.hideShowFileFolder();
     const workspace           = useWorkspaceState.use.workspace();
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
     const setShowTerminal = useAppState.use.setShowTerminal();
     const [filesShow, setFilesShow] = useState(true);
     async function showHideFiles() {    
         try {
-            //count the number of running workspace
             let pathInclude: string[] = [];
             const runningWorkspace = workspace.filter((item) => item.isRunningAs != null);
             const runningCount = runningWorkspace.length;
-
-            //return list of workspace that is not running
             if (runningCount > 0) {
                 pathInclude = workspace.filter((item) => item.isRunningAs == null).map((item) => item.info.path);
             }
-
-            const response = await fetch(`http://localhost:${config.apiPort}/${apiRoute.hideShowFileFolder}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    hide: filesShow,
-                    pathInclude: pathInclude
-                }),
-            });
-            const data = await response.json();
-            if (data.isHidden) {
-                setFilesShow(false);
-            } else {
-                setFilesShow(true);
-            }
-
+            const response = await hideShowFileFolder(filesShow, pathInclude);
+            if (response.isHidden)  setFilesShow(false);
+            else setFilesShow(true);
         } catch (error) {
             console.error('Error toggling files visibility:', error);
         }

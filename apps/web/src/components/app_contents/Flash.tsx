@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import apiRoute from 'apiroute';
-import config from 'config';
+import useAppState  from '../../appstates/app';
 
 interface FlashProps {
     onComplete?: () => void;
 }
 
 export default function Flash({ onComplete }: FlashProps) {
+    const scaffoldRepo    = useAppState.use.scaffoldRepo();
     const [step, setStep] = useState<'intro' | 'prompt' | 'scaffolding' | 'success'>('intro');
     const [scaffoldStatus, setScaffoldStatus] = useState<string>('');
 
@@ -14,9 +14,7 @@ export default function Flash({ onComplete }: FlashProps) {
         setStep('scaffolding');
         setScaffoldStatus('Scaffolding directories and files...');
         try {
-            const port = config.apiPort || 3000;
-            const response = await fetch(`http://localhost:${port}/${apiRoute.scaffoldRepo}`);
-            const data = await response.json();
+            const data = await scaffoldRepo();
             
             if (data.success) {
                 setScaffoldStatus('Scaffolding complete! Installing dependencies...');
@@ -176,5 +174,5 @@ export default function Flash({ onComplete }: FlashProps) {
                 </div>
             </div>
         </div>
-    );
+    ); 
 }

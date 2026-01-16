@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { CrudCategory } from 'types';
 import apiRoute from 'apiroute';
-import config from 'config';
+import { path } from './_relative';
 
 interface CrudContext {
     noData: boolean;
@@ -98,9 +98,8 @@ example:
     setCrudData: async (data) => {
         console.log('called')
 
-        const port     = config.apiPort || 3000;
         try {
-            await fetch(`http://localhost:${port}/${apiRoute.crudTest}`, {
+            await fetch(`${path}${apiRoute.crudTest}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -116,8 +115,7 @@ example:
 
     loadCrudData: async () => {
         try {
-            const port = config.apiPort || 3000;
-            const response = await fetch(`http://localhost:${port}/${apiRoute.crudTest}`);
+            const response = await fetch(`${path}${apiRoute.crudTest}`);
 
             if (!response.ok) {
                 set({ noData: true });

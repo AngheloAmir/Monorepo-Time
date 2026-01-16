@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { ChildProcessInfo } from 'types';
-
+import apiRoute from 'apiroute';
+import { path } from './_relative';
 interface childprocessInfoContext {
     childprocessInfo: ChildProcessInfo[];
     totalRam: number;
@@ -16,7 +17,7 @@ const childprocessInfoState = create<childprocessInfoContext>()((set) => ({
 
     loadChildProcessInfo: async () => {
         try {
-            const res = await fetch('http://localhost:3000/processtree');
+            const res  = await fetch(`${path}${apiRoute.processTree}`);
             const data = await res.json();
             
             // data.processes contains the array.
