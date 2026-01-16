@@ -92,6 +92,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     // Helper to disconnect socket
     const disconnectSocket = () => {
         if (socketRef.current) {
+            socketRef.current.removeAllListeners();
             socketRef.current.disconnect();
             socketRef.current = null;
         }
