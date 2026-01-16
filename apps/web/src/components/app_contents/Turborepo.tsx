@@ -5,6 +5,7 @@ import useAppState from "../../appstates/app";
 import useModal from "../../modal/modals";
 import useWorkspaceState from "../../appstates/workspace";
 import CICDTutorial from "../CICDTutorial";
+import config from 'config';
 
 interface TurborepoProps {
     isVisible: boolean
@@ -30,6 +31,16 @@ export default function Turborepo(props: TurborepoProps) {
     const [showTutorial, setShowTutorial] = useState(false);
 
     useEffect(() => {
+        if (config.useDemo) {
+            terminalRef.current?.write("Demo mode is enabled");
+            terminalRef.current?.write("\n");
+            terminalRef.current?.write("Please use it in your local machine");
+            terminalRef.current?.write("\n");
+            terminalRef.current?.write("Visit https://www.npmjs.com/package/monorepotime to know more.");
+            terminalRef.current?.write("\n");
+            return;
+        }
+
         return () => {
             if (terminalRef.current) {
                 terminalRef.current.disconnect();
@@ -41,6 +52,10 @@ export default function Turborepo(props: TurborepoProps) {
     const workspaces = useWorkspaceState.use.workspace();
 
     function execute(cmd: string) {
+        if (config.useDemo) {
+            return;
+        }
+
         if (terminalRef.current) {
             terminalRef.current.clear();
             terminalRef.current.disconnect();
@@ -58,6 +73,10 @@ export default function Turborepo(props: TurborepoProps) {
     }
 
     function handleCommand(cmd: string) {
+        if (config.useDemo) {
+            return;
+        }
+
         if (cmd === 'turbo prune' || cmd === 'turbo prune --docker') {
             showModal(
                 'selection',
@@ -79,6 +98,10 @@ export default function Turborepo(props: TurborepoProps) {
     }
 
     function handleStop() {
+        if (config.useDemo) {
+            return;
+        }
+
         if (terminalRef.current) {
             terminalRef.current.disconnect();
             setIsRunning(false);
@@ -155,6 +178,7 @@ export default function Turborepo(props: TurborepoProps) {
                             ref={terminalRef}
                             isInteractive={false}
                             className="h-full w-full"
+                            socketUrl={config.serverPath}
                             onExit={() => {
                                 setIsRunning(false);
                             }}

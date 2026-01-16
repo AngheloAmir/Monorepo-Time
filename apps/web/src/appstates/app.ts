@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import apiRoute from 'apiroute';
-import { ServerPath } from './_relative';
+import config from 'config';
 
 interface appContext {
     showTerminal: boolean;
@@ -32,9 +32,11 @@ const appstate = create<appContext>()((set, get) => ({
     setShowAboutModal: (show: boolean) => set({ showAboutModal: show }),
 
     loadRootDir: async () => {
+        if(config.useDemo) return;
+
         if (get().rootDir.length > 0) return;
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.getRootPath}`);
+            const response = await fetch(`${config.serverPath}${apiRoute.getRootPath}`);
             const data = await response.json();
             set({ rootDir: data.path });
         } catch (err) {
@@ -43,8 +45,10 @@ const appstate = create<appContext>()((set, get) => ({
     },
 
     checkIfFirstTime: async () => {
+        if(config.useDemo) return false;
+
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.firstRun}`);
+            const response = await fetch(`${config.serverPath}${apiRoute.firstRun}`);
             const data = await response.json();
             return data.isFirstTime;
         } catch (error) {
@@ -53,8 +57,10 @@ const appstate = create<appContext>()((set, get) => ({
     },
 
     initMonorepoTime: async () => {
+        if(config.useDemo) return;
+
         try {
-            await fetch(`${ServerPath}${apiRoute.initMonorepoTime}`);
+            await fetch(`${config.serverPath}${apiRoute.initMonorepoTime}`);
         } catch (error) {
             console.error('Error initializing Monorepo Time:', error);
         }
@@ -64,8 +70,13 @@ const appstate = create<appContext>()((set, get) => ({
     noteNotFound: true,
     setNotes: (notes: string) => set({ notes }),
     loadNotes: async () => {
+        if(config.useDemo) {
+            set({ notes: 'Demo Mode is enabled\n\nThis is a demo version of the application.\n\nTo disable demo mode, please enable the `useDemo` flag in the `config.ts` file.', noteNotFound: false });
+            return;
+        }
+
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.notes}`);
+            const response = await fetch(`${config.serverPath}${apiRoute.notes}`);
 
             if (!response.ok) {
                 set({ noteNotFound: true });
@@ -79,8 +90,10 @@ const appstate = create<appContext>()((set, get) => ({
         }
     },
     saveNotes: async () => {
+        if(config.useDemo) return;
+
         try {
-            await fetch(`${ServerPath}${apiRoute.notes}`, {
+            await fetch(`${config.serverPath}${apiRoute.notes}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,13 +106,17 @@ const appstate = create<appContext>()((set, get) => ({
     },
 
     scaffoldRepo: async () => {
-        const response = await fetch(`${ServerPath}${apiRoute.scaffoldRepo}`);
+        if(config.useDemo) return { success: false, error: 'Demo Mode is enabled' };
+
+        const response = await fetch(`${config.serverPath}${apiRoute.scaffoldRepo}`);
         const data = await response.json();
         return data;
     },
 
     hideShowFileFolder: async (filesShow: boolean, pathInclude: string[]) => {
-        const response = await fetch(`${ServerPath}${apiRoute.hideShowFileFolder}`, {
+        if(config.useDemo) return { isHidden: false };
+
+        const response = await fetch(`${config.serverPath}${apiRoute.hideShowFileFolder}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -2,7 +2,9 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { ChildProcessInfo } from 'types';
 import apiRoute from 'apiroute';
-import { ServerPath } from './_relative';
+import config from 'config';
+import DemoProcess from './demo/process';
+
 interface childprocessInfoContext {
     childprocessInfo: ChildProcessInfo[];
     totalRam: number;
@@ -16,8 +18,13 @@ const childprocessInfoState = create<childprocessInfoContext>()((set) => ({
     peakRam: 0,
 
     loadChildProcessInfo: async () => {
+        if( config.useDemo ) {
+            set({ childprocessInfo: DemoProcess });
+            return;
+        }
+
         try {
-            const res  = await fetch(`${ServerPath}${apiRoute.processTree}`);
+            const res  = await fetch(`${config.serverPath}${apiRoute.processTree}`);
             const data = await res.json();
             
             // data.processes contains the array.

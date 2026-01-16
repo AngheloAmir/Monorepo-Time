@@ -11,14 +11,7 @@ npx monorepotime
 or
 ```bash
 npm install -D monorepotime
-```
-
-## Usage
-
-Navigate to the root of your monorepo project and run:
-
-```bash
-monorepotime
+npx monorepotime
 ```
 
 This will:
@@ -26,9 +19,6 @@ This will:
 2. Open the dashboard in your default browser.
 3. Allow you to interact with your workspaces immediately.
 
-## Demo
-![Architecture](./preview1.jpg)
-![Architecture](./preview2.jpg)
 
 ## License
 

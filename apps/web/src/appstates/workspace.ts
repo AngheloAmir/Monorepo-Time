@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { WorkspaceInfo } from 'types';
 import apiRoute from 'apiroute';
-import { ServerPath } from './_relative';
-import defaultWorkspace from './fake/defaultWorkspace';
+import config from 'config';
+import defaultWorkspace from './demo/defaultWorkspace';
 
 export interface WorkspaceItem {
     isRunningAs: 'dev' | 'start' | 'crashed' | null;
@@ -103,18 +103,23 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     loadWorkspace: async () => {
+        if( config.useDemo ) {
+            set({ workspace: defaultWorkspace });
+            return;
+        }
+
         const isLoading = get().loading;
         if (isLoading) return;
         set({ loading: true });
 
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.scanWorkspace}`);
+            const response = await fetch(`${config.serverPath}${apiRoute.scanWorkspace}`);
             let workspaceResponse: {
                 root: string;
                 count: number;
                 workspace: WorkspaceInfo[];
             } = await response.json() as any
-            if (!response.ok || workspaceResponse.workspace.length === 0) {
+            if ( !response.ok ) {
                 throw new Error('Failed to fetch workspace');
             }
 
@@ -146,11 +151,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             set({ workspace: alphabeticalWorkspace });
         } catch (error) {
             console.error('Error fetching workspace:', error);
-            set({
-                workspace: defaultWorkspace
-            });
         }
-
         set({ loading: false });
     },
 
@@ -158,12 +159,14 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     // API calls
     //==========================================================================
     stopProcess: async (workspaceName: string) => {
+        if(config.useDemo) return;
+
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
         set({ loadingWorkspace: workspaceName });
 
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.stopProcess}`, {
+            const response = await fetch(`${config.serverPath}${apiRoute.stopProcess}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -181,12 +184,14 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     stopInteractiveTerminal: async (workspaceName: string, skips?: boolean) => {
+        if(config.useDemo) return;
+
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
         set({ loadingWorkspace: workspaceName });
 
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.stopInteractiveTerminal}`, {
+            const response = await fetch(`${config.serverPath}${apiRoute.stopInteractiveTerminal}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -207,8 +212,10 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
  
     listWorkspace: async () => {
+        if(config.useDemo) return [];
+
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.listWorkspacesDir}`);
+            const response = await fetch(`${config.serverPath}${apiRoute.listWorkspacesDir}`);
             if (!response.ok) {
                 throw new Error('Failed to list workspace');
             }
@@ -220,8 +227,10 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     createNewWorkspace: async (workspaceName: WorkspaceInfo) => {
+        if(config.useDemo) return true;
+
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.newWorkspace}`, {
+            const response = await fetch(`${config.serverPath}${apiRoute.newWorkspace}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -236,8 +245,10 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
     
     updateWorkspace: async (workspace: WorkspaceInfo) => {
+        if(config.useDemo) return true;
+
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.updateWorkspace}`, {
+            const response = await fetch(`${config.serverPath}${apiRoute.updateWorkspace}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

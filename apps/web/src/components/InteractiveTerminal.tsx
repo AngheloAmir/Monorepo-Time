@@ -4,7 +4,6 @@ import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
 import "xterm/css/xterm.css";
-import { ServerPath } from "../appstates/_relative";
 
 export interface InteractiveTerminalRef {
     /** Writes data directly to the xterm instance */
@@ -102,7 +101,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     // Helper to connect socket
     const connectSocket = (path: string, command: string = 'bash', workspaceName?: string) => {
         disconnectSocket();
-        const url      = props.socketUrl || ServerPath;
+        const url      = props.socketUrl;
         const socket   = io(url, {
             transports: ['websocket'],
             forceNew: true, // Important for connection stability

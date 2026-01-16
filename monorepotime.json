@@ -1,9 +1,9 @@
 {
-    "notes": "asdasd asd asdsa ",
+    "notes": "",
     "crudtest": [
         {
             "category": "Internal CRUD Test",
-            "devurl": "http://localhost:3200",
+            "devurl": "",
             "produrl": "",
             "items": [
                 {

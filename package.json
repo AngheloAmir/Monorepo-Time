@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":   "cd apps/web && npm run dev   && cd ../api && npm run dev",
+    "dev": "cd apps/web && npm run dev   && cd ../api && npm run dev",
     "build": "cd apps/web && npm run build && cd ../api && npm run build",
     "start": "cd apps/web && npm run start && cd ../api && npm run start"
   },

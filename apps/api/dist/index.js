@@ -123,8 +123,12 @@ var apiRoute = {
 var api_default = apiRoute;
 
 // ../../packages/config/index.ts
+var isDev = process.env.NODE_ENV === "development";
+var port = 4793;
 var config = {
-  apiPort: 4792
+  apiPort: port,
+  serverPath: isDev ? `http://localhost:${port}/` : "/",
+  useDemo: true
 };
 var config_default = config;
 
@@ -567,9 +571,9 @@ async function cleanupProcessPorts(rootPid, socket) {
       } else if (type === "n" && currentPid !== -1) {
         const match = content.match(/:(\d+)$/);
         if (match) {
-          const port2 = match[1];
+          const port3 = match[1];
           if (!pidPorts.has(currentPid)) pidPorts.set(currentPid, []);
-          (_a = pidPorts.get(currentPid)) == null ? void 0 : _a.push(port2);
+          (_a = pidPorts.get(currentPid)) == null ? void 0 : _a.push(port3);
         }
       }
     }
@@ -577,12 +581,12 @@ async function cleanupProcessPorts(rootPid, socket) {
       if (pidPorts.has(pid)) {
         const ports = pidPorts.get(pid);
         if (ports) {
-          for (const port2 of ports) {
-            socket == null ? void 0 : socket.emit("log", import_chalk2.default.yellow(`Detected active port ${port2} on PID ${pid}. Killing port...`));
+          for (const port3 of ports) {
+            socket == null ? void 0 : socket.emit("log", import_chalk2.default.yellow(`Detected active port ${port3} on PID ${pid}. Killing port...`));
             try {
-              await execAsync(`npx -y kill-port ${port2}`);
+              await execAsync(`npx -y kill-port ${port3}`);
             } catch (err) {
-              socket == null ? void 0 : socket.emit("log", import_chalk2.default.red(`Failed to kill port ${port2}: ${err.message}`));
+              socket == null ? void 0 : socket.emit("log", import_chalk2.default.red(`Failed to kill port ${port3}: ${err.message}`));
             }
           }
         }
@@ -1633,9 +1637,9 @@ async function getStats() {
     dockerTotalMem: dockerData.totalMem
   };
 }
-function killPortFunc(port2) {
+function killPortFunc(port3) {
   return new Promise((resolve) => {
-    (0, import_child_process6.exec)(`lsof -t -i:${port2}`, (err, stdout) => {
+    (0, import_child_process6.exec)(`lsof -t -i:${port3}`, (err, stdout) => {
       if (err || !stdout.trim()) return resolve(false);
       (0, import_child_process6.exec)(`kill -9 ${stdout.trim().split("\n").join(" ")}`, () => {
         resolve(true);
@@ -1645,12 +1649,12 @@ function killPortFunc(port2) {
 }
 router16.post("/kill-port", async (req, res) => {
   try {
-    const { port: port2 } = req.body;
-    if (!port2) {
+    const { port: port3 } = req.body;
+    if (!port3) {
       res.status(400).json({ error: "Port is required" });
       return;
     }
-    const killed = await killPortFunc(port2);
+    const killed = await killPortFunc(port3);
     res.json({ success: true, killed });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -1809,7 +1813,7 @@ var apidocker_default = router17;
 
 // src/index.ts
 var app = (0, import_express20.default)();
-var port = config_default.apiPort;
+var port2 = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
@@ -1868,7 +1872,7 @@ var findAvailablePort = (startPort) => {
     });
   });
 };
-findAvailablePort(port).then((availablePort) => {
+findAvailablePort(port2).then((availablePort) => {
   httpServer.listen(availablePort, () => {
     console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
     (0, import_open.default)(`http://localhost:${availablePort}`);

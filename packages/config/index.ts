@@ -1,5 +1,12 @@
+// Vite dynamically replaces process.env.NODE_ENV during build
+declare var process: any;
+const isDev = process.env.NODE_ENV === 'development';
+const port  = 4793;
+
 const config = {
-    apiPort: 4792,
+    apiPort:    port,
+    serverPath: isDev ? `http://localhost:${port}/` : "/",
+    useDemo:    false
 }
 
 export default config;

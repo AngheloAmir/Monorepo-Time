@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import useWorkspaceState, { type WorkspaceItem } from "../../../appstates/workspace";
 import InteractiveTerminal, { type InteractiveTerminalRef } from "../../InteractiveTerminal";
+import config from 'config';
 
 export default function TabTerminalWrapper(props: { workspace: WorkspaceItem, visible: boolean }) {
     const setWorkSpaceRunningAs = useWorkspaceState.use.setWorkSpaceRunningAs();
@@ -43,6 +44,7 @@ export default function TabTerminalWrapper(props: { workspace: WorkspaceItem, vi
             <InteractiveTerminal
                 ref={terminalRef}
                 isInteractive={false} 
+                socketUrl={config.serverPath}
             />
         </div>
     );

@@ -2,6 +2,7 @@ import {useEffect, useRef } from "react";
 import ModalBody from "./ui/ModalBody";
 import ModalHeader from "./ui/ModalHeader";
 import useAppState from "../appstates/app";
+import config from 'config';
 
 import InteractiveTerminal, { type InteractiveTerminalRef } from "./InteractiveTerminal";
 
@@ -19,8 +20,14 @@ export default function RootTerminal() {
     };
 
     useEffect(() => {
+        if(config.useDemo) {
+            terminalRef.current?.write("Demo mode is enabled");
+            terminalRef.current?.write("Please use it in your local machine");
+            terminalRef.current?.write("Visit https://www.npmjs.com/package/monorepotime to know more.");
+            return;
+        }
+
         if (showTerminal && rootDir && terminalRef.current) {
-            // Wait slightly for the terminal to be ready in the DOM
             const timeoutId = setTimeout(() => {
                 terminalRef.current?.connect(rootDir);
                 terminalRef.current?.focus();
@@ -43,6 +50,7 @@ export default function RootTerminal() {
                     ref={terminalRef}
                     isInteractive={true}
                     className="h-full"
+                    socketUrl={config.serverPath}
                 />
             </div>
         </ModalBody>

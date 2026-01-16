@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { DockerProcessInfo } from 'types';
 import apiRoute from 'apiroute';
-import { ServerPath } from './_relative';
+import config from 'config';
+
 interface DockerProcessInfoContext {
     dockerprocessInfo: DockerProcessInfo[];
     loadDockerProcessInfo: () => Promise<void>;
@@ -13,8 +14,10 @@ interface DockerProcessInfoContext {
 const dockerprocessInfoState = create<DockerProcessInfoContext>()((set, get) => ({
     dockerprocessInfo: [],
     loadDockerProcessInfo: async () => {
+        if(config.useDemo) return;
+
         try {
-            const res = await fetch(`${ServerPath}${apiRoute.docker}`); // Correct URL based on API mount
+            const res = await fetch(`${config.serverPath}${apiRoute.docker}`); // Correct URL based on API mount
             const data = await res.json();
             // data is { containers: [], totalMem: number }
             set({ dockerprocessInfo: data.containers });
@@ -22,9 +25,12 @@ const dockerprocessInfoState = create<DockerProcessInfoContext>()((set, get) => 
             console.error("Failed to load docker info", error);
         }
     },
+
     stopDockerContainer: async (id: string) => {
+        if(config.useDemo) return;
+
         try {
-            await fetch(`${ServerPath}${apiRoute.docker}/stop`, {
+            await fetch(`${config.serverPath}${apiRoute.docker}/stop`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
@@ -35,9 +41,12 @@ const dockerprocessInfoState = create<DockerProcessInfoContext>()((set, get) => 
             console.error("Failed to stop container", error);
         }
     },
+
     stopAllDockerContainers: async () => {
+        if(config.useDemo) return;
+
         try {
-            await fetch(`${ServerPath}${apiRoute.docker}/stop-all`, {
+            await fetch(`${config.serverPath}${apiRoute.docker}/stop-all`, {
                 method: 'POST'
             });
             // Reload info after stopping

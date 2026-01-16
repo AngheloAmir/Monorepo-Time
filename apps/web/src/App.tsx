@@ -14,6 +14,13 @@ import Loading from './components/app_contents/_Loading';
 import Turborepo from './components/app_contents/Turborepo';
 import CRUDTester from './components/app_contents/CrudTester';
 import AboutModal from './components/AboutModal';
+import config from 'config';
+
+declare global {
+    interface Window {
+        loaded: boolean;
+    }
+}
 
 export default function App() {
     const currentPage = useNavState.use.currentPage();
@@ -23,15 +30,23 @@ export default function App() {
     const showAboutModal = useAppState.use.showAboutModal();
     const setShowAboutModal = useAppState.use.setShowAboutModal();
     const [isFlashVisible, setIsFlashVisible] = useState(false);
-    const [loading, setLoading] = useState(true);
-
+    const [loading, setLoading]               = useState(true);
 
     useEffect(() => {
+        setLoading(false);
+        if(config.useDemo && !window.loaded) {
+            window.loaded = true;
+            setTimeout(() => {
+                alert("You are viewing a demo version. This application should be running on a local server. visit https://www.npmjs.com/package/monorepotime to know more.");
+            }, 100);
+            return;
+        }
+
         setTimeout(async () => {
             const isFirstTime = await checkIfFirstTime();
             if (isFirstTime) setIsFlashVisible(true);
             await loadRootDir();
-            setLoading(false);
+            
         }, 0);
     }, []);
 

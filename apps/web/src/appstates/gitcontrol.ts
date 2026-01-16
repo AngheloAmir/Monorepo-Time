@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import apiRoute from 'apiroute';
-import { ServerPath } from './_relative';
+import config from 'config';
 
 export interface GitHistory {
     hash: string;
@@ -39,11 +39,20 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
     setSelectedCommit: (commit) => set({ selectedCommit: commit }),
 
     fetchData: async () => {
+        if(config.useDemo) {
+            set({ history: [{
+                hash:    "demo-hash",
+                message: "demo-message",
+                date:    "demo-date"
+            }], branch: "demo-branch", loading: false });
+            return;
+        }
+
         set({ loading: true });
         try {
             const [historyRes, branchRes] = await Promise.all([
-                fetch(`${ServerPath}${apiRoute.gitControl}/history`),
-                fetch(`${ServerPath}${apiRoute.gitControl}/branch`)
+                fetch(`${config.serverPath}${apiRoute.gitControl}/history`),
+                fetch(`${config.serverPath}${apiRoute.gitControl}/branch`)
             ]);
 
             const historyData = await historyRes.json();
@@ -61,6 +70,8 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
     },
 
     handleCommit: async (e?: React.FormEvent) => {
+        if(config.useDemo) return;
+
         if (e) e.preventDefault();
         const { commitMessage } = get();
         if (!commitMessage.trim()) return;
@@ -68,7 +79,7 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
         set({ commitLoading: true });
 
         try {
-            await fetch(`${ServerPath}${apiRoute.gitControl}/push`, {
+            await fetch(`${config.serverPath}${apiRoute.gitControl}/push`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: commitMessage }),
@@ -88,12 +99,14 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
     },
 
     handleRevert: async () => {
+        if(config.useDemo) return;
+
         const { selectedCommit } = get();
         if (!selectedCommit) return;
         
         set({ loading: true });
         try {
-            await fetch(`${ServerPath}${apiRoute.gitControl}/revert`, {
+            await fetch(`${config.serverPath}${apiRoute.gitControl}/revert`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ hash: selectedCommit.hash }),

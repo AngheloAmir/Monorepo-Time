@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { CrudCategory } from 'types';
 import apiRoute from 'apiroute';
-import { ServerPath } from './_relative';
+import config from 'config';
+import INITIAL_CRUD_DATA from './demo/defaultCurd';
 
 interface CrudContext {
     noData: boolean;
@@ -48,9 +49,9 @@ const crudState = create<CrudContext>()((set, get) => ({
     currentCategoryIndex: -1,
     currentCrudIndex: -1,
     useDevURL: true,
-    devURL: "http://localhost:3000",
+    devURL:  "",
     prodURL: "",
-    params: "",
+    params:  "",
 
     method: "GET",
 
@@ -96,10 +97,10 @@ example:
     setCurrentCrudIndex: (index: number) => set({ currentCrudIndex: index }),
 
     setCrudData: async (data) => {
-        console.log('called')
+        if(config.useDemo) return;
 
         try {
-            await fetch(`${ServerPath}${apiRoute.crudTest}`, {
+            await fetch(`${config.serverPath}${apiRoute.crudTest}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -114,8 +115,13 @@ example:
     },
 
     loadCrudData: async () => {
+        if(config.useDemo) {
+            set({ crudData: INITIAL_CRUD_DATA, noData: false });
+            return;
+        }
+
         try {
-            const response = await fetch(`${ServerPath}${apiRoute.crudTest}`);
+            const response = await fetch(`${config.serverPath}${apiRoute.crudTest}`);
 
             if (!response.ok) {
                 set({ noData: true });
@@ -130,6 +136,15 @@ example:
     },
 
     sendRequest: async () => {
+        if(config.useDemo) {
+            set({
+                isFetching: false,
+                executionTime: 9999,
+                output: "Demo mode is enabled\nPlease use it in your local machine\nVisit https://www.npmjs.com/package/monorepotime to know more."
+            });
+            return;
+        }
+
         const { useDevURL, devURL, prodURL, params, method, crudData, currentCategoryIndex, currentCrudIndex } = get();
         const queryString = params ? (params.startsWith('?') ? params : `?${params}`) : "";
         const encodedQueryString = encodeURI(queryString);

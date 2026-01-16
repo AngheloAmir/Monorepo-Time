@@ -3,6 +3,8 @@ import useWorkspaceState from "../../appstates/workspace";
 import ModalBody from "../ui/ModalBody";
 import ModalHeader from "../ui/ModalHeader";
 import InteractiveTerminal, { type InteractiveTerminalRef } from "../InteractiveTerminal";
+import config from 'config';
+
 
 export default function ModalTerminal() {
     const showNewTerminalWindow = useWorkspaceState.use.showNewTerminalWindow();
@@ -17,6 +19,10 @@ export default function ModalTerminal() {
     };
 
     useEffect(() => {
+        if (config.useDemo) {
+            return;
+        }
+
         if (showNewTerminalWindow && terminalRef.current) {
             const timeoutId = setTimeout(() => {
                 terminalRef.current?.connect(showNewTerminalWindow.path, "bash", showNewTerminalWindow.name);
@@ -40,6 +46,7 @@ export default function ModalTerminal() {
                     ref={terminalRef}
                     isInteractive={true}
                     className="h-full"
+                    socketUrl={config.serverPath}
                 />
             </div>
         </ModalBody>
