@@ -124,7 +124,7 @@ var api_default = apiRoute;
 
 // ../../packages/config/index.ts
 var config = {
-  apiPort: 3e3
+  apiPort: 4792
 };
 var config_default = config;
 

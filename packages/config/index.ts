@@ -1,5 +1,5 @@
 const config = {
-    apiPort: 3000,
+    apiPort: 4792,
 }
 
 export default config;
