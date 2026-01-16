@@ -4,6 +4,7 @@ import InteractiveTerminal, { type InteractiveTerminalRef } from "../Interactive
 import useAppState from "../../appstates/app";
 import useModal from "../../modal/modals";
 import useWorkspaceState from "../../appstates/workspace";
+import CICDTutorial from "../CICDTutorial";
 
 interface TurborepoProps {
     isVisible: boolean
@@ -26,6 +27,7 @@ export default function Turborepo(props: TurborepoProps) {
     const terminalRef = useRef<InteractiveTerminalRef>(null);
     const rootDir = useAppState.use.rootDir();
     const [isRunning, setIsRunning] = useState(false);
+    const [showTutorial, setShowTutorial] = useState(false);
 
     useEffect(() => {
         return () => {
@@ -85,7 +87,17 @@ export default function Turborepo(props: TurborepoProps) {
 
     return (
         <div className={`h-[92%] w-full p-4 gap-4 ${props.isVisible ? 'flex' : 'hidden'}`}>
-            <div className="w-[500px] flex-none h-full flex flex-col align-center mt-8">
+            <div className="w-[500px] flex-none h-full flex flex-col align-center">
+                <button
+                    onClick={() => setShowTutorial(true)}
+                    className="mb-6 text-sm w-full text-blue-200 flex items-center justify-center gap-2 transition-all group"
+                >
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i className="fas fa-book-reader text-blue-400 text-sm"></i>
+                    </div>
+                    CI/CD Tutorial with Vercel
+                </button>
+
                 <div className="grid grid-cols-2 gap-3">
                     {commands.map((c) => (
                         <Button2
@@ -153,6 +165,7 @@ export default function Turborepo(props: TurborepoProps) {
                     </div>
                 </div>
             </div>
+            {showTutorial && <CICDTutorial onClose={() => setShowTutorial(false)} />}
         </div>
     )
 }

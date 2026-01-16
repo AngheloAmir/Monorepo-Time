@@ -37,7 +37,7 @@ __export(index_exports, {
   io: () => io
 });
 module.exports = __toCommonJS(index_exports);
-var import_express18 = __toESM(require("express"));
+var import_express20 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
 var import_path14 = __toESM(require("path"));
 
@@ -114,7 +114,11 @@ var apiRoute = {
   /** Initialize monorepotime.json
    * get request returns { success: boolean }
    */
-  initMonorepoTime: "initmtime"
+  initMonorepoTime: "initmtime",
+  /** Process tree and dockers memory usage */
+  processTree: "processtree",
+  /** Docker API */
+  docker: "docker"
 };
 var api_default = apiRoute;
 
@@ -1486,15 +1490,331 @@ router15.get("/", async (req, res) => {
 });
 var initmonorepotime_default = router15;
 
+// src/routes/processUsage.ts
+var import_express18 = require("express");
+var import_fs2 = __toESM(require("fs"));
+var import_child_process6 = require("child_process");
+var import_os = __toESM(require("os"));
+var import_pidusage = __toESM(require("pidusage"));
+var router16 = (0, import_express18.Router)();
+var workSpaceData = {};
+var getActiveJobs = () => /* @__PURE__ */ new Map();
+var getDockerContainers = async () => ({ containers: [], totalMem: 0 });
+var peakMemory = 0;
+function getPSS(pid) {
+  try {
+    const data = import_fs2.default.readFileSync(`/proc/${pid}/smaps_rollup`, "utf8");
+    const match = data.match(/^Pss:\s+(\d+)\s+kB/m);
+    if (!match) return 0;
+    return parseInt(match[1], 10) * 1024;
+  } catch {
+    return 0;
+  }
+}
+function getProcessTree() {
+  return new Promise((resolve) => {
+    (0, import_child_process6.exec)("ps -A -o pid,ppid", (err, stdout) => {
+      var _a;
+      if (err) return resolve(/* @__PURE__ */ new Map());
+      const parentMap = /* @__PURE__ */ new Map();
+      const lines = stdout.trim().split("\n");
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].trim().split(/\s+/).map(Number);
+        const pid = parts[0];
+        const ppid = parts[1];
+        if (!isNaN(pid) && !isNaN(ppid)) {
+          if (!parentMap.has(ppid)) parentMap.set(ppid, []);
+          (_a = parentMap.get(ppid)) == null ? void 0 : _a.push(pid);
+        }
+      }
+      resolve(parentMap);
+    });
+  });
+}
+function getAllDescendants(rootPid, parentMap) {
+  const results = [rootPid];
+  const queue = [rootPid];
+  while (queue.length) {
+    const current = queue.shift();
+    if (current === void 0) continue;
+    const children = parentMap.get(current);
+    if (children) {
+      for (const child of children) {
+        results.push(child);
+        queue.push(child);
+      }
+    }
+  }
+  return results;
+}
+async function getStats() {
+  let totalRepos = 0;
+  Object.values(workSpaceData).forEach((list) => {
+    if (Array.isArray(list)) totalRepos += list.length;
+  });
+  const activeJobMap = getActiveJobs();
+  const parentMap = await getProcessTree();
+  const dockerData = await getDockerContainers();
+  const distinctPids = [];
+  const serviceGroups = [];
+  function addGroup(pid, name, type) {
+    if (!pid) return;
+    const children = getAllDescendants(pid, parentMap);
+    children.forEach((p) => distinctPids.push(p));
+    serviceGroups.push({
+      name,
+      type,
+      rootPid: pid,
+      pids: children
+    });
+  }
+  activeProcesses.forEach((child, name) => {
+    addGroup(child.pid, name, "Service");
+  });
+  activeTerminals.forEach((session, socketId) => {
+    const name = session.workspaceName ? `Terminal (${session.workspaceName})` : `Terminal (${socketId})`;
+    addGroup(session.child.pid, name, "Terminal");
+  });
+  activeJobMap.forEach((e) => {
+    const pid = e.pid || (e.child ? e.child.pid : void 0);
+    addGroup(pid, "Job", "Job");
+  });
+  const mainPid = process.pid;
+  const mainChildren = getAllDescendants(mainPid, parentMap);
+  mainChildren.forEach((p) => distinctPids.push(p));
+  const processList = [];
+  let mainToolMem = 0;
+  if (distinctPids.length) {
+    try {
+      const uniquePids = [...new Set(distinctPids)];
+      await (0, import_pidusage.default)(uniquePids).catch(() => {
+      });
+      for (const group of serviceGroups) {
+        let total = 0;
+        for (const pid of group.pids) {
+          total += getPSS(pid);
+        }
+        processList.push({
+          pid: group.rootPid,
+          name: group.name,
+          type: group.type,
+          memory: total
+        });
+      }
+      const knownServicePids = /* @__PURE__ */ new Set();
+      serviceGroups.forEach((g) => g.pids.forEach((p) => knownServicePids.add(p)));
+      const toolCorePids = mainChildren.filter((pid) => !knownServicePids.has(pid));
+      for (const pid of toolCorePids) {
+        mainToolMem += getPSS(pid);
+      }
+    } catch (e) {
+      console.error("Pid scan error:", e.message);
+    }
+  }
+  processList.push({
+    pid: mainPid,
+    name: "Tool Server (Core)",
+    type: "System",
+    memory: mainToolMem || process.memoryUsage().rss
+  });
+  const totalServerMem = processList.reduce((a, b) => a + b.memory, 0);
+  if (totalServerMem > peakMemory) peakMemory = totalServerMem;
+  return {
+    systemTotalMem: import_os.default.totalmem(),
+    serverUsedMem: totalServerMem,
+    peakMem: peakMemory,
+    cpus: import_os.default.cpus().length,
+    uptime: import_os.default.uptime(),
+    repoCount: totalRepos,
+    activeCount: activeProcesses.size + activeJobMap.size,
+    processes: processList,
+    dockerContainers: dockerData.containers,
+    dockerTotalMem: dockerData.totalMem
+  };
+}
+function killPortFunc(port2) {
+  return new Promise((resolve) => {
+    (0, import_child_process6.exec)(`lsof -t -i:${port2}`, (err, stdout) => {
+      if (err || !stdout.trim()) return resolve(false);
+      (0, import_child_process6.exec)(`kill -9 ${stdout.trim().split("\n").join(" ")}`, () => {
+        resolve(true);
+      });
+    });
+  });
+}
+router16.post("/kill-port", async (req, res) => {
+  try {
+    const { port: port2 } = req.body;
+    if (!port2) {
+      res.status(400).json({ error: "Port is required" });
+      return;
+    }
+    const killed = await killPortFunc(port2);
+    res.json({ success: true, killed });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+router16.get("/stream", (req, res) => {
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "Access-Control-Allow-Origin": "*"
+  });
+  const send = async () => {
+    try {
+      const stats = await getStats();
+      res.write(`data: ${JSON.stringify(stats)}
+
+`);
+    } catch (e) {
+      console.error("Stream error", e);
+    }
+  };
+  send();
+  const interval = setInterval(send, 1e4);
+  req.on("close", () => {
+    clearInterval(interval);
+    res.end();
+  });
+});
+router16.get("/", async (req, res) => {
+  try {
+    const stats = await getStats();
+    res.json(stats);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to get stats" });
+  }
+});
+var processUsage_default = router16;
+
+// src/routes/apidocker.ts
+var import_express19 = require("express");
+var import_child_process7 = require("child_process");
+var router17 = (0, import_express19.Router)();
+function parseMemory(memStr) {
+  const units = {
+    "B": 1,
+    "b": 1,
+    "kB": 1e3,
+    "KB": 1e3,
+    "KiB": 1024,
+    "mB": 1e3 * 1e3,
+    "MB": 1e3 * 1e3,
+    "MiB": 1024 * 1024,
+    "gB": 1e3 * 1e3 * 1e3,
+    "GB": 1e3 * 1e3 * 1e3,
+    "GiB": 1024 * 1024 * 1024
+  };
+  const match = memStr.match(/^([0-9.]+)([a-zA-Z]+)$/);
+  if (!match) return 0;
+  const val = parseFloat(match[1]);
+  const unit = match[2];
+  return val * (units[unit] || 1);
+}
+function getDockerContainers2() {
+  return new Promise((resolve) => {
+    (0, import_child_process7.exec)('docker ps --format "{{.ID}}|{{.Image}}|{{.Status}}|{{.Names}}"', (err, stdout) => {
+      if (err) return resolve({ containers: [], totalMem: 0 });
+      const lines = stdout.trim().split("\n");
+      if (lines.length === 0 || lines.length === 1 && lines[0] === "") {
+        return resolve({ containers: [], totalMem: 0 });
+      }
+      const containers = lines.map((line) => {
+        const parts = line.split("|");
+        return {
+          id: parts[0],
+          image: parts[1],
+          status: parts[2],
+          name: parts[3],
+          memoryStr: "0B",
+          memoryBytes: 0
+        };
+      });
+      (0, import_child_process7.exec)('docker stats --no-stream --format "{{.ID}}|{{.MemUsage}}"', (err2, stdout2) => {
+        let totalMem = 0;
+        if (!err2) {
+          const statLines = stdout2.trim().split("\n");
+          const statMap = {};
+          statLines.forEach((l) => {
+            const parts = l.split("|");
+            if (parts.length >= 2) {
+              const usageStr = parts[1].split("/")[0].trim();
+              statMap[parts[0]] = usageStr;
+            }
+          });
+          containers.forEach((c) => {
+            if (statMap[c.id]) {
+              c.memoryStr = statMap[c.id];
+              c.memoryBytes = parseMemory(c.memoryStr);
+              totalMem += c.memoryBytes;
+            }
+          });
+        }
+        resolve({ containers, totalMem });
+      });
+    });
+  });
+}
+function stopContainer(id) {
+  return new Promise((resolve) => {
+    (0, import_child_process7.exec)(`docker stop ${id}`, (err) => {
+      if (err) return resolve({ success: false, error: err.message });
+      resolve({ success: true });
+    });
+  });
+}
+function stopAllContainers() {
+  return new Promise((resolve) => {
+    (0, import_child_process7.exec)("docker stop $(docker ps -q)", (err) => {
+      if (err) {
+        if (err.message.includes("requires at least 1 argument") || err.message.includes("Usage:")) {
+          return resolve({ success: true, message: "No containers to stop" });
+        }
+        return resolve({ success: false, error: err.message });
+      }
+      resolve({ success: true });
+    });
+  });
+}
+router17.get("/", async (req, res) => {
+  const data = await getDockerContainers2();
+  res.json(data);
+});
+router17.post("/stop", async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      res.status(400).json({ error: "ID required" });
+      return;
+    }
+    const result = await stopContainer(id);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+router17.post("/stop-all", async (req, res) => {
+  try {
+    const result = await stopAllContainers();
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+var apidocker_default = router17;
+
 // src/index.ts
-var app = (0, import_express18.default)();
+var app = (0, import_express20.default)();
 var port = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express18.default.static("public"));
-app.use(import_express18.default.json());
+app.use(import_express20.default.static("public"));
+app.use(import_express20.default.json());
 app.use("/", tester_default);
 app.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app.use("/" + api_default.stopProcess, stopcmd_default);
@@ -1512,8 +1832,10 @@ app.use("/" + api_default.notes, notes_default);
 app.use("/" + api_default.crudTest, crudtest_default);
 app.use("/" + api_default.gitControl, gitControlHelper_default);
 app.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
+app.use("/" + api_default.processTree, processUsage_default);
+app.use("/" + api_default.docker, apidocker_default);
 var frontendPath = import_path14.default.join(__dirname, "../public");
-app.use(import_express18.default.static(frontendPath));
+app.use(import_express20.default.static(frontendPath));
 app.get("*", (req, res) => {
   res.sendFile(import_path14.default.join(frontendPath, "index.html"));
 });
