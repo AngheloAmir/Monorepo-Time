@@ -129,6 +129,7 @@ var config = {
 var config_default = config;
 
 // src/index.ts
+var import_open = __toESM(require("open"));
 var import_http = require("http");
 var import_socket = require("socket.io");
 var import_net = __toESM(require("net"));
@@ -1869,7 +1870,8 @@ var findAvailablePort = (startPort) => {
 };
 findAvailablePort(port).then((availablePort) => {
   httpServer.listen(availablePort, () => {
-    console.log(`Server running at http://localhost:${availablePort}`);
+    console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
+    (0, import_open.default)(`http://localhost:${availablePort}`);
   });
 }).catch((err) => {
   console.error("Failed to find an available port:", err);
