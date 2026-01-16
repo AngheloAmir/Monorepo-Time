@@ -127,7 +127,7 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
                     <InputField
                         label="Label"
                         icon="fas fa-info"
-                        placeholder="(optional) Description"
+                        placeholder="Name for the route"
                         value={label}
                         onChange={(e) => setLabel(e.target.value)}
                     />
@@ -143,14 +143,14 @@ export default function CrudEdit({ isOpen, onClose, categoryIndex, itemIndex }: 
                     <InputField
                         label="Route"
                         icon="fas fa-info"
-                        placeholder="(optional) Description"
+                        placeholder="/mytest"
                         value={route}
                         onChange={(e) => setRoute(e.target.value)}
                     />
                     <InputField
                         label="Method"
                         icon="fas fa-info"
-                        placeholder="(optional) Description"
+                        placeholder="GET | POST | DELETE | PUT"
                         value={method}
                         onChange={(e) => setMethod(e.target.value)}
                     />

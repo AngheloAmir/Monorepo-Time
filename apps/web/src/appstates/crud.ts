@@ -39,13 +39,12 @@ interface CrudContext {
     executionTime: number;
     sendRequest: () => Promise<void>;
 
-    setCrudData: (data: CrudCategory[]) => void;
+    setCrudData: (data: CrudCategory[]) => Promise<void>;
 }
 
 const crudState = create<CrudContext>()((set, get) => ({
     noData: true,
     crudData: [],
-    setCrudData: (data) => set({ crudData: data }),
     currentCategoryIndex: -1,
     currentCrudIndex: -1,
     useDevURL: true,
@@ -95,6 +94,25 @@ example:
 
     setCurrentCategoryIndex: (index: number) => set({ currentCategoryIndex: index }),
     setCurrentCrudIndex: (index: number) => set({ currentCrudIndex: index }),
+
+    setCrudData: async (data) => {
+        console.log('called')
+
+        const port     = config.apiPort || 3000;
+        try {
+            await fetch(`http://localhost:${port}/${apiRoute.crudTest}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ crudtest: data }),
+            });
+        }
+        catch(err) {
+            console.log(err);
+        }
+        set({ crudData: data })
+    },
 
     loadCrudData: async () => {
         try {
@@ -146,7 +164,7 @@ example:
                     set((state) => ({ output: state.output + chunk }));
                 }
                 set({ isFetching: false, executionTime: Date.now() - startTime });
-            } catch (error :any) {
+            } catch (error: any) {
                 let str = "";
                 try {
                     str = error.toString();

@@ -5,35 +5,46 @@ import type { DockerProcessInfo } from 'types';
 interface DockerProcessInfoContext {
     dockerprocessInfo: DockerProcessInfo[];
     loadDockerProcessInfo: () => Promise<void>;
+    stopDockerContainer: (id: string) => Promise<void>;
+    stopAllDockerContainers: () => Promise<void>;
 }
 
-const dockerprocessInfoState = create<DockerProcessInfoContext>()((set) => ({
+const dockerprocessInfoState = create<DockerProcessInfoContext>()((set, get) => ({
     dockerprocessInfo: [],
     loadDockerProcessInfo: async () => {
-        // const response = await fetch('/api/dockerprocessInfo');
-        // const data = await response.json();
-        // set({ dockerprocessInfo: data });
-        //fake process
-        const data = [
-            {
-                id: '1',
-                image: 'image1',
-                status: 'running',
-                name: 'container1',
-                memoryStr: '128MB',
-                memoryBytes: 128 * 1024 * 1024,
-            },
-            {
-                id: '2',
-                image: 'image2',
-                status: 'stopped',
-                name: 'container2',
-                memoryStr: '256MB',
-                memoryBytes: 256 * 1024 * 1024,
-            },
-        ];
-        set({ dockerprocessInfo: data });
+        try {
+            const res = await fetch('http://localhost:3000/docker'); // Correct URL based on API mount
+            const data = await res.json();
+            // data is { containers: [], totalMem: number }
+            set({ dockerprocessInfo: data.containers });
+        } catch (error) {
+            console.error("Failed to load docker info", error);
+        }
     },
+    stopDockerContainer: async (id: string) => {
+        try {
+            await fetch('http://localhost:3000/docker/stop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            // Reload info after stopping
+            await get().loadDockerProcessInfo();
+        } catch (error) {
+            console.error("Failed to stop container", error);
+        }
+    },
+    stopAllDockerContainers: async () => {
+        try {
+            await fetch('http://localhost:3000/docker/stop-all', {
+                method: 'POST'
+            });
+            // Reload info after stopping
+            await get().loadDockerProcessInfo();
+        } catch (error) {
+           console.error("Failed to stop all containers", error);
+        }
+    }
 }));
 
 const useDockerProcessInfoState = createSelectors(dockerprocessInfoState);

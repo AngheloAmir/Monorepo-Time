@@ -87,7 +87,13 @@ const apiRoute = {
     /** Initialize monorepotime.json
      * get request returns { success: boolean }
      */
-    initMonorepoTime: 'initmtime'
+    initMonorepoTime: 'initmtime',
+
+    /** Process tree and dockers memory usage */
+    processTree: 'processtree',
+
+    /** Docker API */
+    docker: 'docker',
 }
 
 export default apiRoute;

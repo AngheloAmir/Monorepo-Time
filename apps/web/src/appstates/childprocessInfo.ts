@@ -15,45 +15,45 @@ const childprocessInfoState = create<childprocessInfoContext>()((set) => ({
     peakRam: 0,
 
     loadChildProcessInfo: async () => {
-        // const childprocessInfo = await fetch('/api/childprocessInfo').then(res => res.json());
-        // set({ childprocessInfo });
-        const childprocessInfo = [
-            {
-                name: "Process 1",
-                pid: 666,
-                mem: Math.floor(Math.random() * 100)
-            },
-            {
-                name: "Process 2",
-                pid: 555,
-                mem: Math.floor(Math.random() * 100)
-            },
-            {
-                name: "Process 3",
-                pid: 333,
-                mem: Math.floor(Math.random() * 100)
-            },
-            {
-                name: "Process 4",
-                pid: 111,
-                mem: Math.floor(Math.random() * 100)
-            },
-            {
-                name: "Process 5",
-                pid: 222,
-                mem: Math.floor(Math.random() * 100)
-            },
-        ]
-        const totalRam = childprocessInfo.reduce((acc, p) => acc + p.mem, 0);
-        set( state => {
-            if(totalRam > state.peakRam) {
-                set({ peakRam: totalRam });
-            }
-            return {
-                childprocessInfo,
-                totalRam
-            }
-        });
+        try {
+            const res = await fetch('http://localhost:3000/processtree');
+            const data = await res.json();
+            
+            // data.processes contains the array.
+            // Map to ChildProcessInfo structure: { name, pid, mem }
+            // Convert mem (bytes) -> MB
+            const childprocessInfo: ChildProcessInfo[] = data.processes.map((p: any) => {
+                let name = p.name;
+                // Remove "Terminal ( ... )" wrapper
+                if (name.startsWith("Terminal (") && name.endsWith(")")) {
+                    // Extract inner name: "Terminal ( myapp )" -> "myapp"
+                    // Or "Terminal (myapp)" -> "myapp"
+                    const match = name.match(/Terminal \(\s*(.*?)\s*\)/);
+                    if (match && match[1]) {
+                        name = match[1];
+                    }
+                }
+
+                return {
+                    name: name,
+                    pid: p.pid,
+                    mem: Math.round(p.memory / 1024 / 1024) // Bytes to MB
+                };
+            });
+
+            const totalRam = childprocessInfo.reduce((acc, p) => acc + p.mem, 0);
+            
+            set(state => {
+                const newPeak = totalRam > state.peakRam ? totalRam : state.peakRam;
+                return {
+                    childprocessInfo,
+                    totalRam,
+                    peakRam: newPeak
+                };
+            });
+        } catch (error) {
+            console.error("Failed to load process info", error);
+        }
     }
 }));
 

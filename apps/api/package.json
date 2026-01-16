@@ -19,6 +19,7 @@
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.3",
     "open": "^11.0.0",
+    "pidusage": "^4.0.1",
     "socket.io": "^4.8.3"
   },
   "keywords": [],
@@ -26,16 +27,17 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "apiroute": "*",
-    "config": "*",
-    "types": "*",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.10.4",
+    "@types/pidusage": "^2.0.5",
+    "apiroute": "*",
+    "config": "*",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
+    "types": "*",
     "typescript": "^5.9.3"
   },
   "bin": {

@@ -29,6 +29,8 @@ import notesRoute        from './routes/notes';
 import crudTestRoute     from './routes/crudtest';
 import gitControlHelper  from './routes/gitControlHelper';
 import initMonorepoTime  from './routes/initmonorepotime';
+import processTree       from './routes/processUsage';
+import apiDocker         from './routes/apidocker';
 
 const app  = express();
 const port = config.apiPort;
@@ -58,6 +60,8 @@ app.use("/" + apiRoute.notes,              notesRoute);
 app.use("/" + apiRoute.crudTest,           crudTestRoute);
 app.use("/" + apiRoute.gitControl,         gitControlHelper);
 app.use("/" + apiRoute.initMonorepoTime,   initMonorepoTime);
+app.use("/" + apiRoute.processTree,        processTree);
+app.use("/" + apiRoute.docker,             apiDocker);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');
