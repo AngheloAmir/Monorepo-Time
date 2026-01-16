@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import apiRoute from 'apiroute';
-import { path } from './_relative';
+import { ServerPath } from './_relative';
 
 interface appContext {
     showTerminal: boolean;
@@ -34,7 +34,7 @@ const appstate = create<appContext>()((set, get) => ({
     loadRootDir: async () => {
         if (get().rootDir.length > 0) return;
         try {
-            const response = await fetch(`${path}${apiRoute.getRootPath}`);
+            const response = await fetch(`${ServerPath}${apiRoute.getRootPath}`);
             const data = await response.json();
             set({ rootDir: data.path });
         } catch (err) {
@@ -44,7 +44,7 @@ const appstate = create<appContext>()((set, get) => ({
 
     checkIfFirstTime: async () => {
         try {
-            const response = await fetch(`${path}${apiRoute.firstRun}`);
+            const response = await fetch(`${ServerPath}${apiRoute.firstRun}`);
             const data = await response.json();
             return data.isFirstTime;
         } catch (error) {
@@ -54,7 +54,7 @@ const appstate = create<appContext>()((set, get) => ({
 
     initMonorepoTime: async () => {
         try {
-            await fetch(`${path}${apiRoute.initMonorepoTime}`);
+            await fetch(`${ServerPath}${apiRoute.initMonorepoTime}`);
         } catch (error) {
             console.error('Error initializing Monorepo Time:', error);
         }
@@ -65,7 +65,7 @@ const appstate = create<appContext>()((set, get) => ({
     setNotes: (notes: string) => set({ notes }),
     loadNotes: async () => {
         try {
-            const response = await fetch(`${path}${apiRoute.notes}`);
+            const response = await fetch(`${ServerPath}${apiRoute.notes}`);
 
             if (!response.ok) {
                 set({ noteNotFound: true });
@@ -80,7 +80,7 @@ const appstate = create<appContext>()((set, get) => ({
     },
     saveNotes: async () => {
         try {
-            await fetch(`${path}${apiRoute.notes}`, {
+            await fetch(`${ServerPath}${apiRoute.notes}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,13 +93,13 @@ const appstate = create<appContext>()((set, get) => ({
     },
 
     scaffoldRepo: async () => {
-        const response = await fetch(`${path}${apiRoute.scaffoldRepo}`);
+        const response = await fetch(`${ServerPath}${apiRoute.scaffoldRepo}`);
         const data = await response.json();
         return data;
     },
 
     hideShowFileFolder: async (filesShow: boolean, pathInclude: string[]) => {
-        const response = await fetch(`${path}${apiRoute.hideShowFileFolder}`, {
+        const response = await fetch(`${ServerPath}${apiRoute.hideShowFileFolder}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
