@@ -25,12 +25,102 @@ router.post("/", async (req: Request, res: Response) => {
         const currentSocket = sockets.get(workspace.name);
         const currentProcess = activeProcesses.get(workspace.name);
 
-        // 1. Kill the Active Process
-        if (currentProcess) {
-            // 1. Send SIGINT first (Polite stop)
-            if (currentProcess.pid) {
+        if (!currentProcess) {
+            currentSocket?.emit('log', chalk.yellow("No active process found to stop."));
+            return res.end();
+        }
+
+        // Helper to kill process forcefully
+        const forceKill = async () => {
+             if (currentProcess.pid) {
+                currentSocket?.emit('log', chalk.red("Forcing kill..."));
+                if (process.platform !== 'win32') {
+                    await cleanupProcessPorts(currentProcess.pid, currentSocket);
+                    try {
+                        process.kill(-currentProcess.pid, 'SIGKILL');
+                    } catch (e) {}
+                } else {
+                    currentProcess.kill('SIGKILL');
+                }
+            }
+        };
+
+        // Helper to wait for process exit
+        const waitForExit = () => {
+            return new Promise<void>((resolve) => {
+                let resolved = false;
+                const safeResolve = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve();
+                    }
+                };
+
+                const timer = setTimeout(async () => {
+                    console.log(`Process stop timed out for ${workspace.name}`);
+                    currentSocket?.emit('log', chalk.red("Process stop timed out."));
+                    await forceKill();
+                    safeResolve();
+                }, 25000);
+
+                currentProcess.once('exit', () => {
+                    clearTimeout(timer);
+                    safeResolve();
+                });
+                
+                if (currentProcess.exitCode !== null) {
+                    clearTimeout(timer);
+                    safeResolve();
+                }
+            });
+        }
+
+        // 1. Check for Stop Command
+        const commandToRun = workspace.stopCommand;
+        
+        if (commandToRun) {
+            currentSocket?.emit('log', chalk.blue(`Executing stop command: ${commandToRun}`));
+            
+            const baseCMD = commandToRun.split(" ")[0];
+            const args = commandToRun.split(" ").slice(1);
+
+            const invalidStop = !baseCMD || (baseCMD === 'echo' && args.length > 0 && args[0].includes('manually'));
+
+            if (!invalidStop) {
+                 const stopChild = spawn(baseCMD, args, {
+                    cwd: workspace.path,
+                    env: {
+                        ...process.env,
+                        TERM: 'dumb',
+                        FORCE_COLOR: '1',
+                    },
+                    stdio: ['ignore', 'pipe', 'pipe'],
+                    shell: true,
+                    detached: process.platform !== 'win32'
+                });
+
+                stopChild.stdout.on('data', (data) => {
+                    currentSocket?.emit('log', chalk.gray(`[Stop Script] ${data.toString()}`));
+                });
+                stopChild.stderr.on('data', (data) => {
+                    currentSocket?.emit('error', chalk.gray(`[Stop Script] ${data.toString()}`));
+                });
+                
+                // Wait for the main process to exit (it should happen if stop script works)
+                await waitForExit();
+            } else {
+                 currentSocket?.emit('log', chalk.yellow("Stop command is a placeholder. Using signal kill."));
+                 // Proceed to signal kill below
+                 process.env.TEST_VAR = 'true'; // Just dummy op
+            }
+
+        }
+
+        // 2. If process is still alive (no stop command, or stop command failed/ignored), Kill it
+        if (currentProcess.exitCode === null) {
+            currentSocket?.emit('log', chalk.yellow("Sending Stop Signal (SIGINT)..."));
+             if (currentProcess.pid) {
                 try {
-                    currentSocket?.emit('log', chalk.yellow("Sending Stop Signal (SIGINT)..."));
                     if (process.platform !== 'win32') {
                         process.kill(-currentProcess.pid, 'SIGINT');
                     } else {
@@ -42,89 +132,12 @@ router.post("/", async (req: Request, res: Response) => {
                     }
                 }
             }
-
-            await new Promise<void>((resolve) => {
-                let resolved = false;
-                const safeResolve = () => {
-                    if (!resolved) {
-                        resolved = true;
-                        resolve();
-                    }
-                };
-
-                // Timeout safety: Give it 15s to shut down gracefully (Docker takes time)
-                const timer = setTimeout(async () => {
-                    console.log(`Process stop timed out for ${workspace.name}`);
-                    currentSocket?.emit('log', chalk.red("Process timed out. Forcing kill..."));
-                    
-                    // Force cleanup ports and kill if it didn't exit
-                    if (currentProcess.pid) {
-                        if (process.platform !== 'win32') {
-                            await cleanupProcessPorts(currentProcess.pid, currentSocket);
-                            try {
-                                process.kill(-currentProcess.pid, 'SIGKILL');
-                            } catch (e) {}
-                        } else {
-                            currentProcess.kill('SIGKILL');
-                        }
-                    }
-                    safeResolve();
-                }, 15000);
-
-                currentProcess.once('exit', () => {
-                    clearTimeout(timer);
-                    safeResolve();
-                });
-                
-                // If process was already dead before we attached listener
-                if (currentProcess.exitCode !== null) {
-                    clearTimeout(timer);
-                    safeResolve();
-                }
-            });
-
-            activeProcesses.delete(workspace.name);
-        } else {
-            currentSocket?.emit('log', chalk.yellow("No active process found to stop."));
+            await waitForExit();
         }
 
-        // 3. Execute Stop Command (if any)
-        const commandToRun = workspace.stopCommand;
-        if (commandToRun) {
-            currentSocket?.emit('log', chalk.green(`Running stop command: ${commandToRun}`));
-
-            const baseCMD = commandToRun.split(" ")[0];
-            const args = commandToRun.split(" ").slice(1);
-
-            const child = spawn(baseCMD, args, {
-                cwd: workspace.path,
-                env: {
-                    ...process.env,
-                    TERM: 'dumb',
-                    FORCE_COLOR: '1',
-                },
-                stdio: ['ignore', 'pipe', 'pipe'],
-                shell: true,
-                detached: process.platform !== 'win32'
-            });
-
-            child.stdout.on('data', (data) => {
-                currentSocket?.emit('log', data.toString());
-            });
-            child.stderr.on('data', (data) => {
-                currentSocket?.emit('error', data.toString());
-            });
-            child.on('close', (code) => {
-                currentSocket?.emit('log', chalk.green(`Stop command finished with code ${code}`));
-                currentSocket?.emit('exit', 'Process stopped');
-                // We keep the socket open or let client disconnect
-            });
-
-        } else {
-            currentSocket?.emit('log', "Process stopped (no stop command defined).");
-            currentSocket?.emit('exit', 'Process stopped');
-        }
-
+        activeProcesses.delete(workspace.name);
+        currentSocket?.emit('exit', 'Process stopped');
+        
         await new Promise((resolve) => setTimeout(resolve, 1000));
         res.end();
 

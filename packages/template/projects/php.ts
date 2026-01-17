@@ -1,0 +1,26 @@
+import { ProjectTemplate } from "..";
+
+export const PHP: ProjectTemplate = {
+    name: "PHP",
+    description: "Simple PHP project template",
+    notes: "PHP must be installed in your system.",
+    templating: [
+        {
+            action: 'file',
+            file: 'index.php',
+            filecontent: '<?php\n\necho "Hello World! Monorepo Time!";\n'
+        },
+        {
+            action: 'command',
+            command: 'npm pkg set scripts.dev="php -S localhost:3000"'
+        },
+        {
+            action: 'command',
+            command: 'npm pkg set scripts.start="php -S localhost:3000"'
+        },
+        {
+            action: 'command',
+            command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+        }
+    ]
+};

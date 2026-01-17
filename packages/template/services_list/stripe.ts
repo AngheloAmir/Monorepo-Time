@@ -1,5 +1,5 @@
 
-import { ProjectTemplate } from ".";
+import { ProjectTemplate } from "..";
 
 const dockerCompose = `services:
   stripe-mock:
@@ -77,7 +77,7 @@ const stripe = new Stripe('sk_test_mock_123', {
 })();
 `;
 
-const stripeTemplate: ProjectTemplate = {
+export const StripeTemplate: ProjectTemplate = {
     name: "Stripe Mock",
     description: "Stripe API Mock Server",
     notes: "Runs the official stripe-mock image",
@@ -114,5 +114,3 @@ const stripeTemplate: ProjectTemplate = {
         }
     ]
 };
-
-export default stripeTemplate;

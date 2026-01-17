@@ -439,10 +439,18 @@ router2.post("/", async (req, res) => {
     const currentSocket = sockets.get(workspace.name);
     const currentProcess = activeProcesses.get(workspace.name);
     if (currentProcess) {
-      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("Stopping active process..."));
       if (currentProcess.pid) {
-        if (process.platform !== "win32") {
-          await cleanupProcessPorts(currentProcess.pid, currentSocket);
+        try {
+          currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("Sending Stop Signal (SIGINT)..."));
+          if (process.platform !== "win32") {
+            process.kill(-currentProcess.pid, "SIGINT");
+          } else {
+            currentProcess.kill();
+          }
+        } catch (error) {
+          if (error.code !== "ESRCH") {
+            console.error(`Failed to signal process: ${error.message}`);
+          }
         }
       }
       await new Promise((resolve) => {
@@ -453,30 +461,28 @@ router2.post("/", async (req, res) => {
             resolve();
           }
         };
-        const timer = setTimeout(() => {
+        const timer = setTimeout(async () => {
           console.log(`Process stop timed out for ${workspace.name}`);
+          currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.red("Process timed out. Forcing kill..."));
+          if (currentProcess.pid) {
+            if (process.platform !== "win32") {
+              await cleanupProcessPorts(currentProcess.pid, currentSocket);
+              try {
+                process.kill(-currentProcess.pid, "SIGKILL");
+              } catch (e) {
+              }
+            } else {
+              currentProcess.kill("SIGKILL");
+            }
+          }
           safeResolve();
-        }, 5e3);
+        }, 15e3);
         currentProcess.once("exit", () => {
           clearTimeout(timer);
           safeResolve();
         });
-        if (currentProcess.pid) {
-          try {
-            if (process.platform !== "win32") {
-              process.kill(-currentProcess.pid, "SIGINT");
-            } else {
-              currentProcess.kill();
-            }
-          } catch (error) {
-            if (error.code === "ESRCH") {
-              clearTimeout(timer);
-              safeResolve();
-            } else {
-              console.error(`Failed to kill process: ${error.message}`);
-            }
-          }
-        } else {
+        if (currentProcess.exitCode !== null) {
+          clearTimeout(timer);
           safeResolve();
         }
       });
@@ -1848,11 +1854,11 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.dev="node server.js"'
+        command: 'npm pkg set scripts.start="node server.js"'
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.start="node server.js"'
+        command: `npm pkg set scripts.stop="echo 'Note: MySQL is running as a system service. Please stop it manually.'"`
       }
     ]
   },
@@ -1864,12 +1870,11 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
       {
         action: "file",
         file: "docker-compose.yml",
-        filecontent: `version: "3.9"
+        filecontent: `
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: user
@@ -1889,12 +1894,70 @@ volumes:
   postgres-data:`
       },
       {
-        action: "command",
-        command: 'npm pkg set scripts.dev="docker compose up"'
+        action: "file",
+        file: "start.js",
+        filecontent: `const { spawn, exec } = require('child_process');
+
+console.log('Starting PostgreSQL...');
+
+// Use spawn to avoid buffer issues and separate process management
+const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+child.stderr.on('data', (data) => {
+   // Filter logs if needed
+   const output = data.toString();
+   if (!output.includes('The attribute \`version\` is obsolete')) {
+       // console.error(output); 
+   }
+});
+
+// Give it time to start, then print info
+setTimeout(() => {
+   exec('docker compose port postgres 5432', (err, stdout, stderr) => {
+       if (stderr) {
+           console.error(stderr);
+           return;
+       }
+       const port = stdout.trim().split(':')[1];
+       console.clear();
+       console.log('\\n==================================================');
+       console.log('\u{1F680} PostgreSQL is running!');
+       console.log('--------------------------------------------------');
+       console.log(\`\u{1F50C} Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
+       console.log('\u{1F464} Username:          user');
+       console.log('\u{1F511} Password:          password');
+       console.log('\u{1F5C4}\uFE0F  Database:          mydatabase');
+       console.log(\`\u{1F310} Port:              \${port}\`);
+       console.log('==================================================\\n');
+   });
+}, 5000);
+
+// Handle process exit to clean up containers
+const cleanup = () => {
+    console.log('Stopping PostgreSQL...');
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.start="docker compose up"'
+        command: "npm install"
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="node start.js"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="docker compose stop"'
       }
     ]
   },
@@ -1913,11 +1976,11 @@ volumes:
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.dev="npx supabase start"'
+        command: 'npm pkg set scripts.start="npx supabase start"'
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.start="npx supabase start"'
+        command: 'npm pkg set scripts.stop="npx supabase stop"'
       }
     ]
   },
@@ -1929,12 +1992,11 @@ volumes:
       {
         action: "file",
         file: "docker-compose.yml",
-        filecontent: `version: "3.9"
+        filecontent: `
 
 services:
   redis:
     image: redis:7.2-alpine
-    container_name: redis
     restart: unless-stopped
     ports:
       - "0:6379"
@@ -1955,12 +2017,57 @@ volumes:
   redis-data:`
       },
       {
-        action: "command",
-        command: 'npm pkg set scripts.dev="docker compose up"'
+        action: "file",
+        file: "start.js",
+        filecontent: `const { spawn, exec } = require('child_process');
+
+console.log('Starting Redis...');
+
+const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Give it time to start
+setTimeout(() => {
+    exec('docker compose port redis 6379', (err, stdout, stderr) => {
+        if (stderr) {
+            console.error(stderr);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        console.clear();
+        console.log('\\n==================================================');
+        console.log('\u{1F680} Redis is running!');
+        console.log('--------------------------------------------------');
+        console.log(\`\u{1F50C} Connection String: redis://localhost:\${port}\`);
+        console.log(\`\u{1F310} Port:              \${port}\`);
+        console.log('==================================================\\n');
+    });
+}, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Redis...');
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.start="docker compose up"'
+        command: "npm install"
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="node start.js"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="docker compose stop"'
       }
     ]
   },
@@ -1975,7 +2082,6 @@ volumes:
         filecontent: `services:
   mongodb:
     image: mongo:7.0
-    container_name: mongodb
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -1999,21 +2105,20 @@ volumes:
       {
         action: "file",
         file: "start.js",
-        filecontent: `const { exec } = require('child_process');
+        filecontent: `const { spawn, exec } = require('child_process');
 
 console.log('Starting MongoDB...');
 
-const process = exec('docker compose up');
+const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
 
-// Filter output
-process.stdout.on('data', (data) => {
-    // Only show critical info or nothing
+child.on('close', (code) => {
+    process.exit(code || 0);
 });
 
-process.stderr.on('data', (data) => {
-    // Docker compose often writes to stderr
-    if (!data.includes('The attribute \`version\` is obsolete')) {
-        // console.error(data); // Uncomment if real errors needed
+child.stderr.on('data', (data) => {
+    const output = data.toString();
+    if (!output.includes('The attribute \`version\` is obsolete')) {
+        // console.error(output);
     }
 });
 
@@ -2035,7 +2140,18 @@ setTimeout(() => {
         console.log(\`\u{1F310} Port:              \${port}\`);
         console.log('==================================================\\n');
     });
-}, 3000);`
+}, 5000);
+
+// Handle process exit to clean up containers
+const cleanup = () => {
+    console.log('Stopping MongoDB...');
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
       },
       {
         action: "command",
@@ -2043,11 +2159,11 @@ setTimeout(() => {
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.dev="node start.js"'
+        command: 'npm pkg set scripts.start="node start.js"'
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.start="node start.js"'
+        command: 'npm pkg set scripts.stop="docker compose stop"'
       }
     ]
   }
@@ -2124,6 +2240,10 @@ export default {
         action: "file",
         file: "src/index.css",
         filecontent: "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="npx kill-port 5173"'
       }
     ]
   },
@@ -2135,6 +2255,10 @@ export default {
       {
         action: "command",
         command: "npx create-next-app@latest . --typescript --tailwind --eslint"
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="npx kill-port 3000"'
       }
     ]
   },
@@ -2181,6 +2305,10 @@ export default {
       {
         action: "command",
         command: 'npm pkg set scripts.start="node dist/index.js"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="npx kill-port 3000"'
       }
     ]
   },
@@ -2201,6 +2329,10 @@ export default {
       {
         action: "command",
         command: 'npm pkg set scripts.start="php -S localhost:3000"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="npx kill-port 3000"'
       }
     ]
   },
@@ -2220,6 +2352,10 @@ export default {
       {
         action: "command",
         command: 'npm pkg set scripts.start="php artisan serve"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="npx kill-port 8000"'
       }
     ]
   },
@@ -2275,7 +2411,6 @@ var dockerCompose = `version: "3.9"
 
 services:
   localstack:
-    container_name: "\${LOCALSTACK_DOCKER_NAME-localstack_main}"
     image: localstack/localstack
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
@@ -2802,6 +2937,120 @@ var awsTemplate = {
 };
 var aws_default = awsTemplate;
 
+// ../../packages/template/stripe.ts
+var dockerCompose2 = `services:
+  stripe-mock:
+    image: stripe/stripe-mock:latest
+    container_name: stripe-mock
+    ports:
+      - "12111:12111"
+      - "12112:12112"
+    healthcheck:
+      test: ["CMD", "/usr/bin/curl", "-f", "http://localhost:12111/"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+`;
+var testJs = `const Stripe = require('stripe');
+
+// Initialize with a fake key and point to the mock server
+// The mock server accepts any API key
+const stripe = new Stripe('sk_test_mock_123', {
+  host: 'localhost',
+  port: 12111,
+  protocol: 'http',
+});
+
+(async () => {
+    console.log('Connecting to Local Stripe Mock at http://localhost:12111...');
+
+    try {
+        // 1. Create a Customer
+        console.log('\\n1. Creating a mock customer...');
+        const customer = await stripe.customers.create({
+            email: 'jane.doe@example.com',
+            name: 'Jane Doe',
+            description: 'My First Mock Customer'
+        });
+        console.log('\u2705 Customer created:', customer.id);
+        console.log('   Email:', customer.email);
+
+        // 2. Create a Product
+        console.log('\\n2. Creating a mock product...');
+        const product = await stripe.products.create({
+            name: 'Gold Special',
+            description: 'One-time gold plan',
+        });
+        console.log('\u2705 Product created:', product.id);
+
+        // 3. Create a Price
+        console.log('\\n3. Creating a price for the product...');
+        const price = await stripe.prices.create({
+            unit_amount: 2000,
+            currency: 'usd',
+            product: product.id,
+        });
+        console.log('\u2705 Price created:', price.id);
+
+        // 4. Create a Payment Intent
+        console.log('\\n4. Creating a payment intent...');
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: 2000,
+            currency: 'usd',
+            payment_method_types: ['card'],
+            customer: customer.id,
+        });
+        console.log('\u2705 Payment Intent created:', paymentIntent.id);
+        console.log('   Status:', paymentIntent.status); // likely 'requires_payment_method' in mock
+
+        console.log('\\n\u{1F389} Success! You are successfully talking to the local Stripe Mock.');
+        console.log('For more examples, try running other Stripe API commands.');
+
+    } catch (err) {
+        console.error('\u274C Error interacting with Stripe Mock:', err.message);
+        console.error('Make sure the docker container is running with: npm run start');
+    }
+})();
+`;
+var stripeTemplate = {
+  name: "Stripe Mock",
+  description: "Stripe API Mock Server",
+  notes: "Runs the official stripe-mock image",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose2
+    },
+    {
+      action: "file",
+      file: "test.js",
+      filecontent: testJs
+    },
+    {
+      action: "command",
+      command: "npm install stripe"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.dev="docker compose up"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="docker compose up"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.test="node test.js"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="docker compose down"'
+    }
+  ]
+};
+var stripe_default = stripeTemplate;
+
 // ../../packages/template/services.ts
 var templates3 = [
   {
@@ -2820,10 +3069,15 @@ var templates3 = [
       {
         action: "command",
         command: 'npm pkg set scripts.start="npx n8n"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.stop="npx kill-port 5678"'
       }
     ]
   },
-  aws_default
+  aws_default,
+  stripe_default
 ];
 var services_default = templates3;
 
@@ -2980,7 +3234,9 @@ var findAvailablePort = (startPort) => {
 findAvailablePort(port2).then((availablePort) => {
   httpServer.listen(availablePort, () => {
     console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
-    (0, import_open.default)(`http://localhost:${availablePort}`);
+    if (process.env.NODE_ENV === "development") {
+      (0, import_open.default)(`http://localhost:${availablePort}`);
+    }
   });
 }).catch((err) => {
   console.error("Failed to find an available port:", err);

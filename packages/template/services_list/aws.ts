@@ -1,3 +1,4 @@
+import { ProjectTemplate } from "..";
 
 const dockerCompose = `version: "3.9"
 
@@ -478,9 +479,7 @@ dynamodb.createTable(params, function(err, data) {
 </body>
 </html>`;
 
-import { ProjectTemplate } from ".";
-
-const awsTemplate: ProjectTemplate = {
+export const AWSTemplate: ProjectTemplate = {
     name: "AWS Local",
     description: "AWS LocalStack Environment with Manager",
     notes: "Requires Docker, Node.js, and AWS CLI installed.",
@@ -534,5 +533,3 @@ const awsTemplate: ProjectTemplate = {
         }
     ]
 };
-
-export default awsTemplate;

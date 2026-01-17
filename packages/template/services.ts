@@ -1,32 +1,12 @@
-import awsTemplate from "./aws";
+
 import { ProjectTemplate } from ".";
-import stripeTemplate from "./stripe";
+import { N8NLocal } from "./services_list/n8n";
+import { AWSTemplate } from "./services_list/aws";
+import { StripeTemplate } from "./services_list/stripe";
 
 const templates: ProjectTemplate[] = [
-   {
-        name: "N8N Local",
-        description: "N8N (Local)",
-        notes: "Requires Node.js installed in your system.",
-        templating: [
-            {
-                action: 'command',
-                command: 'npm install n8n'
-            },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.dev="npx n8n"'
-            },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.start="npx n8n"'
-            },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.stop="npx kill-port 5678"'
-            }
-        ]
-    },
-    awsTemplate,
-    stripeTemplate
+    N8NLocal,
+    AWSTemplate,
+    StripeTemplate
 ];
 export default templates;
