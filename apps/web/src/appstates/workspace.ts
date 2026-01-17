@@ -236,13 +236,22 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
         set({ loadingWorkspace: workspaceName });
+
+        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
+        const workspacePath = workspace?.info.path;
+
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.stopTerminalWorkspace}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ workspace: { name: workspaceName } })
+                body: JSON.stringify({ 
+                    workspace: { 
+                        name: workspaceName,
+                        path: workspacePath
+                    } 
+                })
             });
             if (!response.ok) {
                 throw new Error('Failed to stop interactive terminal');
