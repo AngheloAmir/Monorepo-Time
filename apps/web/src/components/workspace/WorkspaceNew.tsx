@@ -74,13 +74,13 @@ export default function WorkspaceNew() {
         try {
             const response = await createNewWorkspace(newWorkspaceToAdd);
             if (response) {
-                loadWorkspace();
                 if (template) {
                     setWorkspaceTemplate(newWorkspaceToAdd, template);
                 }
                 else {
                     setShowNewTerminalWindow(newWorkspaceToAdd);
                 }
+                loadWorkspace();
                 close();
             }
         } catch (error) {

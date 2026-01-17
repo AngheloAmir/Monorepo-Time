@@ -8,11 +8,34 @@ const templates: ProjectTemplate[] = [
         templating: [
             {
                 action: 'command',
-                command: 'npm pkg set scripts.dev="echo \'Ensure MySQL is running on your system\'"'
+                command: 'npm install open'
+            },
+            {
+                action: 'file',
+                file: 'server.js',
+                filecontent: `const path = require('path');
+
+// Configuration
+const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferred editor URL
+
+(async () => {
+    console.log(\`Opening MySQL Editor at \${EDITOR_URL}...\`);
+    try {
+        const open = (await import('open')).default;
+        await open(EDITOR_URL);
+        console.log('Opened successfully.');
+    } catch (err) {
+        console.error('Failed to open browser:', err);
+    }
+})();`
             },
             {
                 action: 'command',
-                command: 'npm pkg set scripts.start="echo \'Ensure MySQL is running on your system\'"'
+                command: 'npm pkg set scripts.dev="node server.js"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.start="node server.js"'
             }
         ]
     },
