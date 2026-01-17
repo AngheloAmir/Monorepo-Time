@@ -42,6 +42,7 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+let containerId = null;
 
 console.log('Starting Redis...');
 
@@ -65,9 +66,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(0, () => {
     const port = server.address().port;
-    try {
-        fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ port, pid: process.pid }));
-    } catch(e) {}
+    // We update runtime file later
 });
 
 // Give it time to start
@@ -77,22 +76,43 @@ setTimeout(() => {
         const port = stdout.trim().split(':')[1];
         if (!port) return;
 
-        console.clear();
-        console.log('\\n==================================================');
-        console.log('🚀 Redis is running!');
-        console.log('--------------------------------------------------');
-        console.log(\`🔌 Connection String: redis://localhost:\${port}\`);
-        console.log(\`🌐 Port:              \${port}\`);
-        console.log('==================================================\\n');
+        exec('docker compose ps -q redis', (err2, stdout2) => {
+            if (stdout2) containerId = stdout2.trim();
+
+            try {
+                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                    port: server.address().port, 
+                    pid: process.pid,
+                    containerId: containerId 
+                }));
+            } catch(e) {}
+
+            console.clear();
+            console.log('\\n==================================================');
+            console.log('🚀 Redis is running!');
+            console.log('--------------------------------------------------');
+            console.log(\`🔌 Connection String: redis://localhost:\${port}\`);
+            console.log(\`🌐 Port:              \${port}\`);
+            if (containerId) console.log(\`📦 Container ID:      \${containerId}\`);
+            console.log('==================================================\\n');
+        });
     });
 }, 3000);
 
 const cleanup = () => {
     console.log('Stopping Redis...');
     try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    exec('docker compose stop', () => {
-        process.exit(0);
-    });
+    
+    if (containerId) {
+        console.log(\`Stopping container \${containerId}...\`);
+        exec(\`docker stop \${containerId}\`, () => {
+             process.exit(0);
+        });
+    } else {
+        exec('docker compose stop', () => {
+            process.exit(0);
+        });
+    }
 };
 
 process.on('SIGINT', cleanup);

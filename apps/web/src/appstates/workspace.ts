@@ -208,7 +208,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
         set({ loadingWorkspace: workspaceName });
-
+ 
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.stopInteractiveTerminal}`, {
                 method: 'POST',

@@ -1,9 +1,8 @@
 import { Request, Response, Router } from "express";
 import { activeProcesses, sockets } from "./runcmddev";
 import { WorkspaceInfo } from "types";
-import { spawn, exec } from "child_process";
-import { promisify } from "util";
 import chalk from "chalk";
+import { exec } from "child_process";
 
 const router = Router();
 
@@ -18,128 +17,46 @@ router.post("/", async (req: Request, res: Response) => {
         const body = req.body as RequestBody;
         const workspace = body.workspace;
 
-        if (!workspace) {
+        if (!workspace || !workspace.name) {
             return res.status(400).json({ error: "No workspace provided" });
         }
 
-        const currentSocket = sockets.get(workspace.name);
         const currentProcess = activeProcesses.get(workspace.name);
+        const currentSocket  = sockets.get(workspace.name);
 
-        if (!currentProcess) {
-            currentSocket?.emit('log', chalk.yellow("No active process found to stop."));
-            return res.end();
-        }
-
-        // Helper to kill process forcefully
-        const forceKill = async () => {
-             if (currentProcess.pid) {
-                currentSocket?.emit('log', chalk.red("Forcing kill..."));
-                if (process.platform !== 'win32') {
-                    await cleanupProcessPorts(currentProcess.pid, currentSocket);
-                    try {
-                        process.kill(-currentProcess.pid, 'SIGKILL');
-                    } catch (e) {}
-                } else {
-                    currentProcess.kill('SIGKILL');
-                }
-            }
-        };
-
-        // Helper to wait for process exit
-        const waitForExit = () => {
-            return new Promise<void>((resolve) => {
-                let resolved = false;
-                const safeResolve = () => {
-                    if (!resolved) {
-                        resolved = true;
-                        resolve();
-                    }
-                };
-
-                const timer = setTimeout(async () => {
-                    console.log(`Process stop timed out for ${workspace.name}`);
-                    currentSocket?.emit('log', chalk.red("Process stop timed out."));
-                    await forceKill();
-                    safeResolve();
-                }, 25000);
-
-                currentProcess.once('exit', () => {
-                    clearTimeout(timer);
-                    safeResolve();
-                });
-                
-                if (currentProcess.exitCode !== null) {
-                    clearTimeout(timer);
-                    safeResolve();
-                }
-            });
-        }
-
-        // 1. Check for Stop Command
-        const commandToRun = workspace.stopCommand;
-        
-        if (commandToRun) {
-            currentSocket?.emit('log', chalk.blue(`Executing stop command: ${commandToRun}`));
+        if (currentProcess) {
+            currentSocket?.emit('log', chalk.yellow("Stopping process tree..."));
             
-            const baseCMD = commandToRun.split(" ")[0];
-            const args = commandToRun.split(" ").slice(1);
-
-            const invalidStop = !baseCMD || (baseCMD === 'echo' && args.length > 0 && args[0].includes('manually'));
-
-            if (!invalidStop) {
-                 const stopChild = spawn(baseCMD, args, {
-                    cwd: workspace.path,
-                    env: {
-                        ...process.env,
-                        TERM: 'dumb',
-                        FORCE_COLOR: '1',
-                    },
-                    stdio: ['ignore', 'pipe', 'pipe'],
-                    shell: true,
-                    detached: process.platform !== 'win32'
-                });
-
-                stopChild.stdout.on('data', (data) => {
-                    currentSocket?.emit('log', chalk.gray(`[Stop Script] ${data.toString()}`));
-                });
-                stopChild.stderr.on('data', (data) => {
-                    currentSocket?.emit('error', chalk.gray(`[Stop Script] ${data.toString()}`));
-                });
-                
-                // Wait for the main process to exit (it should happen if stop script works)
-                await waitForExit();
-            } else {
-                 currentSocket?.emit('log', chalk.yellow("Stop command is a placeholder. Using signal kill."));
-                 // Proceed to signal kill below
-                 process.env.TEST_VAR = 'true'; // Just dummy op
-            }
-
-        }
-
-        // 2. If process is still alive (no stop command, or stop command failed/ignored), Kill it
-        if (currentProcess.exitCode === null) {
-            currentSocket?.emit('log', chalk.yellow("Sending Stop Signal (SIGINT)..."));
-             if (currentProcess.pid) {
-                try {
-                    if (process.platform !== 'win32') {
-                        process.kill(-currentProcess.pid, 'SIGINT');
-                    } else {
-                        currentProcess.kill();
-                    }
-                } catch (error: any) {
-                    if (error.code !== 'ESRCH') {
-                        console.error(`Failed to signal process: ${error.message}`);
+            if (currentProcess.pid) {
+                if (process.platform === 'win32') {
+                    // Windows: taskkill /T kills tree, /F forces
+                    exec(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
+                         if(err) {
+                             // If taskkill fails, try standard kill as fallback
+                             currentProcess.kill();
+                         }
+                    });
+                } else {
+                    // Linux/Mac: Kill process group (requires detached=true in spawn)
+                    try {
+                        // Use SIGKILL to ensure it stops immediately
+                        process.kill(-currentProcess.pid, 'SIGKILL');
+                    } catch (e: any) {
+                        // Fallback if not detached or other error
+                        currentProcess.kill('SIGKILL');
                     }
                 }
+            } else {
+                currentProcess.kill();
             }
-            await waitForExit();
+            
+            activeProcesses.delete(workspace.name);
+            currentSocket?.emit('exit', 'Process stopped by user');
+            
+            res.json({ success: true, message: `Process for ${workspace.name} stopped` });
+        } else {
+            res.json({ success: true, message: "No active process to stop" });
         }
-
-        activeProcesses.delete(workspace.name);
-        currentSocket?.emit('exit', 'Process stopped');
-        
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        res.end();
 
     } catch (e: any) {
         console.error("Error in stopcmd:", e);
@@ -148,93 +65,5 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 export default router;
-
-const execAsync = promisify(exec);
-
-async function getProcessTreePids(rootPid: number): Promise<number[]> {
-    try {
-        // getting all processes with ppid
-        const { stdout } = await execAsync('ps -e -o pid,ppid --no-headers');
-        const pids = new Set<number>();
-        pids.add(rootPid);
-
-        const tree = new Map<number, number[]>();
-        const lines = stdout.trim().split('\n');
-        for (const line of lines) {
-            const parts = line.trim().split(/\s+/);
-            if (parts.length >= 2) {
-                const pid = parseInt(parts[0], 10);
-                const ppid = parseInt(parts[1], 10);
-                if (!tree.has(ppid)) tree.set(ppid, []);
-                tree.get(ppid)?.push(pid);
-            }
-        }
-
-        const queue = [rootPid];
-        while (queue.length > 0) {
-            const current = queue.shift()!;
-            const children = tree.get(current);
-            if (children) {
-                for (const child of children) {
-                    pids.add(child);
-                    queue.push(child);
-                }
-            }
-        }
-        return Array.from(pids);
-    } catch (e) {
-        console.error("Error building process tree:", e);
-        return [rootPid];
-    }
-}
-
-async function cleanupProcessPorts(rootPid: number, socket: any) {
-    try {
-        const pids = await getProcessTreePids(rootPid);
-        
-        // lsof output format "-F pn":
-        // p1234
-        // n*:3000
-        const { stdout } = await execAsync('lsof -P -n -iTCP -sTCP:LISTEN -F pn');
-        const lines = stdout.trim().split('\n');
-        
-        let currentPid = -1;
-        const pidPorts = new Map<number, string[]>();
-
-        for (const line of lines) {
-            const type = line[0];
-            const content = line.substring(1);
-            if (type === 'p') {
-                currentPid = parseInt(content, 10);
-            } else if (type === 'n' && currentPid !== -1) {
-                const match = content.match(/:(\d+)$/);
-                if (match) {
-                     const port = match[1];
-                     // Only check if this port belongs to one of our tree PIDs
-                     if (!pidPorts.has(currentPid)) pidPorts.set(currentPid, []);
-                     pidPorts.get(currentPid)?.push(port);
-                }
-            }
-        }
-
-        for (const pid of pids) {
-            if (pidPorts.has(pid)) {
-                const ports = pidPorts.get(pid);
-                if (ports) {
-                    for (const port of ports) {
-                        socket?.emit('log', chalk.yellow(`Detected active port ${port} on PID ${pid}. Killing port...`));
-                        try {
-                            await execAsync(`npx -y kill-port ${port}`);
-                        } catch (err: any) {
-                             socket?.emit('log', chalk.red(`Failed to kill port ${port}: ${err.message}`));
-                        }
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        // If lsof fails (e.g. no permissions or no ports open), just ignore
-    }
-}
 
 

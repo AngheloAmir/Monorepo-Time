@@ -12,7 +12,7 @@ router.get("/", async (req: Request, res: Response) => {
 export default router;
 
 // Map to store active terminal processes for each socket
-export const activeTerminals = new Map<string, { child: ChildProcess, workspaceName?: string }>();
+export const activeTerminals = new Map<string, { child: ChildProcess, workspaceName?: string, socket: Socket }>();
 
 interface StartTerminalPayload {
     path: string;
@@ -28,7 +28,13 @@ interface StartTerminalPayload {
 export function stopTerminalProcess(socketId: string): boolean {
     const session = activeTerminals.get(socketId);
     if (session) {
-        const { child } = session;
+        const { child, socket } = session;
+        
+        // Emit closing log before killing
+        if (socket.connected) {
+            socket.emit('terminal:log', '\r\n\x1b[33m[System] Stopping interactive terminal process...\x1b[0m\r\n');
+        }
+
         // Remove active listeners to prevent side effects during kill
         child.removeAllListeners();
         child.stdout?.removeAllListeners();
@@ -125,7 +131,7 @@ except Exception as e:
                     });
                 }
 
-                activeTerminals.set(socket.id, { child, workspaceName });
+                activeTerminals.set(socket.id, { child, workspaceName, socket });
 
                 child.stdout?.on('data', (chunk) => {
                     socket.emit('terminal:log', chunk.toString());

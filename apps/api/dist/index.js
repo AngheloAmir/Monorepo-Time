@@ -138,7 +138,7 @@ var config_default = config;
 var import_open = __toESM(require("open"));
 var import_http = require("http");
 var import_socket = require("socket.io");
-var import_net2 = __toESM(require("net"));
+var import_net = __toESM(require("net"));
 
 // src/routes/_tester.ts
 var import_express = require("express");
@@ -424,8 +424,6 @@ async function handleOnRun(socket, data) {
 
 // src/routes/stopcmd.ts
 var import_express3 = require("express");
-var import_child_process2 = require("child_process");
-var import_util = require("util");
 var import_chalk2 = __toESM(require("chalk"));
 var router2 = (0, import_express3.Router)();
 router2.post("/", async (req, res) => {
@@ -433,176 +431,26 @@ router2.post("/", async (req, res) => {
   try {
     const body = req.body;
     const workspace = body.workspace;
-    if (!workspace) {
+    if (!workspace || !workspace.name) {
       return res.status(400).json({ error: "No workspace provided" });
     }
-    const currentSocket = sockets.get(workspace.name);
     const currentProcess = activeProcesses.get(workspace.name);
+    const currentSocket = sockets.get(workspace.name);
     if (currentProcess) {
-      if (currentProcess.pid) {
-        try {
-          currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("Sending Stop Signal (SIGINT)..."));
-          if (process.platform !== "win32") {
-            process.kill(-currentProcess.pid, "SIGINT");
-          } else {
-            currentProcess.kill();
-          }
-        } catch (error) {
-          if (error.code !== "ESRCH") {
-            console.error(`Failed to signal process: ${error.message}`);
-          }
-        }
-      }
-      await new Promise((resolve) => {
-        let resolved = false;
-        const safeResolve = () => {
-          if (!resolved) {
-            resolved = true;
-            resolve();
-          }
-        };
-        const timer = setTimeout(async () => {
-          console.log(`Process stop timed out for ${workspace.name}`);
-          currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.red("Process timed out. Forcing kill..."));
-          if (currentProcess.pid) {
-            if (process.platform !== "win32") {
-              await cleanupProcessPorts(currentProcess.pid, currentSocket);
-              try {
-                process.kill(-currentProcess.pid, "SIGKILL");
-              } catch (e) {
-              }
-            } else {
-              currentProcess.kill("SIGKILL");
-            }
-          }
-          safeResolve();
-        }, 15e3);
-        currentProcess.once("exit", () => {
-          clearTimeout(timer);
-          safeResolve();
-        });
-        if (currentProcess.exitCode !== null) {
-          clearTimeout(timer);
-          safeResolve();
-        }
-      });
+      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("Stopping process..."));
+      currentProcess.kill();
       activeProcesses.delete(workspace.name);
+      currentSocket == null ? void 0 : currentSocket.emit("exit", "Process stopped by user");
+      res.json({ success: true, message: `Process for ${workspace.name} stopped` });
     } else {
-      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("No active process found to stop."));
+      res.json({ success: true, message: "No active process to stop" });
     }
-    const commandToRun = workspace.stopCommand;
-    if (commandToRun) {
-      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.green(`Running stop command: ${commandToRun}`));
-      const baseCMD = commandToRun.split(" ")[0];
-      const args = commandToRun.split(" ").slice(1);
-      const child = (0, import_child_process2.spawn)(baseCMD, args, {
-        cwd: workspace.path,
-        env: {
-          ...process.env,
-          TERM: "dumb",
-          FORCE_COLOR: "1"
-        },
-        stdio: ["ignore", "pipe", "pipe"],
-        shell: true,
-        detached: process.platform !== "win32"
-      });
-      child.stdout.on("data", (data) => {
-        currentSocket == null ? void 0 : currentSocket.emit("log", data.toString());
-      });
-      child.stderr.on("data", (data) => {
-        currentSocket == null ? void 0 : currentSocket.emit("error", data.toString());
-      });
-      child.on("close", (code) => {
-        currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.green(`Stop command finished with code ${code}`));
-        currentSocket == null ? void 0 : currentSocket.emit("exit", "Process stopped");
-      });
-    } else {
-      currentSocket == null ? void 0 : currentSocket.emit("log", "Process stopped (no stop command defined).");
-      currentSocket == null ? void 0 : currentSocket.emit("exit", "Process stopped");
-    }
-    await new Promise((resolve) => setTimeout(resolve, 1e3));
-    res.end();
   } catch (e) {
     console.error("Error in stopcmd:", e);
     res.status(500).json({ error: e.message });
   }
 });
 var stopcmd_default = router2;
-var execAsync = (0, import_util.promisify)(import_child_process2.exec);
-async function getProcessTreePids(rootPid) {
-  var _a;
-  try {
-    const { stdout } = await execAsync("ps -e -o pid,ppid --no-headers");
-    const pids = /* @__PURE__ */ new Set();
-    pids.add(rootPid);
-    const tree = /* @__PURE__ */ new Map();
-    const lines = stdout.trim().split("\n");
-    for (const line of lines) {
-      const parts = line.trim().split(/\s+/);
-      if (parts.length >= 2) {
-        const pid = parseInt(parts[0], 10);
-        const ppid = parseInt(parts[1], 10);
-        if (!tree.has(ppid)) tree.set(ppid, []);
-        (_a = tree.get(ppid)) == null ? void 0 : _a.push(pid);
-      }
-    }
-    const queue = [rootPid];
-    while (queue.length > 0) {
-      const current = queue.shift();
-      const children = tree.get(current);
-      if (children) {
-        for (const child of children) {
-          pids.add(child);
-          queue.push(child);
-        }
-      }
-    }
-    return Array.from(pids);
-  } catch (e) {
-    console.error("Error building process tree:", e);
-    return [rootPid];
-  }
-}
-async function cleanupProcessPorts(rootPid, socket) {
-  var _a;
-  try {
-    const pids = await getProcessTreePids(rootPid);
-    const { stdout } = await execAsync("lsof -P -n -iTCP -sTCP:LISTEN -F pn");
-    const lines = stdout.trim().split("\n");
-    let currentPid = -1;
-    const pidPorts = /* @__PURE__ */ new Map();
-    for (const line of lines) {
-      const type = line[0];
-      const content = line.substring(1);
-      if (type === "p") {
-        currentPid = parseInt(content, 10);
-      } else if (type === "n" && currentPid !== -1) {
-        const match = content.match(/:(\d+)$/);
-        if (match) {
-          const port3 = match[1];
-          if (!pidPorts.has(currentPid)) pidPorts.set(currentPid, []);
-          (_a = pidPorts.get(currentPid)) == null ? void 0 : _a.push(port3);
-        }
-      }
-    }
-    for (const pid of pids) {
-      if (pidPorts.has(pid)) {
-        const ports = pidPorts.get(pid);
-        if (ports) {
-          for (const port3 of ports) {
-            socket == null ? void 0 : socket.emit("log", import_chalk2.default.yellow(`Detected active port ${port3} on PID ${pid}. Killing port...`));
-            try {
-              await execAsync(`npx -y kill-port ${port3}`);
-            } catch (err) {
-              socket == null ? void 0 : socket.emit("log", import_chalk2.default.red(`Failed to kill port ${port3}: ${err.message}`));
-            }
-          }
-        }
-      }
-    }
-  } catch (e) {
-  }
-}
 
 // src/routes/listworkspacedirs.ts
 var import_express4 = require("express");
@@ -763,7 +611,7 @@ var newworkspace_default = router4;
 
 // src/routes/interactiveTerminal.ts
 var import_express6 = require("express");
-var import_child_process3 = require("child_process");
+var import_child_process2 = require("child_process");
 var router5 = (0, import_express6.Router)();
 router5.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
@@ -774,7 +622,10 @@ function stopTerminalProcess(socketId) {
   var _a, _b;
   const session = activeTerminals.get(socketId);
   if (session) {
-    const { child } = session;
+    const { child, socket } = session;
+    if (socket.connected) {
+      socket.emit("terminal:log", "\r\n\x1B[33m[System] Stopping interactive terminal process...\x1B[0m\r\n");
+    }
     child.removeAllListeners();
     (_a = child.stdout) == null ? void 0 : _a.removeAllListeners();
     (_b = child.stderr) == null ? void 0 : _b.removeAllListeners();
@@ -809,7 +660,7 @@ function interactiveTerminalSocket(io2) {
           socket.emit("terminal:log", "\x1B[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1B[0m\r\n");
           const baseCMD = command.split(" ")[0];
           const args = command.split(" ").slice(1);
-          child = (0, import_child_process3.spawn)(baseCMD, args, {
+          child = (0, import_child_process2.spawn)(baseCMD, args, {
             cwd: path16,
             env,
             shell: true,
@@ -837,13 +688,13 @@ except ImportError:
 except Exception as e:
     sys.exit(1)
 `;
-          child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
+          child = (0, import_child_process2.spawn)("python3", ["-u", "-c", pythonScript], {
             cwd: path16,
             env,
             stdio: ["pipe", "pipe", "pipe"]
           });
         }
-        activeTerminals.set(socket.id, { child, workspaceName });
+        activeTerminals.set(socket.id, { child, workspaceName, socket });
         (_a = child.stdout) == null ? void 0 : _a.on("data", (chunk) => {
           socket.emit("terminal:log", chunk.toString());
         });
@@ -1094,7 +945,7 @@ var rootPath_default = route2;
 var import_express11 = require("express");
 var import_fs_extra7 = __toESM(require("fs-extra"));
 var import_path8 = __toESM(require("path"));
-var import_child_process4 = require("child_process");
+var import_child_process3 = require("child_process");
 var router9 = (0, import_express11.Router)();
 var packageJsonPath = import_path8.default.join(ROOT3, "package.json");
 var turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
@@ -1259,7 +1110,7 @@ async function InitializeGitIfNotExist() {
 function runCommand(cmd, cwd) {
   console.log(`Running: ${cmd} in ${cwd}`);
   return new Promise((resolve, reject) => {
-    (0, import_child_process4.exec)(cmd, { cwd }, (error, stdout, stderr) => {
+    (0, import_child_process3.exec)(cmd, { cwd }, (error, stdout, stderr) => {
       if (error) {
         console.error("Exec error:", stderr);
         reject(error);
@@ -1392,12 +1243,12 @@ var crudtest_default = router13;
 
 // src/routes/gitControlHelper.ts
 var import_express16 = require("express");
-var import_child_process5 = require("child_process");
-var import_util2 = require("util");
-var execAsync2 = (0, import_util2.promisify)(import_child_process5.exec);
+var import_child_process4 = require("child_process");
+var import_util = require("util");
+var execAsync = (0, import_util.promisify)(import_child_process4.exec);
 var router14 = (0, import_express16.Router)();
 async function runGit(command) {
-  const { stdout, stderr } = await execAsync2(command, { cwd: ROOT3 });
+  const { stdout, stderr } = await execAsync(command, { cwd: ROOT3 });
   if (stderr) {
     console.log("Git Output (stderr):", stderr);
   }
@@ -1506,7 +1357,7 @@ var initmonorepotime_default = router15;
 // src/routes/processUsage.ts
 var import_express18 = require("express");
 var import_fs2 = __toESM(require("fs"));
-var import_child_process6 = require("child_process");
+var import_child_process5 = require("child_process");
 var import_os = __toESM(require("os"));
 var import_pidusage = __toESM(require("pidusage"));
 var router16 = (0, import_express18.Router)();
@@ -1526,7 +1377,7 @@ function getPSS(pid) {
 }
 function getProcessTree() {
   return new Promise((resolve) => {
-    (0, import_child_process6.exec)("ps -A -o pid,ppid", (err, stdout) => {
+    (0, import_child_process5.exec)("ps -A -o pid,ppid", (err, stdout) => {
       var _a;
       if (err) return resolve(/* @__PURE__ */ new Map());
       const parentMap = /* @__PURE__ */ new Map();
@@ -1647,9 +1498,9 @@ async function getStats() {
 }
 function killPortFunc(port3) {
   return new Promise((resolve) => {
-    (0, import_child_process6.exec)(`lsof -t -i:${port3}`, (err, stdout) => {
+    (0, import_child_process5.exec)(`lsof -t -i:${port3}`, (err, stdout) => {
       if (err || !stdout.trim()) return resolve(false);
-      (0, import_child_process6.exec)(`kill -9 ${stdout.trim().split("\n").join(" ")}`, () => {
+      (0, import_child_process5.exec)(`kill -9 ${stdout.trim().split("\n").join(" ")}`, () => {
         resolve(true);
       });
     });
@@ -1705,7 +1556,7 @@ var processUsage_default = router16;
 
 // src/routes/apidocker.ts
 var import_express19 = require("express");
-var import_child_process7 = require("child_process");
+var import_child_process6 = require("child_process");
 var router17 = (0, import_express19.Router)();
 function parseMemory(memStr) {
   const units = {
@@ -1729,7 +1580,7 @@ function parseMemory(memStr) {
 }
 function getDockerContainers2() {
   return new Promise((resolve) => {
-    (0, import_child_process7.exec)('docker ps --format "{{.ID}}|{{.Image}}|{{.Status}}|{{.Names}}"', (err, stdout) => {
+    (0, import_child_process6.exec)('docker ps --format "{{.ID}}|{{.Image}}|{{.Status}}|{{.Names}}"', (err, stdout) => {
       if (err) return resolve({ containers: [], totalMem: 0 });
       const lines = stdout.trim().split("\n");
       if (lines.length === 0 || lines.length === 1 && lines[0] === "") {
@@ -1746,7 +1597,7 @@ function getDockerContainers2() {
           memoryBytes: 0
         };
       });
-      (0, import_child_process7.exec)('docker stats --no-stream --format "{{.ID}}|{{.MemUsage}}"', (err2, stdout2) => {
+      (0, import_child_process6.exec)('docker stats --no-stream --format "{{.ID}}|{{.MemUsage}}"', (err2, stdout2) => {
         let totalMem = 0;
         if (!err2) {
           const statLines = stdout2.trim().split("\n");
@@ -1773,7 +1624,7 @@ function getDockerContainers2() {
 }
 function stopContainer(id) {
   return new Promise((resolve) => {
-    (0, import_child_process7.exec)(`docker stop ${id}`, (err) => {
+    (0, import_child_process6.exec)(`docker stop ${id}`, (err) => {
       if (err) return resolve({ success: false, error: err.message });
       resolve({ success: true });
     });
@@ -1781,7 +1632,7 @@ function stopContainer(id) {
 }
 function stopAllContainers() {
   return new Promise((resolve) => {
-    (0, import_child_process7.exec)("docker stop $(docker ps -q)", (err) => {
+    (0, import_child_process6.exec)("docker stop $(docker ps -q)", (err) => {
       if (err) {
         if (err.message.includes("requires at least 1 argument") || err.message.includes("Usage:")) {
           return resolve({ success: true, message: "No containers to stop" });
@@ -1822,21 +1673,20 @@ var apidocker_default = router17;
 // src/routes/availabletemplates.ts
 var import_express21 = __toESM(require("express"));
 
-// ../../packages/template/database.ts
-var templates = [
-  {
-    name: "MySQL",
-    description: "MySQL Database (Local)",
-    notes: "Requires MySQL installed in your system.",
-    templating: [
-      {
-        action: "command",
-        command: "npm install open"
-      },
-      {
-        action: "file",
-        file: "server.js",
-        filecontent: `const path = require('path');
+// ../../packages/template/databases/mysql.ts
+var MySQL = {
+  name: "MySQL",
+  description: "MySQL Database (Local)",
+  notes: "Requires MySQL installed in your system.",
+  templating: [
+    {
+      action: "command",
+      command: "npm install open"
+    },
+    {
+      action: "file",
+      file: "server.js",
+      filecontent: `const path = require('path');
 
 // Configuration
 const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferred editor URL
@@ -1851,26 +1701,28 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
         console.error('Failed to open browser:', err);
     }
 })();`
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="node server.js"'
-      },
-      {
-        action: "command",
-        command: `npm pkg set scripts.stop="echo 'Note: MySQL is running as a system service. Please stop it manually.'"`
-      }
-    ]
-  },
-  {
-    name: "PostgreSQL",
-    description: "PostgreSQL Database (Docker Compose)",
-    notes: "Requires Docker installed.",
-    templating: [
-      {
-        action: "file",
-        file: "docker-compose.yml",
-        filecontent: `
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="node server.js"'
+    },
+    {
+      action: "command",
+      command: `npm pkg set scripts.stop="echo 'Note: MySQL is running as a system service. Please stop it manually.'"`
+    }
+  ]
+};
+
+// ../../packages/template/databases/postgres.ts
+var PostgreSQL = {
+  name: "PostgreSQL",
+  description: "PostgreSQL Database (Docker Compose)",
+  notes: "Requires Docker installed.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `
 
 services:
   postgres:
@@ -1892,15 +1744,21 @@ services:
 
 volumes:
   postgres-data:`
-      },
-      {
-        action: "file",
-        file: "start.js",
-        filecontent: `const { spawn, exec } = require('child_process');
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+let containerId = null;
 
 console.log('Starting PostgreSQL...');
 
-// Use spawn to avoid buffer issues and separate process management
+// Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
 
 child.on('close', (code) => {
@@ -1908,91 +1766,134 @@ child.on('close', (code) => {
 });
 
 child.stderr.on('data', (data) => {
-   // Filter logs if needed
    const output = data.toString();
    if (!output.includes('The attribute \`version\` is obsolete')) {
        // console.error(output); 
    }
 });
 
-// Give it time to start, then print info
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later when we get the container ID
+});
+
+// Info Loop
 setTimeout(() => {
-   exec('docker compose port postgres 5432', (err, stdout, stderr) => {
-       if (stderr) {
-           console.error(stderr);
-           return;
-       }
-       const port = stdout.trim().split(':')[1];
-       console.clear();
-       console.log('\\n==================================================');
-       console.log('\u{1F680} PostgreSQL is running!');
-       console.log('--------------------------------------------------');
-       console.log(\`\u{1F50C} Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
-       console.log('\u{1F464} Username:          user');
-       console.log('\u{1F511} Password:          password');
-       console.log('\u{1F5C4}\uFE0F  Database:          mydatabase');
-       console.log(\`\u{1F310} Port:              \${port}\`);
-       console.log('==================================================\\n');
-   });
+    exec('docker compose port postgres 5432', (err, stdout, stderr) => {
+        if (stderr) return;
+        const port = stdout.trim().split(':')[1];
+        if (!port) return;
+        
+        // Capture Container ID
+        exec('docker compose ps -q postgres', (err2, stdout2) => {
+             if (stdout2) containerId = stdout2.trim();
+             
+             try {
+                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                    port: server.address().port, 
+                    pid: process.pid,
+                    containerId: containerId
+                }));
+             } catch(e) {
+                console.error('Failed to write runtime file:', e);
+             }
+
+             console.clear();
+             console.log('\\n==================================================');
+             console.log('\u{1F680} PostgreSQL is running!');
+             console.log('--------------------------------------------------');
+             console.log(\`\u{1F50C} Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
+             console.log('\u{1F464} Username:          user');
+             console.log('\u{1F511} Password:          password');
+             console.log('\u{1F5C4}\uFE0F  Database:          mydatabase');
+             console.log(\`\u{1F310} Port:              \${port}\`);
+             if (containerId) console.log(\`\u{1F4E6} Container ID:      \${containerId}\`);
+             console.log('==================================================\\n');
+        });
+    });
 }, 5000);
 
-// Handle process exit to clean up containers
 const cleanup = () => {
     console.log('Stopping PostgreSQL...');
-    exec('docker compose stop', () => {
-        process.exit(0);
-    });
+    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+    
+    if (containerId) {
+        console.log(\`Stopping container \${containerId}...\`);
+        exec(\`docker stop \${containerId}\`, () => {
+             process.exit(0);
+        });
+    } else {
+        exec('docker compose stop', () => {
+            process.exit(0);
+        });
+    }
 };
 
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);`
-      },
-      {
-        action: "command",
-        command: "npm install"
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="node start.js"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="docker compose stop"'
-      }
-    ]
-  },
-  {
-    name: "Supabase",
-    description: "Supabase (Docker)",
-    notes: "Requires Docker installed.",
-    templating: [
-      {
-        action: "command",
-        command: "npm install supabase --save-dev"
-      },
-      {
-        action: "command",
-        command: "npx supabase init"
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="npx supabase start"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="npx supabase stop"'
-      }
-    ]
-  },
-  {
-    name: "Redis",
-    description: "Redis (Docker Compose)",
-    notes: "Requires Docker installed.",
-    templating: [
-      {
-        action: "file",
-        file: "docker-compose.yml",
-        filecontent: `
+    },
+    {
+      action: "command",
+      command: "npm install"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="node index.js"'
+    },
+    {
+      action: "command",
+      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+    }
+  ]
+};
+
+// ../../packages/template/databases/supabase.ts
+var Supabase = {
+  name: "Supabase",
+  description: "Supabase (Docker)",
+  notes: "Requires Docker installed.",
+  templating: [
+    {
+      action: "command",
+      command: "npm install supabase --save-dev"
+    },
+    {
+      action: "command",
+      command: "npx supabase init"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="npx supabase start"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="npx supabase stop"'
+    }
+  ]
+};
+
+// ../../packages/template/databases/redis.ts
+var Redis = {
+  name: "Redis",
+  description: "Redis (Docker Compose)",
+  notes: "Requires Docker installed.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `
 
 services:
   redis:
@@ -2015,11 +1916,17 @@ services:
 
 volumes:
   redis-data:`
-      },
-      {
-        action: "file",
-        file: "start.js",
-        filecontent: `const { spawn, exec } = require('child_process');
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+let containerId = null;
 
 console.log('Starting Redis...');
 
@@ -2029,57 +1936,97 @@ child.on('close', (code) => {
     process.exit(code || 0);
 });
 
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later
+});
+
 // Give it time to start
 setTimeout(() => {
     exec('docker compose port redis 6379', (err, stdout, stderr) => {
-        if (stderr) {
-            console.error(stderr);
-            return;
-        }
+        if (stderr) return;
         const port = stdout.trim().split(':')[1];
-        console.clear();
-        console.log('\\n==================================================');
-        console.log('\u{1F680} Redis is running!');
-        console.log('--------------------------------------------------');
-        console.log(\`\u{1F50C} Connection String: redis://localhost:\${port}\`);
-        console.log(\`\u{1F310} Port:              \${port}\`);
-        console.log('==================================================\\n');
+        if (!port) return;
+
+        exec('docker compose ps -q redis', (err2, stdout2) => {
+            if (stdout2) containerId = stdout2.trim();
+
+            try {
+                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                    port: server.address().port, 
+                    pid: process.pid,
+                    containerId: containerId 
+                }));
+            } catch(e) {}
+
+            console.clear();
+            console.log('\\n==================================================');
+            console.log('\u{1F680} Redis is running!');
+            console.log('--------------------------------------------------');
+            console.log(\`\u{1F50C} Connection String: redis://localhost:\${port}\`);
+            console.log(\`\u{1F310} Port:              \${port}\`);
+            if (containerId) console.log(\`\u{1F4E6} Container ID:      \${containerId}\`);
+            console.log('==================================================\\n');
+        });
     });
 }, 3000);
 
 const cleanup = () => {
     console.log('Stopping Redis...');
-    exec('docker compose stop', () => {
-        process.exit(0);
-    });
+    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+    
+    if (containerId) {
+        console.log(\`Stopping container \${containerId}...\`);
+        exec(\`docker stop \${containerId}\`, () => {
+             process.exit(0);
+        });
+    } else {
+        exec('docker compose stop', () => {
+            process.exit(0);
+        });
+    }
 };
 
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);`
-      },
-      {
-        action: "command",
-        command: "npm install"
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="node start.js"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="docker compose stop"'
-      }
-    ]
-  },
-  {
-    name: "MongoDB",
-    description: "MongoDB (Docker Compose)",
-    notes: "Requires Docker installed.",
-    templating: [
-      {
-        action: "file",
-        file: "docker-compose.yml",
-        filecontent: `services:
+    },
+    {
+      action: "command",
+      command: "npm install"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="node index.js"'
+    },
+    {
+      action: "command",
+      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+    }
+  ]
+};
+
+// ../../packages/template/databases/mongodb.ts
+var MongoDB = {
+  name: "MongoDB",
+  description: "MongoDB (Docker Compose)",
+  notes: "Requires Docker installed.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
   mongodb:
     image: mongo:7.0
     restart: unless-stopped
@@ -2101,11 +2048,17 @@ process.on('SIGTERM', cleanup);`
 
 volumes:
   mongo-data:`
-      },
-      {
-        action: "file",
-        file: "start.js",
-        filecontent: `const { spawn, exec } = require('child_process');
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+let containerId = null;
 
 console.log('Starting MongoDB...');
 
@@ -2122,55 +2075,163 @@ child.stderr.on('data', (data) => {
     }
 });
 
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later
+});
+
 // Give it time to start, then print info
 setTimeout(() => {
     exec('docker compose port mongodb 27017', (err, stdout, stderr) => {
-        if (stderr) {
-            console.error(stderr);
-            return;
-        }
+        if (stderr) return;
         const port = stdout.trim().split(':')[1];
-        console.clear();
-        console.log('\\n==================================================');
-        console.log('\u{1F680} MongoDB is running!');
-        console.log('--------------------------------------------------');
-        console.log(\`\u{1F50C} Connection String: mongodb://admin:password@localhost:\${port}\`);
-        console.log('\u{1F464} Username:          admin');
-        console.log('\u{1F511} Password:          password');
-        console.log(\`\u{1F310} Port:              \${port}\`);
-        console.log('==================================================\\n');
+        if (!port) return;
+
+        exec('docker compose ps -q mongodb', (err2, stdout2) => {
+            if (stdout2) containerId = stdout2.trim();
+
+            try {
+                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                    port: server.address().port, 
+                    pid: process.pid,
+                    containerId: containerId 
+                }));
+            } catch(e) {}
+
+            console.clear();
+            console.log('\\n==================================================');
+            console.log('\u{1F680} MongoDB is running!');
+            console.log('--------------------------------------------------');
+            console.log(\`\u{1F50C} Connection String: mongodb://admin:password@localhost:\${port}\`);
+            console.log('\u{1F464} Username:          admin');
+            console.log('\u{1F511} Password:          password');
+            console.log(\`\u{1F310} Port:              \${port}\`);
+            if (containerId) console.log(\`\u{1F4E6} Container ID:      \${containerId}\`);
+            console.log('==================================================\\n');
+        });
     });
 }, 5000);
 
-// Handle process exit to clean up containers
 const cleanup = () => {
     console.log('Stopping MongoDB...');
-    exec('docker compose stop', () => {
-        process.exit(0);
-    });
+    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+    
+    if (containerId) {
+        console.log(\`Stopping container \${containerId}...\`);
+        exec(\`docker stop \${containerId}\`, () => {
+             process.exit(0);
+        });
+    } else {
+        exec('docker compose stop', () => {
+            process.exit(0);
+        });
+    }
 };
 
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);`
-      },
-      {
-        action: "command",
-        command: "npm install"
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="node start.js"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="docker compose stop"'
-      }
-    ]
-  }
+    },
+    {
+      action: "command",
+      command: "npm install"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="node index.js"'
+    },
+    {
+      action: "command",
+      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+    }
+  ]
+};
+
+// ../../packages/template/database.ts
+var templates = [
+  MySQL,
+  PostgreSQL,
+  Supabase,
+  Redis,
+  MongoDB
 ];
 var database_default = templates;
 
-// ../../packages/template/express.ts
+// ../../packages/template/projects/vite-react.ts
+var ViteReact = {
+  name: "Vite React TS",
+  description: "Vite React TS template",
+  notes: "Node.js and NPM must be installed.",
+  templating: [
+    {
+      action: "command",
+      command: "npx create-vite@latest . --template react-ts"
+    },
+    {
+      action: "command",
+      command: "npm install -D tailwindcss postcss autoprefixer"
+    },
+    {
+      action: "file",
+      file: "tailwind.config.js",
+      filecontent: `/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}`
+    },
+    {
+      action: "file",
+      file: "postcss.config.js",
+      filecontent: "export default {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}"
+    },
+    {
+      action: "file",
+      file: "src/index.css",
+      filecontent: "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="npx kill-port 5173"'
+    }
+  ]
+};
+
+// ../../packages/template/projects/nextjs.ts
+var NextJS = {
+  name: "Next.js TS",
+  description: "Next.js TS template",
+  notes: "Node.js and NPM must be installed.",
+  templating: [
+    {
+      action: "command",
+      command: "npx create-next-app@latest . --typescript --tailwind --eslint"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+    }
+  ]
+};
+
+// ../../packages/template/projects/express.ts
 var expressFile = `import express, { Request, Response } from "express";
 const app = express();
 const port = 3000;
@@ -2183,230 +2244,204 @@ app.listen(port, () => {
     console.log("Server running at http://localhost:" + port);
 });
 `;
-var express_default = expressFile;
+var ExpressTS = {
+  name: "Express.js TS",
+  description: "Express.js TS template",
+  notes: "Node.js and NPM must be installed.",
+  templating: [
+    {
+      action: "command",
+      command: "npm install express"
+    },
+    {
+      action: "command",
+      command: "npm install -D nodemon typescript ts-node @types/node @types/express"
+    },
+    {
+      action: "command",
+      command: "npm install -D tsup"
+    },
+    {
+      action: "file",
+      file: "index.ts",
+      filecontent: expressFile
+    },
+    {
+      action: "file",
+      file: "tsup.config.ts",
+      filecontent: "import { defineConfig } from 'tsup';\n\nexport default defineConfig({\n  entry: ['index.ts'],\n  splitting: false,\n  sourcemap: true,\n  clean: true,\n  format: ['cjs'],\n});"
+    },
+    {
+      action: "file",
+      file: "tsconfig.json",
+      filecontent: '{\n  "compilerOptions": {\n    "target": "es2016",\n    "module": "commonjs",\n    "outDir": "./dist",\n    "esModuleInterop": true,\n    "forceConsistentCasingInFileNames": true,\n    "strict": true,\n    "skipLibCheck": true\n  }\n}'
+    },
+    {
+      action: "command",
+      command: `npm pkg set scripts.dev="nodemon --watch '*.ts' --exec 'ts-node' index.ts"`
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.build="tsup"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="node dist/index.js"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+    }
+  ]
+};
 
-// ../../packages/template/net.ts
+// ../../packages/template/projects/php.ts
+var PHP = {
+  name: "PHP",
+  description: "Simple PHP project template",
+  notes: "PHP must be installed in your system.",
+  templating: [
+    {
+      action: "file",
+      file: "index.php",
+      filecontent: '<?php\n\necho "Hello World! Monorepo Time!";\n'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.dev="php -S localhost:3000"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="php -S localhost:3000"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+    }
+  ]
+};
+
+// ../../packages/template/projects/laravel.ts
+var Laravel = {
+  name: "Laravel",
+  description: "Laravel PHP Framework template",
+  notes: "Composer and PHP must be installed in your system.",
+  templating: [
+    {
+      action: "command",
+      command: "composer create-project laravel/laravel ."
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.dev="php artisan serve"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="php artisan serve"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="npx kill-port 8000"'
+    }
+  ]
+};
+
+// ../../packages/template/projects/python.ts
+var pythonFile = `print("Monorepo Time Console!")
+name = input("Please enter your name: ")
+print("Hello " + name)
+`;
+var PythonConsole = {
+  name: "Python Console",
+  description: "Simple Python Console Application",
+  notes: "Python 3 must be installed in your system.",
+  templating: [
+    {
+      action: "file",
+      file: "main.py",
+      filecontent: pythonFile
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.dev="python3 main.py"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="python3 main.py"'
+    }
+  ]
+};
+
+// ../../packages/template/projects/dotnet.ts
 var netFile = `// See https://aka.ms/new-console-template for more information
 Console.WriteLine("Monorepo Time Console!");
 Console.Write("Please enter your name: ");
 string? name = Console.ReadLine();
 Console.WriteLine("Hello " + name);
 `;
-var net_default = netFile;
-
-// ../../packages/template/python.ts
-var pythonFile = `print("Monorepo Time Console!")
-name = input("Please enter your name: ")
-print("Hello " + name)
-`;
-var python_default = pythonFile;
+var DotNetConsole = {
+  name: ".NET Console",
+  description: "Simple .NET Console Application",
+  notes: ".NET SDK must be installed in your system.",
+  templating: [
+    {
+      action: "command",
+      command: "dotnet new console"
+    },
+    {
+      action: "file",
+      file: "Program.cs",
+      filecontent: netFile
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.dev="dotnet run"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="dotnet run"'
+    }
+  ]
+};
 
 // ../../packages/template/projecttemplate.ts
 var templates2 = [
-  {
-    name: "Vite React TS",
-    description: "Vite React TS template",
-    notes: "Node.js and NPM must be installed.",
-    templating: [
-      {
-        action: "command",
-        command: "npx create-vite@latest . --template react-ts"
-      },
-      {
-        action: "command",
-        command: "npm install -D tailwindcss postcss autoprefixer"
-      },
-      {
-        action: "file",
-        file: "tailwind.config.js",
-        filecontent: `/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}`
-      },
-      {
-        action: "file",
-        file: "postcss.config.js",
-        filecontent: "export default {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}"
-      },
-      {
-        action: "file",
-        file: "src/index.css",
-        filecontent: "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="npx kill-port 5173"'
-      }
-    ]
-  },
-  {
-    name: "Next.js TS",
-    description: "Next.js TS template",
-    notes: "Node.js and NPM must be installed.",
-    templating: [
-      {
-        action: "command",
-        command: "npx create-next-app@latest . --typescript --tailwind --eslint"
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="npx kill-port 3000"'
-      }
-    ]
-  },
-  {
-    name: "Express.js TS",
-    description: "Express.js TS template",
-    notes: "Node.js and NPM must be installed.",
-    templating: [
-      {
-        action: "command",
-        command: "npm install express"
-      },
-      {
-        action: "command",
-        command: "npm install -D nodemon typescript ts-node @types/node @types/express"
-      },
-      {
-        action: "command",
-        command: "npm install -D tsup"
-      },
-      {
-        action: "file",
-        file: "index.ts",
-        filecontent: express_default
-      },
-      {
-        action: "file",
-        file: "tsup.config.ts",
-        filecontent: "import { defineConfig } from 'tsup';\n\nexport default defineConfig({\n  entry: ['index.ts'],\n  splitting: false,\n  sourcemap: true,\n  clean: true,\n  format: ['cjs'],\n});"
-      },
-      {
-        action: "file",
-        file: "tsconfig.json",
-        filecontent: '{\n  "compilerOptions": {\n    "target": "es2016",\n    "module": "commonjs",\n    "outDir": "./dist",\n    "esModuleInterop": true,\n    "forceConsistentCasingInFileNames": true,\n    "strict": true,\n    "skipLibCheck": true\n  }\n}'
-      },
-      {
-        action: "command",
-        command: `npm pkg set scripts.dev="nodemon --watch '*.ts' --exec 'ts-node' index.ts"`
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.build="tsup"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="node dist/index.js"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="npx kill-port 3000"'
-      }
-    ]
-  },
-  {
-    name: "PHP",
-    description: "Simple PHP project template",
-    notes: "PHP must be installed in your system.",
-    templating: [
-      {
-        action: "file",
-        file: "index.php",
-        filecontent: '<?php\n\necho "Hello World! Monorepo Time!";\n'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.dev="php -S localhost:3000"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="php -S localhost:3000"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="npx kill-port 3000"'
-      }
-    ]
-  },
-  {
-    name: "Laravel",
-    description: "Laravel PHP Framework template",
-    notes: "Composer and PHP must be installed in your system.",
-    templating: [
-      {
-        action: "command",
-        command: "composer create-project laravel/laravel ."
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.dev="php artisan serve"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="php artisan serve"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="npx kill-port 8000"'
-      }
-    ]
-  },
-  {
-    name: "Python Console",
-    description: "Simple Python Console Application",
-    notes: "Python 3 must be installed in your system.",
-    templating: [
-      {
-        action: "file",
-        file: "main.py",
-        filecontent: python_default
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.dev="python3 main.py"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="python3 main.py"'
-      }
-    ]
-  },
-  {
-    name: ".NET Console",
-    description: "Simple .NET Console Application",
-    notes: ".NET SDK must be installed in your system.",
-    templating: [
-      {
-        action: "command",
-        command: "dotnet new console"
-      },
-      {
-        action: "file",
-        file: "Program.cs",
-        filecontent: net_default
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.dev="dotnet run"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="dotnet run"'
-      }
-    ]
-  }
+  ViteReact,
+  NextJS,
+  ExpressTS,
+  PHP,
+  Laravel,
+  PythonConsole,
+  DotNetConsole
 ];
 var projecttemplate_default = templates2;
 
-// ../../packages/template/aws.ts
+// ../../packages/template/services_list/n8n.ts
+var N8NLocal = {
+  name: "N8N Local",
+  description: "N8N (Local)",
+  notes: "Requires Node.js installed in your system.",
+  templating: [
+    {
+      action: "command",
+      command: "npm install n8n"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.dev="npx n8n"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.start="npx n8n"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="npx kill-port 5678"'
+    }
+  ]
+};
+
+// ../../packages/template/services_list/aws.ts
 var dockerCompose = `version: "3.9"
 
 services:
@@ -2881,7 +2916,7 @@ dynamodb.createTable(params, function(err, data) {
     </script>
 </body>
 </html>`;
-var awsTemplate = {
+var AWSTemplate = {
   name: "AWS Local",
   description: "AWS LocalStack Environment with Manager",
   notes: "Requires Docker, Node.js, and AWS CLI installed.",
@@ -2935,9 +2970,8 @@ var awsTemplate = {
     }
   ]
 };
-var aws_default = awsTemplate;
 
-// ../../packages/template/stripe.ts
+// ../../packages/template/services_list/stripe.ts
 var dockerCompose2 = `services:
   stripe-mock:
     image: stripe/stripe-mock:latest
@@ -3012,7 +3046,7 @@ const stripe = new Stripe('sk_test_mock_123', {
     }
 })();
 `;
-var stripeTemplate = {
+var StripeTemplate = {
   name: "Stripe Mock",
   description: "Stripe API Mock Server",
   notes: "Runs the official stripe-mock image",
@@ -3049,35 +3083,12 @@ var stripeTemplate = {
     }
   ]
 };
-var stripe_default = stripeTemplate;
 
 // ../../packages/template/services.ts
 var templates3 = [
-  {
-    name: "N8N Local",
-    description: "N8N (Local)",
-    notes: "Requires Node.js installed in your system.",
-    templating: [
-      {
-        action: "command",
-        command: "npm install n8n"
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.dev="npx n8n"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.start="npx n8n"'
-      },
-      {
-        action: "command",
-        command: 'npm pkg set scripts.stop="npx kill-port 5678"'
-      }
-    ]
-  },
-  aws_default,
-  stripe_default
+  N8NLocal,
+  AWSTemplate,
+  StripeTemplate
 ];
 var services_default = templates3;
 
@@ -3113,9 +3124,9 @@ var availabletemplates_default = router18;
 var import_express22 = __toESM(require("express"));
 var import_fs3 = __toESM(require("fs"));
 var import_path14 = __toESM(require("path"));
-var import_child_process8 = require("child_process");
-var import_util3 = __toESM(require("util"));
-var execPromise = import_util3.default.promisify(import_child_process8.exec);
+var import_child_process7 = require("child_process");
+var import_util2 = __toESM(require("util"));
+var execPromise = import_util2.default.promisify(import_child_process7.exec);
 var router19 = import_express22.default.Router();
 router19.post("/", async (req, res) => {
   try {
@@ -3215,7 +3226,7 @@ runCmdDevSocket(io);
 interactiveTerminalSocket(io);
 var findAvailablePort = (startPort) => {
   return new Promise((resolve, reject) => {
-    const server = import_net2.default.createServer();
+    const server = import_net.default.createServer();
     server.unref();
     server.on("error", (err) => {
       if (err.code === "EADDRINUSE") {
