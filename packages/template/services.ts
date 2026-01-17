@@ -1,5 +1,6 @@
 import awsTemplate from "./aws";
 import { ProjectTemplate } from ".";
+import stripeTemplate from "./stripe";
 
 const templates: ProjectTemplate[] = [
    {
@@ -25,6 +26,7 @@ const templates: ProjectTemplate[] = [
             }
         ]
     },
-    awsTemplate
+    awsTemplate,
+    stripeTemplate
 ];
 export default templates;
