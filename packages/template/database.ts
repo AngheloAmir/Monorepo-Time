@@ -36,6 +36,10 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="node server.js"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="echo \'Note: MySQL is running as a system service. Please stop it manually.\'"'
             }
         ]
     },
@@ -47,7 +51,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
             {
                 action: 'file',
                 file: 'docker-compose.yml',
-                filecontent: `version: "3.9"
+                filecontent: `
 
 services:
   postgres:
@@ -78,6 +82,10 @@ volumes:
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="docker compose up"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="docker compose down"'
             }
         ]
     },
@@ -101,6 +109,10 @@ volumes:
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="npx supabase start"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="npx supabase stop"'
             }
         ]
     },
@@ -112,7 +124,7 @@ volumes:
             {
                 action: 'file',
                 file: 'docker-compose.yml',
-                filecontent: `version: "3.9"
+                filecontent: `
 
 services:
   redis:
@@ -144,6 +156,10 @@ volumes:
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="docker compose up"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="docker compose down"'
             }
         ]
     },
@@ -231,6 +247,10 @@ setTimeout(() => {
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="node start.js"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="docker compose down"'
             }
         ]
     }

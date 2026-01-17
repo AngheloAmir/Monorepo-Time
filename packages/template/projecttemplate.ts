@@ -31,6 +31,10 @@ const templates: ProjectTemplate[] = [
                 action: 'file',
                 file: 'src/index.css',
                 filecontent: '@tailwind base;\n@tailwind components;\n@tailwind utilities;'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="npx kill-port 5173"'
             }
         ]
     },
@@ -42,6 +46,10 @@ const templates: ProjectTemplate[] = [
             {
                 action: 'command',
                 command: 'npx create-next-app@latest . --typescript --tailwind --eslint'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="npx kill-port 3000"'
             }
         ]
     },
@@ -88,6 +96,10 @@ const templates: ProjectTemplate[] = [
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="node dist/index.js"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="npx kill-port 3000"'
             }
         ]
     },
@@ -108,6 +120,10 @@ const templates: ProjectTemplate[] = [
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="php -S localhost:3000"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="npx kill-port 3000"'
             }
         ]
     },
@@ -127,6 +143,10 @@ const templates: ProjectTemplate[] = [
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="php artisan serve"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="npx kill-port 8000"'
             }
         ]
     },

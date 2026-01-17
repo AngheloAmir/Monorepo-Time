@@ -18,6 +18,10 @@ const templates: ProjectTemplate[] = [
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="npx n8n"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.stop="npx kill-port 5678"'
             }
         ]
     },
