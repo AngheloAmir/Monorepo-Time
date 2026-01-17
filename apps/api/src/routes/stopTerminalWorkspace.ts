@@ -12,7 +12,16 @@ router.post('/', async (req: Request, res: Response) => {
     const { socketId, workspace } = req.body;
 
     if (workspace && workspace.name) {
+        console.log(`[StopTerminal] Request for workspace: ${workspace.name}`);
+        // console.log(`[StopTerminal] Full request body:`, JSON.stringify(req.body));
+        
         const workspacePath = workspace.path;
+        console.log(`[StopTerminal] Workspace path provided: ${workspacePath}`);
+
+        if (!workspacePath) {
+             console.error(`[StopTerminal] ERROR: No workspace path provided for ${workspace.name}. Docker cleanup may fail.`);
+        }
+
         let socket: any = null;
         let activeSession: any = null;
         let activeSessionId: string | null = null;
@@ -41,17 +50,24 @@ router.post('/', async (req: Request, res: Response) => {
         if (workspacePath && await fs.pathExists(path.join(workspacePath, '.runtime.json'))) {
             try {
                 if (activeSession) log("Checking/Stopping Docker container...");
+                console.log(`[StopTerminal] Reading .runtime.json at ${path.join(workspacePath, '.runtime.json')}`);
+                
                 const runtimeConfig = await fs.readJSON(path.join(workspacePath, '.runtime.json'));
                 if (runtimeConfig && runtimeConfig.containerId) {
+                    console.log(`[StopTerminal] Stopping container ${runtimeConfig.containerId}`);
                     await execAsync(`docker stop ${runtimeConfig.containerId}`);
+                    console.log(`[StopTerminal] Container stopped.`);
                     if (activeSession) log("Docker container stopped.");
                 } else {
+                    console.log(`[StopTerminal] No containerId found in .runtime.json`);
                     if (activeSession) log("No active container ID found in config.");
                 }
             } catch (e: any) {
                 console.error('[StopTerminal] Error stopping docker:', e);
                 if (activeSession) log(`Error stopping Docker: ${e.message}`);
             }
+        } else {
+            console.log(`[StopTerminal] No .runtime.json found at ${workspacePath ? path.join(workspacePath, '.runtime.json') : 'undefined path'}`);
         }
 
         // 2. npm run stop
@@ -100,6 +116,10 @@ router.post('/', async (req: Request, res: Response) => {
         if (stopped) {
             res.json({ success: true, message: `Terminated process for workspace ${workspace.name}` });
         } else {
+            // Even if no active terminal session was found (e.g. server restarted), 
+            // we likely performed Docker/Switch cleanup. 
+            // Wait a bit to give the UI a sense of processing if it was too fast.
+            await new Promise(resolve => setTimeout(resolve, 500));
             res.json({ success: true, message: `Cleanup performed for workspace ${workspace.name} (no active terminal found)` });
         }
         return;

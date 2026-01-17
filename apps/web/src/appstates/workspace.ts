@@ -239,6 +239,8 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
         const workspace = get().workspace.find((item) => item.info.name === workspaceName);
         const workspacePath = workspace?.info.path;
+        
+        console.log(`[Frontend] stopping workspace ${workspaceName}, path found: ${workspacePath}`);
 
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.stopTerminalWorkspace}`, {
