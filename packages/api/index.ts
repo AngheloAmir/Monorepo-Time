@@ -94,6 +94,8 @@ const apiRoute = {
 
     /** Docker API */
     docker: 'docker',
+
+    availabletemplates: 'availabletemplates',
 }
 
 export default apiRoute;

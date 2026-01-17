@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import ModalHeader from "../ui/ModalHeader";
 import ModalBody   from "../ui/ModalBody";
+import TemplateSelector from "./TemplateSelector";
 
 const clearInfo: WorkspaceInfo = {
     name: '',
@@ -162,6 +163,14 @@ export default function WorkspaceNew() {
                     </span>
                 </button>
             </footer>
+
+            <TemplateSelector
+                show={ true }
+                onClose={ () => { } }
+                onSelect={ (type, name) => {
+                    console.log(type, name);
+                }}
+            />
 
         </ModalBody>
     )

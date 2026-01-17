@@ -12,7 +12,7 @@ export interface ProcessTemplate {
 export interface ProjectTemplate {
     name:        string;
     description: string;
-    notes?:      string;
+    notes:       string;
     templating:  ProcessTemplate[];
 }
 

@@ -63,7 +63,7 @@ app.use("/" + apiRoute.gitControl,         gitControlHelper);
 app.use("/" + apiRoute.initMonorepoTime,   initMonorepoTime);
 app.use("/" + apiRoute.processTree,        processTree);
 app.use("/" + apiRoute.docker,             apiDocker);
-app.use("/availabletemplates",             availableTemplates);
+app.use("/" + apiRoute.availabletemplates, availableTemplates);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');

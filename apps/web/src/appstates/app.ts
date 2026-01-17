@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import apiRoute from 'apiroute';
 import config from 'config';
+import type { ProjectTemplate } from 'types';
 
 interface appContext {
     showTerminal: boolean;
@@ -22,6 +23,11 @@ interface appContext {
 
     scaffoldRepo: () => Promise<{ success: boolean; error?: string }>;
     hideShowFileFolder: (filesShow: boolean, pathInclude: string[]) => Promise<{ isHidden: boolean }>;
+    getTemplates: () => Promise<{
+        project: ProjectTemplate[],
+        database: ProjectTemplate[],
+        services: ProjectTemplate[],
+    }>;
 }
 
 const appstate = create<appContext>()((set, get) => ({
@@ -128,7 +134,15 @@ const appstate = create<appContext>()((set, get) => ({
         });
         const data = await response.json();
         return data;
-    }
+    },
+
+    getTemplates: async () => {
+        if(config.useDemo) return [];
+
+        const response = await fetch(`${config.serverPath}${apiRoute.availabletemplates}`);
+        const data = await response.json();
+        return data;
+    },
 }));
 
 const useAppState = createSelectors(appstate);

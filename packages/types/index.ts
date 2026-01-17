@@ -88,3 +88,9 @@ export interface CrudItem {
     }>,
     expectedOutcome: string,
 }
+
+export interface ProjectTemplate {
+    name:        string;
+    description: string;
+    notes:       string;
+}
