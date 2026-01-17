@@ -63,8 +63,8 @@ const templates: ProjectTemplate[] = [
                 command: 'npm install -D tsup'
             },
             {
-                action:     'file',
-                file:       'index.ts',
+                action: 'file',
+                file: 'index.ts',
                 filecontent: expressFile
             },
             {
@@ -112,26 +112,21 @@ const templates: ProjectTemplate[] = [
         ]
     },
     {
-        name: ".NET Console",
-        description: "Simple .NET Console Application",
-        notes: ".NET SDK must be installed in your system.",
+        name: "Laravel",
+        description: "Laravel PHP Framework template",
+        notes: "Composer and PHP must be installed in your system.",
         templating: [
             {
                 action: 'command',
-                command: 'dotnet new console'
-            },
-            {
-                action: 'file',
-                file: 'Program.cs',
-                filecontent: netFile
+                command: 'composer create-project laravel/laravel .'
             },
             {
                 action: 'command',
-                command: 'npm pkg set scripts.dev="dotnet run"'
+                command: 'npm pkg set scripts.dev="php artisan serve"'
             },
             {
                 action: 'command',
-                command: 'npm pkg set scripts.start="dotnet run"'
+                command: 'npm pkg set scripts.start="php artisan serve"'
             }
         ]
     },
@@ -156,23 +151,29 @@ const templates: ProjectTemplate[] = [
         ]
     },
     {
-        name: "Laravel",
-        description: "Laravel PHP Framework template",
-        notes: "Composer and PHP must be installed in your system.",
+        name: ".NET Console",
+        description: "Simple .NET Console Application",
+        notes: ".NET SDK must be installed in your system.",
         templating: [
             {
                 action: 'command',
-                command: 'composer create-project laravel/laravel .'
+                command: 'dotnet new console'
+            },
+            {
+                action: 'file',
+                file: 'Program.cs',
+                filecontent: netFile
             },
             {
                 action: 'command',
-                command: 'npm pkg set scripts.dev="php artisan serve"'
+                command: 'npm pkg set scripts.dev="dotnet run"'
             },
             {
                 action: 'command',
-                command: 'npm pkg set scripts.start="php artisan serve"'
+                command: 'npm pkg set scripts.start="dotnet run"'
             }
         ]
-    }
+    },
+
 ];
 export default templates;

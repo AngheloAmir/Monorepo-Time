@@ -7,7 +7,7 @@ import useAppState from "../../appstates/app";
 interface TemplateSelectorProps {
     show: boolean;
     onClose: () => void;
-    onSelect: (type: string, name: string) => void;
+    onSelect: (name: string) => void;
 }
 
 
@@ -53,15 +53,16 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                     <TabItem name="Services" icon="fas fa-server" activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
 
-                <div className="flex-1 w-full h-[600px] overflow-y-auto">
+                <div className="flex-1 w-full h-[500px] overflow-y-auto">
                     <div className="flex flex-col gap-2">
-                        <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={() => {
-
+                        <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={(name) => {
+                            props.onSelect(name);
                         }}/>
-                        <ProjectItem show={activeTab === 'Database'} project={templates.database} onClick={() => {
-
+                        <ProjectItem show={activeTab === 'Database'} project={templates.database} onClick={(name) => {
+                            props.onSelect(name);
                         }}/>
-                        <ProjectItem show={activeTab === 'Services'} project={templates.services} onClick={() => {
+                        <ProjectItem show={activeTab === 'Services'} project={templates.services} onClick={(name) => {
+                            props.onSelect(name);
 
                         }}/>
                     </div>
@@ -109,14 +110,14 @@ const getIcon = (name: string) => {
 }
 
 //==============================================================================================
-function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], onClick: (project: ProjectTemplate) => void, show: boolean }) {
+function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], onClick: (project: string) => void, show: boolean }) {
     if(!show) return null;
     
     return (
         <>
             {project.map((project) => (
                 <button
-                    onClick={() => onClick(project)}
+                    onClick={() => onClick(project.name)}
                     className="flex items-center p-2 hover:bg-gray-800 text-left w-full"
                 >
                     <div className="flex-1 min-w-0">
@@ -128,7 +129,7 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
                             {project.description}
                         </div>
                         {project.notes && (
-                            <div className="flex items-start gap-1.5 text-[11px] text-amber-400/90 w-fit">
+                            <div className="flex items-start gap-1.5 text-[11px] text-amber-400/90  w-fit">
                                 <i className="fas fa-info-circle mt-0.5"></i>
                                 <span className="font-medium opacity-90">{project.notes}</span>
                             </div>

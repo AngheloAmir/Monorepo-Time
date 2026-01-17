@@ -37,7 +37,7 @@ __export(index_exports, {
   io: () => io
 });
 module.exports = __toCommonJS(index_exports);
-var import_express20 = __toESM(require("express"));
+var import_express22 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
 var import_path14 = __toESM(require("path"));
 
@@ -118,7 +118,8 @@ var apiRoute = {
   /** Process tree and dockers memory usage */
   processTree: "processtree",
   /** Docker API */
-  docker: "docker"
+  docker: "docker",
+  availabletemplates: "availabletemplates"
 };
 var api_default = apiRoute;
 
@@ -136,7 +137,7 @@ var config_default = config;
 var import_open = __toESM(require("open"));
 var import_http = require("http");
 var import_socket = require("socket.io");
-var import_net = __toESM(require("net"));
+var import_net2 = __toESM(require("net"));
 
 // src/routes/_tester.ts
 var import_express = require("express");
@@ -1811,15 +1812,988 @@ router17.post("/stop-all", async (req, res) => {
 });
 var apidocker_default = router17;
 
+// src/routes/availabletemplates.ts
+var import_express21 = __toESM(require("express"));
+
+// ../../packages/template/database.ts
+var templates = [
+  {
+    name: "MySQL",
+    description: "MySQL Database (Local)",
+    notes: "Requires MySQL installed in your system.",
+    templating: [
+      {
+        action: "command",
+        command: `npm pkg set scripts.dev="echo 'Ensure MySQL is running on your system'"`
+      },
+      {
+        action: "command",
+        command: `npm pkg set scripts.start="echo 'Ensure MySQL is running on your system'"`
+      }
+    ]
+  },
+  {
+    name: "PostgreSQL",
+    description: "PostgreSQL Database (Docker Compose)",
+    notes: "Requires Docker installed.",
+    templating: [
+      {
+        action: "file",
+        file: "docker-compose.yml",
+        filecontent: `version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:`
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="docker compose up"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="docker compose up"'
+      }
+    ]
+  },
+  {
+    name: "Supabase",
+    description: "Supabase (Docker)",
+    notes: "Requires Docker installed.",
+    templating: [
+      {
+        action: "command",
+        command: "npm install supabase --save-dev"
+      },
+      {
+        action: "command",
+        command: "npx supabase init"
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="npx supabase start"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="npx supabase start"'
+      }
+    ]
+  },
+  {
+    name: "Redis",
+    description: "Redis (Docker Compose)",
+    notes: "Requires Docker installed.",
+    templating: [
+      {
+        action: "file",
+        file: "docker-compose.yml",
+        filecontent: `version: "3.9"
+
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: >
+      redis-server
+      --appendonly yes
+      --save 60 1
+      --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:`
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="docker compose up"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="docker compose up"'
+      }
+    ]
+  },
+  {
+    name: "MongoDB",
+    description: "MongoDB (Docker Compose)",
+    notes: "Requires Docker installed.",
+    templating: [
+      {
+        action: "file",
+        file: "docker-compose.yml",
+        filecontent: `version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  mongo-data:`
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="docker compose up"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="docker compose up"'
+      }
+    ]
+  }
+];
+var database_default = templates;
+
+// ../../packages/template/express.ts
+var expressFile = `import express, { Request, Response } from "express";
+const app = express();
+const port = 3000;
+
+app.get("/", (req: Request, res: Response) => {
+    res.send("Hello World!");
+});
+
+app.listen(port, () => {
+    console.log("Server running at http://localhost:" + port);
+});
+`;
+var express_default = expressFile;
+
+// ../../packages/template/net.ts
+var netFile = `// See https://aka.ms/new-console-template for more information
+Console.WriteLine("Monorepo Time Console!");
+Console.Write("Please enter your name: ");
+string? name = Console.ReadLine();
+Console.WriteLine("Hello " + name);
+`;
+var net_default = netFile;
+
+// ../../packages/template/python.ts
+var pythonFile = `print("Monorepo Time Console!")
+name = input("Please enter your name: ")
+print("Hello " + name)
+`;
+var python_default = pythonFile;
+
+// ../../packages/template/projecttemplate.ts
+var templates2 = [
+  {
+    name: "Vite React TS",
+    description: "Vite React TS template",
+    notes: "Node.js and NPM must be installed.",
+    templating: [
+      {
+        action: "command",
+        command: "npx create-vite@latest . --template react-ts"
+      },
+      {
+        action: "command",
+        command: "npm install -D tailwindcss postcss autoprefixer"
+      },
+      {
+        action: "file",
+        file: "tailwind.config.js",
+        filecontent: `/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}`
+      },
+      {
+        action: "file",
+        file: "postcss.config.js",
+        filecontent: "export default {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}"
+      },
+      {
+        action: "file",
+        file: "src/index.css",
+        filecontent: "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
+      }
+    ]
+  },
+  {
+    name: "Next.js TS",
+    description: "Next.js TS template",
+    notes: "Node.js and NPM must be installed.",
+    templating: [
+      {
+        action: "command",
+        command: "npx create-next-app@latest . --typescript --tailwind --eslint"
+      }
+    ]
+  },
+  {
+    name: "Express.js TS",
+    description: "Express.js TS template",
+    notes: "Node.js and NPM must be installed.",
+    templating: [
+      {
+        action: "command",
+        command: "npm install express"
+      },
+      {
+        action: "command",
+        command: "npm install -D nodemon typescript ts-node @types/node @types/express"
+      },
+      {
+        action: "command",
+        command: "npm install -D tsup"
+      },
+      {
+        action: "file",
+        file: "index.ts",
+        filecontent: express_default
+      },
+      {
+        action: "file",
+        file: "tsup.config.ts",
+        filecontent: "import { defineConfig } from 'tsup';\n\nexport default defineConfig({\n  entry: ['index.ts'],\n  splitting: false,\n  sourcemap: true,\n  clean: true,\n  format: ['cjs'],\n});"
+      },
+      {
+        action: "file",
+        file: "tsconfig.json",
+        filecontent: '{\n  "compilerOptions": {\n    "target": "es2016",\n    "module": "commonjs",\n    "outDir": "./dist",\n    "esModuleInterop": true,\n    "forceConsistentCasingInFileNames": true,\n    "strict": true,\n    "skipLibCheck": true\n  }\n}'
+      },
+      {
+        action: "command",
+        command: `npm pkg set scripts.dev="nodemon --watch '*.ts' --exec 'ts-node' index.ts"`
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.build="tsup"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="node dist/index.js"'
+      }
+    ]
+  },
+  {
+    name: "PHP",
+    description: "Simple PHP project template",
+    notes: "PHP must be installed in your system.",
+    templating: [
+      {
+        action: "file",
+        file: "index.php",
+        filecontent: '<?php\n\necho "Hello World! Monorepo Time!";\n'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="php -S localhost:3000"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="php -S localhost:3000"'
+      }
+    ]
+  },
+  {
+    name: "Laravel",
+    description: "Laravel PHP Framework template",
+    notes: "Composer and PHP must be installed in your system.",
+    templating: [
+      {
+        action: "command",
+        command: "composer create-project laravel/laravel ."
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="php artisan serve"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="php artisan serve"'
+      }
+    ]
+  },
+  {
+    name: "Python Console",
+    description: "Simple Python Console Application",
+    notes: "Python 3 must be installed in your system.",
+    templating: [
+      {
+        action: "file",
+        file: "main.py",
+        filecontent: python_default
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="python3 main.py"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="python3 main.py"'
+      }
+    ]
+  },
+  {
+    name: ".NET Console",
+    description: "Simple .NET Console Application",
+    notes: ".NET SDK must be installed in your system.",
+    templating: [
+      {
+        action: "command",
+        command: "dotnet new console"
+      },
+      {
+        action: "file",
+        file: "Program.cs",
+        filecontent: net_default
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="dotnet run"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="dotnet run"'
+      }
+    ]
+  }
+];
+var projecttemplate_default = templates2;
+
+// ../../packages/template/aws.ts
+var dockerCompose = `version: "3.9"
+
+services:
+  localstack:
+    container_name: "\${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # External services port range
+    environment:
+      - DEBUG=\${DEBUG-}
+      - SERVICES=s3,lambda,dynamodb,apigateway,sqs,sns,logs,cloudwatch
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - cloud-net
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    depends_on:
+      - localstack
+    networks:
+      - cloud-net
+
+  s3-manager:
+    image: cloudlena/s3manager
+    ports:
+      - "8002:8080"
+    environment:
+      - ACCESS_KEY_ID=test
+      - SECRET_ACCESS_KEY=test
+      - REGION=us-east-1
+      - ENDPOINT=localstack:4566
+      - USE_SSL=false
+    depends_on:
+      - localstack
+    networks:
+      - cloud-net
+
+volumes:
+  localstack-data: {}
+
+networks:
+  cloud-net:
+    driver: bridge`;
+var deployJs = `const path = require("path");
+const { spawn } = require("child_process");
+
+/* ======================================================
+   CONFIG \u2014 YOU EDIT ONLY THIS
+====================================================== */
+
+const aws = {
+  provider: "localstack",        // "localstack" | "aws"
+  region: "us-east-1",
+  accessKey: "test",
+  secretKey: "test",
+  endpoint: "http://localhost:4566"
+};
+
+const services = [
+  {
+    name: "foodmaker",
+    type: "frontend",
+    dir: "examples/frontend" 
+  },
+  {
+    name: "nodeserver",
+    type: "backend",
+    dir: "examples/nodeserver",
+    runtime: "nodejs18.x",
+    handler: "index.handler",
+    apiPath: "/api/{proxy+}"
+  }
+];
+
+const dynamoTables = [
+  { name: "Users", hashKey: "id" },
+  { name: "Orders", hashKey: "orderId" }
+];
+
+/* ======================================================
+   INTERNAL SETUP
+====================================================== */
+
+const colors = {
+  reset: "\\x1b[0m",
+  green: "\\x1b[32m",
+  yellow: "\\x1b[33m",
+  cyan: "\\x1b[36m",
+  orange: "\\x1b[38;5;208m",
+  red: "\\x1b[31m"
+};
+
+const ENDPOINT =
+  aws.provider === "localstack" ? \`--endpoint-url=\${aws.endpoint}\` : "";
+
+process.env.AWS_ACCESS_KEY_ID = aws.accessKey;
+process.env.AWS_SECRET_ACCESS_KEY = aws.secretKey;
+process.env.AWS_DEFAULT_REGION = aws.region;
+
+module.exports = {
+  runDeploy: async (req, res) => {
+    res.writeHead(200, {
+      "Content-Type": "text/plain",
+      "Transfer-Encoding": "chunked"
+    });
+
+    const log = (msg, c = colors.reset) =>
+      res.write(\`\${c}\${msg}\${colors.reset}\\n\`);
+
+    const run = (cmd, args, cwd) =>
+      new Promise((resolve, reject) => {
+        const p = spawn(cmd, args, { cwd, shell: true });
+        let out = "";
+        p.stdout.on("data", d => { out += d; res.write(d); });
+        p.stderr.on("data", d => res.write(colors.yellow + d + colors.reset));
+        p.on("close", c => c === 0 ? resolve(out) : reject(new Error(cmd + " failed")));
+      });
+
+    try {
+      log("\\n\u{1F680} Deploying Polyglot Cloud", colors.orange);
+
+      /* IAM */
+      await run("aws", [ENDPOINT, "iam", "create-role", "--role-name", "lambda-role",
+        "--assume-role-policy-document",
+        \`'{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}'\`
+      ]).catch(()=>{});
+
+      /* DynamoDB */
+      for (const t of dynamoTables) {
+        await run("aws", [ENDPOINT, "dynamodb", "create-table",
+          "--table-name", t.name,
+          "--attribute-definitions", \`AttributeName=\${t.hashKey},AttributeType=S\`,
+          "--key-schema", \`AttributeName=\${t.hashKey},KeyType=HASH\`,
+          "--billing-mode", "PAY_PER_REQUEST"
+        ]).catch(()=>{});
+      }
+
+      /* Services */
+      for (const svc of services) {
+
+        /* Frontend */
+        if (svc.type === "frontend") {
+          const bucket = \`\${svc.name}-frontend\`;
+          await run("aws", [ENDPOINT, "s3", "mb", \`s3://\${bucket}\`]).catch(()=>{});
+          // Ensure dir exists or just skip if missing to prevent error in demo
+          try {
+             await run("aws", [ENDPOINT, "s3", "sync", path.resolve(__dirname, svc.dir), \`s3://\${bucket}\`, "--acl", "public-read"]);
+             svc.url = \`http://localhost:4566/\${bucket}/index.html\`;
+          } catch (e) { log("Skipping upload: " + e.message); }
+        }
+
+        /* Backend (ZIP) */
+        if (svc.type === "backend" && svc.runtime !== "docker") {
+          const zip = \`/tmp/\${svc.name}.zip\`;
+          const bucket = \`\${svc.name}-code\`;
+
+          // Simple zip of the dir
+          await run("zip", ["-r", zip, ".", "-x", "*/.git/*"], path.resolve(__dirname, svc.dir)).catch(e => log("Zip failed (is zip installed?): " + e.message));
+          
+          await run("aws", [ENDPOINT, "s3", "mb", \`s3://\${bucket}\`]).catch(()=>{});
+          await run("aws", [ENDPOINT, "s3", "cp", zip, \`s3://\${bucket}/code.zip\`]);
+
+          await run("aws", [ENDPOINT, "lambda", "delete-function", "--function-name", svc.name]).catch(()=>{});
+          await run("aws", [ENDPOINT, "lambda", "create-function",
+            "--function-name", svc.name,
+            "--runtime", svc.runtime,
+            "--handler", svc.handler,
+            "--code", \`S3Bucket=\${bucket},S3Key=code.zip\`,
+            "--role", "arn:aws:iam::000000000000:role/lambda-role"
+          ]);
+        }
+        
+        // ... (Skipped other types for brevity in template, can be added if needed based on original request)
+
+        /* API Gateway */
+        if (svc.type === "backend") {
+          const api = await run("aws", [ENDPOINT, "apigatewayv2", "create-api", "--name", svc.name, "--protocol-type", "HTTP"]);
+          const apiId = JSON.parse(api).ApiId;
+
+          const integ = await run("aws", [ENDPOINT, "apigatewayv2", "create-integration",
+            "--api-id", apiId,
+            "--integration-type", "AWS_PROXY",
+            "--integration-uri", \`arn:aws:lambda:us-east-1:000000000000:function:\${svc.name}\`,
+            "--payload-format-version", "2.0"
+          ]);
+
+          const integId = JSON.parse(integ).IntegrationId;
+
+          await run("aws", [ENDPOINT, "apigatewayv2", "create-route",
+            "--api-id", apiId,
+            "--route-key", \`ANY \${svc.apiPath}\`,
+            "--target", \`integrations/\${integId}\`
+          ]);
+
+          await run("aws", [ENDPOINT, "apigatewayv2", "create-stage",
+            "--api-id", apiId,
+            "--stage-name", "prod",
+            "--auto-deploy"
+          ]);
+
+          svc.url = \`http://localhost:4566/restapis/\${apiId}/prod/_user_request_\`;
+        }
+      }
+
+      log("\\n\u{1F30D} URLs", colors.orange);
+      services.forEach(s => log(\`\u2022 \${s.name}: \${s.url}\`, colors.cyan));
+      
+      log("\\nAdditional Tools:", colors.cyan);
+      log("\u2022 DynamoDB Admin: http://localhost:8001", colors.cyan);
+      log("\u2022 S3 Managed: http://localhost:8002", colors.cyan);
+
+      log("\\n\u2705 Cloud Ready", colors.green);
+    } catch (e) {
+      log("\\n\u274C " + e.message, colors.red);
+    }
+
+    res.end();
+  }
+};`;
+var serverJs = `const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { spawn } = require('child_process');
+const deploy = require('./deploy');
+
+console.log("Starting AWS Local environment...");
+
+// Spawn Docker Compose
+const docker = spawn('docker', ['compose', 'up', '-d'], { stdio: 'inherit' });
+
+const requestListener = function (req, res) {
+  if (req.url === "/") {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(fs.readFileSync(path.join(__dirname, 'index.html')));
+  } else if (req.url === "/deploy") {
+    deploy.runDeploy(req, res);
+  } else {
+    res.writeHead(404);
+    res.end("Not found");
+  }
+}
+
+const server = http.createServer(requestListener);
+server.listen(3000, () => {
+    console.log('AWS Local Manager running at http://localhost:3000');
+});
+
+// Handle cleanup
+process.on('SIGINT', () => {
+    console.log("Stopping Docker containers...");
+    spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
+    process.exit();
+});`;
+var stopJs = `const { spawn } = require('child_process');
+console.log("Stopping AWS Local environment...");
+spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
+var indexHtml = `<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Local Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#1a1a1a',
+                            800: '#2d2d2d',
+                            700: '#404040',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .ansi-green { color: #4ade80; }
+        .ansi-yellow { color: #facc15; }
+        .ansi-red { color: #f87171; }
+        .ansi-cyan { color: #22d3ee; }
+        .ansi-orange { color: #fb923c; }
+    </style>
+</head>
+<body class="bg-dark-900 text-white h-screen flex flex-col font-sans">
+    <div class="container mx-auto p-8 flex-1 flex flex-col">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">AWS Local Manager</h1>
+            <p class="text-gray-400 mt-2">Manage your LocalStack environment and deployments</p>
+        </header>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-dark-700 mb-6">
+            <button onclick="switchTab('deploy')" id="tab-deploy" class="tab-btn px-6 py-3 text-blue-400 border-b-2 border-blue-400 font-medium">Deploy</button>
+            <button onclick="switchTab('upload')" id="tab-upload" class="tab-btn px-6 py-3 text-gray-400 hover:text-white font-medium">Upload Example</button>
+            <button onclick="switchTab('node')" id="tab-node" class="tab-btn px-6 py-3 text-gray-400 hover:text-white font-medium">Node App App</button>
+        </div>
+
+        <!-- Tab Content: Deploy -->
+        <div id="content-deploy" class="tab-content flex-1 flex flex-col gap-6">
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+                    <h2 class="text-xl font-semibold mb-4">Credentials</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Access Key ID</label>
+                            <input type="text" value="test" class="w-full bg-dark-900 border border-dark-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-400 mb-1">Secret Access Key</label>
+                            <input type="password" value="test" class="w-full bg-dark-900 border border-dark-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500" readonly>
+                        </div>
+                         <div>
+                            <label class="block text-sm text-gray-400 mb-1">Region</label>
+                            <input type="text" value="us-east-1" class="w-full bg-dark-900 border border-dark-700 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-dark-800 p-6 rounded-lg border border-dark-700 flex flex-col justify-center items-center">
+                    <button onclick="startDeploy()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors shadow-lg shadow-blue-500/20 flex items-center gap-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        Deploy to LocalStack
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 bg-black rounded-lg border border-dark-700 p-4 font-mono text-sm overflow-auto" id="console-output">
+                <div class="text-gray-500">// Console output will appear here...</div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Upload -->
+        <div id="content-upload" class="hidden tab-content">
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+                <h2 class="text-xl font-semibold mb-4">Upload to S3 Example</h2>
+                <p class="text-gray-400 mb-4">Code example for uploading files to LocalStack S3.</p>
+                <div class="bg-black p-4 rounded overflow-x-auto text-green-400 font-mono text-sm">
+const AWS = require('aws-sdk');
+const fs = require('fs');
+
+const s3 = new AWS.S3({
+    endpoint: 'http://localhost:4566',
+    s3ForcePathStyle: true,
+    region: 'us-east-1',
+    accessKeyId: 'test',
+    secretAccessKey: 'test'
+});
+
+const uploadFile = (fileName) => {
+    const fileContent = fs.readFileSync(fileName);
+    const params = {
+        Bucket: 'my-bucket',
+        Key: fileName,
+        Body: fileContent
+    };
+
+    s3.upload(params, function(err, data) {
+        if (err) { throw err; }
+        console.log(\`File uploaded successfully. \${data.Location}\`);
+    });
+};
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Node App -->
+        <div id="content-node" class="hidden tab-content">
+            <div class="bg-dark-800 p-6 rounded-lg border border-dark-700">
+                <h2 class="text-xl font-semibold mb-4">Node.js AWS App Example</h2>
+                <div class="bg-black p-4 rounded overflow-x-auto text-blue-400 font-mono text-sm">
+const AWS = require('aws-sdk');
+
+AWS.config.update({
+    region: "us-east-1",
+    endpoint: "http://localhost:4566"
+});
+
+const dynamodb = new AWS.DynamoDB();
+
+const params = {
+    TableName : "Movies",
+    KeySchema: [       
+        { AttributeName: "year", KeyType: "HASH"},  //Partition key
+        { AttributeName: "title", KeyType: "RANGE" }  //Sort key
+    ],
+    AttributeDefinitions: [       
+        { AttributeName: "year", AttributeType: "N" },
+        { AttributeName: "title", AttributeType: "S" }
+    ],
+    ProvisionedThroughput: {       
+        ReadCapacityUnits: 10, 
+        WriteCapacityUnits: 10
+    }
+};
+
+dynamodb.createTable(params, function(err, data) {
+    if (err) {
+        console.error("Unable to create table. Error:", JSON.stringify(err, null, 2));
+    } else {
+        console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
+    }
+});
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Remove active style from buttons
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('text-blue-400', 'border-b-2', 'border-blue-400');
+                el.classList.add('text-gray-400');
+            });
+
+            // Show selected content
+            document.getElementById('content-' + tab).classList.remove('hidden');
+            // Add active style to button
+            const btn = document.getElementById('tab-' + tab);
+            btn.classList.remove('text-gray-400');
+            btn.classList.add('text-blue-400', 'border-b-2', 'border-blue-400');
+        }
+
+        async function startDeploy() {
+            const consoleEl = document.getElementById('console-output');
+            consoleEl.innerHTML = ''; // Clear previous output
+            
+            try {
+                const response = await fetch('/deploy');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    const text = decoder.decode(value);
+                    // Simple color replacement for ANSI codes roughly matched to style logic
+                    // In a real app we'd use a proper ANSI parser library
+                    const formatted = text
+                        .replace(/\\x1b\\[32m/g, '<span class="ansi-green">')
+                        .replace(/\\x1b\\[33m/g, '<span class="ansi-yellow">')
+                        .replace(/\\x1b\\[31m/g, '<span class="ansi-red">')
+                        .replace(/\\x1b\\[36m/g, '<span class="ansi-cyan">')
+                        .replace(/\\x1b\\[38;5;208m/g, '<span class="ansi-orange">')
+                        .replace(/\\x1b\\[0m/g, '</span>');
+
+                    consoleEl.innerHTML += formatted;
+                    consoleEl.scrollTop = consoleEl.scrollHeight;
+                }
+            } catch (error) {
+                consoleEl.innerHTML += \`<span class="ansi-red">Error connecting to deploy server: \${error.message}</span>\`;
+            }
+        }
+    </script>
+</body>
+</html>`;
+var awsTemplate = {
+  name: "AWS Local",
+  description: "AWS LocalStack Environment with Manager",
+  notes: "Requires Docker, Node.js, and AWS CLI installed.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose
+    },
+    {
+      action: "file",
+      file: "deploy.js",
+      filecontent: deployJs
+    },
+    {
+      action: "file",
+      file: "server.js",
+      filecontent: serverJs
+    },
+    {
+      action: "file",
+      file: "stop.js",
+      filecontent: stopJs
+    },
+    {
+      action: "file",
+      file: "index.html",
+      filecontent: indexHtml
+    },
+    {
+      action: "command",
+      command: "mkdir -p examples/frontend examples/nodeserver"
+    },
+    {
+      action: "file",
+      file: "examples/frontend/index.html",
+      filecontent: "<html><body><h1>Hello from S3!</h1></body></html>"
+    },
+    {
+      action: "file",
+      file: "examples/nodeserver/index.js",
+      filecontent: 'exports.handler = async (event) => { return { statusCode: 200, body: JSON.stringify("Hello from Lambda!") }; };'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.dev="node server.js"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.stop="node stop.js"'
+    }
+  ]
+};
+var aws_default = awsTemplate;
+
+// ../../packages/template/services.ts
+var templates3 = [
+  {
+    name: "N8N Local",
+    description: "N8N (Local)",
+    notes: "Requires Node.js installed in your system.",
+    templating: [
+      {
+        action: "command",
+        command: "npm install n8n"
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="npx n8n"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="npx n8n"'
+      }
+    ]
+  },
+  aws_default
+];
+var services_default = templates3;
+
+// ../../packages/template/index.ts
+var MonorepoTemplates = {
+  project: projecttemplate_default,
+  database: database_default,
+  services: services_default
+};
+var template_default = MonorepoTemplates;
+
+// src/routes/availabletemplates.ts
+var router18 = import_express21.default.Router();
+router18.get("/", (req, res) => {
+  try {
+    const stripTemplating = (templates4) => {
+      return templates4.map(({ templating, ...rest }) => rest);
+    };
+    const availableTemplates = {
+      project: stripTemplating(template_default.project),
+      database: stripTemplating(template_default.database),
+      services: stripTemplating(template_default.services)
+    };
+    res.json(availableTemplates);
+  } catch (error) {
+    console.error("Error fetching templates:", error);
+    res.status(500).json({ error: "Failed to fetch templates" });
+  }
+});
+var availabletemplates_default = router18;
+
 // src/index.ts
-var app = (0, import_express20.default)();
+var app = (0, import_express22.default)();
 var port2 = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express20.default.static("public"));
-app.use(import_express20.default.json());
+app.use(import_express22.default.static("public"));
+app.use(import_express22.default.json());
 app.use("/", tester_default);
 app.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app.use("/" + api_default.stopProcess, stopcmd_default);
@@ -1839,8 +2813,9 @@ app.use("/" + api_default.gitControl, gitControlHelper_default);
 app.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
 app.use("/" + api_default.processTree, processUsage_default);
 app.use("/" + api_default.docker, apidocker_default);
+app.use("/" + api_default.availabletemplates, availabletemplates_default);
 var frontendPath = import_path14.default.join(__dirname, "../public");
-app.use(import_express20.default.static(frontendPath));
+app.use(import_express22.default.static(frontendPath));
 app.get("*", (req, res) => {
   res.sendFile(import_path14.default.join(frontendPath, "index.html"));
 });
@@ -1856,7 +2831,7 @@ runCmdDevSocket(io);
 interactiveTerminalSocket(io);
 var findAvailablePort = (startPort) => {
   return new Promise((resolve, reject) => {
-    const server = import_net.default.createServer();
+    const server = import_net2.default.createServer();
     server.unref();
     server.on("error", (err) => {
       if (err.code === "EADDRINUSE") {

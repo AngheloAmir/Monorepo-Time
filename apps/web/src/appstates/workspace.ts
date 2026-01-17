@@ -273,7 +273,25 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     setWorkspaceTemplate: async (workspace: WorkspaceInfo, template: string) => {
         if(config.useDemo) return;
 
-       
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.setWorkspaceTemplate}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ workspace, templatename: template })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Failed to apply template');
+            }
+            
+            console.log('Template applied successfully');
+        } catch (error) {
+            console.error('Error applying template:', error);
+            // potentially bubble up error or show notification
+        }
     },
 
 }));

@@ -32,6 +32,7 @@ import initMonorepoTime  from './routes/initmonorepotime';
 import processTree       from './routes/processUsage';
 import apiDocker         from './routes/apidocker';
 import availableTemplates from './routes/availabletemplates';
+import setWorkspaceTemplate from './routes/setworkspacetemplate';
 
 const app  = express();
 const port = config.apiPort;
@@ -64,6 +65,7 @@ app.use("/" + apiRoute.initMonorepoTime,   initMonorepoTime);
 app.use("/" + apiRoute.processTree,        processTree);
 app.use("/" + apiRoute.docker,             apiDocker);
 app.use("/" + apiRoute.availabletemplates, availableTemplates);
+app.use("/" + apiRoute.setWorkspaceTemplate, setWorkspaceTemplate);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');

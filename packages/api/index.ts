@@ -96,6 +96,8 @@ const apiRoute = {
     docker: 'docker',
 
     availabletemplates: 'availabletemplates',
+
+    setWorkspaceTemplate: 'setworkspacetemplate',
 }
 
 export default apiRoute;
