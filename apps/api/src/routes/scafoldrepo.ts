@@ -16,6 +16,7 @@ router.get("/", async (req: Request, res: Response) => {
         await InstallTurborepoIfNotYet();
         await AddTurboJsonIfNotExist();
         await CreateWorkSpaceDirsIfNotExist();
+        await CreateGitIgnoreIfNotExist();
         await InitializeGitIfNotExist();
 
         res.json({ success: true, message: "Scaffolding complete" });
@@ -165,6 +166,52 @@ async function CreateWorkSpaceDirsIfNotExist() {
                 console.error("Error creating types package:", err);
             }
         }
+    }
+}
+
+async function CreateGitIgnoreIfNotExist() {
+    const gitIgnorePath = path.join(ROOT, ".gitignore");
+    if (!fs.existsSync(gitIgnorePath)) {
+        const ignoreContent = [
+            "# Dependencies",
+            "node_modules",
+            ".pnpm-store",
+            "",
+            "# Build Outputs",
+            "dist",
+            "build",
+            ".next",
+            ".output",
+            ".vercel",
+            "out",
+            "",
+            "# Turborepo",
+            ".turbo",
+            "",
+            "# Runtime Configs",
+            ".runtime.json",
+            ".env",
+            ".env.*",
+            "!.env.example",
+            "",
+            "# System",
+            ".DS_Store",
+            "Thumbs.db",
+            "",
+            "# Logs",
+            "npm-debug.log*",
+            "yarn-debug.log*",
+            "yarn-error.log*",
+            "pnpm-debug.log*",
+            "",
+            "# IDEs",
+            ".idea",
+            ".vscode",
+            "!.vscode/extensions.json",
+            "!.vscode/settings.json"
+        ].join("\n");
+        await fs.writeFile(gitIgnorePath, ignoreContent);
+        console.log("[scafoldrepo] Created .gitignore");
     }
 }
 
