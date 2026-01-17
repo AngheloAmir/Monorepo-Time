@@ -59,7 +59,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mydatabase
     ports:
-      - "5432:5432"
+      - "0:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -120,7 +120,7 @@ services:
     container_name: redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "0:6379"
     volumes:
       - redis-data:/data
     command: >
@@ -166,7 +166,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
-      - "27017:27017"
+      - "0:27017"
     volumes:
       - mongo-data:/data/db
     healthcheck:
