@@ -27,8 +27,9 @@ const apiRoute = {
     /** Run a command in the interactive terminal 
      * request body: { path: string, cmd: string }
     */
-    interactvTerminal: 'interactvterminal',
+    interactvTerminal:       'interactvterminal',
     stopInteractiveTerminal: 'stopinteractiveterminal',
+    stopTerminalWorkspace:   'stopTerminalWorkspace',
 
     /** Hide or show a file or folder in your IDE (VS Code and variant)
      * it a get request, return true / false

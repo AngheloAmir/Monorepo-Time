@@ -9,7 +9,7 @@ export interface WorkspaceTemplate {
     name: string;
     description: string;
     template: {
-        
+
     }
 }
 
@@ -66,11 +66,12 @@ interface workspaceContext {
 
     ///API calls
     //function that calls API
-    stopProcess:          (workspaceName: string) => Promise<void>;
+    stopProcess: (workspaceName: string) => Promise<void>;
     stopInteractiveTerminal: (workspaceName: string, skips?: boolean) => Promise<void>;
-    listWorkspace:        () => Promise<any>;
-    createNewWorkspace:   (workspaceName: WorkspaceInfo) => Promise<boolean>;
-    updateWorkspace:      (workspaceName: WorkspaceInfo) => Promise<boolean>;
+    stopWorkspaceTerminal:   (workspaceName: string, skips?: boolean) => Promise<void>;
+    listWorkspace: () => Promise<any>;
+    createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
+    updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
     setWorkspaceTemplate: (workspaceName: WorkspaceInfo, template: string) => Promise<void>;
 }
 
@@ -122,7 +123,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     loadWorkspace: async () => {
-        if( config.useDemo ) {
+        if (config.useDemo) {
             set({ workspace: defaultWorkspace });
             return;
         }
@@ -138,7 +139,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
                 count: number;
                 workspace: WorkspaceInfo[];
             } = await response.json() as any
-            if ( !response.ok ) {
+            if (!response.ok) {
                 throw new Error('Failed to fetch workspace');
             }
 
@@ -178,7 +179,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     // API calls
     //==========================================================================
     stopProcess: async (workspaceName: string) => {
-        if(config.useDemo) return;
+        if (config.useDemo) return;
 
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
@@ -203,12 +204,12 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     stopInteractiveTerminal: async (workspaceName: string, skips?: boolean) => {
-        if(config.useDemo) return;
+        if (config.useDemo) return;
 
         const isLoading = get().loadingWorkspace;
         if (isLoading == workspaceName) return;
         set({ loadingWorkspace: workspaceName });
- 
+
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.stopInteractiveTerminal}`, {
                 method: 'POST',
@@ -220,8 +221,8 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             if (!response.ok) {
                 throw new Error('Failed to stop interactive terminal');
             }
-            
-            if(!skips) 
+
+            if (!skips)
                 await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch (error) {
             console.error('Error stopping interactive terminal:', error);
@@ -229,9 +230,35 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
         set({ loadingWorkspace: null });
     },
- 
+
+    stopWorkspaceTerminal: async (workspaceName: string, skips?: boolean) => {
+        if (config.useDemo) return;
+        const isLoading = get().loadingWorkspace;
+        if (isLoading == workspaceName) return;
+        set({ loadingWorkspace: workspaceName });
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.stopTerminalWorkspace}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ workspace: { name: workspaceName } })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to stop interactive terminal');
+            }
+
+            if (!skips)
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch (error) {
+            console.error('Error stopping interactive terminal:', error);
+        }
+        set({ loadingWorkspace: null });
+    },
+
+
     listWorkspace: async () => {
-        if(config.useDemo) return [];
+        if (config.useDemo) return [];
 
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.listWorkspacesDir}`);
@@ -246,7 +273,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     createNewWorkspace: async (workspaceName: WorkspaceInfo) => {
-        if(config.useDemo) return true;
+        if (config.useDemo) return true;
 
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.newWorkspace}`, {
@@ -262,9 +289,9 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             return false;
         }
     },
-    
+
     updateWorkspace: async (workspace: WorkspaceInfo) => {
-        if(config.useDemo) return true;
+        if (config.useDemo) return true;
 
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.updateWorkspace}`, {
@@ -282,7 +309,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     },
 
     setWorkspaceTemplate: async (workspace: WorkspaceInfo, template: string) => {
-        if(config.useDemo) return;
+        if (config.useDemo) return;
 
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.setWorkspaceTemplate}`, {
@@ -297,7 +324,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
                 const err = await response.json();
                 throw new Error(err.error || 'Failed to apply template');
             }
-            
+
             console.log('Template applied successfully');
         } catch (error) {
             console.error('Error applying template:', error);

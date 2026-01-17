@@ -33,6 +33,7 @@ import processTree       from './routes/processUsage';
 import apiDocker         from './routes/apidocker';
 import availableTemplates from './routes/availabletemplates';
 import setWorkspaceTemplate from './routes/setworkspacetemplate';
+import stopTerminalWorkspace from './routes/stopTerminalWorkspace';
 
 const app  = express();
 const port = config.apiPort;
@@ -52,6 +53,7 @@ app.use("/" + apiRoute.listWorkspacesDir,  listWorkspacesDir);
 app.use("/" + apiRoute.newWorkspace,       newWorkspace);
 app.use("/" + apiRoute.interactvTerminal,  interactiveTerminal);
 app.use("/" + apiRoute.stopInteractiveTerminal, stopInteractiveTerm);
+app.use("/" + apiRoute.stopTerminalWorkspace, stopTerminalWorkspace);
 app.use("/" + apiRoute.updateWorkspace,    updateWorkspace); 
 app.use("/" + apiRoute.hideShowFileFolder, vscodeHideShow);
 app.use("/" + apiRoute.getRootPath,        rootPath);

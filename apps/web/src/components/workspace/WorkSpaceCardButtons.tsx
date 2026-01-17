@@ -6,7 +6,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
     const loadingWorkspace = useWorkspaceState.use.loadingWorkspace();
     const setWorkSpaceRunningAs = useWorkspaceState.use.setWorkSpaceRunningAs();
     const setActiveTerminal = useWorkspaceState.use.setActiveTerminal();
-    const stopInteractiveTerminal = useWorkspaceState.use.stopInteractiveTerminal();
+    const stopWorkspaceTerminal = useWorkspaceState.use.stopWorkspaceTerminal();
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -31,7 +31,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
 
             <Button
                 onClick={async () => {
-                    await stopInteractiveTerminal(props.info.name);
+                    await stopWorkspaceTerminal(props.info.name);
                     setWorkSpaceRunningAs(props.info.name, null);
                 }}
                 name={"App is Running"}
@@ -45,7 +45,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
 
             <Button
                 onClick={async () => {
-                    await stopInteractiveTerminal(props.info.name);
+                    await stopWorkspaceTerminal(props.info.name);
                     setWorkSpaceRunningAs(props.info.name, null);
                 }}
                 name={"Development Server"}
@@ -103,7 +103,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
 
             <Button
                 onClick={async () => {
-                    stopInteractiveTerminal(props.info.name, true);
+                    stopWorkspaceTerminal(props.info.name, true);
                     setWorkSpaceRunningAs(props.info.name, null);
                 }}
                 name={"Crashed"}
