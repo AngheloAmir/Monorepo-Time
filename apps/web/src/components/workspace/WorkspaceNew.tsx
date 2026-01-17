@@ -30,7 +30,7 @@ export default function WorkspaceNew() {
     const setWorkspaceTemplate = useWorkspaceState.use.setWorkspaceTemplate();
 
     const [template, setTemplate] = useState('');
-    const [showTemplateSelector, setShowTemplateSelector] = useState(true);
+    const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
     useEffect(() => {
         if (showWorkspaceNew) {
