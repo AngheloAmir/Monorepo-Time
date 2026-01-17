@@ -113,7 +113,10 @@ const findAvailablePort = (startPort: number): Promise<number> => {
 findAvailablePort(port).then((availablePort) => {
   httpServer.listen(availablePort, () => {
     console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
-    open(`http://localhost:${availablePort}`);
+    
+    if(process.env.NODE_ENV === 'development') {
+      open(`http://localhost:${availablePort}`);
+    }
   });
 }).catch((err) => {
   console.error("Failed to find an available port:", err);

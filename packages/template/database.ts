@@ -29,10 +29,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
     }
 })();`
             },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.dev="node server.js"'
-            },
+
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="node server.js"'
@@ -56,7 +53,6 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: user
@@ -75,10 +71,7 @@ services:
 volumes:
   postgres-data:`
             },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.dev="docker compose up"'
-            },
+
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="docker compose up"'
@@ -102,10 +95,7 @@ volumes:
                 action: 'command',
                 command: 'npx supabase init'
             },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.dev="npx supabase start"'
-            },
+
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="npx supabase start"'
@@ -129,7 +119,6 @@ volumes:
 services:
   redis:
     image: redis:7.2-alpine
-    container_name: redis
     restart: unless-stopped
     ports:
       - "0:6379"
@@ -149,10 +138,7 @@ services:
 volumes:
   redis-data:`
             },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.dev="docker compose up"'
-            },
+
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="docker compose up"'
@@ -174,7 +160,6 @@ volumes:
                 filecontent: `services:
   mongodb:
     image: mongo:7.0
-    container_name: mongodb
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -240,10 +225,7 @@ setTimeout(() => {
                 action: 'command',
                 command: 'npm install'
             },
-            {
-                action: 'command',
-                command: 'npm pkg set scripts.dev="node start.js"'
-            },
+
             {
                 action: 'command',
                 command: 'npm pkg set scripts.start="node start.js"'

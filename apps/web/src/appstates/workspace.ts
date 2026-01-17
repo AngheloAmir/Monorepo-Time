@@ -19,6 +19,9 @@ export interface WorkspaceItem {
 }
 
 interface workspaceContext {
+    /** loading workspace which the workspace itself */
+    workspaceLoading: boolean;
+
     /** Base information of workspace */
     workspace: WorkspaceItem[];
 
@@ -58,6 +61,9 @@ interface workspaceContext {
     /** Close or show a terminal window for the particular workspace */
     setShowNewTerminalWindow: (workspace: WorkspaceInfo | null) => void;
 
+    /** set workspace loading */
+    setWorkspaceLoading: (loading: boolean) => void;
+
     ///API calls
     //function that calls API
     stopProcess:          (workspaceName: string) => Promise<void>;
@@ -70,12 +76,17 @@ interface workspaceContext {
 
 const workspaceState = create<workspaceContext>()((set, get) => ({
     workspace: [],
+    workspaceLoading: false,
     activeTerminal: '',
     activeWorkspaceOptionModal: null,
     loadingWorkspace: null,
     loading: false,
     showWorkspaceNew: false,
     showNewTerminalWindow: null,
+
+    setWorkspaceLoading: (loading: boolean) => {
+        set({ workspaceLoading: loading });
+    },
 
     setShowNewTerminalWindow: (workspace: WorkspaceInfo | null) => {
         set({ showNewTerminalWindow: workspace });

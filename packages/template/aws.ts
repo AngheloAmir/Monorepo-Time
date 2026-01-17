@@ -3,7 +3,6 @@ const dockerCompose = `version: "3.9"
 
 services:
   localstack:
-    container_name: "\${LOCALSTACK_DOCKER_NAME-localstack_main}"
     image: localstack/localstack
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway

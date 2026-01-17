@@ -25,9 +25,10 @@ export default function WorkspaceNew() {
     const createNewWorkspace = useWorkspaceState.use.createNewWorkspace();
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
     const setShowNewTerminalWindow = useWorkspaceState.use.setShowNewTerminalWindow();
-    const loadWorkspace = useWorkspaceState.use.loadWorkspace();
-    const listWorkspaceDir = useWorkspaceState.use.listWorkspace();
+    const loadWorkspace        = useWorkspaceState.use.loadWorkspace();
+    const listWorkspaceDir     = useWorkspaceState.use.listWorkspace();
     const setWorkspaceTemplate = useWorkspaceState.use.setWorkspaceTemplate();
+    const setWorkspaceLoading  = useWorkspaceState.use.setWorkspaceLoading();
 
     const [template, setTemplate] = useState('');
     const [showTemplateSelector, setShowTemplateSelector] = useState(false);
@@ -51,12 +52,13 @@ export default function WorkspaceNew() {
         setShowWorkspaceNew(false);
     }
 
+    //============================================================================================
     async function createWorkspace() {
         if (workspaceCopy.name === '' || workspaceCopy.path === '') {
             setError('Package name and path is required');
             return;
         }
-
+ 
         const checkName = workspace.find((item) => item.info.name === workspaceCopy.name);
         if (checkName) {
             setError('Package name already exist');
@@ -72,25 +74,25 @@ export default function WorkspaceNew() {
         };
 
         try {
+            setWorkspaceLoading(true);
+            close();
             const response = await createNewWorkspace(newWorkspaceToAdd);
             if (response) {
-                if (template) {
-                    setWorkspaceTemplate(newWorkspaceToAdd, template);
-                }
+                if (template) 
+                    await setWorkspaceTemplate(newWorkspaceToAdd, template);
                 else {
+                    setWorkspaceLoading(false);
                     setShowNewTerminalWindow(newWorkspaceToAdd);
                 }
-                close();
-
-                setTimeout(() => {
-                    loadWorkspace();
-                }, 10);
             }
         } catch (error) {
             setError('Failed to create workspace');
         }
+        loadWorkspace();
+        setWorkspaceLoading(false);
     }
 
+    //============================================================================================
     if (!showWorkspaceNew) return null;
     return (
         <ModalBody>
