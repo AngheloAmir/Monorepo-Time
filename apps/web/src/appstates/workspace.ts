@@ -240,8 +240,6 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         const workspace = get().workspace.find((item) => item.info.name === workspaceName);
         const workspacePath = workspace?.info.path;
         
-        console.log(`[Frontend] stopping workspace ${workspaceName}, path found: ${workspacePath}`);
-
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.stopTerminalWorkspace}`, {
                 method: 'POST',
@@ -256,7 +254,20 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
                 })
             });
             if (!response.ok) {
-                throw new Error('Failed to stop interactive terminal');
+                let errMsg = 'Failed to stop interactive terminal';
+                try {
+                    const errText = await response.text();
+                    try {
+                        const errBody = JSON.parse(errText);
+                        errMsg = errBody.message || errBody.error || errMsg;
+                    } catch {
+                        if (errText) errMsg = errText;
+                    }
+                } catch (e) {
+                    // Body might be empty or unreadable
+                }
+                console.error('[Frontend] Backend error:', errMsg);
+                throw new Error(errMsg);
             }
 
             if (!skips)
