@@ -27,11 +27,19 @@ router.post("/", async (req: Request, res: Response) => {
 
         // 1. Kill the Active Process
         if (currentProcess) {
-            currentSocket?.emit('log', chalk.yellow("Stopping active process..."));
-
+            // 1. Send SIGINT first (Polite stop)
             if (currentProcess.pid) {
-                if (process.platform !== 'win32') {
-                    await cleanupProcessPorts(currentProcess.pid, currentSocket);
+                try {
+                    currentSocket?.emit('log', chalk.yellow("Sending Stop Signal (SIGINT)..."));
+                    if (process.platform !== 'win32') {
+                        process.kill(-currentProcess.pid, 'SIGINT');
+                    } else {
+                        currentProcess.kill();
+                    }
+                } catch (error: any) {
+                    if (error.code !== 'ESRCH') {
+                        console.error(`Failed to signal process: ${error.message}`);
+                    }
                 }
             }
 
@@ -44,35 +52,33 @@ router.post("/", async (req: Request, res: Response) => {
                     }
                 };
 
-                // Timeout safety: Proceed after 5s if process hangs
-                const timer = setTimeout(() => {
+                // Timeout safety: Give it 15s to shut down gracefully (Docker takes time)
+                const timer = setTimeout(async () => {
                     console.log(`Process stop timed out for ${workspace.name}`);
+                    currentSocket?.emit('log', chalk.red("Process timed out. Forcing kill..."));
+                    
+                    // Force cleanup ports and kill if it didn't exit
+                    if (currentProcess.pid) {
+                        if (process.platform !== 'win32') {
+                            await cleanupProcessPorts(currentProcess.pid, currentSocket);
+                            try {
+                                process.kill(-currentProcess.pid, 'SIGKILL');
+                            } catch (e) {}
+                        } else {
+                            currentProcess.kill('SIGKILL');
+                        }
+                    }
                     safeResolve();
-                }, 5000);
+                }, 15000);
 
                 currentProcess.once('exit', () => {
                     clearTimeout(timer);
                     safeResolve();
                 });
-
-                if (currentProcess.pid) {
-                    try {
-                        if (process.platform !== 'win32') {
-                            process.kill(-currentProcess.pid, 'SIGINT');
-                        } else {
-                            currentProcess.kill();
-                        }
-                    } catch (error: any) {
-                        if (error.code === 'ESRCH') {
-                            // Process already dead
-                            clearTimeout(timer);
-                            safeResolve();
-                        } else {
-                            console.error(`Failed to kill process: ${error.message}`);
-                            // Don't resolve here, wait for timeout or natural exit if signal worked partially
-                        }
-                    }
-                } else {
+                
+                // If process was already dead before we attached listener
+                if (currentProcess.exitCode !== null) {
+                    clearTimeout(timer);
                     safeResolve();
                 }
             });

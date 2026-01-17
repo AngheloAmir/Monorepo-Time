@@ -74,21 +74,22 @@ volumes:
             {
                 action: 'file',
                 file: 'start.js',
-                filecontent: `const { exec } = require('child_process');
+                filecontent: `const { spawn, exec } = require('child_process');
 
 console.log('Starting PostgreSQL...');
 
-const process = exec('docker compose up');
+// Use spawn to avoid buffer issues and separate process management
+const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
 
-// Filter output
-process.stdout.on('data', (data) => {
-   // Only show critical info or nothing
+child.on('close', (code) => {
+    process.exit(code || 0);
 });
 
-process.stderr.on('data', (data) => {
-   // Docker compose often writes to stderr
-   if (!data.includes('The attribute \`version\` is obsolete')) {
-       // console.error(data); // Uncomment if real errors needed
+child.stderr.on('data', (data) => {
+   // Filter logs if needed
+   const output = data.toString();
+   if (!output.includes('The attribute \`version\` is obsolete')) {
+       // console.error(output); 
    }
 });
 
@@ -117,7 +118,7 @@ setTimeout(() => {
 const cleanup = () => {
     console.log('Stopping PostgreSQL...');
     exec('docker compose stop', () => {
-        process.exit();
+        process.exit(0);
     });
 };
 
@@ -197,8 +198,53 @@ volumes:
             },
 
             {
+                action: 'file',
+                file: 'start.js',
+                filecontent: `const { spawn, exec } = require('child_process');
+
+console.log('Starting Redis...');
+
+const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Give it time to start
+setTimeout(() => {
+    exec('docker compose port redis 6379', (err, stdout, stderr) => {
+        if (stderr) {
+            console.error(stderr);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        console.clear();
+        console.log('\\n==================================================');
+        console.log('🚀 Redis is running!');
+        console.log('--------------------------------------------------');
+        console.log(\`🔌 Connection String: redis://localhost:\${port}\`);
+        console.log(\`🌐 Port:              \${port}\`);
+        console.log('==================================================\\n');
+    });
+}, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Redis...');
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+            },
+            {
                 action: 'command',
-                command: 'npm pkg set scripts.start="docker compose up"'
+                command: 'npm install'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.start="node start.js"'
             },
             {
                 action: 'command',
@@ -240,21 +286,20 @@ volumes:
             {
                 action: 'file',
                 file: 'start.js',
-                filecontent: `const { exec } = require('child_process');
+                filecontent: `const { spawn, exec } = require('child_process');
 
 console.log('Starting MongoDB...');
 
-const process = exec('docker compose up');
+const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
 
-// Filter output
-process.stdout.on('data', (data) => {
-    // Only show critical info or nothing
+child.on('close', (code) => {
+    process.exit(code || 0);
 });
 
-process.stderr.on('data', (data) => {
-    // Docker compose often writes to stderr
-    if (!data.includes('The attribute \`version\` is obsolete')) {
-        // console.error(data); // Uncomment if real errors needed
+child.stderr.on('data', (data) => {
+    const output = data.toString();
+    if (!output.includes('The attribute \`version\` is obsolete')) {
+        // console.error(output);
     }
 });
 
@@ -282,7 +327,7 @@ setTimeout(() => {
 const cleanup = () => {
     console.log('Stopping MongoDB...');
     exec('docker compose stop', () => {
-        process.exit();
+        process.exit(0);
     });
 };
 
