@@ -37,9 +37,9 @@ __export(index_exports, {
   io: () => io
 });
 module.exports = __toCommonJS(index_exports);
-var import_express22 = __toESM(require("express"));
+var import_express23 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
-var import_path14 = __toESM(require("path"));
+var import_path15 = __toESM(require("path"));
 
 // ../../packages/api/index.ts
 var apiRoute = {
@@ -119,7 +119,8 @@ var apiRoute = {
   processTree: "processtree",
   /** Docker API */
   docker: "docker",
-  availabletemplates: "availabletemplates"
+  availabletemplates: "availabletemplates",
+  setWorkspaceTemplate: "setworkspacetemplate"
 };
 var api_default = apiRoute;
 
@@ -789,7 +790,7 @@ function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
     socket.on("terminal:start", (data) => {
       var _a, _b;
-      const { path: path15, command, workspaceName } = data;
+      const { path: path16, command, workspaceName } = data;
       stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
@@ -803,7 +804,7 @@ function interactiveTerminalSocket(io2) {
           const baseCMD = command.split(" ")[0];
           const args = command.split(" ").slice(1);
           child = (0, import_child_process3.spawn)(baseCMD, args, {
-            cwd: path15,
+            cwd: path16,
             env,
             shell: true,
             stdio: ["pipe", "pipe", "pipe"]
@@ -831,7 +832,7 @@ except Exception as e:
     sys.exit(1)
 `;
           child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
-            cwd: path15,
+            cwd: path16,
             env,
             stdio: ["pipe", "pipe", "pipe"]
           });
@@ -1824,11 +1825,34 @@ var templates = [
     templating: [
       {
         action: "command",
-        command: `npm pkg set scripts.dev="echo 'Ensure MySQL is running on your system'"`
+        command: "npm install open"
+      },
+      {
+        action: "file",
+        file: "server.js",
+        filecontent: `const path = require('path');
+
+// Configuration
+const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferred editor URL
+
+(async () => {
+    console.log(\`Opening MySQL Editor at \${EDITOR_URL}...\`);
+    try {
+        const open = (await import('open')).default;
+        await open(EDITOR_URL);
+        console.log('Opened successfully.');
+    } catch (err) {
+        console.error('Failed to open browser:', err);
+    }
+})();`
       },
       {
         action: "command",
-        command: `npm pkg set scripts.start="echo 'Ensure MySQL is running on your system'"`
+        command: 'npm pkg set scripts.dev="node server.js"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="node server.js"'
       }
     ]
   },
@@ -1852,7 +1876,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mydatabase
     ports:
-      - "5432:5432"
+      - "0:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -1913,7 +1937,7 @@ services:
     container_name: redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "0:6379"
     volumes:
       - redis-data:/data
     command: >
@@ -1948,9 +1972,7 @@ volumes:
       {
         action: "file",
         file: "docker-compose.yml",
-        filecontent: `version: "3.9"
-
-services:
+        filecontent: `services:
   mongodb:
     image: mongo:7.0
     container_name: mongodb
@@ -1959,9 +1981,12 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
-      - "27017:27017"
+      - "0:27017"
     volumes:
       - mongo-data:/data/db
+    command: ["mongod", "--quiet"]
+    logging:
+      driver: "none"
     healthcheck:
       test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
       interval: 10s
@@ -1972,12 +1997,57 @@ volumes:
   mongo-data:`
       },
       {
-        action: "command",
-        command: 'npm pkg set scripts.dev="docker compose up"'
+        action: "file",
+        file: "start.js",
+        filecontent: `const { exec } = require('child_process');
+
+console.log('Starting MongoDB...');
+
+const process = exec('docker compose up');
+
+// Filter output
+process.stdout.on('data', (data) => {
+    // Only show critical info or nothing
+});
+
+process.stderr.on('data', (data) => {
+    // Docker compose often writes to stderr
+    if (!data.includes('The attribute \`version\` is obsolete')) {
+        // console.error(data); // Uncomment if real errors needed
+    }
+});
+
+// Give it time to start, then print info
+setTimeout(() => {
+    exec('docker compose port mongodb 27017', (err, stdout, stderr) => {
+        if (stderr) {
+            console.error(stderr);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        console.clear();
+        console.log('\\n==================================================');
+        console.log('\u{1F680} MongoDB is running!');
+        console.log('--------------------------------------------------');
+        console.log(\`\u{1F50C} Connection String: mongodb://admin:password@localhost:\${port}\`);
+        console.log('\u{1F464} Username:          admin');
+        console.log('\u{1F511} Password:          password');
+        console.log(\`\u{1F310} Port:              \${port}\`);
+        console.log('==================================================\\n');
+    });
+}, 3000);`
       },
       {
         action: "command",
-        command: 'npm pkg set scripts.start="docker compose up"'
+        command: "npm install"
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.dev="node start.js"'
+      },
+      {
+        action: "command",
+        command: 'npm pkg set scripts.start="node start.js"'
       }
     ]
   }
@@ -2785,15 +2855,74 @@ router18.get("/", (req, res) => {
 });
 var availabletemplates_default = router18;
 
+// src/routes/setworkspacetemplate.ts
+var import_express22 = __toESM(require("express"));
+var import_fs3 = __toESM(require("fs"));
+var import_path14 = __toESM(require("path"));
+var import_child_process8 = require("child_process");
+var import_util3 = __toESM(require("util"));
+var execPromise = import_util3.default.promisify(import_child_process8.exec);
+var router19 = import_express22.default.Router();
+router19.post("/", async (req, res) => {
+  try {
+    const { workspace, templatename } = req.body;
+    if (!workspace || !workspace.path || !templatename) {
+      return res.status(400).json({ error: "Missing workspace info or template name" });
+    }
+    const workspacePath = workspace.path;
+    let foundTemplate = null;
+    const categories = ["project", "database", "services"];
+    for (const cat of categories) {
+      const list = template_default[cat];
+      if (Array.isArray(list)) {
+        const match = list.find((t) => t.name === templatename);
+        if (match) {
+          foundTemplate = match;
+          break;
+        }
+      }
+    }
+    if (!foundTemplate) {
+      return res.status(404).json({ error: `Template '${templatename}' not found` });
+    }
+    console.log(`Applying template '${templatename}' to ${workspacePath}...`);
+    for (const step of foundTemplate.templating) {
+      if (step.action === "command" && step.command) {
+        console.log(`Executing command: ${step.command}`);
+        try {
+          await execPromise(step.command, { cwd: workspacePath });
+        } catch (cmdErr) {
+          console.error(`Command failed: ${step.command}`, cmdErr);
+          return res.status(500).json({ error: `Command failed: ${step.command}
+${cmdErr.message}` });
+        }
+      } else if (step.action === "file" && step.file && step.filecontent !== void 0) {
+        console.log(`Creating file: ${step.file}`);
+        const filePath = import_path14.default.join(workspacePath, step.file);
+        const dirName = import_path14.default.dirname(filePath);
+        if (!import_fs3.default.existsSync(dirName)) {
+          import_fs3.default.mkdirSync(dirName, { recursive: true });
+        }
+        import_fs3.default.writeFileSync(filePath, step.filecontent);
+      }
+    }
+    res.json({ success: true, message: "Template applied successfully" });
+  } catch (error) {
+    console.error("Error setting workspace template:", error);
+    res.status(500).json({ error: "Failed to apply template: " + error.message });
+  }
+});
+var setworkspacetemplate_default = router19;
+
 // src/index.ts
-var app = (0, import_express22.default)();
+var app = (0, import_express23.default)();
 var port2 = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express22.default.static("public"));
-app.use(import_express22.default.json());
+app.use(import_express23.default.static("public"));
+app.use(import_express23.default.json());
 app.use("/", tester_default);
 app.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app.use("/" + api_default.stopProcess, stopcmd_default);
@@ -2814,10 +2943,11 @@ app.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
 app.use("/" + api_default.processTree, processUsage_default);
 app.use("/" + api_default.docker, apidocker_default);
 app.use("/" + api_default.availabletemplates, availabletemplates_default);
-var frontendPath = import_path14.default.join(__dirname, "../public");
-app.use(import_express22.default.static(frontendPath));
+app.use("/" + api_default.setWorkspaceTemplate, setworkspacetemplate_default);
+var frontendPath = import_path15.default.join(__dirname, "../public");
+app.use(import_express23.default.static(frontendPath));
 app.get("*", (req, res) => {
-  res.sendFile(import_path14.default.join(frontendPath, "index.html"));
+  res.sendFile(import_path15.default.join(frontendPath, "index.html"));
 });
 var httpServer = (0, import_http.createServer)(app);
 var io = new import_socket.Server(httpServer, {
