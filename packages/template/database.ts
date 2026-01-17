@@ -155,9 +155,7 @@ volumes:
             {
                 action: 'file',
                 file: 'docker-compose.yml',
-                filecontent: `version: "3.9"
-
-services:
+                filecontent: `services:
   mongodb:
     image: mongo:7.0
     container_name: mongodb
@@ -169,6 +167,9 @@ services:
       - "0:27017"
     volumes:
       - mongo-data:/data/db
+    command: ["mongod", "--quiet"]
+    logging:
+      driver: "none"
     healthcheck:
       test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
       interval: 10s
@@ -179,12 +180,57 @@ volumes:
   mongo-data:`
             },
             {
-                action: 'command',
-                command: 'npm pkg set scripts.dev="docker compose up"'
+                action: 'file',
+                file: 'start.js',
+                filecontent: `const { exec } = require('child_process');
+
+console.log('Starting MongoDB...');
+
+const process = exec('docker compose up');
+
+// Filter output
+process.stdout.on('data', (data) => {
+    // Only show critical info or nothing
+});
+
+process.stderr.on('data', (data) => {
+    // Docker compose often writes to stderr
+    if (!data.includes('The attribute \`version\` is obsolete')) {
+        // console.error(data); // Uncomment if real errors needed
+    }
+});
+
+// Give it time to start, then print info
+setTimeout(() => {
+    exec('docker compose port mongodb 27017', (err, stdout, stderr) => {
+        if (stderr) {
+            console.error(stderr);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        console.clear();
+        console.log('\\n==================================================');
+        console.log('🚀 MongoDB is running!');
+        console.log('--------------------------------------------------');
+        console.log(\`🔌 Connection String: mongodb://admin:password@localhost:\${port}\`);
+        console.log('👤 Username:          admin');
+        console.log('🔑 Password:          password');
+        console.log(\`🌐 Port:              \${port}\`);
+        console.log('==================================================\\n');
+    });
+}, 3000);`
             },
             {
                 action: 'command',
-                command: 'npm pkg set scripts.start="docker compose up"'
+                command: 'npm install'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.dev="node start.js"'
+            },
+            {
+                action: 'command',
+                command: 'npm pkg set scripts.start="node start.js"'
             }
         ]
     }

@@ -80,8 +80,11 @@ export default function WorkspaceNew() {
                 else {
                     setShowNewTerminalWindow(newWorkspaceToAdd);
                 }
-                loadWorkspace();
                 close();
+
+                setTimeout(() => {
+                    loadWorkspace();
+                }, 10);
             }
         } catch (error) {
             setError('Failed to create workspace');
