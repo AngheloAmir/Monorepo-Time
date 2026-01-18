@@ -1,15 +1,14 @@
 {
   "name": "monorepotime",
   "version": "1.1.4",
-  "description": "",
+  "description": "monorepo / turborepo gui tools built with nodejs and reactjs",
   "main": "dist/index.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon --watch 'src/**/*.ts' --watch '../../packages/**/*.ts' --exec 'ts-node' src/index.ts",
     "build": "tsup",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "stop": "npx -y kill-port 3000",
-    "copy-frontend": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/",
+    "stop": "npx -y kill-port 4793",
+    "predep": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/",
     "publish": "npm publish --access public"
   },
   "dependencies": {
@@ -22,7 +21,16 @@
     "pidusage": "^4.0.1",
     "socket.io": "^4.8.3"
   },
-  "keywords": [],
+  "keywords": [
+    "monorepotime",
+    "monorepo",
+    "gui",
+    "tools",
+    "turborepo",
+    "cicd",
+    "npm",
+    "package"
+  ],
   "author": "Anghelo Amir",
   "license": "ISC",
   "type": "commonjs",

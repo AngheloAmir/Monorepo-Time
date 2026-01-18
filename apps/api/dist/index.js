@@ -601,7 +601,7 @@ router4.post("/", async (req, res) => {
     }
     await import_fs_extra3.default.ensureDir(targetPath);
     const packageJson = {
-      name: reqBody.name || import_path4.default.basename(targetPath),
+      name: (reqBody.name || import_path4.default.basename(targetPath)).toLowerCase().replace(/\s+/g, "-"),
       version: "1.0.0",
       description: reqBody.description || "",
       fontawesomeIcon: reqBody.fontawesomeIcon || "",
