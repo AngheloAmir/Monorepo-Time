@@ -3390,13 +3390,8 @@ router19.post("/", async (req, res) => {
     for (const step of foundTemplate.templating) {
       if (step.action === "command" && step.command) {
         console.log(`Executing command: ${step.command}`);
-        const isWin = process.platform === "win32";
-        let shell = isWin ? true : "/bin/sh";
-        if (!isWin && import_fs3.default.existsSync("/bin/bash")) {
-          shell = "/bin/bash";
-        }
         try {
-          await execPromise(step.command, { cwd: workspacePath, shell, env: process.env });
+          await execPromise(step.command, { cwd: workspacePath, env: process.env });
         } catch (cmdErr) {
           console.error(`Command failed: ${step.command}`, cmdErr);
           return res.status(500).json({ error: `Command failed: ${step.command}

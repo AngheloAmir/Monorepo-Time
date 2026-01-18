@@ -45,14 +45,9 @@ router.post('/', async (req, res) => {
         for (const step of foundTemplate.templating) {
             if (step.action === 'command' && step.command) {
                 console.log(`Executing command: ${step.command}`);
-                const isWin = process.platform === "win32";
-                let shell: string | undefined = isWin ? undefined : "/bin/sh";
-                if (!isWin && fs.existsSync("/bin/bash")) {
-                    shell = "/bin/bash";
-                }
-
                 try {
-                    await execPromise(step.command, { cwd: workspacePath, shell, env: process.env });
+                    // Let Node.js use the default shell (uses /bin/sh on Unix, cmd.exe on Windows)
+                    await execPromise(step.command, { cwd: workspacePath, env: process.env });
                 } catch (cmdErr: any) {
                     console.error(`Command failed: ${step.command}`, cmdErr);
                      // Decide if we want to stop or continue. Usually stopping is safer.
