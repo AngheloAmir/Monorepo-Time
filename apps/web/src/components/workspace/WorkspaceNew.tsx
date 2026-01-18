@@ -25,10 +25,10 @@ export default function WorkspaceNew() {
     const createNewWorkspace = useWorkspaceState.use.createNewWorkspace();
     const setShowWorkspaceNew = useWorkspaceState.use.setShowWorkspaceNew();
     const setShowNewTerminalWindow = useWorkspaceState.use.setShowNewTerminalWindow();
-    const loadWorkspace        = useWorkspaceState.use.loadWorkspace();
-    const listWorkspaceDir     = useWorkspaceState.use.listWorkspace();
+    const loadWorkspace = useWorkspaceState.use.loadWorkspace();
+    const listWorkspaceDir = useWorkspaceState.use.listWorkspace();
     const setWorkspaceTemplate = useWorkspaceState.use.setWorkspaceTemplate();
-    const setWorkspaceLoading  = useWorkspaceState.use.setWorkspaceLoading();
+    const setWorkspaceLoading = useWorkspaceState.use.setWorkspaceLoading();
 
     const [template, setTemplate] = useState('');
     const [showTemplateSelector, setShowTemplateSelector] = useState(false);
@@ -58,7 +58,7 @@ export default function WorkspaceNew() {
             setError('Package name and path is required');
             return;
         }
- 
+
         const checkName = workspace.find((item) => item.info.name === workspaceCopy.name);
         if (checkName) {
             setError('Package name already exist');
@@ -78,7 +78,7 @@ export default function WorkspaceNew() {
             close();
             const response = await createNewWorkspace(newWorkspaceToAdd);
             if (response) {
-                if (template) 
+                if (template)
                     await setWorkspaceTemplate(newWorkspaceToAdd, template);
                 else {
                     setWorkspaceLoading(false);
@@ -104,7 +104,7 @@ export default function WorkspaceNew() {
 
                 <div className="grid grid-cols-2 gap-2 mb-2">
                     <InputField
-                        label="Package Name"
+                        label="Name (small letters)"
                         icon="fa fa-cube"
                         placeholder="Package and Folder Name"
                         value={workspaceCopy?.name || ''}
@@ -112,7 +112,7 @@ export default function WorkspaceNew() {
                             if (!workspaceCopy) return;
                             setWorkspaceCopy({
                                 ...workspaceCopy,
-                                name: e.target.value
+                                name: e.target.value.toLowerCase()
                             })
                         }}
                     />
@@ -134,27 +134,32 @@ export default function WorkspaceNew() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-2">
-                    {(
-                        [
-                            { pkg: "fontawesomeIcon", label: "Icon", icon: "fas fa-icons", placeholder: "(optional) fontawesome icon" },
-                            { pkg: "description", label: "Description", icon: "fas fa-info", placeholder: "(optional) description" },
-                        ] as Array<{ pkg: keyof WorkspaceInfo, label: string, icon: string, placeholder: string }>
-                    ).map((item) => (
-                        <InputField
-                            key={item.pkg}
-                            label={item.label}
-                            icon={item.icon}
-                            placeholder={item.placeholder}
-                            value={workspaceCopy?.[item.pkg] || ''}
-                            onChange={(e) => {
-                                if (!workspaceCopy) return;
-                                setWorkspaceCopy({
-                                    ...workspaceCopy,
-                                    [item.pkg]: e.target.value
-                                })
-                            }}
-                        />
-                    ))}
+                    <InputField
+                        label="Icon"
+                        icon="fas fa-icons"
+                        placeholder="(optional) fontawesome icon"
+                        value={workspaceCopy?.fontawesomeIcon || ''}
+                        onChange={(e) => {
+                            if (!workspaceCopy) return;
+                            setWorkspaceCopy({
+                                ...workspaceCopy,
+                                fontawesomeIcon: e.target.value.toLowerCase()
+                            })
+                        }}
+                    />
+                    <InputField
+                        label="Description"
+                        icon="fas fa-info"
+                        placeholder="(optional) description"
+                        value={workspaceCopy?.description || ''}
+                        onChange={(e) => {
+                            if (!workspaceCopy) return;
+                            setWorkspaceCopy({
+                                ...workspaceCopy,
+                                description: e.target.value
+                            })
+                        }}
+                    />
                 </div>
 
                 <div className="flex flex-row w-[50%] gap-2 mb-2 mt-4">
