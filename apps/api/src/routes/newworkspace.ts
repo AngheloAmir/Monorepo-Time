@@ -12,7 +12,13 @@ router.post("/", async (req: Request, res: Response) => {
     
     try {
         const reqBody: WorkspaceInfo = req.body;
-        const targetPath = reqBody.path;
+        let targetPath = reqBody.path;
+
+        if (targetPath) {
+            const dir = path.dirname(targetPath);
+            const specificName = path.basename(targetPath);
+            targetPath = path.join(dir, specificName.replace(/\s+/g, "-"));
+        }
 
         if (!targetPath) {
             return res.status(400).json({ error: "Path is required" });

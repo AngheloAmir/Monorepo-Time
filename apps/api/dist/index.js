@@ -591,7 +591,12 @@ router4.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
   try {
     const reqBody = req.body;
-    const targetPath = reqBody.path;
+    let targetPath = reqBody.path;
+    if (targetPath) {
+      const dir = import_path4.default.dirname(targetPath);
+      const specificName = import_path4.default.basename(targetPath);
+      targetPath = import_path4.default.join(dir, specificName.replace(/\s+/g, "-"));
+    }
     if (!targetPath) {
       return res.status(400).json({ error: "Path is required" });
     }
@@ -1773,6 +1778,10 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
     {
       action: "command",
       command: `npm pkg set scripts.stop="echo 'Note: MySQL is running as a system service. Please stop it manually.'"`
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -1955,6 +1964,10 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -1980,6 +1993,10 @@ var Supabase = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="npx supabase stop"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -2125,6 +2142,10 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -2273,6 +2294,10 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -2329,6 +2354,10 @@ export default {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-globe"'
     }
   ]
 };
@@ -2346,6 +2375,10 @@ var NextJS = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-globe"'
     }
   ]
 };
@@ -2462,6 +2495,10 @@ var ExpressTS = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="npx -y kill-port 3500"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-server"'
     }
   ]
 };
@@ -2488,6 +2525,10 @@ var PHP = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-server"'
     }
   ]
 };
@@ -2513,6 +2554,10 @@ var Laravel = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="npx kill-port 8000"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-server"'
     }
   ]
 };
@@ -2539,6 +2584,10 @@ var PythonConsole = {
     {
       action: "command",
       command: 'npm pkg set scripts.start="python3 main.py"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-terminal"'
     }
   ]
 };
@@ -2571,6 +2620,10 @@ var DotNetConsole = {
     {
       action: "command",
       command: 'npm pkg set scripts.start="dotnet run"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-terminal"'
     }
   ]
 };
@@ -2608,6 +2661,10 @@ var N8NLocal = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="npx kill-port 5678"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-robot"'
     }
   ]
 };
@@ -3138,6 +3195,10 @@ var AWSTemplate = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="node stop.js"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-cloud"'
     }
   ]
 };
@@ -3251,6 +3312,10 @@ var StripeTemplate = {
     {
       action: "command",
       command: 'npm pkg set scripts.stop="docker compose down"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-credit-card"'
     }
   ]
 };
