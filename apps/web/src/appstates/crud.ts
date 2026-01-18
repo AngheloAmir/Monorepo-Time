@@ -9,8 +9,6 @@ interface CrudContext {
     noData: boolean;
     crudData: CrudCategory[];
     useDevURL: boolean;
-    devURL: string;
-    prodURL: string;
     params: string;
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "STREAM";
 
@@ -31,7 +29,6 @@ interface CrudContext {
 
     loadCrudData: () => Promise<void>;
     setUseDevURL: (useDevURL: boolean) => void;
-    setURL: (devURL: string, prodURL: string) => void;
     setParams: (params: string) => void;
     setMethod: (method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "STREAM") => void;
 
@@ -89,7 +86,6 @@ example:
     setExpectedOutput: (expectedOutput: string) => set({ expectedOutput }),
 
     setUseDevURL: (useDevURL: boolean) => set({ useDevURL }),
-    setURL: (devURL: string, prodURL: string) => set({ devURL, prodURL }),
     setParams: (params: string) => set({ params }),
     setMethod: (method) => set({ method }),
 
@@ -145,10 +141,11 @@ example:
             return;
         }
 
-        const { useDevURL, devURL, prodURL, params, method, crudData, currentCategoryIndex, currentCrudIndex } = get();
+        const { useDevURL, params, method, crudData, currentCategoryIndex, currentCrudIndex } = get();
         const queryString        = params ? (params.startsWith('?') ? params : `?${params}`) : "";
         const encodedQueryString = encodeURI(queryString);
-        const url                = `${useDevURL ? devURL : prodURL}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${encodedQueryString}`;
+        const currentURL         = useDevURL ? crudData[currentCategoryIndex].devurl : crudData[currentCategoryIndex].produrl;
+        const url                = `${currentURL}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${encodedQueryString}`;
         const startTime          = Date.now();
 
         set({ isFetching: true, requestStartTime: startTime, executionTime: 0 });

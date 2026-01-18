@@ -3,8 +3,6 @@ import useCrudState from "../../appstates/crud";
 export default function MainContentHeader() {
     const useDevURL = useCrudState.use.useDevURL();
     const setUseDevURL = useCrudState.use.setUseDevURL();
-    const devURL = useCrudState.use.devURL();
-    const prodURL = useCrudState.use.prodURL();
     const params = useCrudState.use.params();
     const method = useCrudState.use.method();
 
@@ -18,14 +16,14 @@ export default function MainContentHeader() {
                 <button
                     onClick={() => setUseDevURL(true)}
                     className={`${useDevURL ? "bg-gradient-to-r from-blue-600 to-blue-500" : ""} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
-                    title={devURL}
+                    title={crudData[currentCategoryIndex].devurl}
                 >
                     Dev
                 </button>
                 <button
                     onClick={() => setUseDevURL(false)}
                     className={`${useDevURL ? "" : "bg-gradient-to-r from-blue-600 to-blue-500"} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
-                    title={prodURL}
+                    title={crudData[currentCategoryIndex].produrl}
                 >
                     Prod
                 </button>
@@ -39,7 +37,9 @@ export default function MainContentHeader() {
                         {method}
                     </span>
                     <span className="text-gray-500 font-mono text-md">
-                        { `${useDevURL ? devURL : prodURL}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${params ? encodeURI(params.startsWith('?') ? params : `?${params}`) : ""}` }
+                        { `${useDevURL ? 
+                            crudData[currentCategoryIndex].devurl :
+                            crudData[currentCategoryIndex].produrl}${crudData[currentCategoryIndex].items[currentCrudIndex].route}${params ? encodeURI(params.startsWith('?') ? params : `?${params}`) : ""}` }
                     </span>
                 </div>
 
@@ -53,7 +53,6 @@ export default function MainContentHeader() {
                      </span>
                 </div>
             </div>
-
         </header>
     )
 }
