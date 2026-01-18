@@ -3361,9 +3361,65 @@ var import_express22 = __toESM(require("express"));
 var import_fs3 = __toESM(require("fs"));
 var import_path14 = __toESM(require("path"));
 var import_child_process8 = require("child_process");
-var import_util2 = __toESM(require("util"));
-var execPromise = import_util2.default.promisify(import_child_process8.exec);
 var router19 = import_express22.default.Router();
+function runCommand2(command, cwd) {
+  return new Promise((resolve, reject) => {
+    var _a, _b;
+    const parts = command.split(" ");
+    const baseCMD = parts[0];
+    const args = parts.slice(1);
+    const env = {
+      ...process.env,
+      CI: "true",
+      // Most tools detect this and skip interactive prompts
+      npm_config_yes: "true",
+      // npm/npx auto-yes
+      FORCE_COLOR: "0",
+      // Disable colors for cleaner logging
+      DEBIAN_FRONTEND: "noninteractive",
+      // For apt-get if ever used
+      TERM: "dumb"
+    };
+    const child = (0, import_child_process8.spawn)(baseCMD, args, {
+      cwd,
+      env,
+      shell: true,
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    if (child.stdin) {
+      const autoResponder = setInterval(() => {
+        var _a2;
+        try {
+          (_a2 = child.stdin) == null ? void 0 : _a2.write("y\n");
+        } catch {
+        }
+      }, 500);
+      child.on("close", () => clearInterval(autoResponder));
+      child.on("error", () => clearInterval(autoResponder));
+    }
+    let stdout = "";
+    let stderr = "";
+    (_a = child.stdout) == null ? void 0 : _a.on("data", (data) => {
+      stdout += data.toString();
+    });
+    (_b = child.stderr) == null ? void 0 : _b.on("data", (data) => {
+      stderr += data.toString();
+    });
+    child.on("error", (err) => {
+      reject(new Error(`Spawn error: ${err.message}
+stderr: ${stderr}`));
+    });
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve({ stdout, stderr });
+      } else {
+        reject(new Error(`Command exited with code ${code}
+stderr: ${stderr}
+stdout: ${stdout}`));
+      }
+    });
+  });
+}
 router19.post("/", async (req, res) => {
   try {
     const { workspace, templatename } = req.body;
@@ -3391,7 +3447,7 @@ router19.post("/", async (req, res) => {
       if (step.action === "command" && step.command) {
         console.log(`Executing command: ${step.command}`);
         try {
-          await execPromise(step.command, { cwd: workspacePath });
+          await runCommand2(step.command, workspacePath);
         } catch (cmdErr) {
           console.error(`Command failed: ${step.command}`, cmdErr);
           return res.status(500).json({ error: `Command failed: ${step.command}
@@ -3414,14 +3470,76 @@ ${cmdErr.message}` });
   }
 });
 var setworkspacetemplate_default = router19;
+function setWorkspaceTemplateSocket(io2) {
+  io2.on("connection", (socket) => {
+    socket.on("template:start", async (data) => {
+      const { workspace, templatename } = data;
+      if (!workspace || !workspace.path || !templatename) {
+        socket.emit("template:error", { error: "Missing workspace info or template name" });
+        return;
+      }
+      const workspacePath = workspace.path;
+      let foundTemplate = null;
+      const categories = ["project", "database", "services"];
+      for (const cat of categories) {
+        const list = template_default[cat];
+        if (Array.isArray(list)) {
+          const match = list.find((t) => t.name === templatename);
+          if (match) {
+            foundTemplate = match;
+            break;
+          }
+        }
+      }
+      if (!foundTemplate) {
+        socket.emit("template:error", { error: `Template '${templatename}' not found` });
+        return;
+      }
+      socket.emit("template:progress", { message: `Starting template '${templatename}'...` });
+      console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);
+      try {
+        for (const step of foundTemplate.templating) {
+          if (step.action === "command" && step.command) {
+            socket.emit("template:progress", { message: `Running: ${step.command}` });
+            console.log(`[Socket] Executing command: ${step.command}`);
+            try {
+              await runCommand2(step.command, workspacePath);
+            } catch (cmdErr) {
+              console.error(`[Socket] Command failed: ${step.command}`, cmdErr);
+              socket.emit("template:error", {
+                error: `Command failed: ${step.command}
+${cmdErr.message}`
+              });
+              return;
+            }
+          } else if (step.action === "file" && step.file && step.filecontent !== void 0) {
+            socket.emit("template:progress", { message: `Creating file: ${step.file}` });
+            console.log(`[Socket] Creating file: ${step.file}`);
+            const filePath = import_path14.default.join(workspacePath, step.file);
+            const dirName = import_path14.default.dirname(filePath);
+            if (!import_fs3.default.existsSync(dirName)) {
+              import_fs3.default.mkdirSync(dirName, { recursive: true });
+            }
+            import_fs3.default.writeFileSync(filePath, step.filecontent);
+          }
+        }
+        socket.emit("template:success", { message: "Template applied successfully" });
+        console.log(`[Socket] Template '${templatename}' applied successfully`);
+      } catch (error) {
+        console.error("[Socket] Error setting workspace template:", error);
+        socket.emit("template:error", { error: "Failed to apply template: " + error.message });
+      }
+    });
+  });
+}
 
 // src/routes/stopTerminalWorkspace.ts
 var import_express23 = require("express");
 var import_fs_extra12 = __toESM(require("fs-extra"));
 var import_path15 = __toESM(require("path"));
 var import_child_process9 = require("child_process");
-var import_util3 = __toESM(require("util"));
-var execAsync2 = import_util3.default.promisify(import_child_process9.exec);
+var import_util2 = __toESM(require("util"));
+var execAsync2 = import_util2.default.promisify(import_child_process9.exec);
 var router20 = (0, import_express23.Router)();
 router20.post("/", async (req, res) => {
   try {
@@ -3587,6 +3705,7 @@ var io = new import_socket.Server(httpServer, {
 });
 runCmdDevSocket(io);
 interactiveTerminalSocket(io);
+setWorkspaceTemplateSocket(io);
 var findAvailablePort = (startPort) => {
   return new Promise((resolve, reject) => {
     const server = import_net.default.createServer();

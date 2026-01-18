@@ -72,6 +72,8 @@ interface workspaceContext {
     listWorkspace: () => Promise<any>;
     createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
     updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
+
+    loadMessage: string;
     setWorkspaceTemplate: (workspaceName: WorkspaceInfo, template: string) => Promise<void>;
 }
 
@@ -84,6 +86,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     loading: false,
     showWorkspaceNew: false,
     showNewTerminalWindow: null,
+    loadMessage: '',
 
     setWorkspaceLoading: (loading: boolean) => {
         set({ workspaceLoading: loading });
@@ -333,25 +336,59 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     setWorkspaceTemplate: async (workspace: WorkspaceInfo, template: string) => {
         if (config.useDemo) return;
 
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.setWorkspaceTemplate}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ workspace, templatename: template })
+        // Import socket.io-client dynamically to avoid SSR issues
+        const { io } = await import('socket.io-client');
+        
+        return new Promise<void>((resolve, reject) => {
+            const socket = io(config.serverPath, {
+                transports: ['websocket'],
+                forceNew: true,
+                reconnection: false
             });
 
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error || 'Failed to apply template');
-            }
+            // Set initial loading message
+            set({ loadMessage: `Connecting...` });
 
-            console.log('Template applied successfully');
-        } catch (error) {
-            console.error('Error applying template:', error);
-            // potentially bubble up error or show notification
-        }
+            socket.on('connect', () => {
+                set({ loadMessage: `Starting template '${template}'...` });
+                socket.emit('template:start', { workspace, templatename: template });
+            });
+
+            socket.on('template:progress', (data: { message: string }) => {
+                set({ loadMessage: data.message });
+                console.log('[Template Progress]', data.message);
+            });
+
+            socket.on('template:success', (data: { message: string }) => {
+                set({ loadMessage: data.message });
+                console.log('[Template Success]', data.message);
+                socket.disconnect();
+                resolve();
+            });
+
+            socket.on('template:error', (data: { error: string }) => {
+                set({ loadMessage: `Error: ${data.error}` });
+                console.error('[Template Error]', data.error);
+                socket.disconnect();
+                reject(new Error(data.error));
+            });
+
+            socket.on('connect_error', (err) => {
+                set({ loadMessage: `Connection error: ${err.message}` });
+                console.error('[Template Connect Error]', err);
+                socket.disconnect();
+                reject(err);
+            });
+
+            // Timeout after 5 minutes
+            setTimeout(() => {
+                if (socket.connected) {
+                    socket.disconnect();
+                    set({ loadMessage: 'Template setup timed out' });
+                    reject(new Error('Template setup timed out'));
+                }
+            }, 5 * 60 * 1000);
+        });
     },
 
 }));
