@@ -25,7 +25,7 @@ router.post("/", async (req: Request, res: Response) => {
 
         await fs.ensureDir(targetPath);
         const packageJson: any = {
-            name:       reqBody.name || path.basename(targetPath),
+            name:       reqBody.name.toLowerCase() || path.basename(targetPath.toLowerCase()),
             version:    "1.0.0",
             description: reqBody.description || "",
             fontawesomeIcon: reqBody.fontawesomeIcon || "",
