@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import useCrudState from '../../appstates/crud';
 
-export default function CrudExpectedOutput() {
+export default function CrudExpectedOutput({ onMinimize }: { onMinimize: () => void }) {
     const expectedOutput = useCrudState.use.expectedOutput();
     const contentRef    = useRef<HTMLPreElement>(null);
     const [content, setContent] = useState<string>('');
@@ -46,6 +46,10 @@ export default function CrudExpectedOutput() {
                     <i className="fa fa-circle-info text-sm"></i>
                     Expected Response
                 </h2>
+
+                <button className="px-2 py-1 bg-gray-700 rounded-md text-gray-300 text-sm" onClick={onMinimize}>
+                    <i className="fa fa-minus"></i>
+                </button>
             </div>
 
             <div className="flex-1 overflow-auto custom-scrollbar p-1 relative">

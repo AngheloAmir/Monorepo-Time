@@ -13,8 +13,7 @@
                     "description": "Ping the server",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n  \"message\": \"pong\"\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Process Tree",
@@ -23,8 +22,7 @@
                     "description": "Get system process and memory info",
                     "sampleInput": "{}",
                     "expectedOutcome": "",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Stream Test",
@@ -39,8 +37,7 @@
                             "content": "{}"
                         }
                     ],
-                    "expectedOutcome": "",
-                    "availableFor": "public"
+                    "expectedOutcome": ""
                 }
             ]
         },
@@ -56,8 +53,7 @@
                     "description": "Scan for all workspaces in the monorepo",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"root\": \"...\",\n \"count\": 0,\n \"workspace\": []\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "List Workspace Dirs",
@@ -66,8 +62,7 @@
                     "description": "List top-level workspace directories",
                     "sampleInput": "{}",
                     "expectedOutcome": "[\n {\n  \"label\": \"apps\",\n  \"path\": \"...\"\n }\n]",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Get Root Path",
@@ -76,8 +71,7 @@
                     "description": "Get the root path of the monorepo",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"path\": \"/absolute/path/to/root\"\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Check TurboRepo Exist",
@@ -86,8 +80,7 @@
                     "description": "Check if turbo.json and monorepotime.json exist",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"exists\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Check First Run",
@@ -96,8 +89,7 @@
                     "description": "Check if this is the first run",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"isFirstTime\": false\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Get Notes",
@@ -106,8 +98,7 @@
                     "description": "Get saved notes",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"notes\": \"...\"\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Get CRUD Test Data",
@@ -116,8 +107,7 @@
                     "description": "Get valid crudtest configurations",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"crudtest\": [...]\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Git History",
@@ -126,8 +116,7 @@
                     "description": "Get recent git commit history",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"history\": [...]\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Git Branch",
@@ -136,8 +125,7 @@
                     "description": "Get current git branch",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"branch\": \"master\"\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Get Process Tree",
@@ -146,8 +134,7 @@
                     "description": "Get system process stats",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"processes\": [...]\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Get Docker Containers",
@@ -156,8 +143,7 @@
                     "description": "Get running docker containers",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"containers\": [],\n \"totalMem\": 0\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []                    
                 },
                 {
                     "label": "Available Templates",
@@ -166,8 +152,7 @@
                     "description": "Get available project templates",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"project\": [...],\n \"database\": [...]\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []                    
                 },
                 {
                     "label": "Init MonorepoTime",
@@ -176,8 +161,7 @@
                     "description": "Initialize monorepotime.json if missing",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"success\": false,\n \"message\": \"monorepotime.json already exists\"\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Scaffold Repo (Careful)",
@@ -186,8 +170,7 @@
                     "description": "Scaffold the repository structure. WARNING: May modify files.",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "New Workspace",
@@ -196,8 +179,7 @@
                     "description": "Create a new workspace",
                     "sampleInput": "{\n \"path\": \"/absolute/path/to/apps/new-app\",\n \"name\": \"new-app\",\n \"description\": \"A new app\"\n}",
                     "expectedOutcome": "{\n \"message\": \"Workspace created successfully\"\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": [] 
                 },
                 {
                     "label": "Update Workspace",
@@ -206,8 +188,7 @@
                     "description": "Update workspace package.json",
                     "sampleInput": "{\n \"path\": \"/absolute/path/to/apps/my-app\",\n \"description\": \"Updated description\"\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Stop Process",
@@ -216,8 +197,7 @@
                     "description": "Stop a running process",
                     "sampleInput": "{\n \"workspace\": {\n  \"name\": \"app-name\"\n }\n}",
                     "expectedOutcome": "",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Stop Interactive Terminal",
@@ -226,8 +206,7 @@
                     "description": "Stop an interactive terminal session",
                     "sampleInput": "{\n \"workspace\": {\n  \"name\": \"app-name\"\n }\n}",
                     "expectedOutcome": "",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Stop Terminal Workspace",
@@ -236,8 +215,7 @@
                     "description": "Stop terminal and cleanup resources",
                     "sampleInput": "{\n \"workspace\": {\n  \"name\": \"app-name\",\n  \"path\": \"/path/to/app\"\n }\n}",
                     "expectedOutcome": "",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "VSCode Hide/Show",
@@ -246,8 +224,7 @@
                     "description": "Update VSCode files.exclude",
                     "sampleInput": "{\n \"hide\": true,\n \"pathInclude\": [\"apps/hidden-app\"]\n}",
                     "expectedOutcome": "{\n \"success\": true,\n \"isHidden\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Save Notes",
@@ -256,8 +233,7 @@
                     "description": "Save notes",
                     "sampleInput": "{\n \"notes\": \"My notes\"\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Save CRUD Test",
@@ -266,8 +242,7 @@
                     "description": "Save crudtest configuration",
                     "sampleInput": "{\n \"crudtest\": []\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Git Revert",
@@ -276,8 +251,7 @@
                     "description": "Revert to a previous commit",
                     "sampleInput": "{\n \"hash\": \"commit-hash\"\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Git Push",
@@ -286,8 +260,7 @@
                     "description": "Commit all changes and push",
                     "sampleInput": "{\n \"message\": \"commit message\"\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Kill Port",
@@ -296,8 +269,7 @@
                     "description": "Kill process on a specific port",
                     "sampleInput": "{\n \"port\": 3000\n}",
                     "expectedOutcome": "{\n \"success\": true,\n \"killed\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []                    
                 },
                 {
                     "label": "Stop Docker Container",
@@ -306,8 +278,7 @@
                     "description": "Stop a specific docker container",
                     "sampleInput": "{\n \"id\": \"container-id\"\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []
                 },
                 {
                     "label": "Stop All Docker Containers",
@@ -316,8 +287,7 @@
                     "description": "Stop all running docker containers",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []  
                 },
                 {
                     "label": "Set Workspace Template",
@@ -326,8 +296,7 @@
                     "description": "Apply a template to a workspace",
                     "sampleInput": "{\n \"workspace\": { \"path\": \"/path/to/workspace\" },\n \"templatename\": \"react-vite\"\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": [],
-                    "availableFor": "public"
+                    "suggested": []   
                 }
             ]
         }

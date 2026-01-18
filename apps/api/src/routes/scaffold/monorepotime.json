@@ -13,8 +13,7 @@
                     "description": "Ping the tool server to check if it is running.",
                     "sampleInput": "{}",
                     "suggested": [],
-                    "expectedOutcome": "# You should see the word \"pong\" as a message \n\n{\n  \"message\": \"pong\"\n}",
-                    "availableFor": "public"
+                    "expectedOutcome": "# You should see the word \"pong\" as a message \n\n{\n  \"message\": \"pong\"\n}"
                 },
                 {
                     "label": "Check Post",
@@ -29,8 +28,7 @@
                             "content": "{\n \"name\": \"Demo Customer\",\n \"email\": \"demo@test.com\",\n \"phone\": \"123456789\",\n \"icon\": \"test icon\"\n}"
                         }
                     ],
-                    "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
-                    "availableFor": "public"
+                    "expectedOutcome": "# Note \nYou should see the mirror of your inputs"
                 },
                 {
                     "label": "Check Stream",
@@ -50,8 +48,7 @@
                             "content": "{}"
                         }
                     ],
-                    "expectedOutcome": "# Note \nYou should see the stream of words",
-                    "availableFor": "public"
+                    "expectedOutcome": "# Note \nYou should see the stream of words"
                 }
             ]
         }
