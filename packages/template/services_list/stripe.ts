@@ -1,5 +1,5 @@
 
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 const dockerCompose = `services:
   stripe-mock:

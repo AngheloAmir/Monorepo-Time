@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 export const Laravel: ProjectTemplate = {
     name: "Laravel",

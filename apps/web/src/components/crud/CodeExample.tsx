@@ -12,8 +12,6 @@ export default function CodeExample({ isOpen, onClose }: CodeExampleProps) {
         currentCategoryIndex, 
         currentCrudIndex, 
         useDevURL, 
-        devURL, 
-        prodURL, 
         params, 
         method, 
         header, 
@@ -22,8 +20,10 @@ export default function CodeExample({ isOpen, onClose }: CodeExampleProps) {
 
     if (!isOpen || currentCategoryIndex === -1 || currentCrudIndex === -1) return null;
 
-    const item = crudData[currentCategoryIndex].items[currentCrudIndex];
-    const baseUrl = useDevURL ? devURL : prodURL;
+    const item    = crudData[currentCategoryIndex].items[currentCrudIndex];
+    const baseUrl = useDevURL ?
+        crudData[currentCategoryIndex].devurl :
+        crudData[currentCategoryIndex].produrl;
     const fullUrl = `${baseUrl}${item.route}${params ? `?${params}` : ""}`;
     
     let code = "";

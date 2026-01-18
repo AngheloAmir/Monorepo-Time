@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 const pythonFile = `print("Monorepo Time Console!")
 name = input("Please enter your name: ")

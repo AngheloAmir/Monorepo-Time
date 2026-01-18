@@ -37,9 +37,9 @@ __export(index_exports, {
   io: () => io
 });
 module.exports = __toCommonJS(index_exports);
-var import_express23 = __toESM(require("express"));
+var import_express24 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
-var import_path15 = __toESM(require("path"));
+var import_path16 = __toESM(require("path"));
 
 // ../../packages/api/index.ts
 var apiRoute = {
@@ -69,6 +69,7 @@ var apiRoute = {
   */
   interactvTerminal: "interactvterminal",
   stopInteractiveTerminal: "stopinteractiveterminal",
+  stopTerminalWorkspace: "stopTerminalWorkspace",
   /** Hide or show a file or folder in your IDE (VS Code and variant)
    * it a get request, return true / false
   */
@@ -425,6 +426,7 @@ async function handleOnRun(socket, data) {
 // src/routes/stopcmd.ts
 var import_express3 = require("express");
 var import_chalk2 = __toESM(require("chalk"));
+var import_child_process2 = require("child_process");
 var router2 = (0, import_express3.Router)();
 router2.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -437,8 +439,24 @@ router2.post("/", async (req, res) => {
     const currentProcess = activeProcesses.get(workspace.name);
     const currentSocket = sockets.get(workspace.name);
     if (currentProcess) {
-      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("Stopping process..."));
-      currentProcess.kill();
+      currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk2.default.yellow("Stopping process tree..."));
+      if (currentProcess.pid) {
+        if (process.platform === "win32") {
+          (0, import_child_process2.exec)(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
+            if (err) {
+              currentProcess.kill();
+            }
+          });
+        } else {
+          try {
+            process.kill(-currentProcess.pid, "SIGKILL");
+          } catch (e) {
+            currentProcess.kill("SIGKILL");
+          }
+        }
+      } else {
+        currentProcess.kill();
+      }
       activeProcesses.delete(workspace.name);
       currentSocket == null ? void 0 : currentSocket.emit("exit", "Process stopped by user");
       res.json({ success: true, message: `Process for ${workspace.name} stopped` });
@@ -611,7 +629,7 @@ var newworkspace_default = router4;
 
 // src/routes/interactiveTerminal.ts
 var import_express6 = require("express");
-var import_child_process2 = require("child_process");
+var import_child_process3 = require("child_process");
 var router5 = (0, import_express6.Router)();
 router5.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
@@ -647,7 +665,7 @@ function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
     socket.on("terminal:start", (data) => {
       var _a, _b;
-      const { path: path16, command, workspaceName } = data;
+      const { path: path17, command, workspaceName } = data;
       stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
@@ -660,8 +678,8 @@ function interactiveTerminalSocket(io2) {
           socket.emit("terminal:log", "\x1B[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1B[0m\r\n");
           const baseCMD = command.split(" ")[0];
           const args = command.split(" ").slice(1);
-          child = (0, import_child_process2.spawn)(baseCMD, args, {
-            cwd: path16,
+          child = (0, import_child_process3.spawn)(baseCMD, args, {
+            cwd: path17,
             env,
             shell: true,
             stdio: ["pipe", "pipe", "pipe"]
@@ -688,8 +706,8 @@ except ImportError:
 except Exception as e:
     sys.exit(1)
 `;
-          child = (0, import_child_process2.spawn)("python3", ["-u", "-c", pythonScript], {
-            cwd: path16,
+          child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
+            cwd: path17,
             env,
             stdio: ["pipe", "pipe", "pipe"]
           });
@@ -945,7 +963,7 @@ var rootPath_default = route2;
 var import_express11 = require("express");
 var import_fs_extra7 = __toESM(require("fs-extra"));
 var import_path8 = __toESM(require("path"));
-var import_child_process3 = require("child_process");
+var import_child_process4 = require("child_process");
 var router9 = (0, import_express11.Router)();
 var packageJsonPath = import_path8.default.join(ROOT3, "package.json");
 var turboJsonPath = import_path8.default.join(ROOT3, "turbo.json");
@@ -957,6 +975,7 @@ router9.get("/", async (req, res) => {
     await InstallTurborepoIfNotYet();
     await AddTurboJsonIfNotExist();
     await CreateWorkSpaceDirsIfNotExist();
+    await CreateGitIgnoreIfNotExist();
     await InitializeGitIfNotExist();
     res.json({ success: true, message: "Scaffolding complete" });
   } catch (error) {
@@ -1086,6 +1105,51 @@ async function CreateWorkSpaceDirsIfNotExist() {
     }
   }
 }
+async function CreateGitIgnoreIfNotExist() {
+  const gitIgnorePath = import_path8.default.join(ROOT3, ".gitignore");
+  if (!import_fs_extra7.default.existsSync(gitIgnorePath)) {
+    const ignoreContent = [
+      "# Dependencies",
+      "node_modules",
+      ".pnpm-store",
+      "",
+      "# Build Outputs",
+      "dist",
+      "build",
+      ".next",
+      ".output",
+      ".vercel",
+      "out",
+      "",
+      "# Turborepo",
+      ".turbo",
+      "",
+      "# Runtime Configs",
+      ".runtime.json",
+      ".env",
+      ".env.*",
+      "!.env.example",
+      "",
+      "# System",
+      ".DS_Store",
+      "Thumbs.db",
+      "",
+      "# Logs",
+      "npm-debug.log*",
+      "yarn-debug.log*",
+      "yarn-error.log*",
+      "pnpm-debug.log*",
+      "",
+      "# IDEs",
+      ".idea",
+      ".vscode",
+      "!.vscode/extensions.json",
+      "!.vscode/settings.json"
+    ].join("\n");
+    await import_fs_extra7.default.writeFile(gitIgnorePath, ignoreContent);
+    console.log("[scafoldrepo] Created .gitignore");
+  }
+}
 async function InitializeGitIfNotExist() {
   try {
     await runCommand("git --version", ROOT3);
@@ -1110,7 +1174,7 @@ async function InitializeGitIfNotExist() {
 function runCommand(cmd, cwd) {
   console.log(`Running: ${cmd} in ${cwd}`);
   return new Promise((resolve, reject) => {
-    (0, import_child_process3.exec)(cmd, { cwd }, (error, stdout, stderr) => {
+    (0, import_child_process4.exec)(cmd, { cwd }, (error, stdout, stderr) => {
       if (error) {
         console.error("Exec error:", stderr);
         reject(error);
@@ -1243,9 +1307,9 @@ var crudtest_default = router13;
 
 // src/routes/gitControlHelper.ts
 var import_express16 = require("express");
-var import_child_process4 = require("child_process");
+var import_child_process5 = require("child_process");
 var import_util = require("util");
-var execAsync = (0, import_util.promisify)(import_child_process4.exec);
+var execAsync = (0, import_util.promisify)(import_child_process5.exec);
 var router14 = (0, import_express16.Router)();
 async function runGit(command) {
   const { stdout, stderr } = await execAsync(command, { cwd: ROOT3 });
@@ -1357,7 +1421,7 @@ var initmonorepotime_default = router15;
 // src/routes/processUsage.ts
 var import_express18 = require("express");
 var import_fs2 = __toESM(require("fs"));
-var import_child_process5 = require("child_process");
+var import_child_process6 = require("child_process");
 var import_os = __toESM(require("os"));
 var import_pidusage = __toESM(require("pidusage"));
 var router16 = (0, import_express18.Router)();
@@ -1377,7 +1441,7 @@ function getPSS(pid) {
 }
 function getProcessTree() {
   return new Promise((resolve) => {
-    (0, import_child_process5.exec)("ps -A -o pid,ppid", (err, stdout) => {
+    (0, import_child_process6.exec)("ps -A -o pid,ppid", (err, stdout) => {
       var _a;
       if (err) return resolve(/* @__PURE__ */ new Map());
       const parentMap = /* @__PURE__ */ new Map();
@@ -1498,9 +1562,9 @@ async function getStats() {
 }
 function killPortFunc(port3) {
   return new Promise((resolve) => {
-    (0, import_child_process5.exec)(`lsof -t -i:${port3}`, (err, stdout) => {
+    (0, import_child_process6.exec)(`lsof -t -i:${port3}`, (err, stdout) => {
       if (err || !stdout.trim()) return resolve(false);
-      (0, import_child_process5.exec)(`kill -9 ${stdout.trim().split("\n").join(" ")}`, () => {
+      (0, import_child_process6.exec)(`kill -9 ${stdout.trim().split("\n").join(" ")}`, () => {
         resolve(true);
       });
     });
@@ -1556,7 +1620,7 @@ var processUsage_default = router16;
 
 // src/routes/apidocker.ts
 var import_express19 = require("express");
-var import_child_process6 = require("child_process");
+var import_child_process7 = require("child_process");
 var router17 = (0, import_express19.Router)();
 function parseMemory(memStr) {
   const units = {
@@ -1580,7 +1644,7 @@ function parseMemory(memStr) {
 }
 function getDockerContainers2() {
   return new Promise((resolve) => {
-    (0, import_child_process6.exec)('docker ps --format "{{.ID}}|{{.Image}}|{{.Status}}|{{.Names}}"', (err, stdout) => {
+    (0, import_child_process7.exec)('docker ps --format "{{.ID}}|{{.Image}}|{{.Status}}|{{.Names}}"', (err, stdout) => {
       if (err) return resolve({ containers: [], totalMem: 0 });
       const lines = stdout.trim().split("\n");
       if (lines.length === 0 || lines.length === 1 && lines[0] === "") {
@@ -1597,7 +1661,7 @@ function getDockerContainers2() {
           memoryBytes: 0
         };
       });
-      (0, import_child_process6.exec)('docker stats --no-stream --format "{{.ID}}|{{.MemUsage}}"', (err2, stdout2) => {
+      (0, import_child_process7.exec)('docker stats --no-stream --format "{{.ID}}|{{.MemUsage}}"', (err2, stdout2) => {
         let totalMem = 0;
         if (!err2) {
           const statLines = stdout2.trim().split("\n");
@@ -1624,7 +1688,7 @@ function getDockerContainers2() {
 }
 function stopContainer(id) {
   return new Promise((resolve) => {
-    (0, import_child_process6.exec)(`docker stop ${id}`, (err) => {
+    (0, import_child_process7.exec)(`docker stop ${id}`, (err) => {
       if (err) return resolve({ success: false, error: err.message });
       resolve({ success: true });
     });
@@ -1632,7 +1696,7 @@ function stopContainer(id) {
 }
 function stopAllContainers() {
   return new Promise((resolve) => {
-    (0, import_child_process6.exec)("docker stop $(docker ps -q)", (err) => {
+    (0, import_child_process7.exec)("docker stop $(docker ps -q)", (err) => {
       if (err) {
         if (err.message.includes("requires at least 1 argument") || err.message.includes("Usage:")) {
           return resolve({ success: true, message: "No containers to stop" });
@@ -1742,6 +1806,16 @@ services:
       timeout: 5s
       retries: 5
 
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "0:80"
+    depends_on:
+      - postgres
+
 volumes:
   postgres-data:`
     },
@@ -1759,18 +1833,13 @@ let containerId = null;
 console.log('Starting PostgreSQL...');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     process.exit(code || 0);
 });
 
-child.stderr.on('data', (data) => {
-   const output = data.toString();
-   if (!output.includes('The attribute \`version\` is obsolete')) {
-       // console.error(output); 
-   }
-});
+
 
 // Setup Control Server
 const server = http.createServer((req, res) => {
@@ -1790,55 +1859,86 @@ server.listen(0, () => {
 });
 
 // Info Loop
-setTimeout(() => {
+// Check status loop
+// Check status loop
+const checkStatus = () => {
     exec('docker compose port postgres 5432', (err, stdout, stderr) => {
-        if (stderr) return;
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
         const port = stdout.trim().split(':')[1];
-        if (!port) return;
-        
-        // Capture Container ID
-        exec('docker compose ps -q postgres', (err2, stdout2) => {
-             if (stdout2) containerId = stdout2.trim();
-             
-             try {
-                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                    port: server.address().port, 
-                    pid: process.pid,
-                    containerId: containerId
-                }));
-             } catch(e) {
-                console.error('Failed to write runtime file:', e);
-             }
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
 
-             console.clear();
-             console.log('\\n==================================================');
-             console.log('\u{1F680} PostgreSQL is running!');
-             console.log('--------------------------------------------------');
-             console.log(\`\u{1F50C} Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
-             console.log('\u{1F464} Username:          user');
-             console.log('\u{1F511} Password:          password');
-             console.log('\u{1F5C4}\uFE0F  Database:          mydatabase');
-             console.log(\`\u{1F310} Port:              \${port}\`);
-             if (containerId) console.log(\`\u{1F4E6} Container ID:      \${containerId}\`);
-             console.log('==================================================\\n');
+        // Check pgAdmin port
+        exec('docker compose port pgadmin 80', (err2, stdout2, stderr2) => {
+            const pgAdminPort = (stdout2 && stdout2.trim()) ? stdout2.trim().split(':')[1] : null;
+            if (!pgAdminPort) {
+                setTimeout(checkStatus, 2000);
+                return;
+            }
+
+            // Verify pgAdmin is actually responding to HTTP
+            http.get(\`http://localhost:\${pgAdminPort}\`, (res) => {
+                // Capture Container IDs
+                exec('docker compose ps -q', (err3, stdout3) => {
+                     const containerIds = stdout3 ? stdout3.trim().split('\\n') : [];
+                     
+                     try {
+                        fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                            port: server.address().port, 
+                            pid: process.pid,
+                            containerIds: containerIds
+                        }));
+                     } catch(e) {
+                        console.error('Failed to write runtime file:', e);
+                     }
+
+                     console.clear();
+                     console.log('\\n==================================================');
+                     console.log('\u{1F680} PostgreSQL is running!');
+                     console.log('--------------------------------------------------');
+                     console.log(\`\u{1F50C} Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
+                     console.log('\u{1F464} Username:          user');
+                     console.log('\u{1F511} Password:          password');
+                     console.log('\u{1F5C4}\uFE0F  Database:          mydatabase');
+                     console.log(\`\u{1F310} Port:              \${port}\`);
+                     console.log('--------------------------------------------------');
+                     console.log('\u{1F418} pgAdmin 4 is running!');
+                     console.log(\`\u{1F30D} URL:               http://localhost:\${pgAdminPort}\`);
+                     console.log('\u{1F4E7} Email:             admin@admin.com');
+                     console.log('\u{1F511} Password:          root');
+                     console.log('==================================================\\n');
+                });
+            }).on('error', (e) => {
+                // Connection failed (ECONNREFUSED usually), retry
+                setTimeout(checkStatus, 2000);
+            });
         });
     });
-}, 5000);
+};
+
+setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping PostgreSQL...');
+    try { 
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+             runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`);
+             });
+        }
+    } catch(e) {}
     try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
     
-    if (containerId) {
-        console.log(\`Stopping container \${containerId}...\`);
-        exec(\`docker stop \${containerId}\`, () => {
-             process.exit(0);
-        });
-    } else {
-        exec('docker compose stop', () => {
-            process.exit(0);
-        });
-    }
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
 };
 
 process.on('SIGINT', cleanup);
@@ -1930,7 +2030,7 @@ let containerId = null;
 
 console.log('Starting Redis...');
 
-const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     process.exit(code || 0);
@@ -1954,20 +2054,28 @@ server.listen(0, () => {
 });
 
 // Give it time to start
-setTimeout(() => {
+// Check status loop
+const checkStatus = () => {
     exec('docker compose port redis 6379', (err, stdout, stderr) => {
-        if (stderr) return;
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
         const port = stdout.trim().split(':')[1];
-        if (!port) return;
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
 
         exec('docker compose ps -q redis', (err2, stdout2) => {
-            if (stdout2) containerId = stdout2.trim();
+            let containerIds = [];
+            if (stdout2) containerIds = [stdout2.trim()];
 
             try {
                 fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
                     port: server.address().port, 
                     pid: process.pid,
-                    containerId: containerId 
+                    containerIds: containerIds 
                 }));
             } catch(e) {}
 
@@ -1977,26 +2085,30 @@ setTimeout(() => {
             console.log('--------------------------------------------------');
             console.log(\`\u{1F50C} Connection String: redis://localhost:\${port}\`);
             console.log(\`\u{1F310} Port:              \${port}\`);
-            if (containerId) console.log(\`\u{1F4E6} Container ID:      \${containerId}\`);
+
             console.log('==================================================\\n');
         });
     });
-}, 3000);
+};
+
+setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping Redis...');
+    try { 
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+             runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`);
+             });
+        }
+    } catch(e) {}
     try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
     
-    if (containerId) {
-        console.log(\`Stopping container \${containerId}...\`);
-        exec(\`docker stop \${containerId}\`, () => {
-             process.exit(0);
-        });
-    } else {
-        exec('docker compose stop', () => {
-            process.exit(0);
-        });
-    }
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
 };
 
 process.on('SIGINT', cleanup);
@@ -2062,18 +2174,13 @@ let containerId = null;
 
 console.log('Starting MongoDB...');
 
-const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     process.exit(code || 0);
 });
 
-child.stderr.on('data', (data) => {
-    const output = data.toString();
-    if (!output.includes('The attribute \`version\` is obsolete')) {
-        // console.error(output);
-    }
-});
+
 
 // Setup Control Server
 const server = http.createServer((req, res) => {
@@ -2093,20 +2200,28 @@ server.listen(0, () => {
 });
 
 // Give it time to start, then print info
-setTimeout(() => {
+// Check status loop
+const checkStatus = () => {
     exec('docker compose port mongodb 27017', (err, stdout, stderr) => {
-        if (stderr) return;
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
         const port = stdout.trim().split(':')[1];
-        if (!port) return;
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
 
         exec('docker compose ps -q mongodb', (err2, stdout2) => {
-            if (stdout2) containerId = stdout2.trim();
+            let containerIds = [];
+            if (stdout2) containerIds = [stdout2.trim()];
 
             try {
                 fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
                     port: server.address().port, 
                     pid: process.pid,
-                    containerId: containerId 
+                    containerIds: containerIds 
                 }));
             } catch(e) {}
 
@@ -2118,26 +2233,30 @@ setTimeout(() => {
             console.log('\u{1F464} Username:          admin');
             console.log('\u{1F511} Password:          password');
             console.log(\`\u{1F310} Port:              \${port}\`);
-            if (containerId) console.log(\`\u{1F4E6} Container ID:      \${containerId}\`);
+
             console.log('==================================================\\n');
         });
     });
-}, 5000);
+};
+
+setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping MongoDB...');
+    try { 
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+             runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`);
+             });
+        }
+    } catch(e) {}
     try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
     
-    if (containerId) {
-        console.log(\`Stopping container \${containerId}...\`);
-        exec(\`docker stop \${containerId}\`, () => {
-             process.exit(0);
-        });
-    } else {
-        exec('docker compose stop', () => {
-            process.exit(0);
-        });
-    }
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
 };
 
 process.on('SIGINT', cleanup);
@@ -3124,9 +3243,9 @@ var availabletemplates_default = router18;
 var import_express22 = __toESM(require("express"));
 var import_fs3 = __toESM(require("fs"));
 var import_path14 = __toESM(require("path"));
-var import_child_process7 = require("child_process");
+var import_child_process8 = require("child_process");
 var import_util2 = __toESM(require("util"));
-var execPromise = import_util2.default.promisify(import_child_process7.exec);
+var execPromise = import_util2.default.promisify(import_child_process8.exec);
 var router19 = import_express22.default.Router();
 router19.post("/", async (req, res) => {
   try {
@@ -3179,15 +3298,141 @@ ${cmdErr.message}` });
 });
 var setworkspacetemplate_default = router19;
 
+// src/routes/stopTerminalWorkspace.ts
+var import_express23 = require("express");
+var import_fs_extra12 = __toESM(require("fs-extra"));
+var import_path15 = __toESM(require("path"));
+var import_child_process9 = require("child_process");
+var import_util3 = __toESM(require("util"));
+var execAsync2 = import_util3.default.promisify(import_child_process9.exec);
+var router20 = (0, import_express23.Router)();
+router20.post("/", async (req, res) => {
+  try {
+    const { socketId, workspace } = req.body;
+    if (workspace && workspace.name) {
+      const workspacePath = workspace.path;
+      if (!workspacePath) {
+        console.error(`[StopTerminal] ERROR: No workspace path provided for ${workspace.name}. Docker cleanup may fail.`);
+      }
+      let socket = null;
+      let activeSession = null;
+      let activeSessionId = null;
+      for (const [id, session] of activeTerminals.entries()) {
+        if (session.workspaceName === workspace.name) {
+          socket = session.socket;
+          activeSession = session;
+          activeSessionId = id;
+          break;
+        }
+      }
+      const log = (msg) => {
+        if (activeSession && activeSession.socket && activeSession.socket.connected) {
+          activeSession.socket.emit("terminal:log", `\r
+\x1B[33m[System] ${msg}\x1B[0m\r
+`);
+        }
+      };
+      if (activeSession) {
+        log("Stopping workspace resources...");
+      }
+      if (workspacePath && await import_fs_extra12.default.pathExists(import_path15.default.join(workspacePath, ".runtime.json"))) {
+        try {
+          if (activeSession) log("Checking/Stopping Docker container...");
+          const runtimeConfig = await import_fs_extra12.default.readJSON(import_path15.default.join(workspacePath, ".runtime.json"));
+          if (runtimeConfig && runtimeConfig.containerIds && Array.isArray(runtimeConfig.containerIds)) {
+            console.log(`[StopTerminal] Stopping ${runtimeConfig.containerIds.length} containers...`);
+            activeSession && log(`Stopping ${runtimeConfig.containerIds.length} Docker containers...`);
+            for (const cid of runtimeConfig.containerIds) {
+              try {
+                console.log(`[StopTerminal] Stopping container ${cid}`);
+                await execAsync2(`docker stop ${cid}`);
+                console.log(`[StopTerminal] Container ${cid} stopped.`);
+              } catch (e) {
+                console.error(`[StopTerminal] Error stopping container ${cid}:`, e);
+                activeSession && log(`Error stopping container ${cid}: ${e.message}`);
+              }
+            }
+            activeSession && log("All Docker containers stopped.");
+          } else if (runtimeConfig && runtimeConfig.containerId) {
+            console.log(`[StopTerminal] Stopping container ${runtimeConfig.containerId}`);
+            await execAsync2(`docker stop ${runtimeConfig.containerId}`);
+            console.log(`[StopTerminal] Container stopped.`);
+            if (activeSession) log("Docker container stopped.");
+          } else {
+            if (activeSession) log("No active container ID found in config.");
+          }
+        } catch (e) {
+          console.error("[StopTerminal] Error stopping docker:", e);
+          if (activeSession) log(`Error stopping Docker: ${e.message}`);
+        }
+      } else {
+      }
+      if (workspacePath) {
+        try {
+          if (activeSession) log("Running npm run stop...");
+          await execAsync2("npm run stop", { cwd: workspacePath });
+          if (activeSession) log("npm run stop executed.");
+        } catch (e) {
+          if (activeSession) log(`Error running npm run stop (might not exist): ${e.message}`);
+        }
+      }
+      let stopped = false;
+      if (activeSession && activeSessionId) {
+        log("Closing terminal in 1 second...");
+        await new Promise((resolve) => setTimeout(resolve, 1e3));
+        const currentProcess = activeSession.child;
+        if (currentProcess && currentProcess.pid) {
+          if (process.platform === "win32") {
+            (0, import_child_process9.exec)(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
+            });
+          } else {
+            try {
+              process.kill(-currentProcess.pid, "SIGKILL");
+            } catch (e) {
+              try {
+                currentProcess.kill("SIGKILL");
+              } catch (e2) {
+              }
+            }
+          }
+        }
+        stopTerminalProcess(activeSessionId);
+        stopped = true;
+      }
+      if (stopped) {
+        res.json({ success: true, message: `Terminated process for workspace ${workspace.name}` });
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        res.json({ success: true, message: `Cleanup performed for workspace ${workspace.name} (no active terminal found)` });
+      }
+      return;
+    }
+    if (socketId) {
+      const stopped = stopTerminalProcess(socketId);
+      if (stopped) {
+        res.json({ success: true, message: `Terminated process for socket ${socketId}` });
+      } else {
+        res.json({ success: true, message: `No active terminal process found for socket ${socketId} (already stopped)` });
+      }
+      return;
+    }
+    res.status(400).json({ message: "Missing socketId or workspace.name" });
+  } catch (err) {
+    console.error("[StopTerminal] Unexpected Error:", err);
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  }
+});
+var stopTerminalWorkspace_default = router20;
+
 // src/index.ts
-var app = (0, import_express23.default)();
+var app = (0, import_express24.default)();
 var port2 = config_default.apiPort;
 app.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express23.default.static("public"));
-app.use(import_express23.default.json());
+app.use(import_express24.default.static("public"));
+app.use(import_express24.default.json());
 app.use("/", tester_default);
 app.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app.use("/" + api_default.stopProcess, stopcmd_default);
@@ -3195,6 +3440,7 @@ app.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
 app.use("/" + api_default.newWorkspace, newworkspace_default);
 app.use("/" + api_default.interactvTerminal, interactiveTerminal_default);
 app.use("/" + api_default.stopInteractiveTerminal, stopInteractiveTerminal_default);
+app.use("/" + api_default.stopTerminalWorkspace, stopTerminalWorkspace_default);
 app.use("/" + api_default.updateWorkspace, updateworkspace_default);
 app.use("/" + api_default.hideShowFileFolder, vscodeHideShow_default);
 app.use("/" + api_default.getRootPath, rootPath_default);
@@ -3209,10 +3455,10 @@ app.use("/" + api_default.processTree, processUsage_default);
 app.use("/" + api_default.docker, apidocker_default);
 app.use("/" + api_default.availabletemplates, availabletemplates_default);
 app.use("/" + api_default.setWorkspaceTemplate, setworkspacetemplate_default);
-var frontendPath = import_path15.default.join(__dirname, "../public");
-app.use(import_express23.default.static(frontendPath));
+var frontendPath = import_path16.default.join(__dirname, "../public");
+app.use(import_express24.default.static(frontendPath));
 app.get("*", (req, res) => {
-  res.sendFile(import_path15.default.join(frontendPath, "index.html"));
+  res.sendFile(import_path16.default.join(frontendPath, "index.html"));
 });
 var httpServer = (0, import_http.createServer)(app);
 var io = new import_socket.Server(httpServer, {
@@ -3230,6 +3476,7 @@ var findAvailablePort = (startPort) => {
     server.unref();
     server.on("error", (err) => {
       if (err.code === "EADDRINUSE") {
+        console.log(`Port ${startPort} is in use, trying ${startPort + 1}...`);
         resolve(findAvailablePort(startPort + 1));
       } else {
         reject(err);
@@ -3245,7 +3492,7 @@ var findAvailablePort = (startPort) => {
 findAvailablePort(port2).then((availablePort) => {
   httpServer.listen(availablePort, () => {
     console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV != "development") {
       (0, import_open.default)(`http://localhost:${availablePort}`);
     }
   });

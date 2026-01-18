@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 const netFile = `// See https://aka.ms/new-console-template for more information
 Console.WriteLine("Monorepo Time Console!");

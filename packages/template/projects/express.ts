@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 const expressFile = `import express, { Request, Response } from "express";
 const app = express();

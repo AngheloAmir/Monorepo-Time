@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 export const Supabase: ProjectTemplate = {
     name: "Supabase",

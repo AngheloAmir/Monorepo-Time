@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 export const N8NLocal: ProjectTemplate = {
     name: "N8N Local",

@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 export const MongoDB: ProjectTemplate = {
     name: "MongoDB",

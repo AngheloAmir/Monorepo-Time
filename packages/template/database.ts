@@ -1,4 +1,4 @@
-import { ProjectTemplate } from ".";
+import type { ProjectTemplate } from ".";
 import { MySQL } from "./databases/mysql";
 import { PostgreSQL } from "./databases/postgres";
 import { Supabase } from "./databases/supabase";
