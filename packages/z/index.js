@@ -1,50 +1,4 @@
-import { ProjectTemplate } from "..";
-
-export const PostgreSQL: ProjectTemplate = {
-    name: "PostgreSQL",
-    description: "PostgreSQL Database (Docker Compose)",
-    notes: "Requires Docker installed.",
-    templating: [
-        {
-            action: 'file',
-            file: 'docker-compose.yml',
-            filecontent: `
-
-services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydatabase
-    ports:
-      - "0:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - "0:80"
-    depends_on:
-      - postgres
-
-volumes:
-  postgres-data:`
-        },
-        {
-            action: 'file',
-            file: 'index.js',
-            filecontent: `const http = require('http');
+const http = require('http');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -104,7 +58,7 @@ const checkStatus = () => {
             }
 
             // Verify pgAdmin is actually responding to HTTP
-            http.get(\`http://localhost:\${pgAdminPort}\`, (res) => {
+            http.get(`http://localhost:${pgAdminPort}`, (res) => {
                 // Capture Container ID and Print
                 exec('docker compose ps -q postgres', (err3, stdout3) => {
                      if (stdout3) containerId = stdout3.trim();
@@ -120,20 +74,20 @@ const checkStatus = () => {
                      }
 
                      console.clear();
-                     console.log('\\n==================================================');
+                     console.log('\n==================================================');
                      console.log('🚀 PostgreSQL is running!');
                      console.log('--------------------------------------------------');
-                     console.log(\`🔌 Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
+                     console.log(`🔌 Connection String: postgres://user:password@localhost:${port}/mydatabase`);
                      console.log('👤 Username:          user');
                      console.log('🔑 Password:          password');
                      console.log('🗄️  Database:          mydatabase');
-                     console.log(\`🌐 Port:              \${port}\`);
+                     console.log(`🌐 Port:              ${port}`);
                      console.log('--------------------------------------------------');
                      console.log('🐘 pgAdmin 4 is running!');
-                     console.log(\`🌍 URL:               http://localhost:\${pgAdminPort}\`);
+                     console.log(`🌍 URL:               http://localhost:${pgAdminPort}`);
                      console.log('📧 Email:             admin@admin.com');
                      console.log('🔑 Password:          root');
-                     console.log('==================================================\\n');
+                     console.log('==================================================\n');
                 });
             }).on('error', (e) => {
                 // Connection failed (ECONNREFUSED usually), retry
@@ -150,8 +104,8 @@ const cleanup = () => {
     try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
     
     if (containerId) {
-        console.log(\`Stopping container \${containerId}...\`);
-        exec(\`docker stop \${containerId}\`, () => {
+        console.log(`Stopping container ${containerId}...`);
+        exec(`docker stop ${containerId}`, () => {
              process.exit(0);
         });
     } else {
@@ -162,20 +116,4 @@ const cleanup = () => {
 };
 
 process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`
-        },
-        {
-            action: 'command',
-            command: 'npm install'
-        },
-
-        {
-            action: 'command',
-            command: 'npm pkg set scripts.start="node index.js"'
-        },
-        {
-            action: 'command',
-            command: "npm pkg set scripts.stop=\"node -e 'const fs=require(\\\"fs\\\"); try{const p=JSON.parse(fs.readFileSync(\\\".runtime.json\\\")).port; fetch(\\\"http://localhost:\\\"+p+\\\"/stop\\\").catch(e=>{})}catch(e){}'\""
-        }
-    ]
-};
+process.on('SIGTERM', cleanup);
