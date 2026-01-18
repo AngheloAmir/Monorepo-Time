@@ -2674,63 +2674,15 @@ var N8NLocal = {
     {
       action: "command",
       command: 'npm pkg set fontawesomeIcon="fa-solid fa-robot"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set name="$(basename $PWD)"'
     }
   ]
 };
 
-// ../../packages/template/services_list/aws.ts
-var dockerCompose = `services:
-  localstack:
-    image: localstack/localstack
-    ports:
-      - "127.0.0.1:4566:4566"            # LocalStack Gateway
-      - "127.0.0.1:4510-4559:4510-4559"  # External services port range
-    environment:
-      - DEBUG=\${DEBUG-}
-      - SERVICES=s3,lambda,dynamodb,apigateway,sqs,sns,logs,cloudwatch
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - AWS_DEFAULT_REGION=us-east-1
-    volumes:
-      - localstack-data:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - cloud-net
-
-  dynamodb-admin:
-    image: aaronshaf/dynamodb-admin
-    ports:
-      - "8001:8001"
-    environment:
-      - DYNAMO_ENDPOINT=http://localstack:4566
-      - AWS_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-    depends_on:
-      - localstack
-    networks:
-      - cloud-net
-
-  s3-manager:
-    image: cloudlena/s3manager
-    ports:
-      - "8002:8080"
-    environment:
-      - ACCESS_KEY_ID=test
-      - SECRET_ACCESS_KEY=test
-      - REGION=us-east-1
-      - ENDPOINT=localstack:4566
-      - USE_SSL=false
-    depends_on:
-      - localstack
-    networks:
-      - cloud-net
-
-volumes:
-  localstack-data: {}
-
-networks:
-  cloud-net:
-    driver: bridge`;
+// ../../packages/template/services_list/aws/deploy.ts
 var deployJs = `const path = require("path");
 const { spawn } = require("child_process");
 
@@ -2907,128 +2859,62 @@ module.exports = {
     res.end();
   }
 };`;
-var serverJs = `const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const { spawn, exec } = require('child_process');
-const deploy = require('./deploy');
 
-const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-let currentPort = 3748;
+// ../../packages/template/services_list/aws/dockerCompose.ts
+var dockerCompose = `services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # External services port range
+    environment:
+      - DEBUG=\${DEBUG-}
+      - SERVICES=s3,lambda,dynamodb,apigateway,sqs,sns,logs,cloudwatch
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - cloud-net
 
-console.log("Starting AWS Local environment...");
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    depends_on:
+      - localstack
+    networks:
+      - cloud-net
 
-// Spawn Docker Compose
-const docker = spawn('docker', ['compose', 'up', '-d'], { stdio: 'inherit' });
+  s3-manager:
+    image: cloudlena/s3manager
+    ports:
+      - "8002:8080"
+    environment:
+      - ACCESS_KEY_ID=test
+      - SECRET_ACCESS_KEY=test
+      - REGION=us-east-1
+      - ENDPOINT=localstack:4566
+      - USE_SSL=false
+    depends_on:
+      - localstack
+    networks:
+      - cloud-net
 
-docker.on('close', (code) => {
-    if (code !== 0) {
-        console.error('Failed to start Docker containers');
-        process.exit(code);
-    }
-    // Give containers a moment to initialize
-    setTimeout(displayCredentials, 3000);
-});
+volumes:
+  localstack-data: {}
 
-function displayCredentials() {
-    // Get container IDs for runtime file
-    exec('docker compose ps -q', (err, stdout) => {
-        let containerIds = [];
-        if (stdout) {
-            containerIds = stdout.trim().split('\\n').filter(id => id);
-        }
+networks:
+  cloud-net:
+    driver: bridge`;
 
-        // Write runtime file
-        try {
-            fs.writeFileSync(RUNTIME_FILE, JSON.stringify({
-                port: server.address().port,
-                pid: process.pid,
-                containerIds: containerIds
-            }));
-        } catch(e) {}
-
-        console.log('\\n==================================================');
-        console.log('\u{1F680} AWS LocalStack is running!');
-        console.log('--------------------------------------------------');
-        console.log('\u{1F4CC} AWS Credentials:');
-        console.log('   Access Key ID:     test');
-        console.log('   Secret Access Key: test');
-        console.log('   Region:            us-east-1');
-        console.log('--------------------------------------------------');
-        console.log('\u{1F310} Service URLs:');
-        console.log('   LocalStack:        http://localhost:4566');
-        console.log('   DynamoDB Admin:    http://localhost:8001');
-        console.log('   S3 Manager:        http://localhost:8002');
-        console.log(\`   Manager UI:        http://localhost:\${server.address().port}\`);
-        console.log('--------------------------------------------------');
-        console.log('\u{1F4E6} Available Services:');
-        console.log('   S3, Lambda, DynamoDB, API Gateway, SQS, SNS, CloudWatch');
-        console.log('==================================================\\n');
-    });
-}
-
-const requestListener = function (req, res) {
-    if (req.url === "/") {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(fs.readFileSync(path.join(__dirname, 'index.html')));
-    } else if (req.url === "/deploy") {
-        deploy.runDeploy(req, res);
-    } else if (req.url === "/stop") {
-        res.writeHead(200);
-        res.end('Stopping...');
-        cleanup();
-    } else {
-        res.writeHead(404);
-        res.end("Not found");
-    }
-}
-
-const server = http.createServer(requestListener);
-
-function startServer(port) {
-    server.listen(port);
-}
-
-server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-        console.log(\`Port \${currentPort} is in use, trying \${currentPort + 1}...\`);
-        currentPort++;
-        startServer(currentPort);
-    } else {
-        console.error('Server error:', err);
-        process.exit(1);
-    }
-});
-
-server.on('listening', () => {
-    console.log(\`AWS Local Manager running at http://localhost:\${server.address().port}\`);
-});
-
-startServer(currentPort);
-
-const cleanup = () => {
-    console.log("Stopping AWS Local environment...");
-    try {
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-            runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
-            });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
-    setTimeout(() => process.exit(0), 2000);
-};
-
-// Handle cleanup
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`;
-var stopJs = `const { spawn } = require('child_process');
-console.log("Stopping AWS Local environment...");
-spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
+// ../../packages/template/services_list/aws/indexHtml.ts
 var indexHtml = `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -3236,6 +3122,134 @@ dynamodb.createTable(params, function(err, data) {
     </script>
 </body>
 </html>`;
+
+// ../../packages/template/services_list/aws/server.ts
+var serverJs = `const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { spawn, exec } = require('child_process');
+const deploy = require('./deploy');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+let currentPort = 3748;
+
+console.log("Starting AWS Local environment...");
+
+// Spawn Docker Compose
+const docker = spawn('docker', ['compose', 'up', '-d'], { stdio: 'inherit' });
+
+docker.on('close', (code) => {
+    if (code !== 0) {
+        console.error('Failed to start Docker containers');
+        process.exit(code);
+    }
+    // Give containers a moment to initialize
+    setTimeout(displayCredentials, 3000);
+});
+
+function displayCredentials() {
+    // Get container IDs for runtime file
+    exec('docker compose ps -q', (err, stdout) => {
+        let containerIds = [];
+        if (stdout) {
+            containerIds = stdout.trim().split('\\n').filter(id => id);
+        }
+
+        // Write runtime file
+        try {
+            fs.writeFileSync(RUNTIME_FILE, JSON.stringify({
+                port: server.address().port,
+                pid: process.pid,
+                containerIds: containerIds
+            }));
+        } catch(e) {}
+
+        console.log('\\n==================================================');
+        console.log('\u{1F680} AWS LocalStack is running!');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4CC} AWS Credentials:');
+        console.log('   Access Key ID:     test');
+        console.log('   Secret Access Key: test');
+        console.log('   Region:            us-east-1');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F310} Service URLs:');
+        console.log('   LocalStack:        http://localhost:4566');
+        console.log('   DynamoDB Admin:    http://localhost:8001');
+        console.log('   S3 Manager:        http://localhost:8002');
+        console.log(\`   Manager UI:        http://localhost:\${server.address().port}\`);
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4E6} Available Services:');
+        console.log('   S3, Lambda, DynamoDB, API Gateway, SQS, SNS, CloudWatch');
+        console.log('==================================================\\n');
+    });
+}
+
+const requestListener = function (req, res) {
+    if (req.url === "/") {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(fs.readFileSync(path.join(__dirname, 'index.html')));
+    } else if (req.url === "/deploy") {
+        deploy.runDeploy(req, res);
+    } else if (req.url === "/stop") {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end("Not found");
+    }
+}
+
+const server = http.createServer(requestListener);
+
+function startServer(port) {
+    server.listen(port);
+}
+
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.log(\`Port \${currentPort} is in use, trying \${currentPort + 1}...\`);
+        currentPort++;
+        startServer(currentPort);
+    } else {
+        console.error('Server error:', err);
+        process.exit(1);
+    }
+});
+
+server.on('listening', () => {
+    console.log(\`AWS Local Manager running at http://localhost:\${server.address().port}\`);
+});
+
+startServer(currentPort);
+
+const cleanup = () => {
+    console.log("Stopping AWS Local environment...");
+    try {
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+            runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`);
+            });
+        }
+    } catch(e) {}
+    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+    
+    spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
+    setTimeout(() => process.exit(0), 2000);
+};
+
+// Handle cleanup
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/services_list/aws/stop.ts
+var stopJs = `const { spawn } = require('child_process');
+console.log("Stopping AWS Local environment...");
+spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
+
+// ../../packages/template/services_list/aws.ts
 var AWSTemplate = {
   name: "AWS Local",
   description: "AWS LocalStack Environment with Manager",
@@ -3291,6 +3305,10 @@ var AWSTemplate = {
     {
       action: "command",
       command: 'npm pkg set fontawesomeIcon="fa-solid fa-cloud"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set name="$(basename $PWD)"'
     }
   ]
 };
@@ -3508,6 +3526,10 @@ var StripeTemplate = {
     {
       action: "command",
       command: 'npm pkg set fontawesomeIcon="fa-solid fa-credit-card"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set name="$(basename $PWD)"'
     }
   ]
 };
