@@ -7,60 +7,327 @@
             "produrl": "",
             "items": [
                 {
-                    "label": "Ping the Tool Server",
+                    "label": "Ping",
                     "route": "/ping",
                     "methods": "GET",
-                    "description": "Ping the tool server to check if it is running.",
+                    "description": "Ping the server",
                     "sampleInput": "{}",
+                    "expectedOutcome": "{\n  \"message\": \"pong\"\n}",
                     "suggested": [],
-                    "expectedOutcome": "# You should see the word \"pong\" as a message \n\n{\n  \"message\": \"pong\"\n}",
                     "availableFor": "public"
                 },
                 {
-                    "label": "Check Post",
-                    "route": "/post",
-                    "methods": "POST",
-                    "description": "Send a POST request to check if it sending correctly",
-                    "sampleInput": "{\n \"data\": \"test\",\n \"message\": \"test\"\n}",
-                    "suggested": [
-                        {
-                            "name": "Customer Data",
-                            "urlparams": "",
-                            "content": "{\n \"name\": \"Demo Customer\",\n \"email\": \"demo@test.com\",\n \"phone\": \"123456789\",\n \"icon\": \"test icon\"\n}"
-                        }
-                    ],
-                    "expectedOutcome": "# Note \nYou should see the mirror of your inputs",
-                    "availableFor": "public"
-                },
-                {
-                    "label": "Check Stream",
-                    "route": "/stream",
-                    "methods": "STREAM",
-                    "description": "Send a stream request to check if it sending correctly",
-                    "sampleInput": "{ }",
-                    "suggested": [
-                        {
-                            "name": "I Wandered Lonely as a Cloud",
-                            "urlparams": "poem=I Wandered Lonely as a Cloud",
-                            "content": "{}"
-                        },
-                        {
-                            "name": "The Sun Has Long Been Set",
-                            "urlparams": "poem=The Sun Has Long Been Set",
-                            "content": "{}"
-                        }
-                    ],
-                    "expectedOutcome": "# Note \nYou should see the stream of words",
-                    "availableFor": "public"
-                },
-                {
-                    "label": "process Tree",
+                    "label": "Process Tree",
                     "route": "/processtree",
                     "methods": "GET",
-                    "description": "",
+                    "description": "Get system process and memory info",
                     "sampleInput": "{}",
                     "expectedOutcome": "",
-                    "suggested": []
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Stream Test",
+                    "route": "/stream",
+                    "methods": "STREAM",
+                    "description": "Stream text",
+                    "sampleInput": "{}",
+                    "suggested": [
+                        {
+                            "name": "Cloud Poem",
+                            "urlparams": "poem=I Wandered Lonely as a Cloud",
+                            "content": "{}"
+                        }
+                    ],
+                    "expectedOutcome": "",
+                    "availableFor": "public"
+                }
+            ]
+        },
+        {
+            "category": "System API",
+            "devurl": "http://localhost:4793",
+            "produrl": "",
+            "items": [
+                {
+                    "label": "Scan Workspaces",
+                    "route": "/scanworkspace",
+                    "methods": "GET",
+                    "description": "Scan for all workspaces in the monorepo",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"root\": \"...\",\n \"count\": 0,\n \"workspace\": []\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "List Workspace Dirs",
+                    "route": "/listworkspacedirs",
+                    "methods": "GET",
+                    "description": "List top-level workspace directories",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "[\n {\n  \"label\": \"apps\",\n  \"path\": \"...\"\n }\n]",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Get Root Path",
+                    "route": "/getrootpath",
+                    "methods": "GET",
+                    "description": "Get the root path of the monorepo",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"path\": \"/absolute/path/to/root\"\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Check TurboRepo Exist",
+                    "route": "/turborepoexist",
+                    "methods": "GET",
+                    "description": "Check if turbo.json and monorepotime.json exist",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"exists\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Check First Run",
+                    "route": "/firstrun",
+                    "methods": "GET",
+                    "description": "Check if this is the first run",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"isFirstTime\": false\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Get Notes",
+                    "route": "/notes",
+                    "methods": "GET",
+                    "description": "Get saved notes",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"notes\": \"...\"\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Get CRUD Test Data",
+                    "route": "/crudtest",
+                    "methods": "GET",
+                    "description": "Get valid crudtest configurations",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"crudtest\": [...]\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Git History",
+                    "route": "/gitcontrol/history",
+                    "methods": "GET",
+                    "description": "Get recent git commit history",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"history\": [...]\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Git Branch",
+                    "route": "/gitcontrol/branch",
+                    "methods": "GET",
+                    "description": "Get current git branch",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"branch\": \"master\"\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Get Process Tree",
+                    "route": "/processtree",
+                    "methods": "GET",
+                    "description": "Get system process stats",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"processes\": [...]\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Get Docker Containers",
+                    "route": "/docker",
+                    "methods": "GET",
+                    "description": "Get running docker containers",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"containers\": [],\n \"totalMem\": 0\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Available Templates",
+                    "route": "/availabletemplates",
+                    "methods": "GET",
+                    "description": "Get available project templates",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"project\": [...],\n \"database\": [...]\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Init MonorepoTime",
+                    "route": "/initmtime",
+                    "methods": "GET",
+                    "description": "Initialize monorepotime.json if missing",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"success\": false,\n \"message\": \"monorepotime.json already exists\"\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Scaffold Repo (Careful)",
+                    "route": "/scaffoldrepo",
+                    "methods": "GET",
+                    "description": "Scaffold the repository structure. WARNING: May modify files.",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "New Workspace",
+                    "route": "/newworkspace",
+                    "methods": "POST",
+                    "description": "Create a new workspace",
+                    "sampleInput": "{\n \"path\": \"/absolute/path/to/apps/new-app\",\n \"name\": \"new-app\",\n \"description\": \"A new app\"\n}",
+                    "expectedOutcome": "{\n \"message\": \"Workspace created successfully\"\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Update Workspace",
+                    "route": "/updateworkspace",
+                    "methods": "POST",
+                    "description": "Update workspace package.json",
+                    "sampleInput": "{\n \"path\": \"/absolute/path/to/apps/my-app\",\n \"description\": \"Updated description\"\n}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Stop Process",
+                    "route": "/stopprocess",
+                    "methods": "POST",
+                    "description": "Stop a running process",
+                    "sampleInput": "{\n \"workspace\": {\n  \"name\": \"app-name\"\n }\n}",
+                    "expectedOutcome": "",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Stop Interactive Terminal",
+                    "route": "/stopinteractiveterminal",
+                    "methods": "POST",
+                    "description": "Stop an interactive terminal session",
+                    "sampleInput": "{\n \"workspace\": {\n  \"name\": \"app-name\"\n }\n}",
+                    "expectedOutcome": "",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Stop Terminal Workspace",
+                    "route": "/stopTerminalWorkspace",
+                    "methods": "POST",
+                    "description": "Stop terminal and cleanup resources",
+                    "sampleInput": "{\n \"workspace\": {\n  \"name\": \"app-name\",\n  \"path\": \"/path/to/app\"\n }\n}",
+                    "expectedOutcome": "",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "VSCode Hide/Show",
+                    "route": "/hideshowfilefolder",
+                    "methods": "POST",
+                    "description": "Update VSCode files.exclude",
+                    "sampleInput": "{\n \"hide\": true,\n \"pathInclude\": [\"apps/hidden-app\"]\n}",
+                    "expectedOutcome": "{\n \"success\": true,\n \"isHidden\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Save Notes",
+                    "route": "/notes",
+                    "methods": "POST",
+                    "description": "Save notes",
+                    "sampleInput": "{\n \"notes\": \"My notes\"\n}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Save CRUD Test",
+                    "route": "/crudtest",
+                    "methods": "POST",
+                    "description": "Save crudtest configuration",
+                    "sampleInput": "{\n \"crudtest\": []\n}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Git Revert",
+                    "route": "/gitcontrol/revert",
+                    "methods": "POST",
+                    "description": "Revert to a previous commit",
+                    "sampleInput": "{\n \"hash\": \"commit-hash\"\n}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Git Push",
+                    "route": "/gitcontrol/push",
+                    "methods": "POST",
+                    "description": "Commit all changes and push",
+                    "sampleInput": "{\n \"message\": \"commit message\"\n}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Kill Port",
+                    "route": "/processtree/kill-port",
+                    "methods": "POST",
+                    "description": "Kill process on a specific port",
+                    "sampleInput": "{\n \"port\": 3000\n}",
+                    "expectedOutcome": "{\n \"success\": true,\n \"killed\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Stop Docker Container",
+                    "route": "/docker/stop",
+                    "methods": "POST",
+                    "description": "Stop a specific docker container",
+                    "sampleInput": "{\n \"id\": \"container-id\"\n}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Stop All Docker Containers",
+                    "route": "/docker/stop-all",
+                    "methods": "POST",
+                    "description": "Stop all running docker containers",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
+                },
+                {
+                    "label": "Set Workspace Template",
+                    "route": "/setworkspacetemplate",
+                    "methods": "POST",
+                    "description": "Apply a template to a workspace",
+                    "sampleInput": "{\n \"workspace\": { \"path\": \"/path/to/workspace\" },\n \"templatename\": \"react-vite\"\n}",
+                    "expectedOutcome": "{\n \"success\": true\n}",
+                    "suggested": [],
+                    "availableFor": "public"
                 }
             ]
         }
