@@ -105,15 +105,15 @@ const checkStatus = () => {
 
             // Verify pgAdmin is actually responding to HTTP
             http.get(\`http://localhost:\${pgAdminPort}\`, (res) => {
-                // Capture Container ID and Print
-                exec('docker compose ps -q postgres', (err3, stdout3) => {
-                     if (stdout3) containerId = stdout3.trim();
+                // Capture Container IDs
+                exec('docker compose ps -q', (err3, stdout3) => {
+                     const containerIds = stdout3 ? stdout3.trim().split('\\n') : [];
                      
                      try {
                         fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
                             port: server.address().port, 
                             pid: process.pid,
-                            containerId: containerId
+                            containerIds: containerIds
                         }));
                      } catch(e) {
                         console.error('Failed to write runtime file:', e);
@@ -147,18 +147,20 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping PostgreSQL...');
+    try { 
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+             runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`);
+             });
+        }
+    } catch(e) {}
     try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
     
-    if (containerId) {
-        console.log(\`Stopping container \${containerId}...\`);
-        exec(\`docker stop \${containerId}\`, () => {
-             process.exit(0);
-        });
-    } else {
-        exec('docker compose stop', () => {
-            process.exit(0);
-        });
-    }
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
 };
 
 process.on('SIGINT', cleanup);

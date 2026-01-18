@@ -84,13 +84,14 @@ const checkStatus = () => {
         }
 
         exec('docker compose ps -q mongodb', (err2, stdout2) => {
-            if (stdout2) containerId = stdout2.trim();
+            let containerIds = [];
+            if (stdout2) containerIds = [stdout2.trim()];
 
             try {
                 fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
                     port: server.address().port, 
                     pid: process.pid,
-                    containerId: containerId 
+                    containerIds: containerIds 
                 }));
             } catch(e) {}
 
@@ -112,18 +113,20 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping MongoDB...');
+    try { 
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+             runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`);
+             });
+        }
+    } catch(e) {}
     try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
     
-    if (containerId) {
-        console.log(\`Stopping container \${containerId}...\`);
-        exec(\`docker stop \${containerId}\`, () => {
-             process.exit(0);
-        });
-    } else {
-        exec('docker compose stop', () => {
-            process.exit(0);
-        });
-    }
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
 };
 
 process.on('SIGINT', cleanup);

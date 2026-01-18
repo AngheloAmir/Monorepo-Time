@@ -53,7 +53,26 @@ router.post('/', async (req: Request, res: Response) => {
                     // console.log(`[StopTerminal] Reading .runtime.json at ${path.join(workspacePath, '.runtime.json')}`);
                     
                     const runtimeConfig = await fs.readJSON(path.join(workspacePath, '.runtime.json'));
-                    if (runtimeConfig && runtimeConfig.containerId) {
+                    
+                    // Handle array of containers (New Format)
+                    if (runtimeConfig && runtimeConfig.containerIds && Array.isArray(runtimeConfig.containerIds)) {
+                        console.log(`[StopTerminal] Stopping ${runtimeConfig.containerIds.length} containers...`);
+                        activeSession && log(`Stopping ${runtimeConfig.containerIds.length} Docker containers...`);
+                        
+                        for (const cid of runtimeConfig.containerIds) {
+                            try {
+                                console.log(`[StopTerminal] Stopping container ${cid}`);
+                                await execAsync(`docker stop ${cid}`);
+                                console.log(`[StopTerminal] Container ${cid} stopped.`);
+                            } catch (e: any) {
+                                console.error(`[StopTerminal] Error stopping container ${cid}:`, e);
+                                activeSession && log(`Error stopping container ${cid}: ${e.message}`);
+                            }
+                        }
+                        activeSession && log("All Docker containers stopped.");
+                    } 
+                    // Handle single container (Legacy Format)
+                    else if (runtimeConfig && runtimeConfig.containerId) {
                         console.log(`[StopTerminal] Stopping container ${runtimeConfig.containerId}`);
                         await execAsync(`docker stop ${runtimeConfig.containerId}`);
                         console.log(`[StopTerminal] Container stopped.`);
