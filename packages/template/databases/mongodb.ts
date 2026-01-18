@@ -44,18 +44,13 @@ let containerId = null;
 
 console.log('Starting MongoDB...');
 
-const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     process.exit(code || 0);
 });
 
-child.stderr.on('data', (data) => {
-    const output = data.toString();
-    if (!output.includes('The attribute \`version\` is obsolete')) {
-        // console.error(output);
-    }
-});
+
 
 // Setup Control Server
 const server = http.createServer((req, res) => {
@@ -75,11 +70,18 @@ server.listen(0, () => {
 });
 
 // Give it time to start, then print info
-setTimeout(() => {
+// Check status loop
+const checkStatus = () => {
     exec('docker compose port mongodb 27017', (err, stdout, stderr) => {
-        if (stderr) return;
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
         const port = stdout.trim().split(':')[1];
-        if (!port) return;
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
 
         exec('docker compose ps -q mongodb', (err2, stdout2) => {
             if (stdout2) containerId = stdout2.trim();
@@ -100,11 +102,13 @@ setTimeout(() => {
             console.log('👤 Username:          admin');
             console.log('🔑 Password:          password');
             console.log(\`🌐 Port:              \${port}\`);
-            if (containerId) console.log(\`📦 Container ID:      \${containerId}\`);
+
             console.log('==================================================\\n');
         });
     });
-}, 5000);
+};
+
+setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping MongoDB...');

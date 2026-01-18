@@ -45,18 +45,13 @@ let containerId = null;
 console.log('Starting PostgreSQL...');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     process.exit(code || 0);
 });
 
-child.stderr.on('data', (data) => {
-   const output = data.toString();
-   if (!output.includes('The attribute \`version\` is obsolete')) {
-       // console.error(output); 
-   }
-});
+
 
 // Setup Control Server
 const server = http.createServer((req, res) => {
@@ -76,11 +71,18 @@ server.listen(0, () => {
 });
 
 // Info Loop
-setTimeout(() => {
+// Check status loop
+const checkStatus = () => {
     exec('docker compose port postgres 5432', (err, stdout, stderr) => {
-        if (stderr) return;
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
         const port = stdout.trim().split(':')[1];
-        if (!port) return;
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
         
         // Capture Container ID
         exec('docker compose ps -q postgres', (err2, stdout2) => {
@@ -105,11 +107,13 @@ setTimeout(() => {
              console.log('🔑 Password:          password');
              console.log('🗄️  Database:          mydatabase');
              console.log(\`🌐 Port:              \${port}\`);
-             if (containerId) console.log(\`📦 Container ID:      \${containerId}\`);
+
              console.log('==================================================\\n');
         });
     });
-}, 5000);
+};
+
+setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping PostgreSQL...');

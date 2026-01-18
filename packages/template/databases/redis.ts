@@ -46,7 +46,7 @@ let containerId = null;
 
 console.log('Starting Redis...');
 
-const child = spawn('docker', ['compose', 'up'], { stdio: 'pipe' });
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     process.exit(code || 0);
@@ -70,11 +70,18 @@ server.listen(0, () => {
 });
 
 // Give it time to start
-setTimeout(() => {
+// Check status loop
+const checkStatus = () => {
     exec('docker compose port redis 6379', (err, stdout, stderr) => {
-        if (stderr) return;
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
         const port = stdout.trim().split(':')[1];
-        if (!port) return;
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
 
         exec('docker compose ps -q redis', (err2, stdout2) => {
             if (stdout2) containerId = stdout2.trim();
@@ -93,11 +100,13 @@ setTimeout(() => {
             console.log('--------------------------------------------------');
             console.log(\`🔌 Connection String: redis://localhost:\${port}\`);
             console.log(\`🌐 Port:              \${port}\`);
-            if (containerId) console.log(\`📦 Container ID:      \${containerId}\`);
+
             console.log('==================================================\\n');
         });
     });
-}, 3000);
+};
+
+setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping Redis...');
