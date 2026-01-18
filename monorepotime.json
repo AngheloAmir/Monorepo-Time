@@ -63,38 +63,6 @@
                     "suggested": []
                 }
             ]
-        },
-        {
-            "category": "k",
-            "devurl": "http://localhost:4793",
-            "produrl": "",
-            "items": [
-                {
-                    "label": "ping",
-                    "route": "/ping",
-                    "methods": "GET",
-                    "description": "",
-                    "sampleInput": "{}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                }
-            ]
-        },
-        {
-            "category": "test1",
-            "devurl": "http://localhost:4793",
-            "produrl": "",
-            "items": [
-                {
-                    "label": "ping",
-                    "route": "/ping",
-                    "methods": "GET",
-                    "description": "",
-                    "sampleInput": "{}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                }
-            ]
         }
     ]
 }

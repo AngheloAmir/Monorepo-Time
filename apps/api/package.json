@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon --watch 'src/**/*.ts' --watch '../../packages/**/*.ts' --exec 'ts-node' src/index.ts",
+    "dev": "NODE_ENV=development nodemon --watch 'src/**/*.ts' --watch '../../packages/**/*.ts' --exec 'ts-node' src/index.ts",
     "build": "tsup",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",

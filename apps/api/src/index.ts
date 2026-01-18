@@ -96,7 +96,7 @@ const findAvailablePort = (startPort: number): Promise<number> => {
     server.unref();
     server.on('error', (err: any) => {
       if (err.code === 'EADDRINUSE') {
-        // Port is in use, try the next one
+        console.log(`Port ${startPort} is in use, trying ${startPort + 1}...`);
         resolve(findAvailablePort(startPort + 1));
       } else {
         reject(err);
@@ -104,7 +104,6 @@ const findAvailablePort = (startPort: number): Promise<number> => {
     });
     server.listen(startPort, () => {
       server.close(() => {
-        // Port is available
         resolve(startPort);
       });
     });
@@ -116,9 +115,10 @@ findAvailablePort(port).then((availablePort) => {
   httpServer.listen(availablePort, () => {
     console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
     
-    if(process.env.NODE_ENV === 'development') {
+    if(process.env.NODE_ENV != 'development') {
       open(`http://localhost:${availablePort}`);
     }
+
   });
 }).catch((err) => {
   console.error("Failed to find an available port:", err);
