@@ -2295,7 +2295,7 @@ var ViteReact = {
   templating: [
     {
       action: "command",
-      command: "npx create-vite@latest . --template react-ts"
+      command: "npx -y create-vite@latest . --template react-ts"
     },
     {
       action: "command",
@@ -2328,7 +2328,7 @@ export default {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx kill-port 5173"'
+      command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
     }
   ]
 };
@@ -2352,16 +2352,58 @@ var NextJS = {
 
 // ../../packages/template/projects/express.ts
 var expressFile = `import express, { Request, Response } from "express";
+import path from "path";
+import helloRouter from "./routes/hello";
+
 const app = express();
-const port = 3000;
+const port = 3500;
+
+app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.json());
+
+app.use("/hello", helloRouter);
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World!");
+    res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
 app.listen(port, () => {
     console.log("Server running at http://localhost:" + port);
 });
+`;
+var helloRouterFile = `import { Router, Request, Response } from "express";
+
+const router = Router();
+
+router.get("/", (req: Request, res: Response) => {
+    res.json({ message: "Hello World" });
+});
+
+export default router;
+`;
+var htmlFile = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Status</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Server running</h1>
+</body>
+</html>
 `;
 var ExpressTS = {
   name: "Express.js TS",
@@ -2382,13 +2424,23 @@ var ExpressTS = {
     },
     {
       action: "file",
-      file: "index.ts",
+      file: "public/index.html",
+      filecontent: htmlFile
+    },
+    {
+      action: "file",
+      file: "src/routes/hello.ts",
+      filecontent: helloRouterFile
+    },
+    {
+      action: "file",
+      file: "src/index.ts",
       filecontent: expressFile
     },
     {
       action: "file",
       file: "tsup.config.ts",
-      filecontent: "import { defineConfig } from 'tsup';\n\nexport default defineConfig({\n  entry: ['index.ts'],\n  splitting: false,\n  sourcemap: true,\n  clean: true,\n  format: ['cjs'],\n});"
+      filecontent: "import { defineConfig } from 'tsup';\n\nexport default defineConfig({\n  entry: ['src/index.ts'],\n  splitting: false,\n  sourcemap: true,\n  clean: true,\n  format: ['cjs'],\n});"
     },
     {
       action: "file",
@@ -2397,7 +2449,7 @@ var ExpressTS = {
     },
     {
       action: "command",
-      command: `npm pkg set scripts.dev="nodemon --watch '*.ts' --exec 'ts-node' index.ts"`
+      command: `npm pkg set scripts.dev="nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"`
     },
     {
       action: "command",
@@ -2409,7 +2461,7 @@ var ExpressTS = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+      command: 'npm pkg set scripts.stop="npx -y kill-port 3500"'
     }
   ]
 };

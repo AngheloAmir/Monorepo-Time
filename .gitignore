@@ -25,8 +25,7 @@ dist-ssr
 
 dist
 _old
-package-lock.json
+*.package-lock.json
 out
-.turbo
-
-.runtime.json
+*.turbo
+*.runtime.json
