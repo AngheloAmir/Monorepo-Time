@@ -20,6 +20,10 @@ export const N8NLocal: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="npx kill-port 5678"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-robot\""
         }
     ]
 };

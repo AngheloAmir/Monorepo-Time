@@ -31,6 +31,10 @@ export const ViteReact: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-globe\""
         }
     ]
 };

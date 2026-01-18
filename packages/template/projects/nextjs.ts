@@ -12,6 +12,10 @@ export const NextJS: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-globe\""
         }
     ]
 };

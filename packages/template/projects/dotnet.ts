@@ -28,6 +28,10 @@ export const DotNetConsole: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.start="dotnet run"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-terminal\""
         }
     ]
 };

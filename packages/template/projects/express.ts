@@ -114,6 +114,10 @@ export const ExpressTS: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="npx -y kill-port 3500"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-server\""
         }
     ]
 };

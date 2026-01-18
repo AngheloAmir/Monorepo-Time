@@ -20,6 +20,10 @@ export const Laravel: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="npx kill-port 8000"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-server\""
         }
     ]
 };

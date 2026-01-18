@@ -55,5 +55,6 @@
   "files": [
     "dist",
     "public"
-  ]
+  ],
+  "fontawesomeIcon": "fa fa-server"
 }

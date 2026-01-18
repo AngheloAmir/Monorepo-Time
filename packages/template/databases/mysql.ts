@@ -36,6 +36,10 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="echo \'Note: MySQL is running as a system service. Please stop it manually.\'"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-database\""
         }
     ]
 };

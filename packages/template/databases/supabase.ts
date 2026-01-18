@@ -21,6 +21,10 @@ export const Supabase: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="npx supabase stop"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-database\""
         }
     ]
 };

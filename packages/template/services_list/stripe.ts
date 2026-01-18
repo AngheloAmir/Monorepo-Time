@@ -111,6 +111,10 @@ export const StripeTemplate: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="docker compose down"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-credit-card\""
         }
     ]
 };

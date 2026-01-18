@@ -530,6 +530,10 @@ export const AWSTemplate: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.stop="node stop.js"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-cloud\""
         }
     ]
 };

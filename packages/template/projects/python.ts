@@ -22,6 +22,10 @@ export const PythonConsole: ProjectTemplate = {
         {
             action: 'command',
             command: 'npm pkg set scripts.start="python3 main.py"'
+        },
+        {
+            action: 'command',
+            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-terminal\""
         }
     ]
 };
