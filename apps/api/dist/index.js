@@ -2320,36 +2320,21 @@ var ViteReact = {
   templating: [
     {
       action: "command",
-      command: "npx -y create-vite@latest . --template react-ts"
+      command: "npx -y create-vite@latest --template react-ts --no-interactive --overwrite ."
     },
     {
       action: "command",
-      command: "npm install -D tailwindcss postcss autoprefixer"
-    },
-    {
-      action: "file",
-      file: "tailwind.config.js",
-      filecontent: `/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}`
+      command: "npm install -D tailwindcss @tailwindcss/postcss autoprefixer"
     },
     {
       action: "file",
       file: "postcss.config.js",
-      filecontent: "export default {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}"
+      filecontent: 'export default {\n  plugins: {\n    "@tailwindcss/postcss": {},\n    autoprefixer: {},\n  },\n}'
     },
     {
       action: "file",
       file: "src/index.css",
-      filecontent: "@tailwind base;\n@tailwind components;\n@tailwind utilities;"
+      filecontent: '@import "tailwindcss";'
     },
     {
       action: "command",

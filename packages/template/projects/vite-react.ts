@@ -7,26 +7,21 @@ export const ViteReact: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npx -y create-vite@latest . --template react-ts'
+            command: 'npx -y create-vite@latest --template react-ts --no-interactive --overwrite .'
         },
         {
             action: 'command',
-            command: 'npm install -D tailwindcss postcss autoprefixer'
-        },
-        {
-            action: 'file',
-            file: 'tailwind.config.js',
-            filecontent: '/** @type {import(\'tailwindcss\').Config} */\nexport default {\n  content: [\n    "./index.html",\n    "./src/**/*.{js,ts,jsx,tsx}",\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n}'
+            command: 'npm install -D tailwindcss @tailwindcss/postcss autoprefixer'
         },
         {
             action: 'file',
             file: 'postcss.config.js',
-            filecontent: 'export default {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}'
+            filecontent: 'export default {\n  plugins: {\n    "@tailwindcss/postcss": {},\n    autoprefixer: {},\n  },\n}'
         },
         {
             action: 'file',
             file: 'src/index.css',
-            filecontent: '@tailwind base;\n@tailwind components;\n@tailwind utilities;'
+            filecontent: '@import "tailwindcss";'
         },
         {
             action: 'command',
@@ -34,7 +29,7 @@ export const ViteReact: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-globe\""
+            command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-globe"'
         }
     ]
 };
