@@ -2679,9 +2679,7 @@ var N8NLocal = {
 };
 
 // ../../packages/template/services_list/aws.ts
-var dockerCompose = `version: "3.9"
-
-services:
+var dockerCompose = `services:
   localstack:
     image: localstack/localstack
     ports:
@@ -2912,37 +2910,122 @@ module.exports = {
 var serverJs = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const deploy = require('./deploy');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+let currentPort = 3748;
 
 console.log("Starting AWS Local environment...");
 
 // Spawn Docker Compose
 const docker = spawn('docker', ['compose', 'up', '-d'], { stdio: 'inherit' });
 
+docker.on('close', (code) => {
+    if (code !== 0) {
+        console.error('Failed to start Docker containers');
+        process.exit(code);
+    }
+    // Give containers a moment to initialize
+    setTimeout(displayCredentials, 3000);
+});
+
+function displayCredentials() {
+    // Get container IDs for runtime file
+    exec('docker compose ps -q', (err, stdout) => {
+        let containerIds = [];
+        if (stdout) {
+            containerIds = stdout.trim().split('\\n').filter(id => id);
+        }
+
+        // Write runtime file
+        try {
+            fs.writeFileSync(RUNTIME_FILE, JSON.stringify({
+                port: server.address().port,
+                pid: process.pid,
+                containerIds: containerIds
+            }));
+        } catch(e) {}
+
+        console.log('\\n==================================================');
+        console.log('\u{1F680} AWS LocalStack is running!');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4CC} AWS Credentials:');
+        console.log('   Access Key ID:     test');
+        console.log('   Secret Access Key: test');
+        console.log('   Region:            us-east-1');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F310} Service URLs:');
+        console.log('   LocalStack:        http://localhost:4566');
+        console.log('   DynamoDB Admin:    http://localhost:8001');
+        console.log('   S3 Manager:        http://localhost:8002');
+        console.log(\`   Manager UI:        http://localhost:\${server.address().port}\`);
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4E6} Available Services:');
+        console.log('   S3, Lambda, DynamoDB, API Gateway, SQS, SNS, CloudWatch');
+        console.log('==================================================\\n');
+    });
+}
+
 const requestListener = function (req, res) {
-  if (req.url === "/") {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(fs.readFileSync(path.join(__dirname, 'index.html')));
-  } else if (req.url === "/deploy") {
-    deploy.runDeploy(req, res);
-  } else {
-    res.writeHead(404);
-    res.end("Not found");
-  }
+    if (req.url === "/") {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(fs.readFileSync(path.join(__dirname, 'index.html')));
+    } else if (req.url === "/deploy") {
+        deploy.runDeploy(req, res);
+    } else if (req.url === "/stop") {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end("Not found");
+    }
 }
 
 const server = http.createServer(requestListener);
-server.listen(3000, () => {
-    console.log('AWS Local Manager running at http://localhost:3000');
+
+function startServer(port) {
+    server.listen(port);
+}
+
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.log(\`Port \${currentPort} is in use, trying \${currentPort + 1}...\`);
+        currentPort++;
+        startServer(currentPort);
+    } else {
+        console.error('Server error:', err);
+        process.exit(1);
+    }
 });
 
-// Handle cleanup
-process.on('SIGINT', () => {
-    console.log("Stopping Docker containers...");
+server.on('listening', () => {
+    console.log(\`AWS Local Manager running at http://localhost:\${server.address().port}\`);
+});
+
+startServer(currentPort);
+
+const cleanup = () => {
+    console.log("Stopping AWS Local environment...");
+    try {
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+            runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`);
+            });
+        }
+    } catch(e) {}
+    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+    
     spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
-    process.exit();
-});`;
+    setTimeout(() => process.exit(0), 2000);
+};
+
+// Handle cleanup
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
 var stopJs = `const { spawn } = require('child_process');
 console.log("Stopping AWS Local environment...");
 spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
@@ -3226,6 +3309,101 @@ var dockerCompose2 = `services:
       timeout: 5s
       retries: 5
 `;
+var serverJs2 = `const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const { spawn, exec } = require('child_process');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Stripe Mock Server...');
+
+// Spawn Docker Compose
+const docker = spawn('docker', ['compose', 'up', '-d'], { stdio: 'inherit' });
+
+docker.on('close', (code) => {
+    if (code !== 0) {
+        console.error('Failed to start Docker containers');
+        process.exit(code);
+    }
+    // Give container a moment to initialize
+    setTimeout(displayCredentials, 3000);
+});
+
+function displayCredentials() {
+    // Get container ID for runtime file
+    exec('docker compose ps -q stripe-mock', (err, stdout) => {
+        let containerIds = [];
+        if (stdout) {
+            containerIds = [stdout.trim()];
+        }
+
+        // Write runtime file
+        try {
+            fs.writeFileSync(RUNTIME_FILE, JSON.stringify({
+                port: server.address().port,
+                pid: process.pid,
+                containerIds: containerIds
+            }));
+        } catch(e) {}
+
+        console.log('\\n==================================================');
+        console.log('\u{1F4B3} Stripe Mock Server is running!');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4CC} Connection Details:');
+        console.log('   API Key:           sk_test_mock_123 (any key works)');
+        console.log('   HTTP Endpoint:     http://localhost:12111');
+        console.log('   HTTPS Endpoint:    https://localhost:12112');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4DD} Quick Start (Node.js):');
+        console.log("   const stripe = new Stripe('sk_test_mock_123', {");
+        console.log("       host: 'localhost',");
+        console.log("       port: 12111,");
+        console.log("       protocol: 'http'");
+        console.log('   });');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F9EA} Test Command:');
+        console.log('   npm run test');
+        console.log('==================================================\\n');
+    });
+}
+
+const requestListener = function (req, res) {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(200);
+        res.end('Stripe Mock running. Use /stop to stop.');
+    }
+}
+
+const server = http.createServer(requestListener);
+server.listen(0, () => {
+    console.log('Control server running on port', server.address().port);
+});
+
+const cleanup = () => {
+    console.log('Stopping Stripe Mock Server...');
+    try {
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+            console.log(\\\`Stopping \\\${runtime.containerIds.length} containers...\\\`);
+            runtime.containerIds.forEach(id => {
+                exec(\\\`docker stop \\\${id}\\\`);
+            });
+        }
+    } catch(e) {}
+    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+    
+    spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
+    setTimeout(() => process.exit(0), 2000);
+};
+
+// Handle cleanup
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
 var testJs = `const Stripe = require('stripe');
 
 // Initialize with a fake key and point to the mock server
@@ -3290,12 +3468,17 @@ const stripe = new Stripe('sk_test_mock_123', {
 var StripeTemplate = {
   name: "Stripe Mock",
   description: "Stripe API Mock Server",
-  notes: "Runs the official stripe-mock image",
+  notes: "Runs the official stripe-mock image. Requires Docker.",
   templating: [
     {
       action: "file",
       file: "docker-compose.yml",
       filecontent: dockerCompose2
+    },
+    {
+      action: "file",
+      file: "server.js",
+      filecontent: serverJs2
     },
     {
       action: "file",
@@ -3308,11 +3491,11 @@ var StripeTemplate = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="docker compose up"'
+      command: 'npm pkg set scripts.dev="node server.js"'
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="docker compose up"'
+      command: 'npm pkg set scripts.start="node server.js"'
     },
     {
       action: "command",
@@ -3320,7 +3503,7 @@ var StripeTemplate = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="docker compose down"'
+      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
     },
     {
       action: "command",
