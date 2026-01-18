@@ -36,7 +36,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 }}
                 name={"App is Running"}
                 description={"Click to stop"}
-                color="orangePurple"
+                color="yellowOrange"
                 icon="fas fa-check-circle"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'start'}
@@ -50,7 +50,7 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 }}
                 name={"Development Server"}
                 description={"Click to stop"}
-                color="emeraldTeal"
+                color="red"
                 icon="fas fa-check-circle"
                 disabled={false}
                 render={!loading && props.isRunningAs == 'dev'}
@@ -66,10 +66,9 @@ export default function WorkSpaceCardButtons(props: WorkspaceItem) {
                 }}
                 name={"Start"}
                 description={"npm run start"}
-                color="orangePurple"
+                color="emeraldTeal"
                 icon="fas fa-play"
                 disabled={false}
-
                 render={
                     (!loading &&
                         props.isRunningAs != 'dev' &&

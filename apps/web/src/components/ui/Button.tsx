@@ -6,8 +6,14 @@ interface ButtonProps {
     color?: BorderColorVariant | (string & {});
     icon?: string;
     disabled?: boolean;
+
+    /**Tells if needs to not render */
     isNotRendered?: boolean;
+
+    /**Tells if needs to render */
     render?: boolean;
+
+    /**Tells if needs to glow */
     bg?: boolean;
     className?: string;
     onClick: () => void;
@@ -26,11 +32,16 @@ export default function Button(props: ButtonProps) {
 }
 
 function ButtonSkeleton(props: ButtonProps) {
-    const defaultColor  = borderColorVariants.blueIndigo;
-    const borderColor = 
-        props.color && (borderColorVariants as Record<string, string>)[props.color] ? 
-        (borderColorVariants as Record<string, string>)[props.color] : (props.color || defaultColor);
-    
+    const defaultColor = borderColorVariants.blueIndigo;
+    const borderColor =
+        props.color && (borderColorVariants as Record<string, string>)[props.color] ?
+            (borderColorVariants as Record<string, string>)[props.color] : (props.color || defaultColor);
+
+    let glow = props.disabled ?
+        'opacity-70 cursor-not-allowed' :
+        'cursor-pointer hover:-translate-y-1 hover:shadow-lg';
+    glow = props.bg ? 'cursor-pointer hover:-translate-y-1 shadow-lg' : glow;
+
     return (
         <button
             key={props.name}
@@ -38,19 +49,22 @@ function ButtonSkeleton(props: ButtonProps) {
             onClick={props.disabled ? undefined : () => props.onClick()}
             className={`
                 group relative w-full rounded p-[1px] transition-all duration-300
-                ${props.disabled
-                    ? 'opacity-70 cursor-not-allowed'
-                    : 'cursor-pointer hover:-translate-y-1 hover:shadow-lg'}
+                ${glow}
                 ${props.className || ''}
             `}
         >
             {/* Background Layer for Border (Hover - Colored) */}
-            {!props.disabled && (
+            {!props.disabled && !props.bg && (
                 <>
-                    {/* Outer Glow */}
                     <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
-                    {/* Sharp Border Gradient */}
                     <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                </>
+            )}
+
+            {props.bg && (
+                <>
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-50 blur-lg`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-50`} />
                 </>
             )}
 
@@ -58,7 +72,7 @@ function ButtonSkeleton(props: ButtonProps) {
             <div className={`
                 relative h-full w-full rounded bg-[#212121] p-2 flex items-center gap-3 overflow-hidden
                 transition-colors duration-300
-                ${!props.disabled && !props.bg ? 'group-hover:bg-[#212121]/70' : ''}
+                ${!props.disabled ? 'group-hover:bg-[#212121]/70' : ''}
             `}>
                 {/* Active Low-Opacity Background Overlay */}
                 {props.bg && (
