@@ -90,8 +90,11 @@ router.post('/', async (req, res) => {
 
         // Find the template
         let foundTemplate = null;
+
+        console.log( 'workspacePath', workspacePath )
+        console.log( 'templatename', templatename );
         
-        const categories = ['project', 'database', 'services'] as const;
+        const categories = ['project', 'database', 'services', 'demo'] as const;
         for (const cat of categories) {
             const list = MonorepoTemplates[cat];
             if (Array.isArray(list)) {
@@ -171,7 +174,7 @@ export function setWorkspaceTemplateSocket(io: Server) {
 
             // Find the template
             let foundTemplate = null;
-            const categories = ['project', 'database', 'services'] as const;
+            const categories = ['project', 'database', 'services', 'demo'] as const;
             for (const cat of categories) {
                 const list = MonorepoTemplates[cat];
                 if (Array.isArray(list)) {
