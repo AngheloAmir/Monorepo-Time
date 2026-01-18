@@ -25,9 +25,6 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                         Monorepo 
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"> Time</span>
                     </h2>
-                    <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-gray-400 font-mono mb-6">
-                        v1.0.0
-                    </span>
 
                     {/* Description */}
                     <p className="text-gray-400 mb-8 leading-relaxed max-w-sm">
