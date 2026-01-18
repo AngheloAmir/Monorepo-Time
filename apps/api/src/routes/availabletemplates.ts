@@ -15,6 +15,7 @@ router.get('/', (req, res) => {
             project:    stripTemplating(MonorepoTemplates.project),
             database:   stripTemplating(MonorepoTemplates.database),
             services:   stripTemplating(MonorepoTemplates.services),
+            demo:       stripTemplating(MonorepoTemplates.demo),
         };
 
         res.json(availableTemplates);

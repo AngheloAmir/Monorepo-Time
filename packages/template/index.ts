@@ -1,4 +1,5 @@
 import database  from "./database";
+import demo from "./demo";
 import templates from "./projecttemplate";
 import services  from "./services";
 
@@ -20,6 +21,7 @@ const MonorepoTemplates =  {
     project:    templates,
     database:   database,
     services:   services,
+    demo:       demo,
 }
 
 export default MonorepoTemplates;

@@ -27,6 +27,7 @@ interface appContext {
         project: ProjectTemplate[],
         database: ProjectTemplate[],
         services: ProjectTemplate[],
+        demo: ProjectTemplate[],
     }>;
 }
 

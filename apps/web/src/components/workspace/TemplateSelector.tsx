@@ -17,12 +17,14 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
         project: ProjectTemplate[],
         database: ProjectTemplate[],
         services: ProjectTemplate[],
+        demo: ProjectTemplate[],
     }>({
         project: [],
         database: [],
         services: [],
+        demo: [],
     });
-    const [activeTab, setActiveTab] = useState<'Project' | 'Database' | 'Services'>('Project');
+    const [activeTab, setActiveTab] = useState<'Project' | 'Database' | 'Services' | 'Demo'>('Project');
 
     useEffect(() => {
         if (!props.show) return;
@@ -32,6 +34,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                 project: data.project || [],
                 database: data.database || [],
                 services: data.services || [],
+                demo: data.demo || [],
             }
             setTemplates(temp);
         }
@@ -49,8 +52,13 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
             <div className="flex-1 flex flex-row gap-2 overflow-hidden p-2">
                 <div className="w-48">
                     <TabItem name="Project" icon="fas fa-code" activeTab={activeTab} setActiveTab={setActiveTab} />
+
+                    <h2 className="text-sm font-bold text-gray-600 my-2 ml-2">For local testing</h2>
                     <TabItem name="Database" icon="fas fa-database" activeTab={activeTab} setActiveTab={setActiveTab} />
                     <TabItem name="Services" icon="fas fa-server" activeTab={activeTab} setActiveTab={setActiveTab} />
+
+                    <h2 className="text-sm font-bold text-gray-600 my-2 ml-2">Sample Projects</h2>
+                    <TabItem name="Demo" icon="fas fa-cube" activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
 
                 <div className="flex-1 w-full h-[500px] overflow-y-auto">
@@ -63,7 +71,9 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                         }}/>
                         <ProjectItem show={activeTab === 'Services'} project={templates.services} onClick={(name) => {
                             props.onSelect(name);
-
+                        }}/>
+                        <ProjectItem show={activeTab === 'Demo'} project={templates.demo} onClick={(name) => {
+                            props.onSelect(name);
                         }}/>
                     </div>
                 </div>
