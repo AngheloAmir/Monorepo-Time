@@ -144,7 +144,7 @@ process.on('SIGTERM', cleanup);`
         },
         {
             action: 'command',
-            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-database\""
+            command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
         }
     ]
 };

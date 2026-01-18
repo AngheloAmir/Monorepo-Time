@@ -1781,7 +1781,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -1967,7 +1967,7 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -1996,7 +1996,7 @@ var Supabase = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -2145,7 +2145,7 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -2297,7 +2297,7 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-database"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
     }
   ]
 };
@@ -2324,6 +2324,10 @@ var ViteReact = {
     },
     {
       action: "command",
+      command: "npm install"
+    },
+    {
+      action: "command",
       command: "npm install -D tailwindcss @tailwindcss/postcss autoprefixer"
     },
     {
@@ -2338,11 +2342,15 @@ var ViteReact = {
     },
     {
       action: "command",
+      command: 'npm pkg set name="$(basename $PWD)"'
+    },
+    {
+      action: "command",
       command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-globe"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-globe"'
     }
   ]
 };
@@ -2355,15 +2363,23 @@ var NextJS = {
   templating: [
     {
       action: "command",
-      command: "npx create-next-app@latest . --typescript --tailwind --eslint"
+      command: "rm -rf ./* ./.[!.]* 2>/dev/null || true"
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+      command: "npx -y create-next-app@latest . --typescript --tailwind --eslint --app --yes --use-npm"
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-globe"'
+      command: "npm install"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set name="$(basename $PWD)"'
+    },
+    {
+      action: "command",
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-globe"'
     }
   ]
 };
@@ -2483,7 +2499,7 @@ var ExpressTS = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-server"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-server"'
     }
   ]
 };
@@ -2513,7 +2529,7 @@ var PHP = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-server"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-server"'
     }
   ]
 };
@@ -2526,7 +2542,15 @@ var Laravel = {
   templating: [
     {
       action: "command",
-      command: "composer create-project laravel/laravel ."
+      command: "rm -rf ./* ./.[!.]* 2>/dev/null || true"
+    },
+    {
+      action: "command",
+      command: "composer create-project laravel/laravel . --no-interaction --no-progress"
+    },
+    {
+      action: "command",
+      command: 'npm pkg set name="$(basename $PWD)"'
     },
     {
       action: "command",
@@ -2538,11 +2562,11 @@ var Laravel = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx kill-port 8000"'
+      command: 'npm pkg set scripts.stop="npx -y kill-port 8000"'
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-server"'
+      command: 'npm pkg set fontawesomeIcon="fa-brands fa-laravel"'
     }
   ]
 };
@@ -2572,7 +2596,7 @@ var PythonConsole = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-terminal"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-terminal"'
     }
   ]
 };
@@ -2608,7 +2632,7 @@ var DotNetConsole = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-terminal"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-terminal"'
     }
   ]
 };
@@ -2649,7 +2673,7 @@ var N8NLocal = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-robot"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-robot"'
     }
   ]
 };
@@ -3183,7 +3207,7 @@ var AWSTemplate = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-cloud"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-cloud"'
     }
   ]
 };
@@ -3300,7 +3324,7 @@ var StripeTemplate = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-credit-card"'
+      command: 'npm pkg set fontawesomeIcon="fa-solid fa-credit-card"'
     }
   ]
 };

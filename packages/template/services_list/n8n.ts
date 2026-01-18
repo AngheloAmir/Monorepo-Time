@@ -23,7 +23,7 @@ export const N8NLocal: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-robot\""
+            command: 'npm pkg set fontawesomeIcon="fa-solid fa-robot"'
         }
     ]
 };

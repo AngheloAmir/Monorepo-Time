@@ -11,6 +11,10 @@ export const ViteReact: ProjectTemplate = {
         },
         {
             action: 'command',
+            command: 'npm install'
+        },
+        {
+            action: 'command',
             command: 'npm install -D tailwindcss @tailwindcss/postcss autoprefixer'
         },
         {
@@ -25,11 +29,15 @@ export const ViteReact: ProjectTemplate = {
         },
         {
             action: 'command',
+            command: 'npm pkg set name="$(basename $PWD)"'
+        },
+        {
+            action: 'command',
             command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.fontawesomeIcon="fa-solid fa-globe"'
+            command: 'npm pkg set fontawesomeIcon="fa-solid fa-globe"'
         }
     ]
 };

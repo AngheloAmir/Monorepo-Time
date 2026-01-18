@@ -114,7 +114,7 @@ export const StripeTemplate: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: "npm pkg set scripts.fontawesomeIcon=\"fa-solid fa-credit-card\""
+            command: 'npm pkg set fontawesomeIcon="fa-solid fa-credit-card"'
         }
     ]
 };
