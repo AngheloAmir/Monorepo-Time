@@ -8,7 +8,7 @@ interface HeaderItemProps {
 
 export default function HeaderItem(props: HeaderItemProps) {
     const setActiveTerminal     = useWorkspaceState.use.setActiveTerminal();
-    const stopProcess           = useWorkspaceState.use.stopProcess();
+    const stopWorkspaceTerminal = useWorkspaceState.use.stopWorkspaceTerminal();
     const setWorkSpaceRunningAs = useWorkspaceState.use.setWorkSpaceRunningAs();
     const [loading, setLoading] = useState(false);
     const activeTerminal = useWorkspaceState.use.activeTerminal();
@@ -19,7 +19,7 @@ export default function HeaderItem(props: HeaderItemProps) {
         if (loading || !activeTerminal) return;
         try {
             setLoading(true);
-            await stopProcess(activeTerminal);
+            await stopWorkspaceTerminal(activeTerminal);
             setWorkSpaceRunningAs(activeTerminal, null);
             setLoading(false);
             setActiveTerminal('');
