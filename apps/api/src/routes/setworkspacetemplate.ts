@@ -46,8 +46,7 @@ router.post('/', async (req, res) => {
             if (step.action === 'command' && step.command) {
                 console.log(`Executing command: ${step.command}`);
                 try {
-                    // Let Node.js use the default shell (uses /bin/sh on Unix, cmd.exe on Windows)
-                    await execPromise(step.command, { cwd: workspacePath, env: process.env });
+                    await execPromise(step.command, { cwd: workspacePath });
                 } catch (cmdErr: any) {
                     console.error(`Command failed: ${step.command}`, cmdErr);
                      // Decide if we want to stop or continue. Usually stopping is safer.

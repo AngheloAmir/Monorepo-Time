@@ -3391,7 +3391,7 @@ router19.post("/", async (req, res) => {
       if (step.action === "command" && step.command) {
         console.log(`Executing command: ${step.command}`);
         try {
-          await execPromise(step.command, { cwd: workspacePath, env: process.env });
+          await execPromise(step.command, { cwd: workspacePath });
         } catch (cmdErr) {
           console.error(`Command failed: ${step.command}`, cmdErr);
           return res.status(500).json({ error: `Command failed: ${step.command}
