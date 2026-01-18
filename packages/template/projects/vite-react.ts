@@ -7,7 +7,7 @@ export const ViteReact: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npx create-vite@latest . --template react-ts'
+            command: 'npx -y create-vite@latest . --template react-ts'
         },
         {
             action: 'command',
@@ -30,7 +30,7 @@ export const ViteReact: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx kill-port 5173"'
+            command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
         }
     ]
 };

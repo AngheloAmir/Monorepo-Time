@@ -143,7 +143,7 @@
                     "description": "Get running docker containers",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"containers\": [],\n \"totalMem\": 0\n}",
-                    "suggested": []                    
+                    "suggested": []
                 },
                 {
                     "label": "Available Templates",
@@ -152,7 +152,7 @@
                     "description": "Get available project templates",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"project\": [...],\n \"database\": [...]\n}",
-                    "suggested": []                    
+                    "suggested": []
                 },
                 {
                     "label": "Init MonorepoTime",
@@ -179,7 +179,7 @@
                     "description": "Create a new workspace",
                     "sampleInput": "{\n \"path\": \"/absolute/path/to/apps/new-app\",\n \"name\": \"new-app\",\n \"description\": \"A new app\"\n}",
                     "expectedOutcome": "{\n \"message\": \"Workspace created successfully\"\n}",
-                    "suggested": [] 
+                    "suggested": []
                 },
                 {
                     "label": "Update Workspace",
@@ -269,7 +269,7 @@
                     "description": "Kill process on a specific port",
                     "sampleInput": "{\n \"port\": 3000\n}",
                     "expectedOutcome": "{\n \"success\": true,\n \"killed\": true\n}",
-                    "suggested": []                    
+                    "suggested": []
                 },
                 {
                     "label": "Stop Docker Container",
@@ -287,7 +287,7 @@
                     "description": "Stop all running docker containers",
                     "sampleInput": "{}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": []  
+                    "suggested": []
                 },
                 {
                     "label": "Set Workspace Template",
@@ -296,7 +296,7 @@
                     "description": "Apply a template to a workspace",
                     "sampleInput": "{\n \"workspace\": { \"path\": \"/path/to/workspace\" },\n \"templatename\": \"react-vite\"\n}",
                     "expectedOutcome": "{\n \"success\": true\n}",
-                    "suggested": []   
+                    "suggested": []
                 }
             ]
         }
