@@ -13,6 +13,7 @@ import Flash from './components/app_contents/Flash';
 import Loading from './components/app_contents/_Loading';
 import Turborepo from './components/app_contents/Turborepo';
 import CRUDTester from './components/app_contents/CrudTester';
+import ProjectTemplate from './components/app_contents/ProjectTemplate';
 import AboutModal from './components/AboutModal';
 import config from 'config';
 
@@ -92,6 +93,15 @@ export default function App() {
                             onClick: () => navAction.setCurrentPage('crud') 
                         }
                     ]}
+                    extraNavs={[
+                        {
+                            name: 'project-template',
+                            label: 'Project Template',
+                            icon: 'fas fa-file-code',
+                            isSelected: currentPage === 'project-template',
+                            onClick: () => navAction.setCurrentPage('project-template') 
+                        }
+                    ]}
                 />
 
                 <main className="flex-1 relative overflow-hidden">
@@ -105,6 +115,7 @@ export default function App() {
                         <Workspace isVisible={currentPage === "workspace"} />
                         <Turborepo isVisible={currentPage === "turborepo"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
+                        <ProjectTemplate isVisible={currentPage === "project-template"} />
                     </div>
                 </main>
             </div>

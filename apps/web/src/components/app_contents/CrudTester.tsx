@@ -18,7 +18,7 @@ export default function CRUDTester(props: CRUDTesterProps) {
         }
     }, [props.isVisible]);
 
-    if (noData)
+    if (noData && props.isVisible)
         return <Intro />
 
     return (

@@ -1,5 +1,6 @@
 interface NavigationProps {
     navs: NavButton[];
+    extraNavs?: NavButton[];
 }
 
 interface NavButton {
@@ -12,9 +13,24 @@ interface NavButton {
 
 export default function Navigation(props :NavigationProps) {
     return (
-        <nav id="main-nav" className="w-16 h-full flex flex-col items-center py-4">
+        <nav className="w-16 h-full flex flex-col items-center py-4">
             <div className="flex flex-col gap-2 w-full px-2">
                 {props.navs.map((item) => {
+                    return (
+                        <NavButton
+                            key={item.name}
+                            isSelected={item.isSelected}
+                            icon={item.icon}
+                            name={item.name}
+                            label={item.label}
+                            onClick={() => item.onClick()}
+                        />
+                    )
+                })}
+            </div>
+
+            <div className="h-full flex flex-col justify-end gap-2 mb-16">
+                {props.extraNavs?.map((item) => {
                     return (
                         <NavButton
                             key={item.name}
