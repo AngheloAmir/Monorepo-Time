@@ -130,7 +130,9 @@ const cleanup = () => {
         if (runtime.containerIds) {
              console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
              runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
+                exec(\`docker stop \${id}\`, () => {
+                   exec(\`docker rm -f \${id}\`);
+                });
              });
         }
     } catch(e) {}
