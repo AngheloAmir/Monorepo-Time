@@ -633,14 +633,13 @@ var newworkspace_default = router4;
 // src/routes/interactiveTerminal.ts
 var import_express6 = require("express");
 var import_child_process3 = require("child_process");
-var import_tree_kill = __toESM(require("tree-kill"));
 var router5 = (0, import_express6.Router)();
 router5.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
 });
 var interactiveTerminal_default = router5;
 var activeTerminals = /* @__PURE__ */ new Map();
-async function stopTerminalProcess(socketId) {
+function stopTerminalProcess(socketId) {
   var _a, _b;
   const session = activeTerminals.get(socketId);
   if (session) {
@@ -651,37 +650,26 @@ async function stopTerminalProcess(socketId) {
     child.removeAllListeners();
     (_a = child.stdout) == null ? void 0 : _a.removeAllListeners();
     (_b = child.stderr) == null ? void 0 : _b.removeAllListeners();
-    if (child.pid) {
-      await new Promise((resolve) => {
-        (0, import_tree_kill.default)(child.pid, "SIGKILL", (err) => {
-          if (err) {
-            console.error(`Failed to kill process tree for socket ${socketId}:`, err);
-          } else {
-            console.log(`Successfully killed process tree for socket ${socketId}`);
-          }
-          resolve();
-        });
-      });
-    }
+    child.kill();
     activeTerminals.delete(socketId);
     return true;
   }
   return false;
 }
-async function stopTerminalProcessByName(workspaceName) {
+function stopTerminalProcessByName(workspaceName) {
   for (const [socketId, session] of activeTerminals.entries()) {
     if (session.workspaceName === workspaceName) {
-      return await stopTerminalProcess(socketId);
+      return stopTerminalProcess(socketId);
     }
   }
   return false;
 }
 function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
-    socket.on("terminal:start", async (data) => {
+    socket.on("terminal:start", (data) => {
       var _a, _b;
       const { path: path19, command, workspaceName } = data;
-      await stopTerminalProcess(socket.id);
+      stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
         delete env.CI;
@@ -764,8 +752,8 @@ Process exited with code ${code}`);
         session.child.stdin.write(input);
       }
     });
-    socket.on("disconnect", async () => {
-      await stopTerminalProcess(socket.id);
+    socket.on("disconnect", () => {
+      stopTerminalProcess(socket.id);
     });
     function cleanup(socketId) {
       activeTerminals.delete(socketId);
@@ -779,7 +767,7 @@ var router6 = (0, import_express7.Router)();
 router6.post("/", async (req, res) => {
   const { socketId, workspace } = req.body;
   if (workspace && workspace.name) {
-    const stopped = await stopTerminalProcessByName(workspace.name);
+    const stopped = stopTerminalProcessByName(workspace.name);
     if (stopped) {
       res.json({ success: true, message: `Terminated process for workspace ${workspace.name}` });
     } else {
@@ -788,7 +776,7 @@ router6.post("/", async (req, res) => {
     return;
   }
   if (socketId) {
-    const stopped = await stopTerminalProcess(socketId);
+    const stopped = stopTerminalProcess(socketId);
     if (stopped) {
       res.json({ success: true, message: `Terminated process for socket ${socketId}` });
     } else {
@@ -1959,7 +1947,9 @@ const cleanup = () => {
         if (runtime.containerIds) {
              console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
              runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
+                exec(\`docker stop \${id}\`, () => {
+                   exec(\`docker rm -f \${id}\`);
+                });
              });
         }
     } catch(e) {}
@@ -2146,7 +2136,9 @@ const cleanup = () => {
         if (runtime.containerIds) {
              console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
              runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
+                exec(\`docker stop \${id}\`, () => {
+                   exec(\`docker rm -f \${id}\`);
+                });
              });
         }
     } catch(e) {}
@@ -2302,7 +2294,9 @@ const cleanup = () => {
         if (runtime.containerIds) {
              console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
              runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
+                exec(\`docker stop \${id}\`, () => {
+                   exec(\`docker rm -f \${id}\`);
+                });
              });
         }
     } catch(e) {}
@@ -2452,7 +2446,9 @@ const cleanup = () => {
         if (runtime.containerIds) {
              console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
              runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
+                exec(\`docker stop \${id}\`, () => {
+                   exec(\`docker rm -f \${id}\`);
+                });
              });
         }
     } catch(e) {}
@@ -2625,7 +2621,9 @@ const cleanup = () => {
         if (runtime.containerIds) {
              console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
              runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
+                exec(\`docker stop \${id}\`, () => {
+                   exec(\`docker rm -f \${id}\`);
+                });
              });
         }
     } catch(e) {}
@@ -5751,17 +5749,74 @@ function setWorkspaceTemplateSocket(io2) {
 var import_express23 = require("express");
 var import_fs_extra12 = __toESM(require("fs-extra"));
 var import_path17 = __toESM(require("path"));
-var import_child_process8 = require("child_process");
-var import_util2 = __toESM(require("util"));
-var execAsync2 = import_util2.default.promisify(import_child_process8.exec);
+var import_execa2 = require("execa");
+var import_tree_kill = __toESM(require("tree-kill"));
 var router20 = (0, import_express23.Router)();
+async function killProcessTree(pid, signal = "SIGKILL") {
+  return new Promise((resolve, reject) => {
+    (0, import_tree_kill.default)(pid, signal, (err) => {
+      if (err) {
+        console.error(`[StopTerminal] Error killing process tree for PID ${pid}:`, err.message);
+        reject(err);
+      } else {
+        console.log(`[StopTerminal] Successfully killed process tree for PID ${pid}`);
+        resolve();
+      }
+    });
+  });
+}
+async function stopDockerContainers(containerIds) {
+  for (const cid of containerIds) {
+    try {
+      console.log(`[StopTerminal] Stopping container ${cid}`);
+      await (0, import_execa2.execa)("docker", ["stop", cid]);
+      console.log(`[StopTerminal] Stopped container ${cid}`);
+      try {
+        await (0, import_execa2.execa)("docker", ["rm", cid]);
+        console.log(`[StopTerminal] Removed container ${cid}`);
+      } catch (rmError) {
+        console.log(`[StopTerminal] Container ${cid} already removed or doesn't exist`);
+      }
+    } catch (e) {
+      console.error(`[StopTerminal] Error stopping container ${cid}:`, e.message);
+    }
+  }
+}
+function stopTerminalProcessInternal(socketId) {
+  var _a, _b;
+  const session = activeTerminals.get(socketId);
+  if (session) {
+    const { child, socket } = session;
+    if (socket.connected) {
+      socket.emit("terminal:log", "\r\n\x1B[33m[System] Stopping interactive terminal process...\x1B[0m\r\n");
+    }
+    child.removeAllListeners();
+    (_a = child.stdout) == null ? void 0 : _a.removeAllListeners();
+    (_b = child.stderr) == null ? void 0 : _b.removeAllListeners();
+    if (child.pid) {
+      killProcessTree(child.pid).catch((err) => {
+        console.error("[StopTerminal] Error in killProcessTree:", err);
+        try {
+          child.kill("SIGKILL");
+        } catch (e) {
+          console.error("[StopTerminal] Fallback kill also failed:", e);
+        }
+      });
+    } else {
+      child.kill();
+    }
+    activeTerminals.delete(socketId);
+    return true;
+  }
+  return false;
+}
 router20.post("/", async (req, res) => {
   try {
     const { socketId, workspace } = req.body;
     if (workspace && workspace.name) {
       const workspacePath = workspace.path;
       if (!workspacePath) {
-        console.error(`[StopTerminal] ERROR: No workspace path provided for ${workspace.name}. Docker cleanup may fail.`);
+        console.error(`[StopTerminal] ERROR: No workspace path provided for ${workspace.name}. Cleanup may fail.`);
       }
       let socket = null;
       let activeSession = null;
@@ -5775,6 +5830,7 @@ router20.post("/", async (req, res) => {
         }
       }
       const log = (msg) => {
+        console.log(`[StopTerminal] ${msg}`);
         if (activeSession && activeSession.socket && activeSession.socket.connected) {
           activeSession.socket.emit("terminal:log", `\r
 \x1B[33m[System] ${msg}\x1B[0m\r
@@ -5786,78 +5842,64 @@ router20.post("/", async (req, res) => {
       }
       if (workspacePath && await import_fs_extra12.default.pathExists(import_path17.default.join(workspacePath, ".runtime.json"))) {
         try {
-          if (activeSession) log("Checking/Stopping Docker container...");
+          log("Checking/Stopping Docker containers...");
           const runtimeConfig = await import_fs_extra12.default.readJSON(import_path17.default.join(workspacePath, ".runtime.json"));
           if (runtimeConfig && runtimeConfig.containerIds && Array.isArray(runtimeConfig.containerIds)) {
-            console.log(`[StopTerminal] Stopping ${runtimeConfig.containerIds.length} containers...`);
-            activeSession && log(`Stopping ${runtimeConfig.containerIds.length} Docker containers...`);
-            for (const cid of runtimeConfig.containerIds) {
-              try {
-                console.log(`[StopTerminal] Stopping container ${cid}`);
-                await execAsync2(`docker stop ${cid}`);
-                console.log(`[StopTerminal] Container ${cid} stopped.`);
-              } catch (e) {
-                console.error(`[StopTerminal] Error stopping container ${cid}:`, e);
-                activeSession && log(`Error stopping container ${cid}: ${e.message}`);
-              }
-            }
-            activeSession && log("All Docker containers stopped.");
+            log(`Stopping ${runtimeConfig.containerIds.length} Docker containers...`);
+            await stopDockerContainers(runtimeConfig.containerIds);
+            log("All Docker containers stopped and removed.");
           } else if (runtimeConfig && runtimeConfig.containerId) {
-            console.log(`[StopTerminal] Stopping container ${runtimeConfig.containerId}`);
-            await execAsync2(`docker stop ${runtimeConfig.containerId}`);
-            console.log(`[StopTerminal] Container stopped.`);
-            if (activeSession) log("Docker container stopped.");
+            await stopDockerContainers([runtimeConfig.containerId]);
+            log("Docker container stopped and removed.");
           } else {
-            if (activeSession) log("No active container ID found in config.");
+            log("No active container ID found in config.");
           }
         } catch (e) {
           console.error("[StopTerminal] Error stopping docker:", e);
-          if (activeSession) log(`Error stopping Docker: ${e.message}`);
+          log(`Error stopping Docker: ${e.message}`);
         }
-      } else {
       }
       if (workspacePath) {
         try {
-          if (activeSession) log("Running npm run stop...");
-          await execAsync2("npm run stop", { cwd: workspacePath });
-          if (activeSession) log("npm run stop executed.");
+          log("Running npm run stop...");
+          await (0, import_execa2.execa)("npm", ["run", "stop"], {
+            cwd: workspacePath,
+            shell: true,
+            reject: false
+            // Don't throw on non-zero exit
+          });
+          log("npm run stop executed.");
         } catch (e) {
-          if (activeSession) log(`Error running npm run stop (might not exist): ${e.message}`);
+          log(`npm run stop not available or failed (this is okay): ${e.message}`);
         }
       }
       let stopped = false;
       if (activeSession && activeSessionId) {
-        log("Closing terminal in 1 second...");
-        await new Promise((resolve) => setTimeout(resolve, 1e3));
         const currentProcess = activeSession.child;
         if (currentProcess && currentProcess.pid) {
-          if (process.platform === "win32") {
-            (0, import_child_process8.exec)(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
-            });
-          } else {
-            try {
-              process.kill(-currentProcess.pid, "SIGKILL");
-            } catch (e) {
-              try {
-                currentProcess.kill("SIGKILL");
-              } catch (e2) {
-              }
-            }
+          log(`Killing process tree for PID ${currentProcess.pid}...`);
+          try {
+            await killProcessTree(currentProcess.pid, "SIGKILL");
+            log("Process tree killed successfully.");
+          } catch (e) {
+            console.error("[StopTerminal] Error killing process tree:", e);
+            log(`Error killing process tree: ${e.message}`);
           }
         }
-        stopTerminalProcess(activeSessionId);
+        stopTerminalProcessInternal(activeSessionId);
         stopped = true;
+        log("Terminal session cleaned up.");
       }
+      await new Promise((resolve) => setTimeout(resolve, 500));
       if (stopped) {
-        res.json({ success: true, message: `Terminated process for workspace ${workspace.name}` });
+        res.json({ success: true, message: `Terminated process and freed resources for workspace ${workspace.name}` });
       } else {
-        await new Promise((resolve) => setTimeout(resolve, 500));
         res.json({ success: true, message: `Cleanup performed for workspace ${workspace.name} (no active terminal found)` });
       }
       return;
     }
     if (socketId) {
-      const stopped = stopTerminalProcess(socketId);
+      const stopped = stopTerminalProcessInternal(socketId);
       if (stopped) {
         res.json({ success: true, message: `Terminated process for socket ${socketId}` });
       } else {
