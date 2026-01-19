@@ -7,7 +7,7 @@ export const ViteReact: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npx -y create-vite@latest --template react-ts --no-interactive --overwrite .'
+            command: 'npx -y create-vite@latest --template react-ts --no-interactive .'
         },
         {
             action: 'command',

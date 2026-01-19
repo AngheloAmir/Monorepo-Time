@@ -15,6 +15,7 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
+    "execa": "^9.6.1",
     "express": "^4.19.2",
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.3",

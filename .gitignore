@@ -29,3 +29,6 @@ _old
 out
 *.turbo
 *.runtime.json
+
+.agent
+.test-local

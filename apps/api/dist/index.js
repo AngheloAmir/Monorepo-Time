@@ -4170,7 +4170,7 @@ var ViteReact = {
   templating: [
     {
       action: "command",
-      command: "npx -y create-vite@latest --template react-ts --no-interactive --overwrite ."
+      command: "npx -y create-vite@latest --template react-ts --no-interactive ."
     },
     {
       action: "command",
@@ -5426,125 +5426,22 @@ var availabletemplates_default = router18;
 var import_express22 = __toESM(require("express"));
 var import_fs3 = require("fs");
 var import_path14 = __toESM(require("path"));
-var import_child_process8 = require("child_process");
-var delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-function isIdeTerminal() {
-  return !!(process.env.VSCODE_INJECTION || process.env.VSCODE_GIT_IPC_HANDLE || process.env.TERM_PROGRAM === "vscode" || process.env.ANTIGRAVITY_VERSION || process.env.COLORTERM === "truecolor" && process.env.TERM_PROGRAM);
-}
-async function writeFileWithRetry(filePath, content, retries = 5, baseDelay = 100) {
-  const inIde = isIdeTerminal();
-  if (inIde) {
-    await delay(50);
-  }
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      await import_fs3.promises.writeFile(filePath, content, {
-        encoding: "utf8",
-        flag: "w",
-        mode: 420
-      });
-      if (inIde) {
-        await delay(30);
-      }
-      return;
-    } catch (err) {
-      const isRetryable = [
-        "EBUSY",
-        // File is busy (locked by another process)
-        "ENOENT",
-        // File doesn't exist yet (race condition)
-        "EACCES",
-        // Permission denied (temporary lock)
-        "EPERM",
-        // Operation not permitted (temporary)
-        "EMFILE",
-        // Too many open files
-        "ENFILE"
-        // Too many open files in system
-      ].includes(err.code);
-      if (isRetryable && attempt < retries - 1) {
-        const jitter = Math.random() * 50;
-        const waitTime = baseDelay * Math.pow(2, attempt) + jitter;
-        console.log(`[IDE-Compat] File write retry ${attempt + 1}/${retries} for ${filePath}, waiting ${Math.round(waitTime)}ms...`);
-        await delay(waitTime);
-        continue;
-      }
-      throw err;
-    }
-  }
-}
-async function ensureDirectoryWithRetry(dirPath, retries = 3) {
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      await import_fs3.promises.mkdir(dirPath, { recursive: true });
-      return;
-    } catch (err) {
-      if (err.code === "EEXIST") {
-        return;
-      }
-      if (attempt < retries - 1) {
-        await delay(100 * (attempt + 1));
-        continue;
-      }
-      throw err;
-    }
-  }
-}
-var IDE_COMPATIBLE_SETTINGS = {
-  "files.watcherExclude": {
-    "**/node_modules/**": true,
-    "**/.git/**": true,
-    "**/dist/**": true,
-    "**/out/**": true,
-    "**/.turbo/**": true
-  },
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/dist": true,
-    "**/out": true
-  }
-};
-function deepMerge(target, source) {
-  const result = { ...target };
-  for (const key of Object.keys(source)) {
-    if (source[key] && typeof source[key] === "object" && !Array.isArray(source[key])) {
-      result[key] = deepMerge(result[key] || {}, source[key]);
-    } else {
-      result[key] = source[key];
-    }
-  }
-  return result;
-}
-async function ensureIdeCompatibleSettings(workspacePath) {
-  if (!isIdeTerminal()) {
-    return;
-  }
-  const vscodeDir = import_path14.default.join(workspacePath, ".vscode");
-  const settingsPath = import_path14.default.join(vscodeDir, "settings.json");
-  try {
-    await ensureDirectoryWithRetry(vscodeDir);
-    let existingSettings = {};
-    try {
-      const content = await import_fs3.promises.readFile(settingsPath, "utf8");
-      const jsonWithoutComments = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, "");
-      existingSettings = JSON.parse(jsonWithoutComments);
-    } catch (readErr) {
-      if (readErr.code !== "ENOENT") {
-        console.log(`[IDE-Compat] Could not read existing settings: ${readErr.message}`);
-      }
-    }
-    const mergedSettings = deepMerge(existingSettings, IDE_COMPATIBLE_SETTINGS);
-    const existingJson = JSON.stringify(existingSettings, null, 4);
-    const mergedJson = JSON.stringify(mergedSettings, null, 4);
-    if (existingJson !== mergedJson) {
-      await writeFileWithRetry(settingsPath, mergedJson);
-      console.log(`[IDE-Compat] Updated .vscode/settings.json with file watcher exclusions`);
-    }
-  } catch (err) {
-    console.log(`[IDE-Compat] Warning: Could not update IDE settings: ${err.message}`);
-  }
-}
+var import_execa = require("execa");
 var router19 = import_express22.default.Router();
+async function ensureDirectory(dirPath) {
+  try {
+    await import_fs3.promises.mkdir(dirPath, { recursive: true });
+  } catch (err) {
+    if (err.code !== "EEXIST") {
+      throw err;
+    }
+  }
+}
+async function writeFile(filePath, content) {
+  const dirName = import_path14.default.dirname(filePath);
+  await ensureDirectory(dirName);
+  await import_fs3.promises.writeFile(filePath, content, { encoding: "utf8" });
+}
 var isWindows = process.platform === "win32";
 function preprocessCommand(command, cwd) {
   let processedCommand = command;
@@ -5564,62 +5461,78 @@ function preprocessCommand(command, cwd) {
   }
   return processedCommand;
 }
-function runCommand2(command, cwd) {
-  return new Promise((resolve, reject) => {
-    var _a, _b;
-    const env = {
-      ...process.env,
-      CI: "true",
-      // Most tools detect this and skip interactive prompts
-      npm_config_yes: "true",
-      // npm/npx auto-yes
-      FORCE_COLOR: "0",
-      // Disable colors for cleaner logging
-      DEBIAN_FRONTEND: "noninteractive",
-      // For apt-get if ever used
-      TERM: "dumb",
-      // Ensure PATH includes common locations for shell executables
-      PATH: process.env.PATH || "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-    };
-    const child = (0, import_child_process8.spawn)(command, [], {
+async function runCommand2(command, cwd) {
+  try {
+    const result = await (0, import_execa.execa)(command, {
       cwd,
-      env,
       shell: true,
-      stdio: ["pipe", "pipe", "pipe"]
+      // Detach from parent's stdio to avoid IDE terminal conflicts
+      stdin: "ignore",
+      // Set non-interactive environment
+      env: {
+        ...process.env,
+        CI: "true",
+        npm_config_yes: "true",
+        FORCE_COLOR: "0",
+        DEBIAN_FRONTEND: "noninteractive"
+      },
+      // Don't throw on non-zero exit (we handle it ourselves)
+      reject: true,
+      // Kill the whole process tree on abort
+      killSignal: "SIGTERM",
+      // Timeout after 5 minutes (for npm install which can be slow)
+      timeout: 3e5
     });
-    if (child.stdin) {
-      const autoResponder = setInterval(() => {
-        var _a2;
-        try {
-          (_a2 = child.stdin) == null ? void 0 : _a2.write("y\n");
-        } catch {
-        }
-      }, 500);
-      child.on("close", () => clearInterval(autoResponder));
-      child.on("error", () => clearInterval(autoResponder));
-    }
-    let stdout = "";
-    let stderr = "";
-    (_a = child.stdout) == null ? void 0 : _a.on("data", (data) => {
-      stdout += data.toString();
-    });
-    (_b = child.stderr) == null ? void 0 : _b.on("data", (data) => {
-      stderr += data.toString();
-    });
-    child.on("error", (err) => {
-      reject(new Error(`Spawn error: ${err.message}
-stderr: ${stderr}`));
-    });
-    child.on("close", (code) => {
-      if (code === 0) {
-        resolve({ stdout, stderr });
-      } else {
-        reject(new Error(`Command exited with code ${code}
-stderr: ${stderr}
-stdout: ${stdout}`));
+    return { stdout: result.stdout || "", stderr: result.stderr || "" };
+  } catch (error) {
+    const execaError = error;
+    throw new Error(
+      `Command failed: ${command}
+Exit code: ${execaError.exitCode}
+stderr: ${execaError.stderr || "N/A"}
+stdout: ${execaError.stdout || "N/A"}`
+    );
+  }
+}
+function findTemplate(templatename) {
+  const categories = ["project", "database", "services", "demo"];
+  for (const cat of categories) {
+    const list = template_default[cat];
+    if (Array.isArray(list)) {
+      const match = list.find((t) => t.name === templatename);
+      if (match) {
+        return match;
       }
-    });
-  });
+    }
+  }
+  return null;
+}
+async function executeTemplate(template, workspacePath, onProgress) {
+  if (!template) {
+    throw new Error("Template not found");
+  }
+  const progress = onProgress || ((msg) => console.log(`[Template] ${msg}`));
+  for (const step of template.templating) {
+    if (step.action === "command" && step.command) {
+      const processedCommand = preprocessCommand(step.command, workspacePath);
+      progress(`Running: ${processedCommand}`);
+      try {
+        const result = await runCommand2(processedCommand, workspacePath);
+        if (result.stdout.trim()) {
+          const truncated = result.stdout.trim().slice(0, 200);
+          progress(`Output: ${truncated}${result.stdout.length > 200 ? "..." : ""}`);
+        }
+      } catch (cmdErr) {
+        console.error(`Command failed: ${step.command}`, cmdErr);
+        throw new Error(`Command failed: ${step.command}
+${cmdErr.message}`);
+      }
+    } else if (step.action === "file" && step.file && step.filecontent !== void 0) {
+      progress(`Creating file: ${step.file}`);
+      const filePath = import_path14.default.join(workspacePath, step.file);
+      await writeFile(filePath, step.filecontent);
+    }
+  }
 }
 router19.post("/", async (req, res) => {
   try {
@@ -5628,44 +5541,14 @@ router19.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing workspace info or template name" });
     }
     const workspacePath = workspace.path;
-    let foundTemplate = null;
     console.log("workspacePath", workspacePath);
     console.log("templatename", templatename);
-    const categories = ["project", "database", "services", "demo"];
-    for (const cat of categories) {
-      const list = template_default[cat];
-      if (Array.isArray(list)) {
-        const match = list.find((t) => t.name === templatename);
-        if (match) {
-          foundTemplate = match;
-          break;
-        }
-      }
-    }
-    if (!foundTemplate) {
+    const template = findTemplate(templatename);
+    if (!template) {
       return res.status(404).json({ error: `Template '${templatename}' not found` });
     }
     console.log(`Applying template '${templatename}' to ${workspacePath}...`);
-    await ensureIdeCompatibleSettings(workspacePath);
-    for (const step of foundTemplate.templating) {
-      if (step.action === "command" && step.command) {
-        const processedCommand = preprocessCommand(step.command, workspacePath);
-        console.log(`Executing command: ${processedCommand}`);
-        try {
-          await runCommand2(processedCommand, workspacePath);
-        } catch (cmdErr) {
-          console.error(`Command failed: ${step.command}`, cmdErr);
-          return res.status(500).json({ error: `Command failed: ${step.command}
-${cmdErr.message}` });
-        }
-      } else if (step.action === "file" && step.file && step.filecontent !== void 0) {
-        console.log(`Creating file: ${step.file}`);
-        const filePath = import_path14.default.join(workspacePath, step.file);
-        const dirName = import_path14.default.dirname(filePath);
-        await ensureDirectoryWithRetry(dirName);
-        await writeFileWithRetry(filePath, step.filecontent);
-      }
-    }
+    await executeTemplate(template, workspacePath);
     res.json({ success: true, message: "Template applied successfully" });
   } catch (error) {
     console.error("Error setting workspace template:", error);
@@ -5682,50 +5565,18 @@ function setWorkspaceTemplateSocket(io2) {
         return;
       }
       const workspacePath = workspace.path;
-      let foundTemplate = null;
-      const categories = ["project", "database", "services", "demo"];
-      for (const cat of categories) {
-        const list = template_default[cat];
-        if (Array.isArray(list)) {
-          const match = list.find((t) => t.name === templatename);
-          if (match) {
-            foundTemplate = match;
-            break;
-          }
-        }
-      }
-      if (!foundTemplate) {
+      const template = findTemplate(templatename);
+      if (!template) {
         socket.emit("template:error", { error: `Template '${templatename}' not found` });
         return;
       }
       socket.emit("template:progress", { message: `Starting template '${templatename}'...` });
       console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);
       try {
-        await ensureIdeCompatibleSettings(workspacePath);
-        for (const step of foundTemplate.templating) {
-          if (step.action === "command" && step.command) {
-            const processedCommand = preprocessCommand(step.command, workspacePath);
-            socket.emit("template:progress", { message: `Running: ${processedCommand}` });
-            console.log(`[Socket] Executing command: ${processedCommand}`);
-            try {
-              await runCommand2(processedCommand, workspacePath);
-            } catch (cmdErr) {
-              console.error(`[Socket] Command failed: ${step.command}`, cmdErr);
-              socket.emit("template:error", {
-                error: `Command failed: ${step.command}
-${cmdErr.message}`
-              });
-              return;
-            }
-          } else if (step.action === "file" && step.file && step.filecontent !== void 0) {
-            socket.emit("template:progress", { message: `Creating file: ${step.file}` });
-            console.log(`[Socket] Creating file: ${step.file}`);
-            const filePath = import_path14.default.join(workspacePath, step.file);
-            const dirName = import_path14.default.dirname(filePath);
-            await ensureDirectoryWithRetry(dirName);
-            await writeFileWithRetry(filePath, step.filecontent);
-          }
-        }
+        await executeTemplate(template, workspacePath, (message) => {
+          socket.emit("template:progress", { message });
+          console.log(`[Socket] ${message}`);
+        });
         socket.emit("template:success", { message: "Template applied successfully" });
         console.log(`[Socket] Template '${templatename}' applied successfully`);
       } catch (error) {
@@ -5740,9 +5591,9 @@ ${cmdErr.message}`
 var import_express23 = require("express");
 var import_fs_extra12 = __toESM(require("fs-extra"));
 var import_path15 = __toESM(require("path"));
-var import_child_process9 = require("child_process");
+var import_child_process8 = require("child_process");
 var import_util2 = __toESM(require("util"));
-var execAsync2 = import_util2.default.promisify(import_child_process9.exec);
+var execAsync2 = import_util2.default.promisify(import_child_process8.exec);
 var router20 = (0, import_express23.Router)();
 router20.post("/", async (req, res) => {
   try {
@@ -5821,7 +5672,7 @@ router20.post("/", async (req, res) => {
         const currentProcess = activeSession.child;
         if (currentProcess && currentProcess.pid) {
           if (process.platform === "win32") {
-            (0, import_child_process9.exec)(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
+            (0, import_child_process8.exec)(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
             });
           } else {
             try {
