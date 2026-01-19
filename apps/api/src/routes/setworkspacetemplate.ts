@@ -9,17 +9,56 @@ import { Server, Socket } from 'socket.io';
 
 const router = express.Router();
 
+const isWindows = process.platform === 'win32';
+
+/**
+ * Preprocesses a command to make it cross-platform compatible.
+ * Replaces bash-specific syntax with alternatives that work on both Windows and Unix.
+ * 
+ * @param command - The original command string
+ * @param cwd - The current working directory (used for variable substitution)
+ * @returns The preprocessed command string
+ */
+function preprocessCommand(command: string, cwd: string): string {
+    let processedCommand = command;
+    
+    // Replace $(basename $PWD) with the actual directory name
+    // This bash syntax doesn't work on Windows
+    if (processedCommand.includes('$(basename $PWD)')) {
+        const dirName = path.basename(cwd);
+        processedCommand = processedCommand.replace(/\$\(basename \$PWD\)/g, dirName);
+    }
+    
+    // Replace rm -rf cleanup commands with cross-platform alternative
+    // Pattern: rm -rf ./* ./.[!.]* 2>/dev/null || true
+    if (processedCommand.match(/rm\s+-rf\s+\.\/\*\s+\.\/\.\[!\.\]\*.*$/)) {
+        if (isWindows) {
+            // On Windows, use PowerShell to remove all files and folders
+            processedCommand = 'powershell -Command "Get-ChildItem -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"';
+        } else {
+            // Keep the original command for Unix, but ensure it's properly formatted
+            processedCommand = 'rm -rf ./* ./.[!.]* 2>/dev/null || true';
+        }
+    }
+    
+    // Replace python3 with python on Windows (Python installer on Windows uses 'python')
+    if (isWindows && processedCommand.includes('python3')) {
+        processedCommand = processedCommand.replace(/\bpython3\b/g, 'python');
+    }
+    
+    return processedCommand;
+}
+
 /**
  * Executes a command using spawn with shell mode.
  * Returns a promise that resolves when the command completes successfully,
  * or rejects with an error containing stdout/stderr on failure.
+ * 
+ * Note: We pass the command as a single string to avoid DEP0190 deprecation warning.
+ * The shell option is set to true for cross-platform compatibility.
  */
 function runCommand(command: string, cwd: string): Promise<{ stdout: string; stderr: string }> {
     return new Promise((resolve, reject) => {
-        const parts = command.split(' ');
-        const baseCMD = parts[0];
-        const args = parts.slice(1);
-
         // Set up non-interactive environment with auto-yes
         const env = {
             ...process.env,
@@ -27,10 +66,15 @@ function runCommand(command: string, cwd: string): Promise<{ stdout: string; std
             npm_config_yes: 'true',        // npm/npx auto-yes
             FORCE_COLOR: '0',              // Disable colors for cleaner logging
             DEBIAN_FRONTEND: 'noninteractive', // For apt-get if ever used
-            TERM: 'dumb'
+            TERM: 'dumb',
+            // Ensure PATH includes common locations for shell executables
+            PATH: process.env.PATH || '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
         };
 
-        const child = spawn(baseCMD, args, {
+        // Use the command directly as a string (first argument) with empty args array
+        // This avoids the DEP0190 deprecation warning about passing args with shell: true
+        // shell: true is cross-platform - uses cmd.exe on Windows, /bin/sh on Unix
+        const child = spawn(command, [], {
             cwd: cwd,
             env: env,
             shell: true,
@@ -115,9 +159,10 @@ router.post('/', async (req, res) => {
         // Process templating actions
         for (const step of foundTemplate.templating) {
             if (step.action === 'command' && step.command) {
-                console.log(`Executing command: ${step.command}`);
+                const processedCommand = preprocessCommand(step.command, workspacePath);
+                console.log(`Executing command: ${processedCommand}`);
                 try {
-                    await runCommand(step.command, workspacePath);
+                    await runCommand(processedCommand, workspacePath);
                 } catch (cmdErr: any) {
                     console.error(`Command failed: ${step.command}`, cmdErr);
                      // Decide if we want to stop or continue. Usually stopping is safer.
@@ -198,12 +243,13 @@ export function setWorkspaceTemplateSocket(io: Server) {
                 // Process templating actions
                 for (const step of foundTemplate.templating) {
                     if (step.action === 'command' && step.command) {
+                        const processedCommand = preprocessCommand(step.command, workspacePath);
                         // Send progress update before running command
-                        socket.emit('template:progress', { message: `Running: ${step.command}` });
-                        console.log(`[Socket] Executing command: ${step.command}`);
+                        socket.emit('template:progress', { message: `Running: ${processedCommand}` });
+                        console.log(`[Socket] Executing command: ${processedCommand}`);
 
                         try {
-                            await runCommand(step.command, workspacePath);
+                            await runCommand(processedCommand, workspacePath);
                         } catch (cmdErr: any) {
                             console.error(`[Socket] Command failed: ${step.command}`, cmdErr);
                             socket.emit('template:error', { 

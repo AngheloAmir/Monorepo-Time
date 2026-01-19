@@ -5428,12 +5428,28 @@ var import_fs3 = __toESM(require("fs"));
 var import_path14 = __toESM(require("path"));
 var import_child_process8 = require("child_process");
 var router19 = import_express22.default.Router();
+var isWindows = process.platform === "win32";
+function preprocessCommand(command, cwd) {
+  let processedCommand = command;
+  if (processedCommand.includes("$(basename $PWD)")) {
+    const dirName = import_path14.default.basename(cwd);
+    processedCommand = processedCommand.replace(/\$\(basename \$PWD\)/g, dirName);
+  }
+  if (processedCommand.match(/rm\s+-rf\s+\.\/\*\s+\.\/\.\[!\.\]\*.*$/)) {
+    if (isWindows) {
+      processedCommand = 'powershell -Command "Get-ChildItem -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"';
+    } else {
+      processedCommand = "rm -rf ./* ./.[!.]* 2>/dev/null || true";
+    }
+  }
+  if (isWindows && processedCommand.includes("python3")) {
+    processedCommand = processedCommand.replace(/\bpython3\b/g, "python");
+  }
+  return processedCommand;
+}
 function runCommand2(command, cwd) {
   return new Promise((resolve, reject) => {
     var _a, _b;
-    const parts = command.split(" ");
-    const baseCMD = parts[0];
-    const args = parts.slice(1);
     const env = {
       ...process.env,
       CI: "true",
@@ -5444,9 +5460,11 @@ function runCommand2(command, cwd) {
       // Disable colors for cleaner logging
       DEBIAN_FRONTEND: "noninteractive",
       // For apt-get if ever used
-      TERM: "dumb"
+      TERM: "dumb",
+      // Ensure PATH includes common locations for shell executables
+      PATH: process.env.PATH || "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
     };
-    const child = (0, import_child_process8.spawn)(baseCMD, args, {
+    const child = (0, import_child_process8.spawn)(command, [], {
       cwd,
       env,
       shell: true,
@@ -5513,9 +5531,10 @@ router19.post("/", async (req, res) => {
     console.log(`Applying template '${templatename}' to ${workspacePath}...`);
     for (const step of foundTemplate.templating) {
       if (step.action === "command" && step.command) {
-        console.log(`Executing command: ${step.command}`);
+        const processedCommand = preprocessCommand(step.command, workspacePath);
+        console.log(`Executing command: ${processedCommand}`);
         try {
-          await runCommand2(step.command, workspacePath);
+          await runCommand2(processedCommand, workspacePath);
         } catch (cmdErr) {
           console.error(`Command failed: ${step.command}`, cmdErr);
           return res.status(500).json({ error: `Command failed: ${step.command}
@@ -5568,10 +5587,11 @@ function setWorkspaceTemplateSocket(io2) {
       try {
         for (const step of foundTemplate.templating) {
           if (step.action === "command" && step.command) {
-            socket.emit("template:progress", { message: `Running: ${step.command}` });
-            console.log(`[Socket] Executing command: ${step.command}`);
+            const processedCommand = preprocessCommand(step.command, workspacePath);
+            socket.emit("template:progress", { message: `Running: ${processedCommand}` });
+            console.log(`[Socket] Executing command: ${processedCommand}`);
             try {
-              await runCommand2(step.command, workspacePath);
+              await runCommand2(processedCommand, workspacePath);
             } catch (cmdErr) {
               console.error(`[Socket] Command failed: ${step.command}`, cmdErr);
               socket.emit("template:error", {
