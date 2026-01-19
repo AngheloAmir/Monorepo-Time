@@ -3,9 +3,202 @@ import express from 'express';
 import MonorepoTemplates from 'template';
 import { WorkspaceInfo } from 'types';
 import fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
 import { Server, Socket } from 'socket.io';
+
+/**
+ * Delay helper to avoid race conditions with IDE file watchers.
+ * IDEs like VSCode and Antigravity watch files and can cause conflicts.
+ */
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Check if running inside an IDE terminal (VSCode, Antigravity, etc.).
+ * This helps us apply more aggressive conflict avoidance strategies.
+ */
+function isIdeTerminal(): boolean {
+    return !!(
+        process.env.VSCODE_INJECTION ||
+        process.env.VSCODE_GIT_IPC_HANDLE ||
+        process.env.TERM_PROGRAM === 'vscode' ||
+        process.env.ANTIGRAVITY_VERSION ||
+        process.env.COLORTERM === 'truecolor' && process.env.TERM_PROGRAM
+    );
+}
+
+/**
+ * Writes a file with retry logic to handle file locking conflicts.
+ * IDEs often lock files briefly when they detect changes, so we retry.
+ * 
+ * @param filePath - Absolute path to the file
+ * @param content - Content to write
+ * @param retries - Number of retry attempts (default: 5)
+ * @param baseDelay - Base delay in ms between retries (default: 100)
+ */
+async function writeFileWithRetry(
+    filePath: string, 
+    content: string, 
+    retries: number = 5, 
+    baseDelay: number = 100
+): Promise<void> {
+    const inIde = isIdeTerminal();
+    
+    // If running in IDE, add a small pre-write delay to let watchers settle
+    if (inIde) {
+        await delay(50);
+    }
+    
+    for (let attempt = 0; attempt < retries; attempt++) {
+        try {
+            await fsPromises.writeFile(filePath, content, { 
+                encoding: 'utf8',
+                flag: 'w',
+                mode: 0o644 
+            });
+            
+            // If in IDE, add post-write delay to let watchers process
+            if (inIde) {
+                await delay(30);
+            }
+            return;
+        } catch (err: any) {
+            const isRetryable = [
+                'EBUSY',      // File is busy (locked by another process)
+                'ENOENT',     // File doesn't exist yet (race condition)
+                'EACCES',     // Permission denied (temporary lock)
+                'EPERM',      // Operation not permitted (temporary)
+                'EMFILE',     // Too many open files
+                'ENFILE',     // Too many open files in system
+            ].includes(err.code);
+            
+            if (isRetryable && attempt < retries - 1) {
+                // Exponential backoff with jitter
+                const jitter = Math.random() * 50;
+                const waitTime = baseDelay * Math.pow(2, attempt) + jitter;
+                console.log(`[IDE-Compat] File write retry ${attempt + 1}/${retries} for ${filePath}, waiting ${Math.round(waitTime)}ms...`);
+                await delay(waitTime);
+                continue;
+            }
+            throw err;
+        }
+    }
+}
+
+/**
+ * Ensures a directory exists with retry logic for IDE compatibility.
+ * 
+ * @param dirPath - Directory path to create
+ * @param retries - Number of retry attempts
+ */
+async function ensureDirectoryWithRetry(dirPath: string, retries: number = 3): Promise<void> {
+    for (let attempt = 0; attempt < retries; attempt++) {
+        try {
+            await fsPromises.mkdir(dirPath, { recursive: true });
+            return;
+        } catch (err: any) {
+            if (err.code === 'EEXIST') {
+                return; // Directory already exists, that's fine
+            }
+            if (attempt < retries - 1) {
+                await delay(100 * (attempt + 1));
+                continue;
+            }
+            throw err;
+        }
+    }
+}
+
+/**
+ * IDE-compatible VSCode settings that reduce file watcher conflicts.
+ * These settings will be merged into the user's workspace .vscode/settings.json
+ */
+const IDE_COMPATIBLE_SETTINGS = {
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/**": true,
+        "**/dist/**": true,
+        "**/out/**": true,
+        "**/.turbo/**": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/out": true
+    }
+};
+
+/**
+ * Deep merges two objects, with source values taking precedence for conflicts.
+ * Arrays are replaced, not merged.
+ */
+function deepMerge(target: any, source: any): any {
+    const result = { ...target };
+    for (const key of Object.keys(source)) {
+        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            result[key] = deepMerge(result[key] || {}, source[key]);
+        } else {
+            result[key] = source[key];
+        }
+    }
+    return result;
+}
+
+/**
+ * Ensures IDE-compatible settings exist in the workspace's .vscode/settings.json.
+ * This allows the npm tool to work smoothly in IDE terminals like VSCode and Antigravity.
+ * 
+ * - If .vscode/settings.json doesn't exist, it creates it with recommended settings
+ * - If it exists, it merges the recommended settings (preserving user's custom settings)
+ * 
+ * @param workspacePath - The root path of the user's workspace
+ */
+async function ensureIdeCompatibleSettings(workspacePath: string): Promise<void> {
+    // Only apply if running in an IDE terminal
+    if (!isIdeTerminal()) {
+        return;
+    }
+
+    const vscodeDir = path.join(workspacePath, '.vscode');
+    const settingsPath = path.join(vscodeDir, 'settings.json');
+
+    try {
+        // Ensure .vscode directory exists
+        await ensureDirectoryWithRetry(vscodeDir);
+
+        let existingSettings: any = {};
+
+        // Try to read existing settings
+        try {
+            const content = await fsPromises.readFile(settingsPath, 'utf8');
+            // Handle potential JSON with comments (common in VSCode settings)
+            const jsonWithoutComments = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+            existingSettings = JSON.parse(jsonWithoutComments);
+        } catch (readErr: any) {
+            if (readErr.code !== 'ENOENT') {
+                // If it's not a "file not found" error, log it but continue
+                console.log(`[IDE-Compat] Could not read existing settings: ${readErr.message}`);
+            }
+            // File doesn't exist, we'll create it
+        }
+
+        // Merge existing settings with IDE-compatible settings
+        const mergedSettings = deepMerge(existingSettings, IDE_COMPATIBLE_SETTINGS);
+
+        // Only write if something changed
+        const existingJson = JSON.stringify(existingSettings, null, 4);
+        const mergedJson = JSON.stringify(mergedSettings, null, 4);
+
+        if (existingJson !== mergedJson) {
+            await writeFileWithRetry(settingsPath, mergedJson);
+            console.log(`[IDE-Compat] Updated .vscode/settings.json with file watcher exclusions`);
+        }
+    } catch (err: any) {
+        // Don't fail the template operation if this fails - it's just an optimization
+        console.log(`[IDE-Compat] Warning: Could not update IDE settings: ${err.message}`);
+    }
+}
 
 const router = express.Router();
 
@@ -156,6 +349,9 @@ router.post('/', async (req, res) => {
 
          console.log(`Applying template '${templatename}' to ${workspacePath}...`);
 
+        // Ensure IDE-compatible settings are in place (only runs when in IDE terminal)
+        await ensureIdeCompatibleSettings(workspacePath);
+
         // Process templating actions
         for (const step of foundTemplate.templating) {
             if (step.action === 'command' && step.command) {
@@ -173,12 +369,11 @@ router.post('/', async (req, res) => {
                  const filePath = path.join(workspacePath, step.file);
                  const dirName = path.dirname(filePath);
 
-                 // Ensure directory exists
-                 if (!fs.existsSync(dirName)) {
-                     fs.mkdirSync(dirName, { recursive: true });
-                 }
+                 // Ensure directory exists with retry logic for IDE compatibility
+                 await ensureDirectoryWithRetry(dirName);
 
-                 fs.writeFileSync(filePath, step.filecontent);
+                 // Write file with retry logic to handle IDE file watcher conflicts
+                 await writeFileWithRetry(filePath, step.filecontent);
             }
         }
 
@@ -240,6 +435,9 @@ export function setWorkspaceTemplateSocket(io: Server) {
             console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);
 
             try {
+                // Ensure IDE-compatible settings are in place (only runs when in IDE terminal)
+                await ensureIdeCompatibleSettings(workspacePath);
+
                 // Process templating actions
                 for (const step of foundTemplate.templating) {
                     if (step.action === 'command' && step.command) {
@@ -265,12 +463,11 @@ export function setWorkspaceTemplateSocket(io: Server) {
                         const filePath = path.join(workspacePath, step.file);
                         const dirName = path.dirname(filePath);
 
-                        // Ensure directory exists
-                        if (!fs.existsSync(dirName)) {
-                            fs.mkdirSync(dirName, { recursive: true });
-                        }
+                        // Ensure directory exists with retry logic for IDE compatibility
+                        await ensureDirectoryWithRetry(dirName);
 
-                        fs.writeFileSync(filePath, step.filecontent);
+                        // Write file with retry logic to handle IDE file watcher conflicts
+                        await writeFileWithRetry(filePath, step.filecontent);
                     }
                 }
 

@@ -3,5 +3,23 @@
         "**/.git": true,
         ".vscode": true,
         ".turbo": true
+    },
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.git/**": true,
+        "**/dist/**": true,
+        "**/out/**": true,
+        "**/.turbo/**": true,
+        "**/packages/*/dist/**": true,
+        "**/apps/*/dist/**": true
+    },
+    "typescript.tsserver.watchOptions": {
+        "watchFile": "useFsEventsOnParentDirectory",
+        "watchDirectory": "useFsEvents"
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/out": true
     }
 }
