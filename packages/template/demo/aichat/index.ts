@@ -18,11 +18,18 @@ export const AIChat: ProjectTemplate = {
         // Install dependencies
         {
             action: 'command',
-            command: 'npm install express'
+            cmd: 'npm',
+            args: ['init', '-y']
         },
         {
             action: 'command',
-            command: 'npm install -D nodemon typescript ts-node @types/node @types/express tsup'
+            cmd: 'npm',
+            args: ['install', 'express']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', 'tsup']
         },
         // Public files
         {
@@ -85,27 +92,33 @@ export const AIChat: ProjectTemplate = {
         // NPM scripts
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="nodemon --watch \'src/**/*.ts\' --exec \'ts-node\' src/index.ts"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=nodemon --watch \'src/**/*.ts\' --exec \'ts-node\' src/index.ts']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.build="tsup"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.build=tsup']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="node dist/index.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=node dist/index.js']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx -y kill-port 3500"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx -y kill-port 3500']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-comments"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-comments']
         },
         {
             action: 'command',
-            command: 'npm pkg set name="$(basename $PWD)"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'name=$(basename $PWD)']
         }
     ]
 };

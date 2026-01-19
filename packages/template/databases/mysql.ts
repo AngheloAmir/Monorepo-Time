@@ -7,7 +7,8 @@ export const MySQL: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npm install open'
+            cmd: 'npm',
+            args: ['install', 'open']
         },
         {
             action: 'file',
@@ -31,15 +32,18 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
 
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="node server.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=node server.js']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="echo \'Note: MySQL is running as a system service. Please stop it manually.\'"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=echo \'Note: MySQL is running as a system service. Please stop it manually.\'']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-database']
         }
     ]
 };

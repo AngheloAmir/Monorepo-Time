@@ -21,7 +21,8 @@
     "fs-extra": "^11.3.3",
     "open": "^11.0.0",
     "pidusage": "^4.0.1",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "tree-kill": "^1.2.2"
   },
   "keywords": [
     "monorepotime",

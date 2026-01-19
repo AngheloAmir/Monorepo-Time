@@ -633,13 +633,14 @@ var newworkspace_default = router4;
 // src/routes/interactiveTerminal.ts
 var import_express6 = require("express");
 var import_child_process3 = require("child_process");
+var import_tree_kill = __toESM(require("tree-kill"));
 var router5 = (0, import_express6.Router)();
 router5.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
 });
 var interactiveTerminal_default = router5;
 var activeTerminals = /* @__PURE__ */ new Map();
-function stopTerminalProcess(socketId) {
+async function stopTerminalProcess(socketId) {
   var _a, _b;
   const session = activeTerminals.get(socketId);
   if (session) {
@@ -650,26 +651,37 @@ function stopTerminalProcess(socketId) {
     child.removeAllListeners();
     (_a = child.stdout) == null ? void 0 : _a.removeAllListeners();
     (_b = child.stderr) == null ? void 0 : _b.removeAllListeners();
-    child.kill();
+    if (child.pid) {
+      await new Promise((resolve) => {
+        (0, import_tree_kill.default)(child.pid, "SIGKILL", (err) => {
+          if (err) {
+            console.error(`Failed to kill process tree for socket ${socketId}:`, err);
+          } else {
+            console.log(`Successfully killed process tree for socket ${socketId}`);
+          }
+          resolve();
+        });
+      });
+    }
     activeTerminals.delete(socketId);
     return true;
   }
   return false;
 }
-function stopTerminalProcessByName(workspaceName) {
+async function stopTerminalProcessByName(workspaceName) {
   for (const [socketId, session] of activeTerminals.entries()) {
     if (session.workspaceName === workspaceName) {
-      return stopTerminalProcess(socketId);
+      return await stopTerminalProcess(socketId);
     }
   }
   return false;
 }
 function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
-    socket.on("terminal:start", (data) => {
+    socket.on("terminal:start", async (data) => {
       var _a, _b;
       const { path: path19, command, workspaceName } = data;
-      stopTerminalProcess(socket.id);
+      await stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
         delete env.CI;
@@ -752,8 +764,8 @@ Process exited with code ${code}`);
         session.child.stdin.write(input);
       }
     });
-    socket.on("disconnect", () => {
-      stopTerminalProcess(socket.id);
+    socket.on("disconnect", async () => {
+      await stopTerminalProcess(socket.id);
     });
     function cleanup(socketId) {
       activeTerminals.delete(socketId);
@@ -767,7 +779,7 @@ var router6 = (0, import_express7.Router)();
 router6.post("/", async (req, res) => {
   const { socketId, workspace } = req.body;
   if (workspace && workspace.name) {
-    const stopped = stopTerminalProcessByName(workspace.name);
+    const stopped = await stopTerminalProcessByName(workspace.name);
     if (stopped) {
       res.json({ success: true, message: `Terminated process for workspace ${workspace.name}` });
     } else {
@@ -776,7 +788,7 @@ router6.post("/", async (req, res) => {
     return;
   }
   if (socketId) {
-    const stopped = stopTerminalProcess(socketId);
+    const stopped = await stopTerminalProcess(socketId);
     if (stopped) {
       res.json({ success: true, message: `Terminated process for socket ${socketId}` });
     } else {

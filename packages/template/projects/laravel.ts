@@ -7,31 +7,38 @@ export const Laravel: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'rm -rf ./* ./.[!.]* 2>/dev/null || true'
+            cmd: 'rm -rf ./* ./.[!.]*',
+            args: []
         },
         {
             action: 'command',
-            command: 'composer create-project laravel/laravel . --no-interaction --no-progress'
+            cmd: 'composer',
+            args: ['create-project', 'laravel/laravel', '.', '--no-interaction', '--no-progress']
         },
         {
             action: 'command',
-            command: 'npm pkg set name="$(basename $PWD)"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'name=$(basename $PWD)']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="php artisan serve"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=php artisan serve']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="php artisan serve"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=php artisan serve']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx -y kill-port 8000"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx -y kill-port 8000']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-brands fa-laravel"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-brands fa-laravel']
         }
     ]
 };

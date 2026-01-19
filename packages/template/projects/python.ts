@@ -17,15 +17,18 @@ export const PythonConsole: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="python3 main.py"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=python3 main.py']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="python3 main.py"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=python3 main.py']
         },
         {
             action: 'command',
-            command: "npm pkg set fontawesomeIcon=\"fa-solid fa-terminal\""
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-terminal']
         }
     ]
 };

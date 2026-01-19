@@ -37,7 +37,8 @@ export const AWSTemplate: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'mkdir -p examples/frontend examples/nodeserver'
+            cmd: 'mkdir',
+            args: ['-p', 'examples/frontend', 'examples/nodeserver']
         },
          {
             action: 'file',
@@ -51,19 +52,23 @@ export const AWSTemplate: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="node server.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=node server.js']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="node stop.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=node stop.js']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-cloud"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-cloud']
         },
         {
             action: 'command',
-            command: 'npm pkg set name="$(basename $PWD)"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'name=$(basename $PWD)']
         },
     ]
 };

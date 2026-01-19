@@ -12,19 +12,23 @@ export const PHP: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="php -S localhost:3000"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=php -S localhost:3000']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="php -S localhost:3000"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=php -S localhost:3000']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx kill-port 3000']
         },
         {
             action: 'command',
-            command: "npm pkg set fontawesomeIcon=\"fa-solid fa-server\""
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-server']
         }
     ]
 };

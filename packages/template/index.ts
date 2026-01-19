@@ -5,7 +5,8 @@ import services  from "./services";
 
 export interface ProcessTemplate {
     action:   "command" | "file";
-    command?: string;
+    cmd?:     string;
+    args?:    string[];
     file?:    string;
     filecontent?: string;
 }

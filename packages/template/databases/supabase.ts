@@ -7,24 +7,29 @@ export const Supabase: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npm install supabase --save-dev'
+            cmd: 'npm',
+            args: ['install', 'supabase', '--save-dev']
         },
         {
             action: 'command',
-            command: 'npx supabase init'
+            cmd: 'npx',
+            args: ['supabase', 'init']
         },
 
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="npx supabase start"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=npx supabase start']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx supabase stop"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx supabase stop']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-database']
         }
     ]
 };

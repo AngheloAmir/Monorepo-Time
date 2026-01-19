@@ -64,15 +64,23 @@ export const ExpressTS: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npm install express'
+            cmd: 'npm',
+            args: ['init', '-y']
         },
         {
             action: 'command',
-            command: 'npm install -D nodemon typescript ts-node @types/node @types/express'
+            cmd: 'npm',
+            args: ['install', 'express']
         },
         {
             action: 'command',
-            command: 'npm install -D tsup'
+            cmd: 'npm',
+            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['install', '-D', 'tsup']
         },
         {
             action: 'file',
@@ -101,23 +109,28 @@ export const ExpressTS: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="nodemon --watch \'src/**/*.ts\' --exec \'ts-node\' src/index.ts"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=nodemon --watch \'src/**/*.ts\' --exec \'ts-node\' src/index.ts']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.build="tsup"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.build=tsup']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="node dist/index.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=node dist/index.js']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx -y kill-port 3500"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx -y kill-port 3500']
         },
         {
             action: 'command',
-            command: "npm pkg set fontawesomeIcon=\"fa-solid fa-server\""
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-server']
         }
     ]
 };

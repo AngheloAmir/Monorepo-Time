@@ -7,27 +7,33 @@ export const N8NLocal: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npm install n8n'
+            cmd: 'npm',
+            args: ['install', 'n8n']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="npx n8n"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=npx n8n']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="npx n8n"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=npx n8n']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx kill-port 5678"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx kill-port 5678']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-robot"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-robot']
         },
         {
             action: 'command',
-            command: 'npm pkg set name="$(basename $PWD)"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'name=$(basename $PWD)']
         },
     ]
 };

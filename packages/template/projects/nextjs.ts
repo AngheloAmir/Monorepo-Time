@@ -7,23 +7,28 @@ export const NextJS: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'rm -rf ./* ./.[!.]* 2>/dev/null || true'
+            cmd: 'rm -rf ./* ./.[!.]*',
+            args: []
         },
         {
             action: 'command',
-            command: 'npx -y create-next-app@latest . --typescript --tailwind --eslint --app --yes --use-npm'
+            cmd: 'npx',
+            args: ['-y', 'create-next-app@latest', '.', '--typescript', '--tailwind', '--eslint', '--app', '--yes', '--use-npm']
         },
         {
             action: 'command',
-            command: 'npm install'
+            cmd: 'npm',
+            args: ['install']
         },
         {
             action: 'command',
-            command: 'npm pkg set name="$(basename $PWD)"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'name=$(basename $PWD)']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-globe"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-globe']
         }
     ]
 };

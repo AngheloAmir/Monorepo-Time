@@ -195,31 +195,38 @@ export const StripeTemplate: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm install stripe'
+            cmd: 'npm',
+            args: ['install', 'stripe']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="node server.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=node server.js']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="node server.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=node server.js']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.test="node test.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.test=node test.js']
         },
         {
             action: 'command',
-            command: "npm pkg set scripts.stop=\"node -e 'const fs=require(\\\"fs\\\"); try{const p=JSON.parse(fs.readFileSync(\\\".runtime.json\\\")).port; fetch(\\\"http://localhost:\\\"+p+\\\"/stop\\\").catch(e=>{})}catch(e){}'\""
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=node -e \'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}\'']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-credit-card"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-credit-card']
         },
         {
             action: 'command',
-            command: 'npm pkg set name="$(basename $PWD)"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'name=$(basename $PWD)']
         },
     ]
 };

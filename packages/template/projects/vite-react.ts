@@ -7,15 +7,23 @@ export const ViteReact: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'npx -y create-vite@latest --template react-ts --no-interactive .'
+            cmd: 'rm -rf ./* ./.[!.]*',
+            args: []
         },
         {
             action: 'command',
-            command: 'npm install'
+            cmd: 'npm',
+            args: ['create', 'vite@latest', '.', '--', '--template', 'react-ts']
         },
         {
             action: 'command',
-            command: 'npm install -D tailwindcss @tailwindcss/postcss autoprefixer'
+            cmd: 'npm',
+            args: ['install']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['install', '-D', 'tailwindcss', '@tailwindcss/postcss', 'autoprefixer']
         },
         {
             action: 'file',
@@ -29,15 +37,18 @@ export const ViteReact: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm pkg set name="$(basename $PWD)"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'name=$(basename $PWD)']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx -y kill-port 5173']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-globe"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-globe']
         }
     ]
 };

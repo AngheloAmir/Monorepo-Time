@@ -14,7 +14,8 @@ export const DotNetConsole: ProjectTemplate = {
     templating: [
         {
             action: 'command',
-            command: 'dotnet new console'
+            cmd: 'dotnet',
+            args: ['new', 'console']
         },
         {
             action: 'file',
@@ -23,15 +24,18 @@ export const DotNetConsole: ProjectTemplate = {
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.dev="dotnet run"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=dotnet run']
         },
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="dotnet run"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=dotnet run']
         },
         {
             action: 'command',
-            command: "npm pkg set fontawesomeIcon=\"fa-solid fa-terminal\""
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-terminal']
         }
     ]
 };

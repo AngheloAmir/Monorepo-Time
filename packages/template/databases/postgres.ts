@@ -168,20 +168,24 @@ process.on('SIGTERM', cleanup);`
         },
         {
             action: 'command',
-            command: 'npm install'
+            cmd: 'npm',
+            args: ['install']
         },
 
         {
             action: 'command',
-            command: 'npm pkg set scripts.start="node index.js"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=node index.js']
         },
         {
             action: 'command',
-            command: "npm pkg set scripts.stop=\"node -e 'const fs=require(\\\"fs\\\"); try{const p=JSON.parse(fs.readFileSync(\\\".runtime.json\\\")).port; fetch(\\\"http://localhost:\\\"+p+\\\"/stop\\\").catch(e=>{})}catch(e){}'\""
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=node -e \'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}\'']
         },
         {
             action: 'command',
-            command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-database']
         }
     ]
 };
