@@ -5424,9 +5424,126 @@ var availabletemplates_default = router18;
 
 // src/routes/setworkspacetemplate.ts
 var import_express22 = __toESM(require("express"));
-var import_fs3 = __toESM(require("fs"));
+var import_fs3 = require("fs");
 var import_path14 = __toESM(require("path"));
 var import_child_process8 = require("child_process");
+var delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+function isIdeTerminal() {
+  return !!(process.env.VSCODE_INJECTION || process.env.VSCODE_GIT_IPC_HANDLE || process.env.TERM_PROGRAM === "vscode" || process.env.ANTIGRAVITY_VERSION || process.env.COLORTERM === "truecolor" && process.env.TERM_PROGRAM);
+}
+async function writeFileWithRetry(filePath, content, retries = 5, baseDelay = 100) {
+  const inIde = isIdeTerminal();
+  if (inIde) {
+    await delay(50);
+  }
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      await import_fs3.promises.writeFile(filePath, content, {
+        encoding: "utf8",
+        flag: "w",
+        mode: 420
+      });
+      if (inIde) {
+        await delay(30);
+      }
+      return;
+    } catch (err) {
+      const isRetryable = [
+        "EBUSY",
+        // File is busy (locked by another process)
+        "ENOENT",
+        // File doesn't exist yet (race condition)
+        "EACCES",
+        // Permission denied (temporary lock)
+        "EPERM",
+        // Operation not permitted (temporary)
+        "EMFILE",
+        // Too many open files
+        "ENFILE"
+        // Too many open files in system
+      ].includes(err.code);
+      if (isRetryable && attempt < retries - 1) {
+        const jitter = Math.random() * 50;
+        const waitTime = baseDelay * Math.pow(2, attempt) + jitter;
+        console.log(`[IDE-Compat] File write retry ${attempt + 1}/${retries} for ${filePath}, waiting ${Math.round(waitTime)}ms...`);
+        await delay(waitTime);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+async function ensureDirectoryWithRetry(dirPath, retries = 3) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      await import_fs3.promises.mkdir(dirPath, { recursive: true });
+      return;
+    } catch (err) {
+      if (err.code === "EEXIST") {
+        return;
+      }
+      if (attempt < retries - 1) {
+        await delay(100 * (attempt + 1));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+var IDE_COMPATIBLE_SETTINGS = {
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/**": true,
+    "**/dist/**": true,
+    "**/out/**": true,
+    "**/.turbo/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/out": true
+  }
+};
+function deepMerge(target, source) {
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    if (source[key] && typeof source[key] === "object" && !Array.isArray(source[key])) {
+      result[key] = deepMerge(result[key] || {}, source[key]);
+    } else {
+      result[key] = source[key];
+    }
+  }
+  return result;
+}
+async function ensureIdeCompatibleSettings(workspacePath) {
+  if (!isIdeTerminal()) {
+    return;
+  }
+  const vscodeDir = import_path14.default.join(workspacePath, ".vscode");
+  const settingsPath = import_path14.default.join(vscodeDir, "settings.json");
+  try {
+    await ensureDirectoryWithRetry(vscodeDir);
+    let existingSettings = {};
+    try {
+      const content = await import_fs3.promises.readFile(settingsPath, "utf8");
+      const jsonWithoutComments = content.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, "");
+      existingSettings = JSON.parse(jsonWithoutComments);
+    } catch (readErr) {
+      if (readErr.code !== "ENOENT") {
+        console.log(`[IDE-Compat] Could not read existing settings: ${readErr.message}`);
+      }
+    }
+    const mergedSettings = deepMerge(existingSettings, IDE_COMPATIBLE_SETTINGS);
+    const existingJson = JSON.stringify(existingSettings, null, 4);
+    const mergedJson = JSON.stringify(mergedSettings, null, 4);
+    if (existingJson !== mergedJson) {
+      await writeFileWithRetry(settingsPath, mergedJson);
+      console.log(`[IDE-Compat] Updated .vscode/settings.json with file watcher exclusions`);
+    }
+  } catch (err) {
+    console.log(`[IDE-Compat] Warning: Could not update IDE settings: ${err.message}`);
+  }
+}
 var router19 = import_express22.default.Router();
 var isWindows = process.platform === "win32";
 function preprocessCommand(command, cwd) {
@@ -5529,6 +5646,7 @@ router19.post("/", async (req, res) => {
       return res.status(404).json({ error: `Template '${templatename}' not found` });
     }
     console.log(`Applying template '${templatename}' to ${workspacePath}...`);
+    await ensureIdeCompatibleSettings(workspacePath);
     for (const step of foundTemplate.templating) {
       if (step.action === "command" && step.command) {
         const processedCommand = preprocessCommand(step.command, workspacePath);
@@ -5544,10 +5662,8 @@ ${cmdErr.message}` });
         console.log(`Creating file: ${step.file}`);
         const filePath = import_path14.default.join(workspacePath, step.file);
         const dirName = import_path14.default.dirname(filePath);
-        if (!import_fs3.default.existsSync(dirName)) {
-          import_fs3.default.mkdirSync(dirName, { recursive: true });
-        }
-        import_fs3.default.writeFileSync(filePath, step.filecontent);
+        await ensureDirectoryWithRetry(dirName);
+        await writeFileWithRetry(filePath, step.filecontent);
       }
     }
     res.json({ success: true, message: "Template applied successfully" });
@@ -5585,6 +5701,7 @@ function setWorkspaceTemplateSocket(io2) {
       socket.emit("template:progress", { message: `Starting template '${templatename}'...` });
       console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);
       try {
+        await ensureIdeCompatibleSettings(workspacePath);
         for (const step of foundTemplate.templating) {
           if (step.action === "command" && step.command) {
             const processedCommand = preprocessCommand(step.command, workspacePath);
@@ -5605,10 +5722,8 @@ ${cmdErr.message}`
             console.log(`[Socket] Creating file: ${step.file}`);
             const filePath = import_path14.default.join(workspacePath, step.file);
             const dirName = import_path14.default.dirname(filePath);
-            if (!import_fs3.default.existsSync(dirName)) {
-              import_fs3.default.mkdirSync(dirName, { recursive: true });
-            }
-            import_fs3.default.writeFileSync(filePath, step.filecontent);
+            await ensureDirectoryWithRetry(dirName);
+            await writeFileWithRetry(filePath, step.filecontent);
           }
         }
         socket.emit("template:success", { message: "Template applied successfully" });
