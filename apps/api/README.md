@@ -6,12 +6,8 @@
 To use it instantly without installing:
 
 ```bash
-npx monorepotime
-```
-or
-```bash
 npm install -D monorepotime
-npx monorepotime
+monorepotime
 ```
 
 This will:

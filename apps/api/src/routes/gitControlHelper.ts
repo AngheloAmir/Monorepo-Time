@@ -31,7 +31,9 @@ router.get('/history', async (req: Request, res: Response) => {
         });
         res.json({ history });
     } catch (error: any) {
-        console.error("Git History Error:", error);
+        if (!error.message?.includes('not a git repository')) {
+            console.error("Git History Error:", error);
+        }
         res.status(500).json({ error: error.message });
     }
 });
@@ -41,7 +43,9 @@ router.get('/branch', async (req: Request, res: Response) => {
         const branch = await runGit('git branch --show-current');
         res.json({ branch });
     } catch (error: any) {
-        console.error("Git Branch Error:", error);
+        if (!error.message?.includes('not a git repository')) {
+            console.error("Git Branch Error:", error);
+        }
         res.status(500).json({ error: error.message });
     }
 });

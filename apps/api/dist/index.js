@@ -39,7 +39,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 var import_express24 = __toESM(require("express"));
 var import_cors = __toESM(require("cors"));
-var import_path16 = __toESM(require("path"));
+var import_path18 = __toESM(require("path"));
 
 // ../../packages/api/index.ts
 var apiRoute = {
@@ -394,10 +394,8 @@ async function handleOnRun(socket, data) {
     return socket.emit("log", "Attached to already running process...");
   const commandToRun = runas === "dev" ? workspace.devCommand : workspace.startCommand;
   if (!commandToRun) throw new Error("No command to run");
-  const baseCMD = commandToRun.split(" ")[0];
-  const args = commandToRun.split(" ").slice(1);
   socket.emit("log", import_chalk.default.green(`${data.workspace.path}: ${commandToRun}`));
-  const child = (0, import_child_process.spawn)(baseCMD, args, {
+  const child = (0, import_child_process.spawn)(commandToRun, [], {
     cwd: workspace.path,
     env: {
       ...process.env,
@@ -670,7 +668,7 @@ function interactiveTerminalSocket(io2) {
   io2.on("connection", (socket) => {
     socket.on("terminal:start", (data) => {
       var _a, _b;
-      const { path: path17, command, workspaceName } = data;
+      const { path: path19, command, workspaceName } = data;
       stopTerminalProcess(socket.id);
       try {
         const env = { ...process.env };
@@ -684,7 +682,7 @@ function interactiveTerminalSocket(io2) {
           const baseCMD = command.split(" ")[0];
           const args = command.split(" ").slice(1);
           child = (0, import_child_process3.spawn)(baseCMD, args, {
-            cwd: path17,
+            cwd: path19,
             env,
             shell: true,
             stdio: ["pipe", "pipe", "pipe"]
@@ -712,7 +710,7 @@ except Exception as e:
     sys.exit(1)
 `;
           child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
-            cwd: path17,
+            cwd: path19,
             env,
             stdio: ["pipe", "pipe", "pipe"]
           });
@@ -1324,6 +1322,7 @@ async function runGit(command) {
   return stdout.trim();
 }
 router14.get("/history", async (req, res) => {
+  var _a;
   try {
     const output = await runGit('git log -n 10 --pretty=format:"%h|%s|%ar"');
     const history = output.split("\n").filter(Boolean).map((line) => {
@@ -1336,16 +1335,21 @@ router14.get("/history", async (req, res) => {
     });
     res.json({ history });
   } catch (error) {
-    console.error("Git History Error:", error);
+    if (!((_a = error.message) == null ? void 0 : _a.includes("not a git repository"))) {
+      console.error("Git History Error:", error);
+    }
     res.status(500).json({ error: error.message });
   }
 });
 router14.get("/branch", async (req, res) => {
+  var _a;
   try {
     const branch = await runGit("git branch --show-current");
     res.json({ branch });
   } catch (error) {
-    console.error("Git Branch Error:", error);
+    if (!((_a = error.message) == null ? void 0 : _a.includes("not a git repository"))) {
+      console.error("Git Branch Error:", error);
+    }
     res.status(500).json({ error: error.message });
   }
 });
@@ -1750,7 +1754,8 @@ var MySQL = {
   templating: [
     {
       action: "command",
-      command: "npm install open"
+      cmd: "npm",
+      args: ["install", "open"]
     },
     {
       action: "file",
@@ -1773,15 +1778,18 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node server.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node server.js"]
     },
     {
       action: "command",
-      command: `npm pkg set scripts.stop="echo 'Note: MySQL is running as a system service. Please stop it manually.'"`
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=echo 'Note: MySQL is running as a system service. Please stop it manually.'"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
     }
   ]
 };
@@ -1955,19 +1963,23 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: "npm install"
+      cmd: "npm",
+      args: ["install"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node index.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
       action: "command",
-      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
     }
   ]
 };
@@ -1980,23 +1992,28 @@ var Supabase = {
   templating: [
     {
       action: "command",
-      command: "npm install supabase --save-dev"
+      cmd: "npm",
+      args: ["install", "supabase", "--save-dev"]
     },
     {
       action: "command",
-      command: "npx supabase init"
+      cmd: "npx",
+      args: ["supabase", "init"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="npx supabase start"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=npx supabase start"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx supabase stop"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx supabase stop"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
     }
   ]
 };
@@ -2133,19 +2150,23 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: "npm install"
+      cmd: "npm",
+      args: ["install"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node index.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
       action: "command",
-      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
     }
   ]
 };
@@ -2285,19 +2306,23 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: "npm install"
+      cmd: "npm",
+      args: ["install"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node index.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
       action: "command",
-      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-database"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
     }
   ]
 };
@@ -2431,23 +2456,28 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: "npm install"
+      cmd: "npm",
+      args: ["install"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node index.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
       action: "command",
-      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-magnifying-glass"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-magnifying-glass"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
 };
@@ -2599,23 +2629,28 @@ process.on('SIGTERM', cleanup);`
     },
     {
       action: "command",
-      command: "npm install"
+      cmd: "npm",
+      args: ["install"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node index.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
       action: "command",
-      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-bucket"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-bucket"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
 };
@@ -4064,11 +4099,18 @@ var AIChat = {
     // Install dependencies
     {
       action: "command",
-      command: "npm install express"
+      cmd: "npm",
+      args: ["init", "-y"]
     },
     {
       action: "command",
-      command: "npm install -D nodemon typescript ts-node @types/node @types/express tsup"
+      cmd: "npm",
+      args: ["install", "express"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "tsup"]
     },
     // Public files
     {
@@ -4131,27 +4173,33 @@ var AIChat = {
     // NPM scripts
     {
       action: "command",
-      command: `npm pkg set scripts.dev="nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"`
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.build="tsup"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.build=tsup"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node dist/index.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node dist/index.js"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx -y kill-port 3500"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx -y kill-port 3500"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-comments"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-comments"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
 };
@@ -4170,15 +4218,23 @@ var ViteReact = {
   templating: [
     {
       action: "command",
-      command: "npx -y create-vite@latest --template react-ts --no-interactive ."
+      cmd: "rm -rf ./* ./.[!.]*",
+      args: []
     },
     {
       action: "command",
-      command: "npm install"
+      cmd: "npm",
+      args: ["create", "vite@latest", ".", "--", "--template", "react-ts"]
     },
     {
       action: "command",
-      command: "npm install -D tailwindcss @tailwindcss/postcss autoprefixer"
+      cmd: "npm",
+      args: ["install"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "tailwindcss", "@tailwindcss/postcss", "autoprefixer"]
     },
     {
       action: "file",
@@ -4192,15 +4248,18 @@ var ViteReact = {
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx -y kill-port 5173"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx -y kill-port 5173"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-globe"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-globe"]
     }
   ]
 };
@@ -4213,23 +4272,28 @@ var NextJS = {
   templating: [
     {
       action: "command",
-      command: "rm -rf ./* ./.[!.]* 2>/dev/null || true"
+      cmd: "rm -rf ./* ./.[!.]*",
+      args: []
     },
     {
       action: "command",
-      command: "npx -y create-next-app@latest . --typescript --tailwind --eslint --app --yes --use-npm"
+      cmd: "npx",
+      args: ["-y", "create-next-app@latest", ".", "--typescript", "--tailwind", "--eslint", "--app", "--yes", "--use-npm"]
     },
     {
       action: "command",
-      command: "npm install"
+      cmd: "npm",
+      args: ["install"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-globe"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-globe"]
     }
   ]
 };
@@ -4296,15 +4360,23 @@ var ExpressTS = {
   templating: [
     {
       action: "command",
-      command: "npm install express"
+      cmd: "npm",
+      args: ["init", "-y"]
     },
     {
       action: "command",
-      command: "npm install -D nodemon typescript ts-node @types/node @types/express"
+      cmd: "npm",
+      args: ["install", "express"]
     },
     {
       action: "command",
-      command: "npm install -D tsup"
+      cmd: "npm",
+      args: ["install", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "tsup"]
     },
     {
       action: "file",
@@ -4333,23 +4405,28 @@ var ExpressTS = {
     },
     {
       action: "command",
-      command: `npm pkg set scripts.dev="nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"`
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.build="tsup"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.build=tsup"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node dist/index.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node dist/index.js"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx -y kill-port 3500"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx -y kill-port 3500"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-server"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-server"]
     }
   ]
 };
@@ -4367,19 +4444,23 @@ var PHP = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="php -S localhost:3000"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=php -S localhost:3000"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="php -S localhost:3000"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=php -S localhost:3000"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx kill-port 3000"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx kill-port 3000"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-server"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-server"]
     }
   ]
 };
@@ -4392,31 +4473,38 @@ var Laravel = {
   templating: [
     {
       action: "command",
-      command: "rm -rf ./* ./.[!.]* 2>/dev/null || true"
+      cmd: "rm -rf ./* ./.[!.]*",
+      args: []
     },
     {
       action: "command",
-      command: "composer create-project laravel/laravel . --no-interaction --no-progress"
+      cmd: "composer",
+      args: ["create-project", "laravel/laravel", ".", "--no-interaction", "--no-progress"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="php artisan serve"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=php artisan serve"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="php artisan serve"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=php artisan serve"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx -y kill-port 8000"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx -y kill-port 8000"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-brands fa-laravel"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-brands fa-laravel"]
     }
   ]
 };
@@ -4438,15 +4526,18 @@ var PythonConsole = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="python3 main.py"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=python3 main.py"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="python3 main.py"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=python3 main.py"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-terminal"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-terminal"]
     }
   ]
 };
@@ -4465,7 +4556,8 @@ var DotNetConsole = {
   templating: [
     {
       action: "command",
-      command: "dotnet new console"
+      cmd: "dotnet",
+      args: ["new", "console"]
     },
     {
       action: "file",
@@ -4474,15 +4566,18 @@ var DotNetConsole = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="dotnet run"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=dotnet run"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="dotnet run"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=dotnet run"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-terminal"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-terminal"]
     }
   ]
 };
@@ -4507,27 +4602,33 @@ var N8NLocal = {
   templating: [
     {
       action: "command",
-      command: "npm install n8n"
+      cmd: "npm",
+      args: ["install", "n8n"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="npx n8n"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=npx n8n"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="npx n8n"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=npx n8n"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="npx kill-port 5678"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx kill-port 5678"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-robot"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-robot"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
 };
@@ -5132,7 +5233,8 @@ var AWSTemplate = {
     },
     {
       action: "command",
-      command: "mkdir -p examples/frontend examples/nodeserver"
+      cmd: "mkdir",
+      args: ["-p", "examples/frontend", "examples/nodeserver"]
     },
     {
       action: "file",
@@ -5146,19 +5248,23 @@ var AWSTemplate = {
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="node server.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=node server.js"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.stop="node stop.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=node stop.js"]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-cloud"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-cloud"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
 };
@@ -5355,31 +5461,38 @@ var StripeTemplate = {
     },
     {
       action: "command",
-      command: "npm install stripe"
+      cmd: "npm",
+      args: ["install", "stripe"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.dev="node server.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.dev=node server.js"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.start="node server.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node server.js"]
     },
     {
       action: "command",
-      command: 'npm pkg set scripts.test="node test.js"'
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.test=node test.js"]
     },
     {
       action: "command",
-      command: `npm pkg set scripts.stop="node -e 'const fs=require(\\"fs\\"); try{const p=JSON.parse(fs.readFileSync(\\".runtime.json\\")).port; fetch(\\"http://localhost:\\"+p+\\"/stop\\").catch(e=>{})}catch(e){}'"`
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
     },
     {
       action: "command",
-      command: 'npm pkg set fontawesomeIcon="fa-solid fa-credit-card"'
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-credit-card"]
     },
     {
       action: "command",
-      command: 'npm pkg set name="$(basename $PWD)"'
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
 };
@@ -5422,12 +5535,15 @@ router18.get("/", (req, res) => {
 });
 var availabletemplates_default = router18;
 
-// src/routes/setworkspacetemplate.ts
+// src/routes/setworkspace/index.ts
 var import_express22 = __toESM(require("express"));
+
+// src/routes/setworkspace/template.ts
+var import_path16 = __toESM(require("path"));
+
+// src/routes/setworkspace/utils.ts
 var import_fs3 = require("fs");
 var import_path14 = __toESM(require("path"));
-var import_execa = require("execa");
-var router19 = import_express22.default.Router();
 async function ensureDirectory(dirPath) {
   try {
     await import_fs3.promises.mkdir(dirPath, { recursive: true });
@@ -5443,10 +5559,14 @@ async function writeFile(filePath, content) {
   await import_fs3.promises.writeFile(filePath, content, { encoding: "utf8" });
 }
 var isWindows = process.platform === "win32";
+
+// src/routes/setworkspace/command.ts
+var import_path15 = __toESM(require("path"));
+var import_execa = require("execa");
 function preprocessCommand(command, cwd) {
   let processedCommand = command;
   if (processedCommand.includes("$(basename $PWD)")) {
-    const dirName = import_path14.default.basename(cwd);
+    const dirName = import_path15.default.basename(cwd);
     processedCommand = processedCommand.replace(/\$\(basename \$PWD\)/g, dirName);
   }
   if (processedCommand.match(/rm\s+-rf\s+\.\/\*\s+\.\/\.\[!\.\]\*.*$/)) {
@@ -5461,13 +5581,17 @@ function preprocessCommand(command, cwd) {
   }
   return processedCommand;
 }
-async function runCommand2(command, cwd) {
+async function runCommand2(command, args, cwd, useShell = false) {
   try {
-    const result = await (0, import_execa.execa)(command, {
+    let cmd = command;
+    if (!useShell && process.platform === "win32" && (command === "npm" || command === "npx")) {
+      cmd = `${command}.cmd`;
+    }
+    const result = await (0, import_execa.execa)(cmd, args, {
       cwd,
-      shell: true,
       // Detach from parent's stdio to avoid IDE terminal conflicts
       stdin: "ignore",
+      shell: useShell,
       // Set non-interactive environment
       env: {
         ...process.env,
@@ -5483,17 +5607,23 @@ async function runCommand2(command, cwd) {
       // Timeout after 5 minutes (for npm install which can be slow)
       timeout: 3e5
     });
-    return { stdout: result.stdout || "", stderr: result.stderr || "" };
+    return {
+      stdout: result.stdout ?? "",
+      stderr: result.stderr ?? ""
+    };
   } catch (error) {
     const execaError = error;
     throw new Error(
-      `Command failed: ${command}
+      `Command failed: ${command} ${args.join(" ")}
+Error code: ${execaError.code || "N/A"}
 Exit code: ${execaError.exitCode}
 stderr: ${execaError.stderr || "N/A"}
 stdout: ${execaError.stdout || "N/A"}`
     );
   }
 }
+
+// src/routes/setworkspace/template.ts
 function findTemplate(templatename) {
   const categories = ["project", "database", "services", "demo"];
   for (const cat of categories) {
@@ -5511,29 +5641,47 @@ async function executeTemplate(template, workspacePath, onProgress) {
   if (!template) {
     throw new Error("Template not found");
   }
+  await ensureDirectory(workspacePath);
   const progress = onProgress || ((msg) => console.log(`[Template] ${msg}`));
   for (const step of template.templating) {
-    if (step.action === "command" && step.command) {
-      const processedCommand = preprocessCommand(step.command, workspacePath);
-      progress(`Running: ${processedCommand}`);
+    if (step.action === "command" && step.cmd) {
+      const cmd = step.cmd;
+      let args = step.args || [];
+      const rawFullCmd = args.length > 0 ? `${cmd} ${args.join(" ")}` : cmd;
+      const processedCmd = preprocessCommand(rawFullCmd, workspacePath);
+      let finalCmd = cmd;
+      let finalArgs = args;
+      let useShell = false;
+      if (processedCmd !== rawFullCmd || cmd.includes(" ") && args.length === 0) {
+        finalCmd = processedCmd;
+        finalArgs = [];
+        useShell = true;
+      } else {
+        const dirName = import_path16.default.basename(workspacePath);
+        finalArgs = finalArgs.map((arg) => arg.replace(/\$\(basename \$PWD\)/g, dirName));
+      }
+      progress(`Running: ${finalCmd} ${finalArgs.join(" ")}`);
       try {
-        const result = await runCommand2(processedCommand, workspacePath);
+        const result = await runCommand2(finalCmd, finalArgs, workspacePath, useShell);
         if (result.stdout.trim()) {
           const truncated = result.stdout.trim().slice(0, 200);
           progress(`Output: ${truncated}${result.stdout.length > 200 ? "..." : ""}`);
         }
       } catch (cmdErr) {
-        console.error(`Command failed: ${step.command}`, cmdErr);
-        throw new Error(`Command failed: ${step.command}
+        console.error(`Command failed: ${finalCmd}`, cmdErr);
+        throw new Error(`Command failed: ${finalCmd}
 ${cmdErr.message}`);
       }
     } else if (step.action === "file" && step.file && step.filecontent !== void 0) {
       progress(`Creating file: ${step.file}`);
-      const filePath = import_path14.default.join(workspacePath, step.file);
+      const filePath = import_path16.default.join(workspacePath, step.file);
       await writeFile(filePath, step.filecontent);
     }
   }
 }
+
+// src/routes/setworkspace/index.ts
+var router19 = import_express22.default.Router();
 router19.post("/", async (req, res) => {
   try {
     const { workspace, templatename } = req.body;
@@ -5555,7 +5703,7 @@ router19.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to apply template: " + error.message });
   }
 });
-var setworkspacetemplate_default = router19;
+var setworkspace_default = router19;
 function setWorkspaceTemplateSocket(io2) {
   io2.on("connection", (socket) => {
     socket.on("template:start", async (data) => {
@@ -5590,7 +5738,7 @@ function setWorkspaceTemplateSocket(io2) {
 // src/routes/stopTerminalWorkspace.ts
 var import_express23 = require("express");
 var import_fs_extra12 = __toESM(require("fs-extra"));
-var import_path15 = __toESM(require("path"));
+var import_path17 = __toESM(require("path"));
 var import_child_process8 = require("child_process");
 var import_util2 = __toESM(require("util"));
 var execAsync2 = import_util2.default.promisify(import_child_process8.exec);
@@ -5624,10 +5772,10 @@ router20.post("/", async (req, res) => {
       if (activeSession) {
         log("Stopping workspace resources...");
       }
-      if (workspacePath && await import_fs_extra12.default.pathExists(import_path15.default.join(workspacePath, ".runtime.json"))) {
+      if (workspacePath && await import_fs_extra12.default.pathExists(import_path17.default.join(workspacePath, ".runtime.json"))) {
         try {
           if (activeSession) log("Checking/Stopping Docker container...");
-          const runtimeConfig = await import_fs_extra12.default.readJSON(import_path15.default.join(workspacePath, ".runtime.json"));
+          const runtimeConfig = await import_fs_extra12.default.readJSON(import_path17.default.join(workspacePath, ".runtime.json"));
           if (runtimeConfig && runtimeConfig.containerIds && Array.isArray(runtimeConfig.containerIds)) {
             console.log(`[StopTerminal] Stopping ${runtimeConfig.containerIds.length} containers...`);
             activeSession && log(`Stopping ${runtimeConfig.containerIds.length} Docker containers...`);
@@ -5743,11 +5891,11 @@ app.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
 app.use("/" + api_default.processTree, processUsage_default);
 app.use("/" + api_default.docker, apidocker_default);
 app.use("/" + api_default.availabletemplates, availabletemplates_default);
-app.use("/" + api_default.setWorkspaceTemplate, setworkspacetemplate_default);
-var frontendPath = import_path16.default.join(__dirname, "../public");
+app.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
+var frontendPath = import_path18.default.join(__dirname, "../public");
 app.use(import_express24.default.static(frontendPath));
 app.get("*", (req, res) => {
-  res.sendFile(import_path16.default.join(frontendPath, "index.html"));
+  res.sendFile(import_path18.default.join(frontendPath, "index.html"));
 });
 var httpServer = (0, import_http.createServer)(app);
 var io = new import_socket.Server(httpServer, {

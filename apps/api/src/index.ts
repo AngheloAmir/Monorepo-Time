@@ -32,7 +32,7 @@ import initMonorepoTime  from './routes/initmonorepotime';
 import processTree       from './routes/processUsage';
 import apiDocker         from './routes/apidocker';
 import availableTemplates from './routes/availabletemplates';
-import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/setworkspacetemplate';
+import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/setworkspace';
 import stopTerminalWorkspace from './routes/stopTerminalWorkspace';
 
 const app  = express();

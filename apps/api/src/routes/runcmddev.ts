@@ -34,12 +34,13 @@ async function handleOnRun( socket: Socket, data: RequestBody) {
         return socket.emit("log", "Attached to already running process...");
     
     const commandToRun = runas === "dev" ? workspace.devCommand: workspace.startCommand;
-    if( !commandToRun ) throw new Error("No command to run");
-    const baseCMD      = commandToRun.split(" ")[0];
-    const args         = commandToRun.split(" ").slice(1);
+    if (!commandToRun) throw new Error("No command to run");
 
     socket.emit('log', chalk.green(`${data.workspace.path}: ${commandToRun}`));
-    const child        = spawn(baseCMD, args, {
+    
+    // Use command as single string with shell: true to avoid DEP0190 warning
+    // When shell: true is used, args should be empty array
+    const child = spawn(commandToRun, [], {
         cwd: workspace.path,
         env: {
             ...process.env,
