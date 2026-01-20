@@ -19,6 +19,7 @@ This will add the following script to your `package.json`:
 
 ```json
 {
+  "packageManager": "npm@<the version of you package manager>",
   "scripts": {
     "monorepotime": "monorepotime"
   }
@@ -38,4 +39,4 @@ This will:
 
 ## License
 
-ISC © [Anghelo Amir](https://github.com/AngheloAmir)
+ISC © [Anghelo Amir](https://github.com/AngheloAmir/Monorepo-Time)
