@@ -10,13 +10,10 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import net from 'net';
 import { initCommand } from './commands/init';
-import chalk from 'chalk';
 
 // Handle CLI commands
-const args = process.argv.slice(2);
+const args    = process.argv.slice(2);
 const command = args[0];
-
-// If a command is provided, handle it and exit
 if (command === 'init') {
   initCommand().then(() => {
     process.exit(0);
@@ -24,10 +21,6 @@ if (command === 'init') {
     console.error('Error:', error);
     process.exit(1);
   });
-  // Don't start the server, just exit after handling the command
-} else {
-  console.log(chalk.red('Unknown command:'), chalk.yellow(command));
-  process.exit(0);
 }
 
 //routers

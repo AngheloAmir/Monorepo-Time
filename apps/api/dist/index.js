@@ -165,6 +165,17 @@ async function initCommand() {
       return;
     }
     packageJson.scripts.monorepotime = "monorepotime";
+    if (!packageJson.packageManager) {
+      try {
+        const { stdout } = await import("execa").then((m) => m.execa("npm", ["--version"]));
+        if (stdout) {
+          packageJson.packageManager = `npm@${stdout.trim()}`;
+          console.log(import_chalk.default.green(`\u2705 Added "packageManager": "npm@${stdout.trim()}" to package.json`));
+        }
+      } catch (err) {
+        console.warn(import_chalk.default.yellow('\u26A0\uFE0F  Could not determine npm version to set "packageManager". Skipping...'));
+      }
+    }
     await import_fs_extra.default.writeJson(packageJsonPath2, packageJson, { spaces: 2 });
     console.log(import_chalk.default.green("\u2705 Successfully initialized monorepotime!"));
     console.log(import_chalk.default.cyan("\nAdded to your package.json:"));
@@ -180,9 +191,6 @@ async function initCommand() {
     process.exit(1);
   }
 }
-
-// src/index.ts
-var import_chalk4 = __toESM(require("chalk"));
 
 // src/routes/_tester.ts
 var import_express = require("express");
@@ -5968,9 +5976,6 @@ if (command === "init") {
     console.error("Error:", error);
     process.exit(1);
   });
-} else {
-  console.log(import_chalk4.default.red("Unknown command:"), import_chalk4.default.yellow(command));
-  process.exit(0);
 }
 var app = (0, import_express24.default)();
 var port2 = config_default.apiPort;

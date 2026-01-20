@@ -38,6 +38,19 @@ export async function initCommand() {
     // Add the monorepotime script
     packageJson.scripts.monorepotime = 'monorepotime';
 
+    // Check if packageManager exists, if not, add it
+    if (!packageJson.packageManager) {
+      try {
+        const { stdout } = await import('execa').then(m => m.execa('npm', ['--version']));
+        if (stdout) {
+          packageJson.packageManager = `npm@${stdout.trim()}`;
+          console.log(chalk.green(`✅ Added "packageManager": "npm@${stdout.trim()}" to package.json`));
+        }
+      } catch (err) {
+        console.warn(chalk.yellow('⚠️  Could not determine npm version to set "packageManager". Skipping...'));
+      }
+    }
+
     // Write the updated package.json back
     await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
 
