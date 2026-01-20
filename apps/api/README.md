@@ -3,18 +3,38 @@
 
 ## Installation
 
-To use it instantly without installing:
+Install as a dev dependency in your project:
 
 ```bash
 npm install -D monorepotime
-monorepotime
+```
+
+Then initialize it in your project:
+
+```bash
+npx monorepotime init
+```
+
+This will add the following script to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "monorepotime": "monorepotime"
+  }
+}
+```
+
+Now you can run it with:
+
+```bash
+npm run monorepotime
 ```
 
 This will:
 1. Start a local server.
 2. Open the dashboard in your default browser.
 3. Allow you to interact with your workspaces immediately.
-
 
 ## License
 
