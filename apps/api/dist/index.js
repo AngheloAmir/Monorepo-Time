@@ -4298,14 +4298,150 @@ var ViteReact = {
       args: ["install", "-D", "tailwindcss", "@tailwindcss/postcss", "autoprefixer"]
     },
     {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "@heroui/react", "framer-motion"]
+    },
+    {
       action: "file",
       file: "postcss.config.js",
       filecontent: 'export default {\n  plugins: {\n    "@tailwindcss/postcss": {},\n    autoprefixer: {},\n  },\n}'
     },
     {
       action: "file",
+      file: "tailwind.config.js",
+      filecontent: `import { heroui } from "@heroui/react";
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  darkMode: "class",
+  plugins: [heroui()],
+};`
+    },
+    {
+      action: "file",
       file: "src/index.css",
       filecontent: '@import "tailwindcss";'
+    },
+    {
+      action: "file",
+      file: "src/main.tsx",
+      filecontent: `import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { HeroUIProvider } from '@heroui/react'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <HeroUIProvider>
+      <App />
+    </HeroUIProvider>
+  </React.StrictMode>,
+)`
+    },
+    {
+      action: "command",
+      cmd: "rm",
+      args: ["src/App.css"]
+    },
+    {
+      action: "file",
+      file: "src/App.tsx",
+      filecontent: `import { Button, Card, CardBody, CardHeader, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
+
+function App() {
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Navbar */}
+      <Navbar className="bg-background/70 backdrop-blur-md border-b border-default-100">
+        <NavbarBrand>
+          <p className="font-bold text-inherit text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Monorepo Time</p>
+        </NavbarBrand>
+        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+          <NavbarItem>
+            <Link color="foreground" href="#">
+              Features
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive>
+            <Link href="#" aria-current="page">
+              Templates
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link color="foreground" href="#">
+              Integrations
+            </Link>
+          </NavbarItem>
+        </NavbarContent>
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <Button as={Link} color="primary" href="#" variant="flat">
+              Get Started
+            </Button>
+          </NavbarItem>
+        </NavbarContent>
+      </Navbar>
+
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center py-24 px-4 text-center">
+        <div className="max-w-4xl space-y-8">
+          <h1 className="text-6xl md:text-8xl font-bold tracking-tight">
+            Manage your <span className="text-primary">Monorepo</span> like a Pro.
+          </h1>
+          <p className="text-xl text-default-500 max-w-2xl mx-auto leading-relaxed">
+            The ultimate tool for managing workspaces, templates, and deployments. 
+            Speed up your workflow with our premium suite of tools.
+          </p>
+          <div className="flex gap-4 justify-center pt-8">
+            <Button color="primary" size="lg" variant="shadow" className="font-semibold">
+              Start Building
+            </Button>
+            <Button variant="bordered" size="lg" className="font-semibold">
+              Learn More
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-20 px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { title: "Instant Templates", desc: "Deploy React, Next.js, and API templates in seconds." },
+            { title: "Workspace Management", desc: "Control all your projects from a single unified interface." },
+            { title: "Docker Integration", desc: "Seamlessly manage containers and database services." }
+          ].map((item, index) => (
+            <Card key={index} className="py-4 border border-default-100 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
+                <h4 className="font-bold text-large">{item.title}</h4>
+              </CardHeader>
+              <CardBody className="overflow-visible py-2">
+                <p className="text-default-500">{item.desc}</p>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-10 text-center text-default-400 text-sm border-t border-default-100 mt-auto">
+        <p>\xA9 2026 Monorepo Time. All rights reserved.</p>
+      </footer>
+    </div>
+  );
+}
+
+export default App;`
     },
     {
       action: "command",
@@ -4345,6 +4481,193 @@ var NextJS = {
       action: "command",
       cmd: "npm",
       args: ["install"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "@heroui/react", "framer-motion"]
+    },
+    {
+      action: "file",
+      file: "tailwind.config.ts",
+      filecontent: `import type { Config } from "tailwindcss";
+import { heroui } from "@heroui/react";
+
+export default {
+    content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
+    ],
+    theme: {
+    extend: {
+        colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+        },
+    },
+    },
+    darkMode: "class",
+    plugins: [heroui()],
+} satisfies Config;`
+    },
+    {
+      action: "file",
+      file: "app/globals.css",
+      filecontent: `@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}`
+    },
+    {
+      action: "file",
+      file: "app/providers.tsx",
+      filecontent: `'use client'
+
+import {HeroUIProvider} from '@heroui/react'
+
+export function Providers({children}: { children: React.ReactNode }) {
+  return (
+    <HeroUIProvider>
+      {children}
+    </HeroUIProvider>
+  )
+}`
+    },
+    {
+      action: "file",
+      file: "app/layout.tsx",
+      filecontent: `import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Providers } from './providers'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'Monorepo Time - Next.js',
+  description: 'Manage your Monorepo like a Pro.',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en" className='dark'>
+      <body className={inter.className}>
+        <Providers>
+            {children}
+        </Providers>
+      </body>
+    </html>
+  )
+}`
+    },
+    {
+      action: "file",
+      file: "app/page.tsx",
+      filecontent: `import { Button, Card, CardBody, CardHeader, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Navbar */}
+      <Navbar className="bg-background/70 backdrop-blur-md border-b border-default-100">
+        <NavbarBrand>
+          <p className="font-bold text-inherit text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Monorepo Time</p>
+        </NavbarBrand>
+        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+          <NavbarItem>
+            <Link color="foreground" href="#">
+              Features
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive>
+            <Link href="#" aria-current="page">
+              Templates
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link color="foreground" href="#">
+              Integrations
+            </Link>
+          </NavbarItem>
+        </NavbarContent>
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <Button as={Link} color="primary" href="#" variant="flat">
+              Get Started
+            </Button>
+          </NavbarItem>
+        </NavbarContent>
+      </Navbar>
+
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center py-24 px-4 text-center">
+        <div className="max-w-4xl space-y-8">
+          <h1 className="text-6xl md:text-8xl font-bold tracking-tight">
+            Manage your <span className="text-primary">Monorepo</span> like a Pro.
+          </h1>
+          <p className="text-xl text-default-500 max-w-2xl mx-auto leading-relaxed">
+            The ultimate tool for managing workspaces, templates, and deployments. 
+            Speed up your workflow with current Next.js technologies.
+          </p>
+          <div className="flex gap-4 justify-center pt-8">
+            <Button color="primary" size="lg" variant="shadow" className="font-semibold">
+              Start Building
+            </Button>
+            <Button variant="bordered" size="lg" className="font-semibold">
+              Learn More
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-20 px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { title: "Next.js 14+", desc: "Leverage Server Components and the new App Router." },
+            { title: "Workspace Management", desc: "Control all your projects from a single unified interface." },
+            { title: "Docker Integration", desc: "Seamlessly manage containers and database services." }
+          ].map((item, index) => (
+            <Card key={index} className="py-4 border border-default-100 shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
+                <h4 className="font-bold text-large">{item.title}</h4>
+              </CardHeader>
+              <CardBody className="overflow-visible py-2">
+                <p className="text-default-500">{item.desc}</p>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-10 text-center text-default-400 text-sm border-t border-default-100 mt-auto">
+        <p>\xA9 2026 Monorepo Time. All rights reserved.</p>
+      </footer>
+    </div>
+  );
+}`
     },
     {
       action: "command",
@@ -4395,22 +4718,69 @@ var htmlFile = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Status</title>
+    <title>Monorepo Time - Express Service</title>
     <style>
         body {
-            background-color: black;
-            color: white;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            font-family: sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            max-width: 500px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            line-height: 1.6;
+        }
+        .status-badge {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <h1>Server running</h1>
+    <div class="container">
+        <h1>Express Service</h1>
+        <p>Your backend service is up and running successfully. Ready to handle API requests.</p>
+        <div class="status-badge">\u25CF System Online</div>
+    </div>
 </body>
 </html>
 `;
