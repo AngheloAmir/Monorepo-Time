@@ -78,6 +78,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             filecontent: file
         },
         {
+            action: 'file',
+            file: 'vercel.json',
+            filecontent: `{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}`
+        },
+        {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'name=$(basename $PWD)']
@@ -86,6 +98,28 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'scripts.stop=npx -y kill-port 5173']
+        },
+        {
+            action: 'file',
+            file: 'netlify.toml',
+            filecontent: `[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200`
+        },
+        {
+            action: 'file',
+            file: 'render.yaml',
+            filecontent: `services:
+  - type: web
+    name: vite-react-app
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist`
         },
         {
             action: 'command',

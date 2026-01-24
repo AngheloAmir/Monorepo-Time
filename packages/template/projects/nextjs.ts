@@ -102,9 +102,37 @@ export default function RootLayout({
             filecontent: app
         },
         {
+            action: 'file',
+            file: 'vercel.json',
+            filecontent: '{\n  "framework": "nextjs"\n}'
+        },
+        {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'name=$(basename $PWD)']
+        },
+        {
+            action: 'file',
+            file: 'netlify.toml',
+            filecontent: `[build]
+  command = "npm run build"
+  publish = ".next"`
+        },
+        {
+            action: 'file',
+            file: 'render.yaml',
+            filecontent: `services:
+  - type: web
+    name: nextjs-app
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start`
+        },
+        {
+            action: 'file',
+            file: 'Procfile',
+            filecontent: 'web: npm start'
         },
         {
             action: 'command',

@@ -2,11 +2,13 @@ import type { ProjectTemplate } from "..";
 
 const expressFile = `import express, { Request, Response } from "express";
 import path from "path";
+import cors from "cors";
 import helloRouter from "./routes/hello";
 
 const app = express();
-const port = 3500;
+const port = process.env.PORT || 3500;
 
+app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(express.json());
 
@@ -98,6 +100,9 @@ const htmlFile = `<!DOCTYPE html>
     <div class="container">
         <h1>Express Service</h1>
         <p>Your backend service is up and running successfully. Ready to handle API requests.</p>
+        <p style="margin-top: 1rem; padding: 1rem; background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; color: #ffc107; font-size: 0.9rem;">
+            <strong>Caution:</strong> Any origin is allowed. Update the CORS configuration in <code>src/index.ts</code> and headers in <code>vercel.json</code> to whitelist only your frontend origin to prevent unauthorized usage.
+        </p>
         <div class="status-badge">● System Online</div>
     </div>
 </body>
@@ -117,12 +122,12 @@ export const ExpressTS: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['install', 'express']
+            args: ['install', 'express', 'cors']
         },
         {
             action: 'command',
             cmd: 'npm',
-            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express']
+            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', '@types/cors']
         },
         {
             action: 'command',
@@ -173,6 +178,49 @@ export const ExpressTS: ProjectTemplate = {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'scripts.stop=npx -y kill-port 3500']
+        },
+        {
+            action: 'file',
+            file: 'vercel.json',
+            filecontent: `{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/dist/index.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
+      ]
+    }
+  ]
+}`
+        },
+        {
+            action: 'file',
+            file: 'render.yaml',
+            filecontent: `services:
+  - type: web
+    name: express-service
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000`
+        },
+        {
+            action: 'file',
+            file: 'Procfile',
+            filecontent: 'web: npm start'
         },
         {
             action: 'command',
