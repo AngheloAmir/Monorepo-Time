@@ -4284,8 +4284,8 @@ var ViteReact = {
     },
     {
       action: "command",
-      cmd: "npm",
-      args: ["create", "vite@latest", ".", "--", "--template", "react-ts"]
+      cmd: "npx",
+      args: ["-y", "create-vite@latest", ".", "--template", "react-ts"]
     },
     {
       action: "command",
@@ -5998,7 +5998,7 @@ function preprocessCommand(command2, cwd) {
   let processedCommand = command2;
   if (processedCommand.includes("$(basename $PWD)")) {
     const dirName = import_path16.default.basename(cwd);
-    processedCommand = processedCommand.replace(/\$\(basename \$PWD\)/g, dirName);
+    processedCommand = processedCommand.replace(/\$\(basename \$PWD\)/g, `"${dirName}"`);
   }
   if (processedCommand.match(/rm\s+-rf\s+\.\/\*\s+\.\/\.\[!\.\]\*.*$/)) {
     if (isWindows) {
@@ -6012,13 +6012,14 @@ function preprocessCommand(command2, cwd) {
   }
   return processedCommand;
 }
-async function runCommand2(command2, args2, cwd, useShell = false) {
+async function runCommand2(command2, args2, cwd, useShell = false, onData) {
+  var _a, _b;
   try {
     let cmd = command2;
     if (!useShell && process.platform === "win32" && (command2 === "npm" || command2 === "npx")) {
       cmd = `${command2}.cmd`;
     }
-    const result = await (0, import_execa.execa)(cmd, args2, {
+    const subprocess = (0, import_execa.execa)(cmd, args2, {
       cwd,
       // Detach from parent's stdio to avoid IDE terminal conflicts
       stdin: "ignore",
@@ -6038,9 +6039,14 @@ async function runCommand2(command2, args2, cwd, useShell = false) {
       // Timeout after 5 minutes (for npm install which can be slow)
       timeout: 3e5
     });
+    if (onData) {
+      (_a = subprocess.stdout) == null ? void 0 : _a.on("data", (chunk) => onData(stripAnsi(chunk.toString())));
+      (_b = subprocess.stderr) == null ? void 0 : _b.on("data", (chunk) => onData(stripAnsi(chunk.toString())));
+    }
+    const result = await subprocess;
     return {
-      stdout: result.stdout ?? "",
-      stderr: result.stderr ?? ""
+      stdout: stripAnsi(result.stdout ?? ""),
+      stderr: stripAnsi(result.stderr ?? "")
     };
   } catch (error) {
     const execaError = error;
@@ -6048,10 +6054,16 @@ async function runCommand2(command2, args2, cwd, useShell = false) {
       `Command failed: ${command2} ${args2.join(" ")}
 Error code: ${execaError.code || "N/A"}
 Exit code: ${execaError.exitCode}
-stderr: ${execaError.stderr || "N/A"}
-stdout: ${execaError.stdout || "N/A"}`
+stderr: ${stripAnsi(execaError.stderr || "N/A")}
+stdout: ${stripAnsi(execaError.stdout || "N/A")}`
     );
   }
+}
+function stripAnsi(input) {
+  if (typeof input !== "string") {
+    return String(input);
+  }
+  return input.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 }
 
 // src/routes/setworkspace/template.ts
@@ -6093,10 +6105,11 @@ async function executeTemplate(template, workspacePath, onProgress) {
       }
       progress(`Running: ${finalCmd} ${finalArgs.join(" ")}`);
       try {
-        const result = await runCommand2(finalCmd, finalArgs, workspacePath, useShell);
+        const result = await runCommand2(finalCmd, finalArgs, workspacePath, useShell, (data) => {
+          const trimmed = data.trim();
+          if (trimmed) progress(trimmed);
+        });
         if (result.stdout.trim()) {
-          const truncated = result.stdout.trim().slice(0, 200);
-          progress(`Output: ${truncated}${result.stdout.length > 200 ? "..." : ""}`);
         }
       } catch (cmdErr) {
         console.error(`Command failed: ${finalCmd}`, cmdErr);
@@ -6412,17 +6425,19 @@ var findAvailablePort = (startPort) => {
     });
   });
 };
-findAvailablePort(port2).then((availablePort) => {
-  httpServer.listen(availablePort, () => {
-    console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
-    if (process.env.NODE_ENV != "development") {
-      (0, import_open.default)(`http://localhost:${availablePort}`);
-    }
+if (command != "init") {
+  findAvailablePort(port2).then((availablePort) => {
+    httpServer.listen(availablePort, () => {
+      console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
+      if (process.env.NODE_ENV != "development") {
+        (0, import_open.default)(`http://localhost:${availablePort}`);
+      }
+    });
+  }).catch((err) => {
+    console.error("Failed to find an available port:", err);
+    process.exit(1);
   });
-}).catch((err) => {
-  console.error("Failed to find an available port:", err);
-  process.exit(1);
-});
+}
 var index_default = app;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

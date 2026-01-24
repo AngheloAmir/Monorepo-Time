@@ -11,7 +11,7 @@ export function preprocessCommand(command: string, cwd: string): string {
     // Replace $(basename $PWD) with the actual directory name
     if (processedCommand.includes('$(basename $PWD)')) {
         const dirName = path.basename(cwd);
-        processedCommand = processedCommand.replace(/\$\(basename \$PWD\)/g, dirName);
+        processedCommand = processedCommand.replace(/\$\(basename \$PWD\)/g, `"${dirName}"`);
     }
 
     // Handle cleanup commands
@@ -34,14 +34,14 @@ export function preprocessCommand(command: string, cwd: string): string {
 /**
  * Execute a command using execa.
  */
-export async function runCommand(command: string, args: string[], cwd: string, useShell = false): Promise<{ stdout: string; stderr: string }> {
+export async function runCommand(command: string, args: string[], cwd: string, useShell = false, onData?: (data: string) => void): Promise<{ stdout: string; stderr: string }> {
     try {
         let cmd = command;
         if (!useShell && process.platform === 'win32' && (command === 'npm' || command === 'npx')) {
             cmd = `${command}.cmd`;
         }
 
-        const result = await execa(cmd, args, {
+        const subprocess = execa(cmd, args, {
             cwd,
             // Detach from parent's stdio to avoid IDE terminal conflicts
             stdin: 'ignore',
@@ -62,9 +62,16 @@ export async function runCommand(command: string, args: string[], cwd: string, u
             timeout: 300000,
         });
 
+        if (onData) {
+            subprocess.stdout?.on('data', (chunk) => onData(stripAnsi(chunk.toString())));
+            subprocess.stderr?.on('data', (chunk) => onData(stripAnsi(chunk.toString())));
+        }
+
+        const result = await subprocess;
+
         return {
-            stdout: result.stdout ?? '',
-            stderr: result.stderr ?? '',
+            stdout: stripAnsi(result.stdout ?? ''),
+            stderr: stripAnsi(result.stderr ?? ''),
         };
 
     } catch (error) {
@@ -73,8 +80,16 @@ export async function runCommand(command: string, args: string[], cwd: string, u
             `Command failed: ${command} ${args.join(' ')}\n` +
             `Error code: ${execaError.code || 'N/A'}\n` +
             `Exit code: ${execaError.exitCode}\n` +
-            `stderr: ${execaError.stderr || 'N/A'}\n` +
-            `stdout: ${execaError.stdout || 'N/A'}`
+            `stderr: ${stripAnsi(execaError.stderr || 'N/A')}\n` +
+            `stdout: ${stripAnsi(execaError.stdout || 'N/A')}`
         );
     }
+}
+
+function stripAnsi(input: unknown): string {
+    if (typeof input !== 'string') {
+        return String(input);
+    }
+    // eslint-disable-next-line no-control-regex
+    return input.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }

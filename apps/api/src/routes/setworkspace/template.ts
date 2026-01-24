@@ -64,10 +64,13 @@ export async function executeTemplate(
             progress(`Running: ${finalCmd} ${finalArgs.join(' ')}`);
 
             try {
-                const result = await runCommand(finalCmd, finalArgs, workspacePath, useShell);
+                const result = await runCommand(finalCmd, finalArgs, workspacePath, useShell, (data) => {
+                    const trimmed = data.trim();
+                    if (trimmed) progress(trimmed);
+                });
                 if (result.stdout.trim()) {
-                    const truncated = result.stdout.trim().slice(0, 200);
-                    progress(`Output: ${truncated}${result.stdout.length > 200 ? '...' : ''}`);
+                    // Start of output already streamed via progress
+                    // progress(`Final Output: ...`);
                 }
             } catch (cmdErr: any) {
                 console.error(`Command failed: ${finalCmd}`, cmdErr);

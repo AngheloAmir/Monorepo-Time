@@ -1,5 +1,5 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
-import { io, Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
@@ -99,8 +99,10 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     };
 
     // Helper to connect socket
-    const connectSocket = (path: string, command: string = 'bash', workspaceName?: string) => {
+    const connectSocket = async (path: string, command: string = 'bash', workspaceName?: string) => {
         disconnectSocket();
+        const { io } = await import("socket.io-client");
+
         const url      = props.socketUrl;
         const socket   = io(url, {
             transports: ['websocket'],

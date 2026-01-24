@@ -12,8 +12,8 @@ export const ViteReact: ProjectTemplate = {
         },
         {
             action: 'command',
-            cmd: 'npm',
-            args: ['create', 'vite@latest', '.', '--', '--template', 'react-ts']
+            cmd: 'npx',
+            args: ['-y', 'create-vite@latest', '.', '--template', 'react-ts']
         },
         {
             action: 'command',
