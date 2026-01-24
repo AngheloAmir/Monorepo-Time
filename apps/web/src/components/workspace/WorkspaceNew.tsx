@@ -86,6 +86,7 @@ export default function WorkspaceNew() {
                 }
             }
         } catch (error) {
+            if(window.isLoadingCancelled) return;
             setError('Failed to create workspace');
         }
         loadWorkspace();
@@ -110,9 +111,10 @@ export default function WorkspaceNew() {
                         value={workspaceCopy?.name || ''}
                         onChange={(e) => {
                             if (!workspaceCopy) return;
+                            const name = e.target.value.replace(/ /g, '-');
                             setWorkspaceCopy({
                                 ...workspaceCopy,
-                                name: e.target.value.toLowerCase()
+                                name: name.toLowerCase()
                             })
                         }}
                     />

@@ -5,6 +5,12 @@ import apiRoute from 'apiroute';
 import config from 'config';
 import defaultWorkspace from './demo/defaultWorkspace';
 
+declare global {
+    interface Window {
+        isLoadingCancelled: boolean | undefined;
+    }
+}
+
 export interface WorkspaceTemplate {
     name: string;
     description: string;
@@ -335,6 +341,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
     setWorkspaceTemplate: async (workspace: WorkspaceInfo, template: string) => {
         if (config.useDemo) return;
+        window.isLoadingCancelled = false;
 
         // Import socket.io-client dynamically to avoid SSR issues
         const { io } = await import('socket.io-client');
@@ -352,11 +359,21 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             socket.on('connect', () => {
                 set({ loadMessage: `Starting template '${template}'...` });
                 socket.emit('template:start', { workspace, templatename: template });
+
+                if(window.isLoadingCancelled) {
+                    socket.disconnect();
+                    reject(new Error('Loading cancelled'));
+                }
             });
 
             socket.on('template:progress', (data: { message: string }) => {
                 set({ loadMessage: data.message });
                 console.log('[Template Progress]', data.message);
+
+                if(window.isLoadingCancelled) {
+                    socket.disconnect();
+                    reject(new Error('Loading cancelled'));
+                }
             });
 
             socket.on('template:success', (data: { message: string }) => {
