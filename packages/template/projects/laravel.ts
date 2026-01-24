@@ -38,7 +38,7 @@ export const Laravel: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-brands fa-laravel']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-laravel text-red-500']
         }
     ]
 };

@@ -177,7 +177,7 @@ export const ExpressTS: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-server']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-node text-green-500']
         }
     ]
 };

@@ -28,7 +28,7 @@ export const PythonConsole: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-terminal']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-python text-yellow-500']
         }
     ]
 };

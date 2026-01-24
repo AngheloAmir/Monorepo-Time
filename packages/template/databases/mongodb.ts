@@ -153,7 +153,7 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-database']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-leaf text-green-500']
         }
     ]
 };

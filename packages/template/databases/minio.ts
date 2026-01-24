@@ -164,7 +164,7 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-bucket']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-amazon text-blue-500']
         },
          {
             action: 'command',

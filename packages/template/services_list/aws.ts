@@ -63,7 +63,7 @@ export const AWSTemplate: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-cloud']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-aws text-orange-400']
         },
         {
             action: 'command',

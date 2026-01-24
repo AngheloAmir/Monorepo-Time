@@ -28,7 +28,7 @@ export const N8NLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-robot']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-project-diagram text-red-500']
         },
         {
             action: 'command',

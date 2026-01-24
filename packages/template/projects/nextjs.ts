@@ -109,7 +109,7 @@ export default function RootLayout({
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-globe']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-js text-white']
         }
     ]
 };

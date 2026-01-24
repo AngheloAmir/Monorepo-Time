@@ -37,8 +37,8 @@ export default function HeaderItem(props: HeaderItemProps) {
                 cursor-pointer transition-all duration-300 select-none
                 rounded-t-md
                 ${isActive 
-                    ? 'bg-gray-900 text-white' 
-                    : 'bg-[#0a0a0a] text-gray-500 hover:bg-[#121212] hover:text-gray-300'
+                    ? 'bg-gray-900/80 text-white' 
+                    : 'bg-[#0a0a0a]/80 text-gray-500 hover:bg-[#121212] hover:text-gray-300'
                 }
             `}
         >

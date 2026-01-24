@@ -91,11 +91,11 @@ var require_depd = __commonJS({
       }
       var stack = getStack();
       var site = callSiteLocation(stack[1]);
-      var file = site[0];
+      var file2 = site[0];
       function deprecate(message) {
         log.call(deprecate, message);
       }
-      deprecate._file = file;
+      deprecate._file = file2;
       deprecate._ignored = isignored(namespace);
       deprecate._namespace = namespace;
       deprecate._traced = istraced(namespace);
@@ -134,12 +134,12 @@ var require_depd = __commonJS({
       var i2 = 0;
       var seen = false;
       var stack = getStack();
-      var file = this._file;
+      var file2 = this._file;
       if (site) {
         depSite = site;
         callSite = callSiteLocation(stack[1]);
         callSite.name = depSite.name;
-        file = callSite[0];
+        file2 = callSite[0];
       } else {
         i2 = 2;
         depSite = callSiteLocation(stack[i2]);
@@ -148,10 +148,10 @@ var require_depd = __commonJS({
       for (; i2 < stack.length; i2++) {
         caller = callSiteLocation(stack[i2]);
         callFile = caller[0];
-        if (callFile === file) {
+        if (callFile === file2) {
           seen = true;
         } else if (callFile === this._file) {
-          file = this._file;
+          file2 = this._file;
         } else if (seen) {
           break;
         }
@@ -175,13 +175,13 @@ var require_depd = __commonJS({
       process.stderr.write(output + "\n", "utf8");
     }
     function callSiteLocation(callSite) {
-      var file = callSite.getFileName() || "<anonymous>";
+      var file2 = callSite.getFileName() || "<anonymous>";
       var line = callSite.getLineNumber();
       var colm = callSite.getColumnNumber();
       if (callSite.isEval()) {
-        file = callSite.getEvalOrigin() + ", " + file;
+        file2 = callSite.getEvalOrigin() + ", " + file2;
       }
-      var site = [file, line, colm];
+      var site = [file2, line, colm];
       site.callSite = callSite;
       site.name = callSite.getFunctionName();
       return site;
@@ -19198,14 +19198,14 @@ var require_init = __commonJS({
   "node_modules/express/lib/middleware/init.js"(exports2) {
     "use strict";
     var setPrototypeOf = require_setprototypeof();
-    exports2.init = function(app2) {
+    exports2.init = function(app3) {
       return function expressInit(req, res, next) {
-        if (app2.enabled("x-powered-by")) res.setHeader("X-Powered-By", "Express");
+        if (app3.enabled("x-powered-by")) res.setHeader("X-Powered-By", "Express");
         req.res = res;
         res.req = req;
         req.next = next;
-        setPrototypeOf(req, app2.request);
-        setPrototypeOf(res, app2.response);
+        setPrototypeOf(req, app3.request);
+        setPrototypeOf(res, app3.response);
         res.locals = res.locals || /* @__PURE__ */ Object.create(null);
         next();
       };
@@ -19288,8 +19288,8 @@ var require_view = __commonJS({
         var root = roots[i2];
         var loc = resolve(root, name);
         var dir = dirname(loc);
-        var file = basename(loc);
-        path27 = this.resolve(dir, file);
+        var file2 = basename(loc);
+        path27 = this.resolve(dir, file2);
       }
       return path27;
     };
@@ -19297,14 +19297,14 @@ var require_view = __commonJS({
       debug('render "%s"', this.path);
       this.engine(this.path, options, callback);
     };
-    View.prototype.resolve = function resolve2(dir, file) {
+    View.prototype.resolve = function resolve2(dir, file2) {
       var ext = this.ext;
-      var path27 = join(dir, file);
+      var path27 = join(dir, file2);
       var stat = tryStat(path27);
       if (stat && stat.isFile()) {
         return path27;
       }
-      path27 = join(dir, basename(file, ext), "index" + ext);
+      path27 = join(dir, basename(file2, ext), "index" + ext);
       stat = tryStat(path27);
       if (stat && stat.isFile()) {
         return path27;
@@ -20118,9 +20118,9 @@ var require_mime = __commonJS({
         }
       }
     };
-    Mime.prototype.load = function(file) {
-      this._loading = file;
-      var map = {}, content = fs22.readFileSync(file, "ascii"), lines = content.split(/[\r\n]+/);
+    Mime.prototype.load = function(file2) {
+      this._loading = file2;
+      var map = {}, content = fs22.readFileSync(file2, "ascii"), lines = content.split(/[\r\n]+/);
       lines.forEach(function(line) {
         var fields = line.replace(/\s*#.*|^\s*|\s*$/g, "").split(/\s+/);
         map[fields.shift()] = fields;
@@ -21880,15 +21880,15 @@ var require_application = __commonJS({
     var setPrototypeOf = require_setprototypeof();
     var hasOwnProperty = Object.prototype.hasOwnProperty;
     var slice = Array.prototype.slice;
-    var app2 = exports2 = module2.exports = {};
+    var app3 = exports2 = module2.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
-    app2.init = function init() {
+    app3.init = function init() {
       this.cache = {};
       this.engines = {};
       this.settings = {};
       this.defaultConfiguration();
     };
-    app2.defaultConfiguration = function defaultConfiguration() {
+    app3.defaultConfiguration = function defaultConfiguration() {
       var env = process.env.NODE_ENV || "development";
       this.enable("x-powered-by");
       this.set("etag", "weak");
@@ -21926,7 +21926,7 @@ var require_application = __commonJS({
         }
       });
     };
-    app2.lazyrouter = function lazyrouter() {
+    app3.lazyrouter = function lazyrouter() {
       if (!this._router) {
         this._router = new Router21({
           caseSensitive: this.enabled("case sensitive routing"),
@@ -21936,7 +21936,7 @@ var require_application = __commonJS({
         this._router.use(middleware.init(this));
       }
     };
-    app2.handle = function handle(req, res, callback) {
+    app3.handle = function handle(req, res, callback) {
       var router21 = this._router;
       var done = callback || finalhandler(req, res, {
         env: this.get("env"),
@@ -21949,7 +21949,7 @@ var require_application = __commonJS({
       }
       router21.handle(req, res, done);
     };
-    app2.use = function use(fn) {
+    app3.use = function use(fn) {
       var offset = 0;
       var path26 = "/";
       if (typeof fn !== "function") {
@@ -21987,11 +21987,11 @@ var require_application = __commonJS({
       }, this);
       return this;
     };
-    app2.route = function route3(path26) {
+    app3.route = function route3(path26) {
       this.lazyrouter();
       return this._router.route(path26);
     };
-    app2.engine = function engine(ext, fn) {
+    app3.engine = function engine(ext, fn) {
       if (typeof fn !== "function") {
         throw new Error("callback function required");
       }
@@ -21999,7 +21999,7 @@ var require_application = __commonJS({
       this.engines[extension] = fn;
       return this;
     };
-    app2.param = function param(name, fn) {
+    app3.param = function param(name, fn) {
       this.lazyrouter();
       if (Array.isArray(name)) {
         for (var i2 = 0; i2 < name.length; i2++) {
@@ -22010,7 +22010,7 @@ var require_application = __commonJS({
       this._router.param(name, fn);
       return this;
     };
-    app2.set = function set(setting, val) {
+    app3.set = function set(setting, val) {
       if (arguments.length === 1) {
         var settings = this.settings;
         while (settings && settings !== Object.prototype) {
@@ -22040,23 +22040,23 @@ var require_application = __commonJS({
       }
       return this;
     };
-    app2.path = function path26() {
+    app3.path = function path26() {
       return this.parent ? this.parent.path() + this.mountpath : "";
     };
-    app2.enabled = function enabled(setting) {
+    app3.enabled = function enabled(setting) {
       return Boolean(this.set(setting));
     };
-    app2.disabled = function disabled(setting) {
+    app3.disabled = function disabled(setting) {
       return !this.set(setting);
     };
-    app2.enable = function enable(setting) {
+    app3.enable = function enable(setting) {
       return this.set(setting, true);
     };
-    app2.disable = function disable(setting) {
+    app3.disable = function disable(setting) {
       return this.set(setting, false);
     };
     methods.forEach(function(method) {
-      app2[method] = function(path26) {
+      app3[method] = function(path26) {
         if (method === "get" && arguments.length === 1) {
           return this.set(path26);
         }
@@ -22066,7 +22066,7 @@ var require_application = __commonJS({
         return this;
       };
     });
-    app2.all = function all(path26) {
+    app3.all = function all(path26) {
       this.lazyrouter();
       var route3 = this._router.route(path26);
       var args2 = slice.call(arguments, 1);
@@ -22075,8 +22075,8 @@ var require_application = __commonJS({
       }
       return this;
     };
-    app2.del = deprecate.function(app2.delete, "app.del: Use app.delete instead");
-    app2.render = function render(name, options, callback) {
+    app3.del = deprecate.function(app3.delete, "app.del: Use app.delete instead");
+    app3.render = function render(name, options, callback) {
       var cache = this.cache;
       var done = callback;
       var engines = this.engines;
@@ -22117,7 +22117,7 @@ var require_application = __commonJS({
       }
       tryRender(view, renderOptions, done);
     };
-    app2.listen = function listen() {
+    app3.listen = function listen() {
       var server = http.createServer(this);
       return server.listen.apply(server, arguments);
     };
@@ -23185,7 +23185,7 @@ var require_response = __commonJS({
       var encoding;
       var req = this.req;
       var type;
-      var app2 = this.app;
+      var app3 = this.app;
       if (arguments.length === 2) {
         if (typeof arguments[0] !== "number" && typeof arguments[1] === "number") {
           deprecate("res.send(body, status): Use res.status(status).send(body) instead");
@@ -23232,7 +23232,7 @@ var require_response = __commonJS({
           this.set("Content-Type", setCharset(type, "utf-8"));
         }
       }
-      var etagFn = app2.get("etag fn");
+      var etagFn = app3.get("etag fn");
       var generateETag = !this.get("ETag") && typeof etagFn === "function";
       var len;
       if (chunk !== void 0) {
@@ -23284,10 +23284,10 @@ var require_response = __commonJS({
           val = arguments[1];
         }
       }
-      var app2 = this.app;
-      var escape2 = app2.get("json escape");
-      var replacer = app2.get("json replacer");
-      var spaces = app2.get("json spaces");
+      var app3 = this.app;
+      var escape2 = app3.get("json escape");
+      var replacer = app3.get("json replacer");
+      var spaces = app3.get("json spaces");
       var body = stringify(val, replacer, spaces, escape2);
       if (!this.get("Content-Type")) {
         this.set("Content-Type", "application/json");
@@ -23306,12 +23306,12 @@ var require_response = __commonJS({
           val = arguments[1];
         }
       }
-      var app2 = this.app;
-      var escape2 = app2.get("json escape");
-      var replacer = app2.get("json replacer");
-      var spaces = app2.get("json spaces");
+      var app3 = this.app;
+      var escape2 = app3.get("json escape");
+      var replacer = app3.get("json replacer");
+      var spaces = app3.get("json spaces");
       var body = stringify(val, replacer, spaces, escape2);
-      var callback = this.req.query[app2.get("jsonp callback name")];
+      var callback = this.req.query[app3.get("jsonp callback name")];
       if (!this.get("Content-Type")) {
         this.set("X-Content-Type-Options", "nosniff");
         this.set("Content-Type", "application/json");
@@ -23358,8 +23358,8 @@ var require_response = __commonJS({
         throw new TypeError("path must be absolute or specify root to res.sendFile");
       }
       var pathname = encodeURI(path27);
-      var file = send(req, pathname, opts);
-      sendfile(res2, file, opts, function(err) {
+      var file2 = send(req, pathname, opts);
+      sendfile(res2, file2, opts, function(err) {
         if (done) return done(err);
         if (err && err.code === "EISDIR") return next();
         if (err && err.code !== "ECONNABORTED" && err.syscall !== "write") {
@@ -23377,8 +23377,8 @@ var require_response = __commonJS({
         done = options;
         opts = {};
       }
-      var file = send(req, path27, opts);
-      sendfile(res2, file, opts, function(err) {
+      var file2 = send(req, path27, opts);
+      sendfile(res2, file2, opts, function(err) {
         if (done) return done(err);
         if (err && err.code === "EISDIR") return next();
         if (err && err.code !== "ECONNABORTED" && err.syscall !== "write") {
@@ -23576,7 +23576,7 @@ var require_response = __commonJS({
       return this;
     };
     res.render = function render(view, options, callback) {
-      var app2 = this.req.app;
+      var app3 = this.req.app;
       var done = callback;
       var opts = options || {};
       var req = this.req;
@@ -23590,9 +23590,9 @@ var require_response = __commonJS({
         if (err) return req.next(err);
         self.send(str);
       };
-      app2.render(view, opts, done);
+      app3.render(view, opts, done);
     };
-    function sendfile(res2, file, options, callback) {
+    function sendfile(res2, file2, options, callback) {
       var done = false;
       var streaming;
       function onaborted() {
@@ -23639,14 +23639,14 @@ var require_response = __commonJS({
       function onstream() {
         streaming = true;
       }
-      file.on("directory", ondirectory);
-      file.on("end", onend);
-      file.on("error", onerror);
-      file.on("file", onfile);
-      file.on("stream", onstream);
+      file2.on("directory", ondirectory);
+      file2.on("end", onend);
+      file2.on("error", onerror);
+      file2.on("file", onfile);
+      file2.on("stream", onstream);
       onFinished(res2, onfinish);
       if (options.headers) {
-        file.on("headers", function headers(res3) {
+        file2.on("headers", function headers(res3) {
           var obj = options.headers;
           var keys = Object.keys(obj);
           for (var i2 = 0; i2 < keys.length; i2++) {
@@ -23655,7 +23655,7 @@ var require_response = __commonJS({
           }
         });
       }
-      file.pipe(res2);
+      file2.pipe(res2);
     }
     function stringify(value, replacer, spaces, escape2) {
       var json = replacer || spaces ? JSON.stringify(value, replacer, spaces) : JSON.stringify(value);
@@ -23798,19 +23798,19 @@ var require_express = __commonJS({
     var res = require_response();
     exports2 = module2.exports = createApplication;
     function createApplication() {
-      var app2 = function(req2, res2, next) {
-        app2.handle(req2, res2, next);
+      var app3 = function(req2, res2, next) {
+        app3.handle(req2, res2, next);
       };
-      mixin2(app2, EventEmitter2.prototype, false);
-      mixin2(app2, proto, false);
-      app2.request = Object.create(req, {
-        app: { configurable: true, enumerable: true, writable: true, value: app2 }
+      mixin2(app3, EventEmitter2.prototype, false);
+      mixin2(app3, proto, false);
+      app3.request = Object.create(req, {
+        app: { configurable: true, enumerable: true, writable: true, value: app3 }
       });
-      app2.response = Object.create(res, {
-        app: { configurable: true, enumerable: true, writable: true, value: app2 }
+      app3.response = Object.create(res, {
+        app: { configurable: true, enumerable: true, writable: true, value: app3 }
       });
-      app2.init();
-      return app2;
+      app3.init();
+      return app3;
     }
     exports2.application = proto;
     exports2.request = req;
@@ -31731,9 +31731,9 @@ var require_userver = __commonJS({
        * @param app
        * @param options
        */
-      attach(app2, options = {}) {
+      attach(app3, options = {}) {
         const path26 = this._computePath(options);
-        app2.any(path26, this.handleRequest.bind(this)).ws(path26, {
+        app3.any(path26, this.handleRequest.bind(this)).ws(path26, {
           compression: options.compression,
           idleTimeout: options.idleTimeout,
           maxBackpressure: options.maxBackpressure,
@@ -35899,7 +35899,7 @@ var require_uws = __commonJS({
     var debug = (0, debug_1.default)("socket.io:adapter-uws");
     var SEPARATOR = "";
     var { addAll, del, broadcast } = socket_io_adapter_1.Adapter.prototype;
-    function patchAdapter(app2) {
+    function patchAdapter(app3) {
       socket_io_adapter_1.Adapter.prototype.addAll = function(id, rooms) {
         const isNew = !this.sids.has(id);
         addAll.call(this, id, rooms);
@@ -35949,7 +35949,7 @@ var require_uws = __commonJS({
         debug("fast publish to %s", topic);
         encodedPackets.forEach((encodedPacket) => {
           const isBinary = typeof encodedPacket !== "string";
-          app2.publish(topic, isBinary ? encodedPacket : "4" + encodedPacket, isBinary);
+          app3.publish(topic, isBinary ? encodedPacket : "4" + encodedPacket, isBinary);
         });
         this.apply(opts, (socket) => {
           if (socket.conn.transport.name !== "websocket") {
@@ -36310,15 +36310,15 @@ var require_dist2 = __commonJS({
        * @param app
        * @param opts
        */
-      attachApp(app2, opts = {}) {
+      attachApp(app3, opts = {}) {
         Object.assign(opts, this.opts);
         opts.path = opts.path || this._path;
         debug("creating uWebSockets.js-based engine with opts %j", opts);
         const engine = new engine_io_1.uServer(opts);
-        engine.attach(app2, opts);
+        engine.attach(app3, opts);
         this.bind(engine);
         if (this._serveClient) {
-          app2.get(`${this._path}/*`, (res, req) => {
+          app3.get(`${this._path}/*`, (res, req) => {
             if (!this.clientPathRegex.test(req.getUrl())) {
               req.setYield(true);
               return;
@@ -36345,7 +36345,7 @@ var require_dist2 = __commonJS({
             (0, uws_1.serveFile)(res, filepath);
           });
         }
-        (0, uws_1.patchAdapter)(app2);
+        (0, uws_1.patchAdapter)(app3);
       }
       /**
        * Initialize engine
@@ -37904,7 +37904,7 @@ var require_stat = __commonJS({
     var path26 = require("path");
     var u2 = require_universalify().fromPromise;
     function getStats2(src, dest, opts) {
-      const statFunc = opts.dereference ? (file) => fs22.stat(file, { bigint: true }) : (file) => fs22.lstat(file, { bigint: true });
+      const statFunc = opts.dereference ? (file2) => fs22.stat(file2, { bigint: true }) : (file2) => fs22.lstat(file2, { bigint: true });
       return Promise.all([
         statFunc(src),
         statFunc(dest).catch((err) => {
@@ -37915,7 +37915,7 @@ var require_stat = __commonJS({
     }
     function getStatsSync(src, dest, opts) {
       let destStat;
-      const statFunc = opts.dereference ? (file) => fs22.statSync(file, { bigint: true }) : (file) => fs22.lstatSync(file, { bigint: true });
+      const statFunc = opts.dereference ? (file2) => fs22.statSync(file2, { bigint: true }) : (file2) => fs22.lstatSync(file2, { bigint: true });
       const srcStat = statFunc(src);
       try {
         destStat = statFunc(dest);
@@ -38398,40 +38398,40 @@ var require_file = __commonJS({
     var path26 = require("path");
     var fs22 = require_fs();
     var mkdir = require_mkdirs();
-    async function createFile(file) {
+    async function createFile(file2) {
       let stats;
       try {
-        stats = await fs22.stat(file);
+        stats = await fs22.stat(file2);
       } catch {
       }
       if (stats && stats.isFile()) return;
-      const dir = path26.dirname(file);
+      const dir = path26.dirname(file2);
       let dirStats = null;
       try {
         dirStats = await fs22.stat(dir);
       } catch (err) {
         if (err.code === "ENOENT") {
           await mkdir.mkdirs(dir);
-          await fs22.writeFile(file, "");
+          await fs22.writeFile(file2, "");
           return;
         } else {
           throw err;
         }
       }
       if (dirStats.isDirectory()) {
-        await fs22.writeFile(file, "");
+        await fs22.writeFile(file2, "");
       } else {
         await fs22.readdir(dir);
       }
     }
-    function createFileSync(file) {
+    function createFileSync(file2) {
       let stats;
       try {
-        stats = fs22.statSync(file);
+        stats = fs22.statSync(file2);
       } catch {
       }
       if (stats && stats.isFile()) return;
-      const dir = path26.dirname(file);
+      const dir = path26.dirname(file2);
       try {
         if (!fs22.statSync(dir).isDirectory()) {
           fs22.readdirSync(dir);
@@ -38440,7 +38440,7 @@ var require_file = __commonJS({
         if (err && err.code === "ENOENT") mkdir.mkdirsSync(dir);
         else throw err;
       }
-      fs22.writeFileSync(file, "");
+      fs22.writeFileSync(file2, "");
     }
     module2.exports = {
       createFile: u2(createFile),
@@ -38729,20 +38729,20 @@ var require_jsonfile = __commonJS({
     }
     var universalify = require_universalify();
     var { stringify, stripBom } = require_utils4();
-    async function _readFile(file, options = {}) {
+    async function _readFile(file2, options = {}) {
       if (typeof options === "string") {
         options = { encoding: options };
       }
       const fs22 = options.fs || _fs;
       const shouldThrow = "throws" in options ? options.throws : true;
-      let data = await universalify.fromCallback(fs22.readFile)(file, options);
+      let data = await universalify.fromCallback(fs22.readFile)(file2, options);
       data = stripBom(data);
       let obj;
       try {
         obj = JSON.parse(data, options ? options.reviver : null);
       } catch (err) {
         if (shouldThrow) {
-          err.message = `${file}: ${err.message}`;
+          err.message = `${file2}: ${err.message}`;
           throw err;
         } else {
           return null;
@@ -38751,35 +38751,35 @@ var require_jsonfile = __commonJS({
       return obj;
     }
     var readFile = universalify.fromPromise(_readFile);
-    function readFileSync3(file, options = {}) {
+    function readFileSync3(file2, options = {}) {
       if (typeof options === "string") {
         options = { encoding: options };
       }
       const fs22 = options.fs || _fs;
       const shouldThrow = "throws" in options ? options.throws : true;
       try {
-        let content = fs22.readFileSync(file, options);
+        let content = fs22.readFileSync(file2, options);
         content = stripBom(content);
         return JSON.parse(content, options.reviver);
       } catch (err) {
         if (shouldThrow) {
-          err.message = `${file}: ${err.message}`;
+          err.message = `${file2}: ${err.message}`;
           throw err;
         } else {
           return null;
         }
       }
     }
-    async function _writeFile(file, obj, options = {}) {
+    async function _writeFile(file2, obj, options = {}) {
       const fs22 = options.fs || _fs;
       const str = stringify(obj, options);
-      await universalify.fromCallback(fs22.writeFile)(file, str, options);
+      await universalify.fromCallback(fs22.writeFile)(file2, str, options);
     }
     var writeFile2 = universalify.fromPromise(_writeFile);
-    function writeFileSync2(file, obj, options = {}) {
+    function writeFileSync2(file2, obj, options = {}) {
       const fs22 = options.fs || _fs;
       const str = stringify(obj, options);
-      return fs22.writeFileSync(file, str, options);
+      return fs22.writeFileSync(file2, str, options);
     }
     module2.exports = {
       readFile,
@@ -38814,19 +38814,19 @@ var require_output_file = __commonJS({
     var path26 = require("path");
     var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
-    async function outputFile(file, data, encoding = "utf-8") {
-      const dir = path26.dirname(file);
+    async function outputFile(file2, data, encoding = "utf-8") {
+      const dir = path26.dirname(file2);
       if (!await pathExists(dir)) {
         await mkdir.mkdirs(dir);
       }
-      return fs22.writeFile(file, data, encoding);
+      return fs22.writeFile(file2, data, encoding);
     }
-    function outputFileSync(file, ...args2) {
-      const dir = path26.dirname(file);
+    function outputFileSync(file2, ...args2) {
+      const dir = path26.dirname(file2);
       if (!fs22.existsSync(dir)) {
         mkdir.mkdirsSync(dir);
       }
-      fs22.writeFileSync(file, ...args2);
+      fs22.writeFileSync(file2, ...args2);
     }
     module2.exports = {
       outputFile: u2(outputFile),
@@ -38841,9 +38841,9 @@ var require_output_json = __commonJS({
     "use strict";
     var { stringify } = require_utils4();
     var { outputFile } = require_output_file();
-    async function outputJson(file, data, options = {}) {
+    async function outputJson(file2, data, options = {}) {
       const str = stringify(data, options);
-      await outputFile(file, str, options);
+      await outputFile(file2, str, options);
     }
     module2.exports = outputJson;
   }
@@ -38855,9 +38855,9 @@ var require_output_json_sync = __commonJS({
     "use strict";
     var { stringify } = require_utils4();
     var { outputFileSync } = require_output_file();
-    function outputJsonSync(file, data, options) {
+    function outputJsonSync(file2, data, options) {
       const str = stringify(data, options);
-      outputFileSync(file, str, options);
+      outputFileSync(file2, str, options);
     }
     module2.exports = outputJsonSync;
   }
@@ -40474,16 +40474,16 @@ var init_file_url = __esm({
   "../../node_modules/execa/lib/arguments/file-url.js"() {
     "use strict";
     import_node_url2 = require("url");
-    safeNormalizeFileUrl = (file, name) => {
-      const fileString = normalizeFileUrl(normalizeDenoExecPath(file));
+    safeNormalizeFileUrl = (file2, name) => {
+      const fileString = normalizeFileUrl(normalizeDenoExecPath(file2));
       if (typeof fileString !== "string") {
         throw new TypeError(`${name} must be a string or a file URL: ${fileString}.`);
       }
       return fileString;
     };
-    normalizeDenoExecPath = (file) => isDenoExecPath(file) ? file.toString() : file;
-    isDenoExecPath = (file) => typeof file !== "string" && file && Object.getPrototypeOf(file) === String.prototype;
-    normalizeFileUrl = (file) => file instanceof URL ? (0, import_node_url2.fileURLToPath)(file) : file;
+    normalizeDenoExecPath = (file2) => isDenoExecPath(file2) ? file2.toString() : file2;
+    isDenoExecPath = (file2) => typeof file2 !== "string" && file2 && Object.getPrototypeOf(file2) === String.prototype;
+    normalizeFileUrl = (file2) => file2 instanceof URL ? (0, import_node_url2.fileURLToPath)(file2) : file2;
   }
 });
 
@@ -40592,8 +40592,8 @@ var init_template = __esm({
       if (tokens.length === 0) {
         throw new TypeError("Template script must not be empty");
       }
-      const [file, ...commandArguments] = tokens;
-      return [file, commandArguments, {}];
+      const [file2, ...commandArguments] = tokens;
+      return [file2, commandArguments, {}];
     };
     parseTemplate = ({ templates: templates5, expressions, tokens, index, template }) => {
       if (template === void 0) {
@@ -43344,7 +43344,7 @@ var init_node2 = __esm({
       }
       return { options: { ...options, node: true } };
     };
-    handleNodeOption = (file, commandArguments, {
+    handleNodeOption = (file2, commandArguments, {
       node: shouldHandleNode = false,
       nodePath = import_node_process13.execPath,
       nodeOptions = import_node_process13.execArgv.filter((nodeOption) => !nodeOption.startsWith("--inspect")),
@@ -43364,14 +43364,14 @@ var init_node2 = __esm({
         cwd
       };
       if (!shouldHandleNode) {
-        return [file, commandArguments, newOptions];
+        return [file2, commandArguments, newOptions];
       }
-      if (import_node_path4.default.basename(file, ".exe") === "node") {
+      if (import_node_path4.default.basename(file2, ".exe") === "node") {
         throw new TypeError('When the "node" option is true, the first argument does not need to be "node".');
       }
       return [
         resolvedNodePath,
-        [...nodeOptions, file, ...commandArguments],
+        [...nodeOptions, file2, ...commandArguments],
         { ipc: true, ...newOptions, shell: false }
       ];
     };
@@ -43534,7 +43534,7 @@ var init_options = __esm({
     normalizeOptions = (filePath, rawArguments, rawOptions) => {
       rawOptions.cwd = normalizeCwd(rawOptions.cwd);
       const [processedFile, processedArguments, processedOptions] = handleNodeOption(filePath, rawArguments, rawOptions);
-      const { command: file, args: commandArguments, options: initialOptions } = import_cross_spawn.default._parse(processedFile, processedArguments, processedOptions);
+      const { command: file2, args: commandArguments, options: initialOptions } = import_cross_spawn.default._parse(processedFile, processedArguments, processedOptions);
       const fdOptions = normalizeFdSpecificOptions(initialOptions);
       const options = addDefaultOptions(fdOptions);
       validateTimeout(options);
@@ -43547,10 +43547,10 @@ var init_options = __esm({
       options.killSignal = normalizeKillSignal(options.killSignal);
       options.forceKillAfterDelay = normalizeForceKillAfterDelay(options.forceKillAfterDelay);
       options.lines = options.lines.map((lines, fdNumber) => lines && !BINARY_ENCODINGS.has(options.encoding) && options.buffer[fdNumber]);
-      if (import_node_process15.default.platform === "win32" && import_node_path6.default.basename(file, ".exe") === "cmd") {
+      if (import_node_process15.default.platform === "win32" && import_node_path6.default.basename(file2, ".exe") === "cmd") {
         commandArguments.unshift("/q");
       }
-      return { file, commandArguments, options };
+      return { file: file2, commandArguments, options };
     };
     addDefaultOptions = ({
       extendEnv = true,
@@ -43608,7 +43608,7 @@ var concatenateShell;
 var init_shell = __esm({
   "../../node_modules/execa/lib/arguments/shell.js"() {
     "use strict";
-    concatenateShell = (file, commandArguments, options) => options.shell && commandArguments.length > 0 ? [[file, ...commandArguments].join(" "), [], options] : [file, commandArguments, options];
+    concatenateShell = (file2, commandArguments, options) => options.shell && commandArguments.length > 0 ? [[file2, ...commandArguments].join(" "), [], options] : [file2, commandArguments, options];
   }
 });
 
@@ -44796,7 +44796,7 @@ var init_type = __esm({
     isRegularUrl = (value) => isUrl(value) && value.protocol !== "file:";
     isFilePathObject = (value) => isPlainObject(value) && Object.keys(value).length > 0 && Object.keys(value).every((key) => FILE_PATH_KEYS.has(key)) && isFilePathString(value.file);
     FILE_PATH_KEYS = /* @__PURE__ */ new Set(["file", "append"]);
-    isFilePathString = (file) => typeof file === "string";
+    isFilePathString = (file2) => typeof file2 === "string";
     isUnknownStdioString = (type, value) => type === "native" && typeof value === "string" && !KNOWN_STDIO_STRINGS.has(value);
     KNOWN_STDIO_STRINGS = /* @__PURE__ */ new Set(["ipc", "ignore", "inherit", "overlapped", "pipe"]);
     isReadableStream2 = (value) => Object.prototype.toString.call(value) === "[object ReadableStream]";
@@ -45489,7 +45489,7 @@ var init_handle_sync = __esm({
       input: {
         ...addProperties,
         fileUrl: ({ value }) => ({ contents: [bufferToUint8Array((0, import_node_fs6.readFileSync)(value))] }),
-        filePath: ({ value: { file } }) => ({ contents: [bufferToUint8Array((0, import_node_fs6.readFileSync)(file))] }),
+        filePath: ({ value: { file: file2 } }) => ({ contents: [bufferToUint8Array((0, import_node_fs6.readFileSync)(file2))] }),
         fileNumber: forbiddenIfSync,
         iterable: ({ value }) => ({ contents: [...value] }),
         string: ({ value }) => ({ contents: [value] }),
@@ -45498,7 +45498,7 @@ var init_handle_sync = __esm({
       output: {
         ...addProperties,
         fileUrl: ({ value }) => ({ path: value }),
-        filePath: ({ value: { file, append } }) => ({ path: file, append }),
+        filePath: ({ value: { file: file2, append } }) => ({ path: file2, append }),
         fileNumber: ({ value }) => ({ path: value }),
         iterable: forbiddenIfSync,
         string: forbiddenIfSync,
@@ -46167,9 +46167,9 @@ var init_main_sync = __esm({
     init_all_sync();
     init_exit_sync();
     execaCoreSync = (rawFile, rawArguments, rawOptions) => {
-      const { file, commandArguments, command: command2, escapedCommand, startTime, verboseInfo, options, fileDescriptors } = handleSyncArguments(rawFile, rawArguments, rawOptions);
+      const { file: file2, commandArguments, command: command2, escapedCommand, startTime, verboseInfo, options, fileDescriptors } = handleSyncArguments(rawFile, rawArguments, rawOptions);
       const result = spawnSubprocessSync({
-        file,
+        file: file2,
         commandArguments,
         options,
         command: command2,
@@ -46183,11 +46183,11 @@ var init_main_sync = __esm({
     handleSyncArguments = (rawFile, rawArguments, rawOptions) => {
       const { command: command2, escapedCommand, startTime, verboseInfo } = handleCommand(rawFile, rawArguments, rawOptions);
       const syncOptions = normalizeSyncOptions(rawOptions);
-      const { file, commandArguments, options } = normalizeOptions(rawFile, rawArguments, syncOptions);
+      const { file: file2, commandArguments, options } = normalizeOptions(rawFile, rawArguments, syncOptions);
       validateSyncOptions(options);
       const fileDescriptors = handleStdioSync(options, verboseInfo);
       return {
-        file,
+        file: file2,
         commandArguments,
         command: command2,
         escapedCommand,
@@ -46215,9 +46215,9 @@ var init_main_sync = __esm({
     throwInvalidSyncOption = (value) => {
       throw new TypeError(`The "${value}" option cannot be used with synchronous methods.`);
     };
-    spawnSubprocessSync = ({ file, commandArguments, options, command: command2, escapedCommand, verboseInfo, fileDescriptors, startTime }) => {
+    spawnSubprocessSync = ({ file: file2, commandArguments, options, command: command2, escapedCommand, verboseInfo, fileDescriptors, startTime }) => {
       const syncResult = runSubprocessSync({
-        file,
+        file: file2,
         commandArguments,
         options,
         command: command2,
@@ -46252,11 +46252,11 @@ var init_main_sync = __esm({
         startTime
       });
     };
-    runSubprocessSync = ({ file, commandArguments, options, command: command2, escapedCommand, fileDescriptors, startTime }) => {
+    runSubprocessSync = ({ file: file2, commandArguments, options, command: command2, escapedCommand, fileDescriptors, startTime }) => {
       try {
         addInputOptionsSync(fileDescriptors, options);
         const normalizedOptions = normalizeSpawnSyncOptions(options);
-        return (0, import_node_child_process10.spawnSync)(...concatenateShell(file, commandArguments, normalizedOptions));
+        return (0, import_node_child_process10.spawnSync)(...concatenateShell(file2, commandArguments, normalizedOptions));
       } catch (error) {
         return makeEarlyError({
           error,
@@ -46592,7 +46592,7 @@ var init_handle_async = __esm({
       input: {
         ...addProperties2,
         fileUrl: ({ value }) => ({ stream: (0, import_node_fs8.createReadStream)(value) }),
-        filePath: ({ value: { file } }) => ({ stream: (0, import_node_fs8.createReadStream)(file) }),
+        filePath: ({ value: { file: file2 } }) => ({ stream: (0, import_node_fs8.createReadStream)(file2) }),
         webStream: ({ value }) => ({ stream: import_node_stream3.Readable.fromWeb(value) }),
         iterable: ({ value }) => ({ stream: import_node_stream3.Readable.from(value) }),
         asyncIterable: ({ value }) => ({ stream: import_node_stream3.Readable.from(value) }),
@@ -46602,7 +46602,7 @@ var init_handle_async = __esm({
       output: {
         ...addProperties2,
         fileUrl: ({ value }) => ({ stream: (0, import_node_fs8.createWriteStream)(value) }),
-        filePath: ({ value: { file, append } }) => ({ stream: (0, import_node_fs8.createWriteStream)(file, append ? { flags: "a" } : {}) }),
+        filePath: ({ value: { file: file2, append } }) => ({ stream: (0, import_node_fs8.createWriteStream)(file2, append ? { flags: "a" } : {}) }),
         webStream: ({ value }) => ({ stream: import_node_stream3.Writable.fromWeb(value) }),
         iterable: forbiddenIfAsync,
         asyncIterable: forbiddenIfAsync,
@@ -48511,9 +48511,9 @@ var init_main_async = __esm({
     init_deferred();
     init_promise();
     execaCoreAsync = (rawFile, rawArguments, rawOptions, createNested) => {
-      const { file, commandArguments, command: command2, escapedCommand, startTime, verboseInfo, options, fileDescriptors } = handleAsyncArguments(rawFile, rawArguments, rawOptions);
+      const { file: file2, commandArguments, command: command2, escapedCommand, startTime, verboseInfo, options, fileDescriptors } = handleAsyncArguments(rawFile, rawArguments, rawOptions);
       const { subprocess, promise } = spawnSubprocessAsync({
-        file,
+        file: file2,
         commandArguments,
         options,
         startTime,
@@ -48534,11 +48534,11 @@ var init_main_async = __esm({
     };
     handleAsyncArguments = (rawFile, rawArguments, rawOptions) => {
       const { command: command2, escapedCommand, startTime, verboseInfo } = handleCommand(rawFile, rawArguments, rawOptions);
-      const { file, commandArguments, options: normalizedOptions } = normalizeOptions(rawFile, rawArguments, rawOptions);
+      const { file: file2, commandArguments, options: normalizedOptions } = normalizeOptions(rawFile, rawArguments, rawOptions);
       const options = handleAsyncOptions(normalizedOptions);
       const fileDescriptors = handleStdioAsync(options, verboseInfo);
       return {
-        file,
+        file: file2,
         commandArguments,
         command: command2,
         escapedCommand,
@@ -48554,10 +48554,10 @@ var init_main_async = __esm({
       }
       return { ...options, timeoutDuration: timeout };
     };
-    spawnSubprocessAsync = ({ file, commandArguments, options, startTime, verboseInfo, command: command2, escapedCommand, fileDescriptors }) => {
+    spawnSubprocessAsync = ({ file: file2, commandArguments, options, startTime, verboseInfo, command: command2, escapedCommand, fileDescriptors }) => {
       let subprocess;
       try {
-        subprocess = (0, import_node_child_process12.spawn)(...concatenateShell(file, commandArguments, options));
+        subprocess = (0, import_node_child_process12.spawn)(...concatenateShell(file2, commandArguments, options));
       } catch (error) {
         return handleEarlyError({
           error,
@@ -48721,27 +48721,27 @@ var init_create = __esm({
       if (isPlainObject(firstArgument)) {
         return createNested(mapArguments, mergeOptions(boundOptions, firstArgument), setBoundExeca);
       }
-      const { file, commandArguments, options, isSync } = parseArguments({
+      const { file: file2, commandArguments, options, isSync } = parseArguments({
         mapArguments,
         firstArgument,
         nextArguments,
         deepOptions,
         boundOptions
       });
-      return isSync ? execaCoreSync(file, commandArguments, options) : execaCoreAsync(file, commandArguments, options, createNested);
+      return isSync ? execaCoreSync(file2, commandArguments, options) : execaCoreAsync(file2, commandArguments, options, createNested);
     };
     parseArguments = ({ mapArguments, firstArgument, nextArguments, deepOptions, boundOptions }) => {
       const callArguments = isTemplateString(firstArgument) ? parseTemplates(firstArgument, nextArguments) : [firstArgument, ...nextArguments];
       const [initialFile, initialArguments, initialOptions] = normalizeParameters(...callArguments);
       const mergedOptions = mergeOptions(mergeOptions(deepOptions, boundOptions), initialOptions);
       const {
-        file = initialFile,
+        file: file2 = initialFile,
         commandArguments = initialArguments,
         options = mergedOptions,
         isSync = false
       } = mapArguments({ file: initialFile, commandArguments: initialArguments, options: mergedOptions });
       return {
-        file,
+        file: file2,
         commandArguments,
         options,
         isSync
@@ -48755,14 +48755,14 @@ var mapCommandAsync, mapCommandSync, parseCommand, parseCommandString, SPACES_RE
 var init_command2 = __esm({
   "../../node_modules/execa/lib/methods/command.js"() {
     "use strict";
-    mapCommandAsync = ({ file, commandArguments }) => parseCommand(file, commandArguments);
-    mapCommandSync = ({ file, commandArguments }) => ({ ...parseCommand(file, commandArguments), isSync: true });
+    mapCommandAsync = ({ file: file2, commandArguments }) => parseCommand(file2, commandArguments);
+    mapCommandSync = ({ file: file2, commandArguments }) => ({ ...parseCommand(file2, commandArguments), isSync: true });
     parseCommand = (command2, unusedArguments) => {
       if (unusedArguments.length > 0) {
         throw new TypeError(`The command and its arguments must be passed as a single string: ${command2} ${unusedArguments}.`);
       }
-      const [file, ...commandArguments] = parseCommandString(command2);
-      return { file, commandArguments };
+      const [file2, ...commandArguments] = parseCommandString(command2);
+      return { file: file2, commandArguments };
     };
     parseCommandString = (command2) => {
       if (typeof command2 !== "string") {
@@ -55241,7 +55241,7 @@ var require_tree_kill = __commonJS({
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
-  app: () => app,
+  app: () => app2,
   default: () => index_default,
   httpServer: () => httpServer,
   io: () => io2
@@ -55688,9 +55688,9 @@ var tryEachApp = async (apps2, opener) => {
     return;
   }
   const errors = [];
-  for (const app2 of apps2) {
+  for (const app3 of apps2) {
     try {
-      return await opener(app2);
+      return await opener(app3);
     } catch (error) {
       errors.push(error);
     }
@@ -55714,10 +55714,10 @@ var baseOpen = async (options) => {
       [fallbackAttemptSymbol]: true
     }));
   }
-  let { name: app2, arguments: appArguments = [] } = options.app ?? {};
+  let { name: app3, arguments: appArguments = [] } = options.app ?? {};
   appArguments = [...appArguments];
-  if (Array.isArray(app2)) {
-    return tryEachApp(app2, (appName) => baseOpen({
+  if (Array.isArray(app3)) {
+    return tryEachApp(app3, (appName) => baseOpen({
       ...options,
       app: {
         name: appName,
@@ -55726,7 +55726,7 @@ var baseOpen = async (options) => {
       [fallbackAttemptSymbol]: true
     }));
   }
-  if (app2 === "browser" || app2 === "browserPrivate") {
+  if (app3 === "browser" || app3 === "browserPrivate") {
     const ids = {
       "com.google.chrome": "chrome",
       "google-chrome.desktop": "chrome",
@@ -55756,7 +55756,7 @@ var baseOpen = async (options) => {
     }
     if (browser.id in ids) {
       const browserName = ids[browser.id.toLowerCase()];
-      if (app2 === "browserPrivate") {
+      if (app3 === "browserPrivate") {
         if (browserName === "safari") {
           throw new Error("Safari doesn't support opening in private mode via command line");
         }
@@ -55776,7 +55776,7 @@ var baseOpen = async (options) => {
   const cliArguments = [];
   const childProcessOptions = {};
   let shouldUseWindowsInWsl = false;
-  if (is_wsl_default && !isInsideContainer() && !is_in_ssh_default && !app2) {
+  if (is_wsl_default && !isInsideContainer() && !is_in_ssh_default && !app3) {
     shouldUseWindowsInWsl = await canAccessPowerShell();
   }
   if (platform === "darwin") {
@@ -55790,8 +55790,8 @@ var baseOpen = async (options) => {
     if (options.newInstance) {
       cliArguments.push("--new");
     }
-    if (app2) {
-      cliArguments.push("-a", app2);
+    if (app3) {
+      cliArguments.push("-a", app3);
     }
   } else if (platform === "win32" || shouldUseWindowsInWsl) {
     command2 = await powerShellPath2();
@@ -55806,8 +55806,8 @@ var baseOpen = async (options) => {
     if (options.wait) {
       encodedArguments.push("-Wait");
     }
-    if (app2) {
-      encodedArguments.push(executePowerShell.escapeArgument(app2));
+    if (app3) {
+      encodedArguments.push(executePowerShell.escapeArgument(app3));
       if (options.target) {
         appArguments.push(options.target);
       }
@@ -55823,8 +55823,8 @@ var baseOpen = async (options) => {
       childProcessOptions.stdio = "ignore";
     }
   } else {
-    if (app2) {
-      command2 = app2;
+    if (app3) {
+      command2 = app3;
     } else {
       const isBundled = !__dirname2 || __dirname2 === "/";
       let exeLocalXdgOpen = false;
@@ -56151,9 +56151,9 @@ var IGNORE = [
   "**/out/**",
   "**/coverage/**"
 ];
-async function readJSON(file) {
+async function readJSON(file2) {
   try {
-    return await import_fs_extra2.default.readJSON(file);
+    return await import_fs_extra2.default.readJSON(file2);
   } catch {
     return null;
   }
@@ -57669,7 +57669,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-blue-500"]
     }
   ]
 };
@@ -57861,7 +57861,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-blue-300"]
     }
   ]
 };
@@ -57895,7 +57895,7 @@ var Supabase = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-bolt text-green-400"]
     }
   ]
 };
@@ -58050,7 +58050,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-server text-red-400"]
     }
   ]
 };
@@ -58208,7 +58208,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-database"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-leaf text-green-500"]
     }
   ]
 };
@@ -58360,7 +58360,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-magnifying-glass"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-meetup text-green-500"]
     },
     {
       action: "command",
@@ -58535,7 +58535,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-bucket"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-amazon text-blue-500"]
     },
     {
       action: "command",
@@ -60100,6 +60100,109 @@ var templates2 = [
 ];
 var demo_default = templates2;
 
+// ../../packages/template/projects/_viteapp.ts
+var file = `import { useState } from 'react'
+
+function App() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-indigo-500 selection:text-white">
+      {/* Navbar */}
+      <nav className="fixed w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg">M</div>
+              <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                Monorepo Time
+              </span>
+            </div>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-1">
+                <a href="#" className="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">Features</a>
+                <a href="#" className="px-3 py-2 rounded-md text-sm font-medium text-white bg-slate-800/50 border border-slate-700/50">Templates</a>
+                <a href="#" className="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">Integrations</a>
+              </div>
+            </div>
+            <div>
+              <a href="#" className="px-4 py-2 rounded-full text-sm font-semibold bg-white text-slate-900 hover:bg-slate-100 transition-colors shadow-lg shadow-white/5">
+                Get Started
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            v2.0 is now available
+          </div>
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
+            Manage your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Monorepo</span> like a Pro.
+          </h1>
+          <p className="mt-4 text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            The ultimate tool for managing workspaces, templates, and deployments. 
+            Speed up your workflow with our premium suite of tools.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button className="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-lg transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5">
+              Start Building
+            </button>
+            <button className="px-8 py-4 rounded-xl border border-slate-700 hover:border-slate-600 bg-slate-900/50 hover:bg-slate-800 text-slate-300 font-semibold text-lg transition-all hover:-translate-y-0.5">
+              View Documentation
+            </button>
+          </div>
+        </div>
+        
+        {/* Background gradient effects */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
+          <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px]"></div>
+          <div className="absolute top-40 right-10 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px]"></div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-24 bg-slate-950 relative">
+        <div className="absolute inset-0 bg-slate-900/20 skew-y-3 transform origin-top-left -z-10"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: "Instant Templates", desc: "Deploy React, Next.js, and API templates in seconds.", icon: "\u26A1" },
+              { title: "Workspace Management", desc: "Control all your projects from a single unified interface.", icon: "\u{1F6E0}\uFE0F" },
+              { title: "Docker Integration", desc: "Seamlessly manage containers and database services.", icon: "\u{1F433}" }
+            ].map((item, index) => (
+              <div key={index} className="group p-8 rounded-2xl bg-slate-900 border border-slate-800 hover:border-indigo-500/30 transition-all hover:bg-slate-800/50">
+                <div className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform group-hover:border-indigo-500/30 group-hover:shadow-lg group-hover:shadow-indigo-500/10">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-slate-100 group-hover:text-indigo-400 transition-colors">{item.title}</h3>
+                <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 border-t border-slate-800 text-center">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="w-6 h-6 rounded bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">M</div>
+          <span className="font-bold text-slate-200">Monorepo Time</span>
+        </div>
+        <p className="text-slate-500 text-sm">\xA9 2026 Monorepo Time. All rights reserved.</p>
+      </footer>
+    </div>
+  )
+}
+
+export default App`;
+var viteapp_default = file;
+
 // ../../packages/template/projects/vite-react.ts
 var ViteReact = {
   name: "Vite React TS",
@@ -60127,11 +60230,6 @@ var ViteReact = {
       args: ["install", "-D", "tailwindcss", "@tailwindcss/postcss", "autoprefixer"]
     },
     {
-      action: "command",
-      cmd: "npm",
-      args: ["install", "@heroui/react", "framer-motion"]
-    },
-    {
       action: "file",
       file: "postcss.config.js",
       filecontent: 'export default {\n  plugins: {\n    "@tailwindcss/postcss": {},\n    autoprefixer: {},\n  },\n}'
@@ -60139,20 +60237,16 @@ var ViteReact = {
     {
       action: "file",
       file: "tailwind.config.js",
-      filecontent: `import { heroui } from "@heroui/react";
-
-/** @type {import('tailwindcss').Config} */
+      filecontent: `/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {},
   },
-  darkMode: "class",
-  plugins: [heroui()],
+  plugins: [],
 };`
     },
     {
@@ -60165,15 +60259,12 @@ export default {
       file: "src/main.tsx",
       filecontent: `import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { HeroUIProvider } from '@heroui/react'
 import App from './App'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HeroUIProvider>
-      <App />
-    </HeroUIProvider>
+    <App />
   </React.StrictMode>,
 )`
     },
@@ -60185,92 +60276,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     {
       action: "file",
       file: "src/App.tsx",
-      filecontent: `import { Button, Card, CardBody, CardHeader, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
-
-function App() {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Navbar */}
-      <Navbar className="bg-background/70 backdrop-blur-md border-b border-default-100">
-        <NavbarBrand>
-          <p className="font-bold text-inherit text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Monorepo Time</p>
-        </NavbarBrand>
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Features
-            </Link>
-          </NavbarItem>
-          <NavbarItem isActive>
-            <Link href="#" aria-current="page">
-              Templates
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
-          </NavbarItem>
-        </NavbarContent>
-        <NavbarContent justify="end">
-          <NavbarItem>
-            <Button as={Link} color="primary" href="#" variant="flat">
-              Get Started
-            </Button>
-          </NavbarItem>
-        </NavbarContent>
-      </Navbar>
-
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <div className="max-w-4xl space-y-8">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight">
-            Manage your <span className="text-primary">Monorepo</span> like a Pro.
-          </h1>
-          <p className="text-xl text-default-500 max-w-2xl mx-auto leading-relaxed">
-            The ultimate tool for managing workspaces, templates, and deployments. 
-            Speed up your workflow with our premium suite of tools.
-          </p>
-          <div className="flex gap-4 justify-center pt-8">
-            <Button color="primary" size="lg" variant="shadow" className="font-semibold">
-              Start Building
-            </Button>
-            <Button variant="bordered" size="lg" className="font-semibold">
-              Learn More
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-20 px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { title: "Instant Templates", desc: "Deploy React, Next.js, and API templates in seconds." },
-            { title: "Workspace Management", desc: "Control all your projects from a single unified interface." },
-            { title: "Docker Integration", desc: "Seamlessly manage containers and database services." }
-          ].map((item, index) => (
-            <Card key={index} className="py-4 border border-default-100 shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                <h4 className="font-bold text-large">{item.title}</h4>
-              </CardHeader>
-              <CardBody className="overflow-visible py-2">
-                <p className="text-default-500">{item.desc}</p>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-10 text-center text-default-400 text-sm border-t border-default-100 mt-auto">
-        <p>\xA9 2026 Monorepo Time. All rights reserved.</p>
-      </footer>
-    </div>
-  );
-}
-
-export default App;`
+      filecontent: viteapp_default
     },
     {
       action: "command",
@@ -60285,10 +60291,109 @@ export default App;`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-globe"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-react text-blue-400"]
     }
   ]
 };
+
+// ../../packages/template/projects/_nextapp.ts
+var app = `export default function Home() {
+  return (
+    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-indigo-500 selection:text-white">
+      {/* Navbar */}
+      <nav className="fixed w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg">P</div>
+              <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                Product Name
+              </span>
+            </div>
+            <div className="hidden md:block">
+              <div className="ml-10 flex items-baseline space-x-1">
+                <a href="#features" className="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">Features</a>
+                <a href="#testimonials" className="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">Testimonials</a>
+                <a href="#pricing" className="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/50 transition-all">Pricing</a>
+              </div>
+            </div>
+            <div>
+              <a href="#" className="px-4 py-2 rounded-full text-sm font-semibold bg-white text-slate-900 hover:bg-slate-100 transition-colors shadow-lg shadow-white/5">
+                Get Started
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            v1.0 is now live
+          </div>
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
+            Build your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">Next Big Thing</span> with ease.
+          </h1>
+          <p className="mt-4 text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+            The ultimate solution for your product needs. Fast, reliable, and designed to scale.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <button className="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-lg transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5">
+              Get Started
+            </button>
+            <button className="px-8 py-4 rounded-xl border border-slate-700 hover:border-slate-600 bg-slate-900/50 hover:bg-slate-800 text-slate-300 font-semibold text-lg transition-all hover:-translate-y-0.5">
+              Learn More
+            </button>
+          </div>
+        </div>
+        
+        {/* Background gradient effects */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
+          <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px]"></div>
+          <div className="absolute top-40 right-10 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px]"></div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section id="features" className="py-24 bg-slate-950 relative">
+        <div className="absolute inset-0 bg-slate-900/20 skew-y-3 transform origin-top-left -z-10"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: "High Performance", desc: "Optimized for speed and efficiency.", icon: "\u26A1" },
+              { title: "Secure by Design", desc: "Built with security in mind from day one.", icon: "\u{1F512}" },
+              { title: "Scalable Architecture", desc: "Grow your user base without worry.", icon: "\u{1F4C8}" }
+            ].map((item, index) => (
+              <div key={index} className="group p-8 rounded-2xl bg-slate-900 border border-slate-800 hover:border-indigo-500/30 transition-all hover:bg-slate-800/50">
+                <div className="w-12 h-12 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform group-hover:border-indigo-500/30 group-hover:shadow-lg group-hover:shadow-indigo-500/10">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-slate-100 group-hover:text-indigo-400 transition-colors">{item.title}</h3>
+                <p className="text-slate-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 border-t border-slate-800 text-center">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="w-6 h-6 rounded bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">P</div>
+          <span className="font-bold text-slate-200">Product Name</span>
+        </div>
+        <p className="text-slate-500 text-sm">\xA9 2026 Product Name. All rights reserved.</p>
+      </footer>
+    </div>
+  )
+}
+`;
+var nextapp_default = app;
 
 // ../../packages/template/projects/nextjs.ts
 var NextJS = {
@@ -60312,22 +60417,15 @@ var NextJS = {
       args: ["install"]
     },
     {
-      action: "command",
-      cmd: "npm",
-      args: ["install", "@heroui/react", "framer-motion"]
-    },
-    {
       action: "file",
       file: "tailwind.config.ts",
       filecontent: `import type { Config } from "tailwindcss";
-import { heroui } from "@heroui/react";
 
 export default {
     content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
     ],
     theme: {
     extend: {
@@ -60337,8 +60435,7 @@ export default {
         },
     },
     },
-    darkMode: "class",
-    plugins: [heroui()],
+    plugins: [],
 } satisfies Config;`
     },
     {
@@ -60366,26 +60463,10 @@ body {
     },
     {
       action: "file",
-      file: "app/providers.tsx",
-      filecontent: `'use client'
-
-import {HeroUIProvider} from '@heroui/react'
-
-export function Providers({children}: { children: React.ReactNode }) {
-  return (
-    <HeroUIProvider>
-      {children}
-    </HeroUIProvider>
-  )
-}`
-    },
-    {
-      action: "file",
       file: "app/layout.tsx",
       filecontent: `import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { Providers } from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -60400,11 +60481,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className='dark'>
+    <html lang="en">
       <body className={inter.className}>
-        <Providers>
-            {children}
-        </Providers>
+        {children}
       </body>
     </html>
   )
@@ -60413,90 +60492,7 @@ export default function RootLayout({
     {
       action: "file",
       file: "app/page.tsx",
-      filecontent: `import { Button, Card, CardBody, CardHeader, Link, Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
-
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Navbar */}
-      <Navbar className="bg-background/70 backdrop-blur-md border-b border-default-100">
-        <NavbarBrand>
-          <p className="font-bold text-inherit text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Monorepo Time</p>
-        </NavbarBrand>
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Features
-            </Link>
-          </NavbarItem>
-          <NavbarItem isActive>
-            <Link href="#" aria-current="page">
-              Templates
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
-          </NavbarItem>
-        </NavbarContent>
-        <NavbarContent justify="end">
-          <NavbarItem>
-            <Button as={Link} color="primary" href="#" variant="flat">
-              Get Started
-            </Button>
-          </NavbarItem>
-        </NavbarContent>
-      </Navbar>
-
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center py-24 px-4 text-center">
-        <div className="max-w-4xl space-y-8">
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight">
-            Manage your <span className="text-primary">Monorepo</span> like a Pro.
-          </h1>
-          <p className="text-xl text-default-500 max-w-2xl mx-auto leading-relaxed">
-            The ultimate tool for managing workspaces, templates, and deployments. 
-            Speed up your workflow with current Next.js technologies.
-          </p>
-          <div className="flex gap-4 justify-center pt-8">
-            <Button color="primary" size="lg" variant="shadow" className="font-semibold">
-              Start Building
-            </Button>
-            <Button variant="bordered" size="lg" className="font-semibold">
-              Learn More
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-20 px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { title: "Next.js 14+", desc: "Leverage Server Components and the new App Router." },
-            { title: "Workspace Management", desc: "Control all your projects from a single unified interface." },
-            { title: "Docker Integration", desc: "Seamlessly manage containers and database services." }
-          ].map((item, index) => (
-            <Card key={index} className="py-4 border border-default-100 shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-                <h4 className="font-bold text-large">{item.title}</h4>
-              </CardHeader>
-              <CardBody className="overflow-visible py-2">
-                <p className="text-default-500">{item.desc}</p>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-10 text-center text-default-400 text-sm border-t border-default-100 mt-auto">
-        <p>\xA9 2026 Monorepo Time. All rights reserved.</p>
-      </footer>
-    </div>
-  );
-}`
+      filecontent: nextapp_default
     },
     {
       action: "command",
@@ -60506,7 +60502,7 @@ export default function Home() {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-globe"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-js text-white"]
     }
   ]
 };
@@ -60686,7 +60682,7 @@ var ExpressTS = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-server"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-node text-green-500"]
     }
   ]
 };
@@ -60720,7 +60716,7 @@ var PHP = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-server"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-php text-indigo-400"]
     }
   ]
 };
@@ -60764,7 +60760,7 @@ var Laravel = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-brands fa-laravel"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-laravel text-red-500"]
     }
   ]
 };
@@ -60797,7 +60793,7 @@ var PythonConsole = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-terminal"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-python text-yellow-500"]
     }
   ]
 };
@@ -60837,7 +60833,7 @@ var DotNetConsole = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-terminal"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-windows text-blue-600"]
     }
   ]
 };
@@ -60883,7 +60879,7 @@ var N8NLocal = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-robot"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-project-diagram text-red-500"]
     },
     {
       action: "command",
@@ -61519,7 +61515,7 @@ var AWSTemplate = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-cloud"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-aws text-orange-400"]
     },
     {
       action: "command",
@@ -61747,7 +61743,7 @@ var StripeTemplate = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-credit-card"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-credit-card text-green-500"]
     },
     {
       action: "command",
@@ -62189,42 +62185,42 @@ if (command === "init") {
     process.exit(1);
   });
 }
-var app = (0, import_express24.default)();
+var app2 = (0, import_express24.default)();
 var port2 = config_default.apiPort;
-app.use((0, import_cors.default)({
+app2.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app.use(import_express24.default.static("public"));
-app.use(import_express24.default.json());
-app.use("/", tester_default);
-app.use("/" + api_default.scanWorkspace, scanworkspace_default);
-app.use("/" + api_default.stopProcess, stopcmd_default);
-app.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
-app.use("/" + api_default.newWorkspace, newworkspace_default);
-app.use("/" + api_default.interactvTerminal, interactiveTerminal_default);
-app.use("/" + api_default.stopInteractiveTerminal, stopInteractiveTerminal_default);
-app.use("/" + api_default.stopTerminalWorkspace, stopTerminalWorkspace_default);
-app.use("/" + api_default.updateWorkspace, updateworkspace_default);
-app.use("/" + api_default.hideShowFileFolder, vscodeHideShow_default);
-app.use("/" + api_default.getRootPath, rootPath_default);
-app.use("/" + api_default.scaffoldRepo, scafoldrepo_default);
-app.use("/" + api_default.turborepoExist, turborepoexist_default);
-app.use("/" + api_default.firstRun, firstrun_default);
-app.use("/" + api_default.notes, notes_default);
-app.use("/" + api_default.crudTest, crudtest_default);
-app.use("/" + api_default.gitControl, gitControlHelper_default);
-app.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
-app.use("/" + api_default.processTree, processUsage_default);
-app.use("/" + api_default.docker, apidocker_default);
-app.use("/" + api_default.availabletemplates, availabletemplates_default);
-app.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
+app2.use(import_express24.default.static("public"));
+app2.use(import_express24.default.json());
+app2.use("/", tester_default);
+app2.use("/" + api_default.scanWorkspace, scanworkspace_default);
+app2.use("/" + api_default.stopProcess, stopcmd_default);
+app2.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
+app2.use("/" + api_default.newWorkspace, newworkspace_default);
+app2.use("/" + api_default.interactvTerminal, interactiveTerminal_default);
+app2.use("/" + api_default.stopInteractiveTerminal, stopInteractiveTerminal_default);
+app2.use("/" + api_default.stopTerminalWorkspace, stopTerminalWorkspace_default);
+app2.use("/" + api_default.updateWorkspace, updateworkspace_default);
+app2.use("/" + api_default.hideShowFileFolder, vscodeHideShow_default);
+app2.use("/" + api_default.getRootPath, rootPath_default);
+app2.use("/" + api_default.scaffoldRepo, scafoldrepo_default);
+app2.use("/" + api_default.turborepoExist, turborepoexist_default);
+app2.use("/" + api_default.firstRun, firstrun_default);
+app2.use("/" + api_default.notes, notes_default);
+app2.use("/" + api_default.crudTest, crudtest_default);
+app2.use("/" + api_default.gitControl, gitControlHelper_default);
+app2.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
+app2.use("/" + api_default.processTree, processUsage_default);
+app2.use("/" + api_default.docker, apidocker_default);
+app2.use("/" + api_default.availabletemplates, availabletemplates_default);
+app2.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
 var frontendPath = import_path19.default.join(__dirname, "../public");
-app.use(import_express24.default.static(frontendPath));
-app.get("*", (req, res) => {
+app2.use(import_express24.default.static(frontendPath));
+app2.get("*", (req, res) => {
   res.sendFile(import_path19.default.join(frontendPath, "index.html"));
 });
-var httpServer = (0, import_http.createServer)(app);
+var httpServer = (0, import_http.createServer)(app2);
 var io2 = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -62267,7 +62263,7 @@ if (command != "init") {
     process.exit(1);
   });
 }
-var index_default = app;
+var index_default = app2;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   app,

@@ -29,7 +29,7 @@ export const Supabase: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fa-solid fa-database']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-bolt text-green-400']
         }
     ]
 };
