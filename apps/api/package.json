@@ -1,7 +1,7 @@
 {
   "name": "monorepotime",
   "version": "1.1.11",
-  "description": "monorepo / turborepo gui tools built with nodejs and reactjs",
+  "description": "monorepo gui tool",
   "main": "dist/index.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon --watch 'src/**/*.ts' --watch '../../packages/**/*.ts' --exec 'ts-node' src/index.ts",
