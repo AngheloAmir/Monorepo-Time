@@ -24075,11 +24075,11 @@ var require_lib3 = __commonJS({
         var headers = [], method = req.method && req.method.toUpperCase && req.method.toUpperCase();
         if (method === "OPTIONS") {
           headers.push(configureOrigin(options, req));
-          headers.push(configureCredentials(options, req));
-          headers.push(configureMethods(options, req));
+          headers.push(configureCredentials(options));
+          headers.push(configureMethods(options));
           headers.push(configureAllowedHeaders(options, req));
-          headers.push(configureMaxAge(options, req));
-          headers.push(configureExposedHeaders(options, req));
+          headers.push(configureMaxAge(options));
+          headers.push(configureExposedHeaders(options));
           applyHeaders(headers, res);
           if (options.preflightContinue) {
             next();
@@ -24090,8 +24090,8 @@ var require_lib3 = __commonJS({
           }
         } else {
           headers.push(configureOrigin(options, req));
-          headers.push(configureCredentials(options, req));
-          headers.push(configureExposedHeaders(options, req));
+          headers.push(configureCredentials(options));
+          headers.push(configureExposedHeaders(options));
           applyHeaders(headers, res);
           next();
         }
@@ -60798,18 +60798,106 @@ var ExpressTS = {
 };
 
 // ../../packages/template/projects/serverless-express.ts
+var htmlFile2 = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monorepo Time - Universal Express Service</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #2d2a4e 0%, #1c1c38 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 550px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #ff9966 0%, #ff5e62 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #c9d6ea;
+            line-height: 1.6;
+        }
+        .status-badge {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 153, 102, 0.15);
+            color: #ff9966;
+            border-radius: 50px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 153, 102, 0.25);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Universal Express</h1>
+        <p>Your serverless-ready service is active. Deploy to AWS, Vercel, Netlify, or Docker with zero config changes.</p>
+        <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+             <span class="status-badge">AWS</span>
+             <span class="status-badge">Netlify</span>
+             <span class="status-badge">Vercel</span>
+             <span class="status-badge">Docker</span>
+        </div>
+        <p style="margin-top: 1.5rem; font-size: 0.9rem; opacity: 0.7;">
+            Check <code>src/app.ts</code> for routing logic.
+        </p>
+    </div>
+</body>
+</html>
+`;
 var appFile = `import express, { Request, Response } from "express";
 import cors from "cors";
+import path from "path";
 import helloRouter from "./routes/hello";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, "../public")));
 
 const router = express.Router();
 router.get("/", (req: Request, res: Response) => {
-    res.json({ message: "Hello from Serverless Express!" });
+   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
 router.use("/hello", helloRouter);
@@ -60908,6 +60996,11 @@ var ServerlessExpressTS = {
       args: ["install", "-D", "nodemon", "typescript", "ts-node", "tsup", "@types/node", "@types/express", "@types/cors"]
     },
     // App Files
+    {
+      action: "file",
+      file: "public/index.html",
+      filecontent: htmlFile2
+    },
     {
       action: "file",
       file: "src/app.ts",
