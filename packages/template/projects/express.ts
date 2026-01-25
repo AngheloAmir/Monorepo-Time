@@ -120,19 +120,19 @@ export const ExpressTS: ProjectTemplate = {
             args: ['init', '-y']
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', 'express', 'cors']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', 'express', 'cors']
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', '@types/cors']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', '@types/cors']
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', '-D', 'tsup']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'tsup']
         },
         {
             action: 'file',

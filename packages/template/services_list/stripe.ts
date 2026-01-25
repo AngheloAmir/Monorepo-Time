@@ -194,9 +194,9 @@ export const StripeTemplate: ProjectTemplate = {
             filecontent: testJs
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', 'stripe']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', 'stripe']
         },
         {
             action: 'command',

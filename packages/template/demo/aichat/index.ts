@@ -22,14 +22,14 @@ export const AIChat: ProjectTemplate = {
             args: ['init', '-y']
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', 'express']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', 'express']
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', 'tsup']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', 'tsup']
         },
         // Public files
         {

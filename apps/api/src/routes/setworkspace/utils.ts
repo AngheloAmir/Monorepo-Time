@@ -27,3 +27,41 @@ export async function writeFile(filePath: string, content: string): Promise<void
  * Platform-specific settings.
  */
 export const isWindows = process.platform === 'win32';
+
+/**
+ * Finds the monorepo root by looking for specific markers.
+ */
+export async function findMonorepoRoot(startDir: string): Promise<string> {
+    let currentDir = startDir;
+    while (true) {
+        // Check for common monorepo markers
+        const markers = ['pnpm-workspace.yaml', 'turbo.json', 'lerna.json', '.git'];
+        for (const marker of markers) {
+             try {
+                await fsPromises.stat(path.join(currentDir, marker));
+                return currentDir;
+            } catch {
+                // Continue checking
+            }
+        }
+
+        // Check for package.json with workspaces
+        try {
+            const pkgPath = path.join(currentDir, 'package.json');
+            const content = await fsPromises.readFile(pkgPath, 'utf8');
+            const pkg = JSON.parse(content);
+            if (pkg.workspaces) {
+                return currentDir;
+            }
+        } catch {
+            // Ignore missing package.json or parse errors
+        }
+
+        const parentDir = path.dirname(currentDir);
+        if (parentDir === currentDir) {
+            // Reached filesystem root without finding monorepo root, fallback to startDir
+            return startDir;
+        }
+        currentDir = parentDir;
+    }
+}

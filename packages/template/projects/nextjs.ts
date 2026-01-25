@@ -17,7 +17,7 @@ export const NextJS: ProjectTemplate = {
             args: ['-y', 'create-next-app@latest', '.', '--typescript', '--tailwind', '--eslint', '--app', '--yes', '--use-npm']
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
             args: ['install']
         },

@@ -4,7 +4,7 @@ import templates from "./projecttemplate";
 import services  from "./services";
 
 export interface ProcessTemplate {
-    action:   "command" | "file";
+    action:   "command" | "file" | "root-command";
     cmd?:     string;
     args?:    string[];
     file?:    string;

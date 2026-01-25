@@ -186,9 +186,9 @@ functions:
 `;
 
 export const ServerlessExpressTS: ProjectTemplate = {
-    name: "Universal Express TS",
-    description: "Express.js TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
-    notes: "Works on Vercel, Netlify, AWS Lambda, Google Cloud, Render, Heroku & Docker.",
+    name: "Serverless Express TS",
+    description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
+    notes: "Node.js and NPM must be installed.",
     templating: [
         {
             action: 'command',
@@ -197,14 +197,14 @@ export const ServerlessExpressTS: ProjectTemplate = {
         },
         // Dependencies
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', 'express', 'cors', 'serverless-http']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', 'express', 'cors', 'serverless-http']
         },
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', 'tsup', '@types/node', '@types/express', '@types/cors']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'nodemon', 'typescript', 'ts-node', 'tsup', '@types/node', '@types/express', '@types/cors']
         },
         // App Files
         {

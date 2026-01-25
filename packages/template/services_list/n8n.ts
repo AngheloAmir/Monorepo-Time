@@ -6,9 +6,9 @@ export const N8NLocal: ProjectTemplate = {
     notes: "Requires Node.js installed in your system.",
     templating: [
         {
-            action: 'command',
+            action: 'root-command',
             cmd: 'npm',
-            args: ['install', 'n8n']
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', 'n8n']
         },
         {
             action: 'command',
