@@ -44,5 +44,6 @@
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
   },
-  "fontawesomeIcon": "fas fa-credit-card text-blue-500"
+  "fontawesomeIcon": "fas fa-credit-card text-blue-500",
+  "description": "GUI tool"
 }
