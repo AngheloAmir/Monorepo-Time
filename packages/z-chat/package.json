@@ -8,9 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "stop": "npx -y kill-port 5173"
+    "stop": "npx -y kill-port 5174"
   },
   "dependencies": {
+    "@heroui/react": "^3.0.0-beta.5",
+    "@heroui/styles": "^3.0.0-beta.5",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
