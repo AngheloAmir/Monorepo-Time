@@ -58652,7 +58652,7 @@ var MonoChat = {
     {
       action: "file",
       file: "package.json",
-      filecontent: '{\n  "name": "z-chat",\n  "private": true,\n  "version": "0.0.0",\n  "type": "module",\n  "scripts": {\n    "dev": "vite",\n    "build": "tsc -b && vite build",\n    "lint": "eslint .",\n    "preview": "vite preview",\n    "stop": ""\n  },\n  "dependencies": {\n    "react": "^19.2.0",\n    "react-dom": "^19.2.0",\n    "zustand": "^4.5.7"\n  },\n  "devDependencies": {\n    "@eslint/js": "^9.39.1",\n    "@types/node": "^24.10.1",\n    "@types/react": "^19.2.5",\n    "@types/react-dom": "^19.2.3",\n    "@vitejs/plugin-react": "^5.1.1",\n    "eslint": "^9.39.1",\n    "eslint-plugin-react-hooks": "^7.0.1",\n    "eslint-plugin-react-refresh": "^0.4.24",\n    "globals": "^16.5.0",\n    "typescript": "~5.9.3",\n    "typescript-eslint": "^8.46.4",\n    "vite": "^7.2.4"\n  },\n  "description": "Vite React TS",\n  "fontawesomeIcon": "fab fa-react text-blue-500"\n}\n'
+      filecontent: '{\n  "name": "z-chat",\n  "private": true,\n  "version": "0.0.0",\n  "type": "module",\n  "scripts": {\n    "dev": "vite",\n    "build": "tsc -b && vite build",\n    "lint": "eslint .",\n    "preview": "vite preview",\n    "stop": ""\n  },\n  "dependencies": {\n    "react": "^19.2.0",\n    "react-dom": "^19.2.0",\n    "zustand": "^4.5.7"\n  },\n  "devDependencies": {\n    "@eslint/js": "^9.39.1",\n    "@tailwindcss/postcss": "^4.0.0",\n    "@types/node": "^24.10.1",\n    "@types/react": "^19.2.5",\n    "@types/react-dom": "^19.2.3",\n    "@vitejs/plugin-react": "^5.1.1",\n    "autoprefixer": "^10.4.20",\n    "eslint": "^9.39.1",\n    "eslint-plugin-react-hooks": "^7.0.1",\n    "eslint-plugin-react-refresh": "^0.4.24",\n    "globals": "^16.5.0",\n    "jiti": "^2.4.2",\n    "postcss": "^8.5.1",\n    "tailwindcss": "^4.0.0",\n    "typescript": "~5.9.3",\n    "typescript-eslint": "^8.46.4",\n    "vite": "^7.2.4"\n  },\n  "description": "Vite React TS",\n  "fontawesomeIcon": "fab fa-react text-blue-500"\n}\n'
     },
     {
       action: "file",
@@ -59046,7 +59046,7 @@ var ViteReact = {
     {
       action: "command",
       cmd: "npm",
-      args: ["install", "-D", "tailwindcss@next", "@tailwindcss/postcss@next", "autoprefixer"]
+      args: ["install", "-D", "tailwindcss", "@tailwindcss/postcss", "postcss", "autoprefixer"]
     },
     {
       action: "file",
@@ -59054,19 +59054,9 @@ var ViteReact = {
       filecontent: 'export default {\n  plugins: {\n    "@tailwindcss/postcss": {},\n    autoprefixer: {},\n  },\n}'
     },
     {
-      action: "file",
-      file: "tailwind.config.js",
-      filecontent: `/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};`
+      action: "command",
+      cmd: "rm",
+      args: ["src/App.css"]
     },
     {
       action: "file",
@@ -59086,11 +59076,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <App />
   </React.StrictMode>,
 )`
-    },
-    {
-      action: "command",
-      cmd: "rm",
-      args: ["src/App.css"]
     },
     {
       action: "file",

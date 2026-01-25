@@ -24,7 +24,7 @@ export const ViteReact: ProjectTemplate = {
     {
       action: 'command',
       cmd: 'npm',
-      args: ['install', '-D', 'tailwindcss@next', '@tailwindcss/postcss@next', 'autoprefixer']
+      args: ['install', '-D', 'tailwindcss', '@tailwindcss/postcss', 'postcss', 'autoprefixer']
     },
     {
       action: 'file',
@@ -32,19 +32,9 @@ export const ViteReact: ProjectTemplate = {
       filecontent: 'export default {\n  plugins: {\n    "@tailwindcss/postcss": {},\n    autoprefixer: {},\n  },\n}'
     },
     {
-      action: 'file',
-      file: 'tailwind.config.js',
-      filecontent: `/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};`
+      action: 'command',
+      cmd: 'rm',
+      args: ['src/App.css']
     },
     {
       action: 'file',
@@ -65,11 +55,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>,
 )`
     },
-    {
-      action: 'command',
-      cmd: 'rm',
-      args: ['src/App.css']
-    },
+
     {
       action: 'file',
       file: 'src/App.tsx',
