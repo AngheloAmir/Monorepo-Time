@@ -1,4 +1,5 @@
 import Background from './components/Background';
+import ChatContainer from './components/ChatContainer';
 import Header from './components/Header';
 
 export default function App() {
@@ -12,6 +13,7 @@ export default function App() {
             <div className='w-full h-full'>
                 <Background />
                 <Header />
+                <ChatContainer />
             </div>
         </div>
     );
