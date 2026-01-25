@@ -119,7 +119,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     {
       action: 'command',
       cmd: 'npm',
-      args: ['pkg', 'set', 'fontawesomeIcon=fab fa-react text-blue-400']
+      args: ['pkg', 'set', 'fontawesomeIcon=fab fa-react text-blue-500']
     }
   ]
 };

@@ -56729,12 +56729,33 @@ var EXCLUDE_PATTERNS = {
   "**/turbo.json": true,
   "**/nodemon.json": true,
   "**/temp.md": true,
-  "**/*postcss*": true,
-  "**/*tailwind*": true,
-  "**/*tsconfig*": true,
-  "**/*eslint*": true,
-  "**/*prettier*": true,
-  "**/*vite*": true,
+  "**/postcss.config.js": true,
+  "**/configs": true,
+  "**/tailwind.config.js": true,
+  "**/tsconfig.app.json": true,
+  "**/tsconfig.json": true,
+  "**/tsconfig.node.json": true,
+  "**/tsconfig.spec.json": true,
+  "**/eslint.json": true,
+  "**/eslint.config.js": true,
+  "**/eslint.config.mjs": true,
+  "**/prettier.config.js": true,
+  "**/prettier.config.mjs": true,
+  "**/prettier.config.cjs": true,
+  "**/vite.config.ts": true,
+  "**/vite.config.js": true,
+  "**/tsup.config.ts": true,
+  "**/rollup.config.ts": true,
+  "**/rollup.config.js": true,
+  "**/webpack.config.js": true,
+  "**/babel.config.js": true,
+  "**/jest.config.js": true,
+  "**/jest.config.ts": true,
+  "**/next.config.js": true,
+  "**/next.config.mjs": true,
+  "**/postcss.config.cjs": true,
+  "**/postcss.config.mjs": true,
+  "**/tailwind.config.ts": true,
   "_temp": true,
   ".gitignore": true,
   ".vscode": true,
@@ -59993,14 +60014,14 @@ var AIChat = {
       args: ["init", "-y"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "express"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "express"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "tsup"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "tsup"]
     },
     // Public files
     {
@@ -60220,14 +60241,9 @@ var ViteReact = {
       args: ["-y", "create-vite@latest", ".", "--template", "react-ts"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["install", "-D", "tailwindcss", "@tailwindcss/postcss", "autoprefixer"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "tailwindcss", "@tailwindcss/postcss", "autoprefixer"]
     },
     {
       action: "file",
@@ -60446,7 +60462,7 @@ var NextJS = {
       args: ["-y", "create-next-app@latest", ".", "--typescript", "--tailwind", "--eslint", "--app", "--yes", "--use-npm"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
       args: ["install"]
     },
@@ -60687,19 +60703,19 @@ var ExpressTS = {
       args: ["init", "-y"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "express", "cors"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "express", "cors"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "@types/cors"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "@types/cors"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "-D", "tsup"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "tsup"]
     },
     {
       action: "file",
@@ -60975,9 +60991,9 @@ functions:
       - httpApi: '*'
 `;
 var ServerlessExpressTS = {
-  name: "Universal Express TS",
-  description: "Express.js TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
-  notes: "Works on Vercel, Netlify, AWS Lambda, Google Cloud, Render, Heroku & Docker.",
+  name: "Serverless Express TS",
+  description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
+  notes: "Node.js and NPM must be installed.",
   templating: [
     {
       action: "command",
@@ -60986,14 +61002,14 @@ var ServerlessExpressTS = {
     },
     // Dependencies
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "express", "cors", "serverless-http"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "express", "cors", "serverless-http"]
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "-D", "nodemon", "typescript", "ts-node", "tsup", "@types/node", "@types/express", "@types/cors"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon", "typescript", "ts-node", "tsup", "@types/node", "@types/express", "@types/cors"]
     },
     // App Files
     {
@@ -61303,9 +61319,9 @@ var N8NLocal = {
   notes: "Requires Node.js installed in your system.",
   templating: [
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "n8n"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "n8n"]
     },
     {
       action: "command",
@@ -62162,9 +62178,9 @@ var StripeTemplate = {
       filecontent: testJs
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["install", "stripe"]
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "stripe"]
     },
     {
       action: "command",
@@ -62261,6 +62277,33 @@ async function writeFile(filePath, content) {
   await import_fs3.promises.writeFile(filePath, content, { encoding: "utf8" });
 }
 var isWindows = process.platform === "win32";
+async function findMonorepoRoot4(startDir) {
+  let currentDir = startDir;
+  while (true) {
+    const markers = ["pnpm-workspace.yaml", "turbo.json", "lerna.json", ".git"];
+    for (const marker of markers) {
+      try {
+        await import_fs3.promises.stat(import_path15.default.join(currentDir, marker));
+        return currentDir;
+      } catch {
+      }
+    }
+    try {
+      const pkgPath = import_path15.default.join(currentDir, "package.json");
+      const content = await import_fs3.promises.readFile(pkgPath, "utf8");
+      const pkg = JSON.parse(content);
+      if (pkg.workspaces) {
+        return currentDir;
+      }
+    } catch {
+    }
+    const parentDir = import_path15.default.dirname(currentDir);
+    if (parentDir === currentDir) {
+      return startDir;
+    }
+    currentDir = parentDir;
+  }
+}
 
 // src/routes/setworkspace/command.ts
 var import_path16 = __toESM(require("path"));
@@ -62358,11 +62401,17 @@ async function executeTemplate(template, workspacePath, onProgress) {
   await ensureDirectory(workspacePath);
   const progress = onProgress || ((msg) => console.log(`[Template] ${msg}`));
   for (const step of template.templating) {
-    if (step.action === "command" && step.cmd) {
+    if ((step.action === "command" || step.action === "root-command") && step.cmd) {
       const cmd = step.cmd;
       let args2 = step.args || [];
+      let cwd = workspacePath;
+      if (step.action === "root-command") {
+        cwd = await findMonorepoRoot4(workspacePath);
+      }
+      let relativePath = import_path17.default.relative(cwd, workspacePath);
+      if (relativePath === "") relativePath = ".";
       const rawFullCmd = args2.length > 0 ? `${cmd} ${args2.join(" ")}` : cmd;
-      const processedCmd = preprocessCommand(rawFullCmd, workspacePath);
+      const processedCmd = preprocessCommand(rawFullCmd, cwd);
       let finalCmd = cmd;
       let finalArgs = args2;
       let useShell = false;
@@ -62370,13 +62419,16 @@ async function executeTemplate(template, workspacePath, onProgress) {
         finalCmd = processedCmd;
         finalArgs = [];
         useShell = true;
+        finalCmd = finalCmd.replace(/\{\{RELATIVE_PATH\}\}/g, relativePath);
       } else {
-        const dirName = import_path17.default.basename(workspacePath);
-        finalArgs = finalArgs.map((arg) => arg.replace(/\$\(basename \$PWD\)/g, dirName));
+        const dirName = import_path17.default.basename(cwd);
+        finalArgs = finalArgs.map(
+          (arg) => arg.replace(/\$\(basename \$PWD\)/g, dirName).replace(/\{\{RELATIVE_PATH\}\}/g, relativePath)
+        );
       }
-      progress(`Running: ${finalCmd} ${finalArgs.join(" ")}`);
+      progress(`Running in ${step.action === "root-command" ? "Root" : "Workspace"}: ${finalCmd} ${finalArgs.join(" ")}`);
       try {
-        const result = await runCommand2(finalCmd, finalArgs, workspacePath, useShell, (data) => {
+        const result = await runCommand2(finalCmd, finalArgs, cwd, useShell, (data) => {
           const trimmed = data.trim();
           if (trimmed) progress(trimmed);
         });

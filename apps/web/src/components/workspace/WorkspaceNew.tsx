@@ -86,7 +86,7 @@ export default function WorkspaceNew() {
                 }
             }
         } catch (error) {
-            if(window.isLoadingCancelled) return;
+            if (window.isLoadingCancelled) return;
             setError('Failed to create workspace');
         }
         loadWorkspace();
@@ -135,7 +135,7 @@ export default function WorkspaceNew() {
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mb-2">
+                {template === '' && <div className="grid grid-cols-2 gap-2 mb-2">
                     <InputField
                         label="Icon"
                         icon="fas fa-icons"
@@ -163,6 +163,7 @@ export default function WorkspaceNew() {
                         }}
                     />
                 </div>
+                }
 
                 <div className="flex flex-row w-[50%] gap-2 mb-2 mt-4">
                     <InputField
@@ -173,6 +174,7 @@ export default function WorkspaceNew() {
                         onChange={(e) => {
                             setTemplate(e.target.value)
                         }}
+                        disabled={ true }
                     />
                     <button
                         onClick={() => setShowTemplateSelector(true)}

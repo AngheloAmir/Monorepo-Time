@@ -11,7 +11,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
         <GradientBody>
             <header className="p-3 flex items-start gap-4 bg-gradient-to-b from-white/5 to-transparent">
                 <div className="w-10 h-10 rounded flex items-center justify-center border border-white/10">
-                    <i className={`text-gray-400 text-xl ${props.info.fontawesomeIcon ?? 'fa fa-cube'}`}></i>
+                    <i className={`text-xl ${props.info.fontawesomeIcon ?? 'text-gray-400 fa fa-cube'}`}></i>
                 </div>
                 <div className="flex flex-col h-12 overflow-hidden flex-1">
                     <h3 className="text-base font-bold text-gray-200 group-hover:text-white leading-tight mb-1 transition-colors">

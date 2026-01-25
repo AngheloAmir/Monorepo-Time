@@ -35,7 +35,7 @@ export const DotNetConsole: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-windows text-blue-600']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-windows text-blue-500']
         }
     ]
 };
