@@ -174,7 +174,7 @@ const stripe = new Stripe('sk_test_mock_123', {
 `;
 
 export const StripeTemplate: ProjectTemplate = {
-    name: "Stripe Mock",
+    name: "Stripe Mock (Experimental)",
     description: "Stripe API Mock Server",
     notes: "Runs the official stripe-mock image. Requires Docker.",
     templating: [
@@ -222,6 +222,11 @@ export const StripeTemplate: ProjectTemplate = {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-credit-card text-green-500']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'description=Stripe Mock']
         },
         {
             action: 'command',

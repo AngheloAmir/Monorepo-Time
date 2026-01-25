@@ -187,6 +187,11 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=PostgreSQL (Docker)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-database text-blue-500']
         }
     ]

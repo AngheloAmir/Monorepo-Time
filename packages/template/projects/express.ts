@@ -225,6 +225,11 @@ export const ExpressTS: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=Express.js TS']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fab fa-node text-green-500']
         }
     ]

@@ -33,6 +33,11 @@ export const N8NLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=N8N (Local)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'name=$(basename $PWD)']
         },
     ]

@@ -43,6 +43,11 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=MySQL (Local)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-database text-blue-500']
         }
     ]

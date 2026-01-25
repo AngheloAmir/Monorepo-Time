@@ -28,6 +28,11 @@ export const PHP: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=PHP']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fab fa-php text-indigo-500']
         }
     ]

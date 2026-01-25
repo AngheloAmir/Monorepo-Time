@@ -151,6 +151,11 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=Meilisearch (Docker)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'name=$(basename $PWD)']
         }
     ]

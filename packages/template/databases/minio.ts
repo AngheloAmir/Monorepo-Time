@@ -166,7 +166,12 @@ process.on('SIGTERM', cleanup);`
             cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fab fa-amazon text-blue-500']
         },
-         {
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'description=MinIO (Docker)']
+        },
+        {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'name=$(basename $PWD)']

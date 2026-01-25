@@ -137,6 +137,11 @@ export default function RootLayout({
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=Next.js TS']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fab fa-js text-white']
         }
     ]

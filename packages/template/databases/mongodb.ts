@@ -153,6 +153,11 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=MongoDB (Docker)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-leaf text-green-500']
         }
     ]

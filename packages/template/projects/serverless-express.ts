@@ -338,6 +338,11 @@ export const ServerlessExpressTS: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=Serverless Express TS']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fab fa-aws text-orange-500']
         }
     ]

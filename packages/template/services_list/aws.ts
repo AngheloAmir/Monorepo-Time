@@ -6,7 +6,7 @@ import { serverJs } from "./aws/server";
 import { stopJs } from "./aws/stop";
 
 export const AWSTemplate: ProjectTemplate = {
-    name: "AWS Local",
+    name: "Localstack (Experimental)",
     description: "AWS LocalStack Environment with Manager",
     notes: "Requires Docker, Node.js, and AWS CLI installed.",
     templating: [
@@ -64,6 +64,11 @@ export const AWSTemplate: ProjectTemplate = {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fab fa-aws text-orange-500']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'description=AWS LocalStack Environment with Manager']
         },
         {
             action: 'command',

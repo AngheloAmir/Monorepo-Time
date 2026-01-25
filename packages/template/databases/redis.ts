@@ -150,6 +150,11 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=Redis (Docker)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-server text-red-500']
         }
     ]

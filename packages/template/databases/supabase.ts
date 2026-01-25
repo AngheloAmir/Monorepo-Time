@@ -29,6 +29,11 @@ export const Supabase: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'description=Supabase (Docker)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-bolt text-green-500']
         }
     ]
