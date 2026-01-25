@@ -21,5 +21,6 @@ export default async function FetchToWho( chats: ChatItem[]) {
     // const data = await response.json();
     // return data.choices[0].message.content;
 
-    return "edit the FetchToWho";
+    const lorem = "Please edit the FetchToWho function. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.";
+    return lorem;
 }

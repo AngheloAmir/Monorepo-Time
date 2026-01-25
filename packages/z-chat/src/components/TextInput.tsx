@@ -44,7 +44,7 @@ export default function TextInput() {
                         onChange={(e) => setTextinput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Message MonoChat..."
-                        className="w-full pl-4 py-3 bg-transparent active:bg-transparent border-none outline-none focus:outline-none text-zinc-100 placeholder:text-zinc-500 focus:ring-0 resize-none max-h-48 min-h-[44px] scrollbar-hide text-[15px] leading-6"
+                        className="w-full pl-4 py-3 bg-transparent active:bg-transparent border-none outline-none focus:outline-none text-zinc-100 placeholder:text-zinc-500 focus:ring-0 resize-none max-h-48 min-h-[44px] scrollbar-hide text-md leading-6"
                         rows={1}
                         style={{ height: 'auto', minHeight: '44px' }}
                         onInput={(e) => {

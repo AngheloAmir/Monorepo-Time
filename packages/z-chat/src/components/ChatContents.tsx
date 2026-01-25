@@ -14,7 +14,7 @@ export default function ChatContents() {
     }, [chats]);
 
     return (
-        <div className="flex-1 overflow-y-auto w-full px-4 pt-6 pb-4 space-y-8 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto w-full px-4 scrollbar-hide">
             {chats.map((chat) => (
                 <div
                     key={chat.id}
@@ -28,9 +28,9 @@ export default function ChatContents() {
                                 </span>
                             </div>
                             <div
-                                className={`relative px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-lg backdrop-blur-sm transition-transform duration-200 ${chat.who === 'user'
-                                    ? 'bg-zinc-800/80 text-white rounded-tr-sm border border-zinc-700/50'
-                                    : 'bg-black/40 text-zinc-100 rounded-tl-sm border border-white/10'
+                                className={`relative px-5 py-3 rounded-2xl text-md leading-relaxed  transition-transform duration-200 ${chat.who === 'user'
+                                    ? 'bg-zinc-800/80 text-white rounded-tr-sm border border-zinc-700/50 shadow-lg backdrop-blur-sm'
+                                    : ' text-zinc-100'
                                     }`}
                             >
                                 {chat.message}
