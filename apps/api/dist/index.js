@@ -58613,1534 +58613,297 @@ var templates = [
 ];
 var database_default = templates;
 
-// ../../packages/template/demo/aichat/files/indexHtml.ts
-var indexHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreshFruit - Premium Organic Fruits</title>
-    <meta name="description" content="Fresh organic fruits delivered to your doorstep. Premium quality, farm-to-table freshness.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">\u{1F34A} FreshFruit</div>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="#products">Products</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>Fresh Organic Fruits Delivered Daily</h1>
-        <p>Experience the finest selection of farm-fresh fruits, handpicked and delivered straight to your doorstep. Taste the difference of truly organic produce.</p>
-        <button class="cta-button">Shop Now</button>
-    </section>
-
-    <!-- Products Section -->
-    <section class="products" id="products">
-        <h2>Our Fresh Selection</h2>
-        <div class="products-grid">
-            <div class="product-card">
-                <div class="product-image">\u{1F34E}</div>
-                <div class="product-info">
-                    <h3>Organic Apples</h3>
-                    <p>Crisp and sweet, straight from our partner orchards</p>
-                    <span class="product-price">$4.99/lb</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <div class="product-image">\u{1F34A}</div>
-                <div class="product-info">
-                    <h3>Valencia Oranges</h3>
-                    <p>Juicy and vitamin-packed, perfect for fresh juice</p>
-                    <span class="product-price">$5.49/lb</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <div class="product-image">\u{1F347}</div>
-                <div class="product-info">
-                    <h3>Premium Grapes</h3>
-                    <p>Seedless and bursting with natural sweetness</p>
-                    <span class="product-price">$6.99/lb</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <div class="product-image">\u{1F96D}</div>
-                <div class="product-info">
-                    <h3>Alphonso Mangoes</h3>
-                    <p>The king of fruits, rich and aromatic</p>
-                    <span class="product-price">$8.99/lb</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <div class="product-image">\u{1F353}</div>
-                <div class="product-info">
-                    <h3>Fresh Strawberries</h3>
-                    <p>Hand-picked at peak ripeness for maximum flavor</p>
-                    <span class="product-price">$7.49/lb</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <div class="product-image">\u{1F34C}</div>
-                <div class="product-info">
-                    <h3>Organic Bananas</h3>
-                    <p>Naturally ripened, perfect for smoothies</p>
-                    <span class="product-price">$2.99/lb</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Chat Widget -->
-    <div class="chat-widget">
-        <div class="chat-window" id="chatWindow">
-            <div class="chat-header">
-                <div class="chat-header-avatar">\u{1F34A}</div>
-                <div class="chat-header-info">
-                    <h4>FreshFruit Support</h4>
-                    <span>We typically reply instantly</span>
-                </div>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="message bot">
-                    Hi! \u{1F44B} Welcome to FreshFruit! How can I help you today? I can answer questions about our products, delivery, or anything else!
-                </div>
-            </div>
-            <div class="chat-input-container">
-                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." autocomplete="off">
-                <button class="chat-send" id="chatSend">
-                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                </button>
-            </div>
-        </div>
-        <button class="chat-toggle" id="chatToggle">
-            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-        </button>
-    </div>
-
-    <script>
-        // Chat Widget Functionality
-        const chatToggle = document.getElementById('chatToggle');
-        const chatWindow = document.getElementById('chatWindow');
-        const chatInput = document.getElementById('chatInput');
-        const chatSend = document.getElementById('chatSend');
-        const chatMessages = document.getElementById('chatMessages');
-
-        // Toggle chat window
-        chatToggle.addEventListener('click', () => {
-            chatWindow.classList.toggle('open');
-            if (chatWindow.classList.contains('open')) {
-                chatInput.focus();
-            }
-        });
-
-        // Send message function
-        async function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message) return;
-
-            // Add user message
-            addMessage(message, 'user');
-            chatInput.value = '';
-
-            // Show typing indicator
-            const typingEl = showTyping();
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message })
-                });
-
-                const data = await response.json();
-                typingEl.remove();
-
-                if (data.reply) {
-                    addMessage(data.reply, 'bot');
-                } else {
-                    addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-                }
-            } catch (error) {
-                typingEl.remove();
-                addMessage('Sorry, I\\'m having trouble connecting. Please try again later.', 'bot');
-            }
-        }
-
-        // Add message to chat
-        function addMessage(text, type) {
-            const messageEl = document.createElement('div');
-            messageEl.className = 'message ' + type;
-            messageEl.textContent = text;
-            chatMessages.appendChild(messageEl);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Show typing indicator
-        function showTyping() {
-            const typingEl = document.createElement('div');
-            typingEl.className = 'typing-indicator';
-            typingEl.innerHTML = '<span></span><span></span><span></span>';
-            chatMessages.appendChild(typingEl);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            return typingEl;
-        }
-
-        // Event listeners
-        chatSend.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    </script>
-</body>
-</html>
-`;
-
-// ../../packages/template/demo/aichat/files/adminHtml.ts
-var adminHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - AI Chat Configuration</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">\u{1F34A} FreshFruit Admin</div>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="/">View Store</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1>AI Chat Configuration</h1>
-            <p>Configure your AI provider and embed FAQ knowledge for customer support</p>
-        </div>
-
-        <!-- AI Provider Configuration -->
-        <div class="admin-card">
-            <h2>\u{1F511} AI Provider Settings</h2>
-            <form id="configForm">
-                <div class="form-group">
-                    <label for="apiKey">API Key</label>
-                    <input type="password" class="form-input" id="apiKey" placeholder="sk-..." autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label for="providerUrl">Chat Completions URL</label>
-                    <input type="text" class="form-input" id="providerUrl" placeholder="https://api.openai.com/v1/chat/completions">
-                </div>
-                <div class="form-group">
-                    <label for="embeddingsUrl">Embeddings URL</label>
-                    <input type="text" class="form-input" id="embeddingsUrl" placeholder="https://api.openai.com/v1/embeddings">
-                </div>
-                <div class="form-group">
-                    <label for="model">Chat Model</label>
-                    <input type="text" class="form-input" id="model" placeholder="gpt-3.5-turbo">
-                </div>
-                <div class="form-group">
-                    <label for="embeddingsModel">Embeddings Model</label>
-                    <input type="text" class="form-input" id="embeddingsModel" placeholder="text-embedding-3-small">
-                </div>
-                <button type="submit" class="btn">\u{1F4BE} Save Configuration</button>
-            </form>
-        </div>
-
-        <!-- Knowledge Base Embedding -->
-        <div class="admin-card">
-            <h2>\u{1F4DA} Knowledge Base</h2>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
-                Enter your FAQ content below. Each paragraph will be embedded and used to answer customer questions.
-            </p>
-            <form id="embedForm">
-                <div class="form-group">
-                    <label for="faqContent">FAQ Content</label>
-                    <textarea class="form-input" id="faqContent" placeholder="Enter your FAQ content here...
-
-Example:
-Q: What are your delivery hours?
-A: We deliver from 8 AM to 8 PM, Monday through Saturday.
-
-Q: How do I return a product?
-A: You can return any product within 24 hours of delivery if you're not satisfied. Contact our support team.
-
-Q: Do you offer organic certification?
-A: Yes, all our products are certified organic by USDA."></textarea>
-                </div>
-                <button type="submit" class="btn" id="embedBtn">\u{1F52E} Embed Knowledge</button>
-            </form>
-            <div class="status-bar">
-                <div class="status-item">
-                    <div class="value" id="embeddingCount">0</div>
-                    <div class="label">Embeddings</div>
-                </div>
-                <div class="status-item">
-                    <div class="value" id="lastUpdated">Never</div>
-                    <div class="label">Last Updated</div>
-                </div>
-                <div class="status-item">
-                    <div class="value" id="configStatus">\u274C</div>
-                    <div class="label">API Configured</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Clear Data -->
-        <div class="admin-card">
-            <h2>\u{1F5D1}\uFE0F Data Management</h2>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
-                Clear all embeddings to start fresh or to re-embed with new content.
-            </p>
-            <button class="btn btn-secondary" id="clearBtn">Clear All Embeddings</button>
-        </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
-
-    <script>
-        // Toast notification
-        function showToast(message, duration = 3000) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), duration);
-        }
-
-        // Load configuration on page load
-        async function loadConfig() {
-            try {
-                const response = await fetch('/api/config');
-                const data = await response.json();
-                
-                if (data.config) {
-                    document.getElementById('apiKey').value = data.config.apiKey || '';
-                    document.getElementById('providerUrl').value = data.config.providerUrl || 'https://api.openai.com/v1/chat/completions';
-                    document.getElementById('embeddingsUrl').value = data.config.embeddingsUrl || 'https://api.openai.com/v1/embeddings';
-                    document.getElementById('model').value = data.config.model || 'gpt-3.5-turbo';
-                    document.getElementById('embeddingsModel').value = data.config.embeddingsModel || 'text-embedding-3-small';
-                }
-                
-                document.getElementById('embeddingCount').textContent = data.embeddingCount || 0;
-                document.getElementById('lastUpdated').textContent = data.lastUpdated || 'Never';
-                document.getElementById('configStatus').textContent = data.config?.apiKey ? '\u2705' : '\u274C';
-            } catch (error) {
-                console.error('Failed to load config:', error);
-            }
-        }
-
-        // Save configuration
-        document.getElementById('configForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const config = {
-                apiKey: document.getElementById('apiKey').value,
-                providerUrl: document.getElementById('providerUrl').value,
-                embeddingsUrl: document.getElementById('embeddingsUrl').value,
-                model: document.getElementById('model').value,
-                embeddingsModel: document.getElementById('embeddingsModel').value
-            };
-
-            try {
-                const response = await fetch('/api/config', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(config)
-                });
-                
-                if (response.ok) {
-                    showToast('\u2705 Configuration saved successfully!');
-                    document.getElementById('configStatus').textContent = config.apiKey ? '\u2705' : '\u274C';
-                } else {
-                    showToast('\u274C Failed to save configuration');
-                }
-            } catch (error) {
-                showToast('\u274C Error saving configuration');
-            }
-        });
-
-        // Embed knowledge
-        document.getElementById('embedForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const content = document.getElementById('faqContent').value.trim();
-            if (!content) {
-                showToast('\u26A0\uFE0F Please enter some content to embed');
-                return;
-            }
-
-            const embedBtn = document.getElementById('embedBtn');
-            embedBtn.disabled = true;
-            embedBtn.textContent = '\u23F3 Embedding...';
-
-            try {
-                const response = await fetch('/api/embed', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    showToast('\u2705 ' + (data.message || 'Content embedded successfully!'));
-                    document.getElementById('embeddingCount').textContent = data.count || 0;
-                    document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-                    document.getElementById('faqContent').value = '';
-                } else {
-                    showToast('\u274C ' + (data.error || 'Failed to embed content'));
-                }
-            } catch (error) {
-                showToast('\u274C Error embedding content');
-            } finally {
-                embedBtn.disabled = false;
-                embedBtn.textContent = '\u{1F52E} Embed Knowledge';
-            }
-        });
-
-        // Clear embeddings
-        document.getElementById('clearBtn').addEventListener('click', async () => {
-            if (!confirm('Are you sure you want to clear all embeddings?')) return;
-
-            try {
-                const response = await fetch('/api/embed', {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    showToast('\u2705 All embeddings cleared');
-                    document.getElementById('embeddingCount').textContent = '0';
-                } else {
-                    showToast('\u274C Failed to clear embeddings');
-                }
-            } catch (error) {
-                showToast('\u274C Error clearing embeddings');
-            }
-        });
-
-        // Load config on page load
-        loadConfig();
-    </script>
-</body>
-</html>
-`;
-
-// ../../packages/template/demo/aichat/files/stylesTs.ts
-var stylesCSS = `/* === CSS Variables === */
-:root {
-    --primary: #22c55e;
-    --primary-dark: #16a34a;
-    --secondary: #f97316;
-    --bg-dark: #0f172a;
-    --bg-card: rgba(255, 255, 255, 0.05);
-    --text-light: #f8fafc;
-    --text-muted: #94a3b8;
-    --border-color: rgba(255, 255, 255, 0.1);
-    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    --glass: rgba(255, 255, 255, 0.1);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-    color: var(--text-light);
-    min-height: 100vh;
-    line-height: 1.6;
-}
-
-/* === Header === */
-.header {
-    background: var(--glass);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color);
-    padding: 1rem 2rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-}
-
-.header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
-}
-
-.nav-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.nav-links a:hover {
-    color: var(--primary);
-}
-
-/* === Hero Section === */
-.hero {
-    padding: 8rem 2rem 4rem;
-    text-align: center;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.hero h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, #fff, var(--primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.hero p {
-    font-size: 1.25rem;
-    color: var(--text-muted);
-    margin-bottom: 2rem;
-}
-
-.cta-button {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    padding: 1rem 2.5rem;
-    border: none;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
-}
-
-/* === Products Grid === */
-.products {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 4rem 2rem;
-}
-
-.products h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-}
-
-.product-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow);
-}
-
-.product-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-}
-
-.product-info {
-    padding: 1.5rem;
-}
-
-.product-info h3 {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
-}
-
-.product-info p {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-
-.product-price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-/* === Chatbox Widget === */
-.chat-widget {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-}
-
-.chat-toggle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 30px rgba(34, 197, 94, 0.4);
-    transition: transform 0.3s;
-}
-
-.chat-toggle:hover {
-    transform: scale(1.1);
-}
-
-.chat-toggle svg {
-    width: 28px;
-    height: 28px;
-    fill: white;
-}
-
-.chat-window {
-    position: absolute;
-    bottom: 80px;
-    right: 0;
-    width: 380px;
-    height: 500px;
-    background: var(--bg-dark);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    animation: slideUp 0.3s ease;
-}
-
-.chat-window.open {
-    display: flex;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.chat-header {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.chat-header-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-}
-
-.chat-header-info h4 {
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.chat-header-info span {
-    font-size: 0.75rem;
-    opacity: 0.8;
-}
-
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.message {
-    max-width: 80%;
-    padding: 0.75rem 1rem;
-    border-radius: 18px;
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
-.message.bot {
-    background: var(--glass);
-    border: 1px solid var(--border-color);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-}
-
-.message.user {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-}
-
-.typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 0.75rem 1rem;
-    background: var(--glass);
-    border: 1px solid var(--border-color);
-    border-radius: 18px;
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-}
-
-.typing-indicator span {
-    width: 8px;
-    height: 8px;
-    background: var(--text-muted);
-    border-radius: 50%;
-    animation: bounce 1.4s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
-}
-
-.chat-input-container {
-    padding: 1rem;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    gap: 0.5rem;
-}
-
-.chat-input {
-    flex: 1;
-    background: var(--glass);
-    border: 1px solid var(--border-color);
-    border-radius: 25px;
-    padding: 0.75rem 1rem;
-    color: var(--text-light);
-    font-size: 0.9rem;
-    outline: none;
-}
-
-.chat-input::placeholder {
-    color: var(--text-muted);
-}
-
-.chat-send {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s;
-}
-
-.chat-send:hover {
-    transform: scale(1.05);
-}
-
-.chat-send svg {
-    width: 20px;
-    height: 20px;
-    fill: white;
-}
-
-/* === Admin Panel Styles === */
-.admin-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 6rem 2rem 4rem;
-}
-
-.admin-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.admin-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.admin-header p {
-    color: var(--text-muted);
-}
-
-.admin-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-}
-
-.admin-card h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-}
-
-.form-input {
-    width: 100%;
-    background: var(--glass);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 0.875rem 1rem;
-    color: var(--text-light);
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-.form-input:focus {
-    border-color: var(--primary);
-}
-
-.form-input::placeholder {
-    color: var(--text-muted);
-}
-
-textarea.form-input {
-    min-height: 200px;
-    resize: vertical;
-    font-family: inherit;
-}
-
-.btn {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    padding: 0.875rem 2rem;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-secondary {
-    background: var(--glass);
-    border: 1px solid var(--border-color);
-}
-
-.status-bar {
-    background: var(--glass);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 1rem 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1.5rem;
-}
-
-.status-item {
-    text-align: center;
-}
-
-.status-item .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.status-item .label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.toast {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--primary);
-    color: white;
-    padding: 1rem 2rem;
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 2000;
-}
-
-.toast.show {
-    opacity: 1;
-}
-
-/* === Responsive === */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-    
-    .chat-window {
-        width: calc(100vw - 40px);
-        height: 60vh;
-    }
-    
-    .nav-links {
-        display: none;
-    }
-}
-`;
-
-// ../../packages/template/demo/aichat/files/serverTs.ts
-var serverTs = `import express, { Request, Response } from 'express';
-import path from 'path';
-import chatRouter from './routes/chat';
-import embedRouter from './routes/embed';
-import configRouter from './routes/config';
-import { loadEmbeddings } from './vectorStore';
-import { loadConfig } from './aiClient';
-
-const app = express();
-const port = 3500;
-
-// Middleware
-app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.json());
-
-// Load persisted data
-loadEmbeddings();
-loadConfig();
-
-// API Routes
-app.use('/api/chat', chatRouter);
-app.use('/api/embed', embedRouter);
-app.use('/api/config', configRouter);
-
-// Serve main page
-app.get('/', (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-});
-
-// Start server
-app.listen(port, () => {
-    console.log('');
-    console.log('\u{1F34A} ====================================');
-    console.log('   FreshFruit AI Chat Demo');
-    console.log('====================================');
-    console.log('');
-    console.log('\u{1F4CD} Store:       http://localhost:' + port);
-    console.log('\u{1F527} Admin Panel: http://localhost:' + port + '/admin.html');
-    console.log('');
-    console.log('\u{1F4DD} Quick Start:');
-    console.log('   1. Open the Admin Panel');
-    console.log('   2. Configure your OpenAI API key');
-    console.log('   3. Add FAQ content and click "Embed"');
-    console.log('   4. Open the Store and chat with the AI!');
-    console.log('');
-});
-`;
-var tsconfigJson = `{
-  "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
-  }
-}`;
-var tsupConfig = `import { defineConfig } from 'tsup';
-
-export default defineConfig({
-  entry: ['src/index.ts'],
-  splitting: false,
-  sourcemap: true,
-  clean: true,
-  format: ['cjs'],
-});`;
-
-// ../../packages/template/demo/aichat/files/vectorStoreTs.ts
-var vectorStoreTs = `import fs from 'fs';
-import path from 'path';
-
-const EMBEDDINGS_FILE = path.join(__dirname, '../embeddings.json');
-
-interface EmbeddingEntry {
-    id: string;
-    text: string;
-    embedding: number[];
-    timestamp: number;
-}
-
-// In-memory vector database
-let vectorStore: EmbeddingEntry[] = [];
-
-// Load embeddings from file on startup
-export function loadEmbeddings(): void {
-    try {
-        if (fs.existsSync(EMBEDDINGS_FILE)) {
-            const data = fs.readFileSync(EMBEDDINGS_FILE, 'utf-8');
-            vectorStore = JSON.parse(data);
-            console.log('\u{1F4DA} Loaded ' + vectorStore.length + ' embeddings from file');
-        }
-    } catch (error) {
-        console.error('Failed to load embeddings:', error);
-        vectorStore = [];
-    }
-}
-
-// Save embeddings to file
-export function saveEmbeddings(): void {
-    try {
-        fs.writeFileSync(EMBEDDINGS_FILE, JSON.stringify(vectorStore, null, 2));
-    } catch (error) {
-        console.error('Failed to save embeddings:', error);
-    }
-}
-
-// Add embedding to store
-export function addEmbedding(text: string, embedding: number[]): void {
-    const entry: EmbeddingEntry = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-        text,
-        embedding,
-        timestamp: Date.now()
-    };
-    vectorStore.push(entry);
-    saveEmbeddings();
-}
-
-// Clear all embeddings
-export function clearEmbeddings(): void {
-    vectorStore = [];
-    saveEmbeddings();
-}
-
-// Get embedding count
-export function getEmbeddingCount(): number {
-    return vectorStore.length;
-}
-
-// Cosine similarity between two vectors
-function cosineSimilarity(a: number[], b: number[]): number {
-    if (a.length !== b.length) return 0;
-    
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-    
-    for (let i = 0; i < a.length; i++) {
-        dotProduct += a[i] * b[i];
-        normA += a[i] * a[i];
-        normB += b[i] * b[i];
-    }
-    
-    if (normA === 0 || normB === 0) return 0;
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
-// Search for similar embeddings
-export function searchSimilar(queryEmbedding: number[], topK: number = 3): { text: string; score: number }[] {
-    const results = vectorStore
-        .map(entry => ({
-            text: entry.text,
-            score: cosineSimilarity(queryEmbedding, entry.embedding)
-        }))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, topK);
-    
-    return results;
-}
-
-// Get last update time
-export function getLastUpdated(): string | null {
-    if (vectorStore.length === 0) return null;
-    const latest = Math.max(...vectorStore.map(e => e.timestamp));
-    return new Date(latest).toLocaleString();
-}
-`;
-
-// ../../packages/template/demo/aichat/files/aiClientTs.ts
-var aiClientTs = `import fs from 'fs';
-import path from 'path';
-
-const CONFIG_FILE = path.join(__dirname, '../config.json');
-
-export interface AIConfig {
-    apiKey: string;
-    providerUrl: string;
-    embeddingsUrl: string;
-    model: string;
-    embeddingsModel: string;
-}
-
-// Default configuration
-const defaultConfig: AIConfig = {
-    apiKey: '',
-    providerUrl: 'https://api.openai.com/v1/chat/completions',
-    embeddingsUrl: 'https://api.openai.com/v1/embeddings',
-    model: 'gpt-3.5-turbo',
-    embeddingsModel: 'text-embedding-3-small'
-};
-
-let currentConfig: AIConfig = { ...defaultConfig };
-
-// Load configuration from file
-export function loadConfig(): void {
-    try {
-        if (fs.existsSync(CONFIG_FILE)) {
-            const data = fs.readFileSync(CONFIG_FILE, 'utf-8');
-            currentConfig = { ...defaultConfig, ...JSON.parse(data) };
-            console.log('\u{1F511} Loaded AI configuration');
-        }
-    } catch (error) {
-        console.error('Failed to load config:', error);
-        currentConfig = { ...defaultConfig };
-    }
-}
-
-// Save configuration to file
-export function saveConfig(config: AIConfig): void {
-    currentConfig = { ...config };
-    try {
-        fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
-    } catch (error) {
-        console.error('Failed to save config:', error);
-    }
-}
-
-// Get current configuration
-export function getConfig(): AIConfig {
-    return currentConfig;
-}
-
-// Call embeddings API
-export async function callEmbeddingsAPI(text: string): Promise<number[]> {
-    const config = getConfig();
-    
-    if (!config.apiKey) {
-        throw new Error('API key not configured');
-    }
-
-    const response = await fetch(config.embeddingsUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + config.apiKey
-        },
-        body: JSON.stringify({
-            model: config.embeddingsModel,
-            input: text
-        })
-    });
-
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error('Embeddings API error: ' + error);
-    }
-
-    const data = await response.json();
-    return data.data[0].embedding;
-}
-
-// Call chat completions API
-export async function callChatAPI(systemPrompt: string, userMessage: string): Promise<string> {
-    const config = getConfig();
-    
-    if (!config.apiKey) {
-        throw new Error('API key not configured');
-    }
-
-    const response = await fetch(config.providerUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + config.apiKey
-        },
-        body: JSON.stringify({
-            model: config.model,
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: userMessage }
-            ],
-            max_tokens: 500,
-            temperature: 0.7
-        })
-    });
-
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error('Chat API error: ' + error);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-}
-`;
-
-// ../../packages/template/demo/aichat/files/routesTs.ts
-var chatRouteTs = `import { Router, Request, Response } from 'express';
-import { searchSimilar } from '../vectorStore';
-import { getConfig, callEmbeddingsAPI, callChatAPI } from '../aiClient';
-
-const router = Router();
-
-router.post('/', async (req: Request, res: Response) => {
-    try {
-        const { message } = req.body;
-        
-        if (!message) {
-            return res.status(400).json({ error: 'Message is required' });
-        }
-
-        const config = getConfig();
-        if (!config.apiKey) {
-            return res.json({ 
-                reply: "I'm not configured yet. Please ask the admin to set up the AI provider in the admin panel." 
-            });
-        }
-
-        // Get embedding for the user's message
-        const queryEmbedding = await callEmbeddingsAPI(message);
-        
-        // Search for similar content in our knowledge base
-        const similarDocs = searchSimilar(queryEmbedding, 3);
-        
-        // Build context from similar documents
-        let context = '';
-        if (similarDocs.length > 0 && similarDocs[0].score > 0.3) {
-            context = 'Relevant information from our knowledge base:\\n' + 
-                similarDocs
-                    .filter(doc => doc.score > 0.3)
-                    .map(doc => doc.text)
-                    .join('\\n\\n');
-        }
-
-        // Create the chat prompt
-        const systemPrompt = "You are a helpful customer support assistant for FreshFruit, " +
-            "a premium organic fruit delivery service. Be friendly, helpful, and concise. " +
-            "If you have relevant information from the knowledge base, use it to answer. " +
-            "If you don't know something, say so politely and suggest contacting human support.\\n\\n" +
-            (context ? 'Knowledge Base Context:\\n' + context : 'No specific knowledge base context available for this query.');
-
-        // Call the chat API
-        const reply = await callChatAPI(systemPrompt, message);
-        
-        res.json({ reply });
-    } catch (error) {
-        console.error('Chat error:', error);
-        res.status(500).json({ error: 'Failed to process message' });
-    }
-});
-
-export default router;
-`;
-var embedRouteTs = `import { Router, Request, Response } from 'express';
-import { addEmbedding, clearEmbeddings, getEmbeddingCount } from '../vectorStore';
-import { getConfig, callEmbeddingsAPI } from '../aiClient';
-
-const router = Router();
-
-// Embed new content
-router.post('/', async (req: Request, res: Response) => {
-    try {
-        const { content } = req.body;
-        
-        if (!content) {
-            return res.status(400).json({ error: 'Content is required' });
-        }
-
-        const config = getConfig();
-        if (!config.apiKey) {
-            return res.status(400).json({ error: 'API key not configured. Please configure in admin panel.' });
-        }
-
-        // Split content into chunks (by double newline or paragraph)
-        const chunks = content
-            .split(/\\n\\n+/)
-            .map((chunk: string) => chunk.trim())
-            .filter((chunk: string) => chunk.length > 10);
-
-        if (chunks.length === 0) {
-            return res.status(400).json({ error: 'No valid content chunks found' });
-        }
-
-        // Embed each chunk
-        let embedded = 0;
-        for (const chunk of chunks) {
-            try {
-                const embedding = await callEmbeddingsAPI(chunk);
-                addEmbedding(chunk, embedding);
-                embedded++;
-            } catch (error) {
-                console.error('Failed to embed chunk:', error);
-            }
-        }
-
-        res.json({ 
-            message: 'Successfully embedded ' + embedded + ' chunks',
-            count: getEmbeddingCount()
-        });
-    } catch (error) {
-        console.error('Embed error:', error);
-        res.status(500).json({ error: 'Failed to embed content' });
-    }
-});
-
-// Clear all embeddings
-router.delete('/', (req: Request, res: Response) => {
-    clearEmbeddings();
-    res.json({ message: 'All embeddings cleared', count: 0 });
-});
-
-export default router;
-`;
-var configRouteTs = `import { Router, Request, Response } from 'express';
-import { getConfig, saveConfig, AIConfig } from '../aiClient';
-import { getEmbeddingCount, getLastUpdated } from '../vectorStore';
-
-const router = Router();
-
-// Get current config
-router.get('/', (req: Request, res: Response) => {
-    const config = getConfig();
-    // Mask the API key for security
-    const maskedConfig = {
-        ...config,
-        apiKey: config.apiKey ? '\u2022\u2022\u2022\u2022\u2022\u2022' + config.apiKey.slice(-4) : ''
-    };
-    
-    res.json({
-        config: maskedConfig,
-        embeddingCount: getEmbeddingCount(),
-        lastUpdated: getLastUpdated()
-    });
-});
-
-// Update config
-router.post('/', (req: Request, res: Response) => {
-    try {
-        const { apiKey, providerUrl, embeddingsUrl, model, embeddingsModel } = req.body;
-        
-        const newConfig: AIConfig = {
-            apiKey: apiKey || '',
-            providerUrl: providerUrl || 'https://api.openai.com/v1/chat/completions',
-            embeddingsUrl: embeddingsUrl || 'https://api.openai.com/v1/embeddings',
-            model: model || 'gpt-3.5-turbo',
-            embeddingsModel: embeddingsModel || 'text-embedding-3-small'
-        };
-        
-        saveConfig(newConfig);
-        res.json({ message: 'Configuration saved' });
-    } catch (error) {
-        console.error('Config save error:', error);
-        res.status(500).json({ error: 'Failed to save configuration' });
-    }
-});
-
-export default router;
-`;
-
-// ../../packages/template/demo/aichat/index.ts
+// ../../packages/template/demo.ts
 var AIChat = {
-  name: "AI Chat",
-  description: "Fullstack AI Customer Support Chat - Chat with your FAQ/Knowledge Base",
-  notes: "Requires Node.js, NPM, and an OpenAI-compatible API key",
+  name: "Chat To MonoChat",
+  description: "React Frontend, needs custom backend",
+  notes: "Vite React + TailwindCSS + TypeScript",
   templating: [
-    // Install dependencies
     {
       action: "command",
-      cmd: "npm",
-      args: ["init", "-y"]
-    },
-    {
-      action: "root-command",
-      cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "express"]
-    },
-    {
-      action: "root-command",
-      cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "tsup"]
-    },
-    // Public files
-    {
-      action: "file",
-      file: "public/index.html",
-      filecontent: indexHTML
+      cmd: "rm -rf ./* ./.[!.]*",
+      args: []
     },
     {
       action: "file",
-      file: "public/admin.html",
-      filecontent: adminHTML
+      file: ".gitignore",
+      filecontent: "# Logs\nlogs\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\npnpm-debug.log*\nlerna-debug.log*\n\nnode_modules\ndist\ndist-ssr\n*.local\n\n# Editor directories and files\n.vscode/*\n!.vscode/extensions.json\n.idea\n.DS_Store\n*.suo\n*.ntvs*\n*.njsproj\n*.sln\n*.sw?\n"
     },
     {
       action: "file",
-      file: "public/styles.css",
-      filecontent: stylesCSS
-    },
-    // Source files
-    {
-      action: "file",
-      file: "src/index.ts",
-      filecontent: serverTs
+      file: "README.md",
+      filecontent: "# React + TypeScript + Vite\n\nThis template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.\n\nCurrently, two official plugins are available:\n\n- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh\n- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh\n\n## React Compiler\n\nThe React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).\n\n## Expanding the ESLint configuration\n\nIf you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:\n\n```js\nexport default defineConfig([\n  globalIgnores(['dist']),\n  {\n    files: ['**/*.{ts,tsx}'],\n    extends: [\n      // Other configs...\n\n      // Remove tseslint.configs.recommended and replace with this\n      tseslint.configs.recommendedTypeChecked,\n      // Alternatively, use this for stricter rules\n      tseslint.configs.strictTypeChecked,\n      // Optionally, add this for stylistic rules\n      tseslint.configs.stylisticTypeChecked,\n\n      // Other configs...\n    ],\n    languageOptions: {\n      parserOptions: {\n        project: ['./tsconfig.node.json', './tsconfig.app.json'],\n        tsconfigRootDir: import.meta.dirname,\n      },\n      // other options...\n    },\n  },\n])\n```\n\nYou can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:\n\n```js\n// eslint.config.js\nimport reactX from 'eslint-plugin-react-x'\nimport reactDom from 'eslint-plugin-react-dom'\n\nexport default defineConfig([\n  globalIgnores(['dist']),\n  {\n    files: ['**/*.{ts,tsx}'],\n    extends: [\n      // Other configs...\n      // Enable lint rules for React\n      reactX.configs['recommended-typescript'],\n      // Enable lint rules for React DOM\n      reactDom.configs.recommended,\n    ],\n    languageOptions: {\n      parserOptions: {\n        project: ['./tsconfig.node.json', './tsconfig.app.json'],\n        tsconfigRootDir: import.meta.dirname,\n      },\n      // other options...\n    },\n  },\n])\n```\n"
     },
     {
       action: "file",
-      file: "src/vectorStore.ts",
-      filecontent: vectorStoreTs
+      file: "eslint.config.js",
+      filecontent: "import js from '@eslint/js'\nimport globals from 'globals'\nimport reactHooks from 'eslint-plugin-react-hooks'\nimport reactRefresh from 'eslint-plugin-react-refresh'\nimport tseslint from 'typescript-eslint'\nimport { defineConfig, globalIgnores } from 'eslint/config'\n\nexport default defineConfig([\n  globalIgnores(['dist']),\n  {\n    files: ['**/*.{ts,tsx}'],\n    extends: [\n      js.configs.recommended,\n      tseslint.configs.recommended,\n      reactHooks.configs.flat.recommended,\n      reactRefresh.configs.vite,\n    ],\n    languageOptions: {\n      ecmaVersion: 2020,\n      globals: globals.browser,\n    },\n  },\n])\n"
     },
     {
       action: "file",
-      file: "src/aiClient.ts",
-      filecontent: aiClientTs
+      file: "index.html",
+      filecontent: '<!doctype html>\n<html lang="en">\n  <head>\n    <meta charset="UTF-8" />\n    <link rel="icon" type="image/svg+xml" href="/logo.svg" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>MonoChat</title>\n  </head>\n  <body>\n    <div id="root"></div>\n    <script type="module" src="/src/main.tsx"></script>\n  </body>\n</html>\n'
     },
     {
       action: "file",
-      file: "src/routes/chat.ts",
-      filecontent: chatRouteTs
+      file: "netlify.toml",
+      filecontent: '[build]\n  command = "npm run build"\n  publish = "dist"\n\n[[redirects]]\n  from = "/*"\n  to = "/index.html"\n  status = 200'
     },
     {
       action: "file",
-      file: "src/routes/embed.ts",
-      filecontent: embedRouteTs
+      file: "package.json",
+      filecontent: '{\n  "name": "z-chat",\n  "private": true,\n  "version": "0.0.0",\n  "type": "module",\n  "scripts": {\n    "dev": "vite",\n    "build": "tsc -b && vite build",\n    "lint": "eslint .",\n    "preview": "vite preview",\n    "stop": ""\n  },\n  "dependencies": {\n    "react": "^19.2.0",\n    "react-dom": "^19.2.0",\n    "zustand": "^4.5.7"\n  },\n  "devDependencies": {\n    "@eslint/js": "^9.39.1",\n    "@types/node": "^24.10.1",\n    "@types/react": "^19.2.5",\n    "@types/react-dom": "^19.2.3",\n    "@vitejs/plugin-react": "^5.1.1",\n    "eslint": "^9.39.1",\n    "eslint-plugin-react-hooks": "^7.0.1",\n    "eslint-plugin-react-refresh": "^0.4.24",\n    "globals": "^16.5.0",\n    "typescript": "~5.9.3",\n    "typescript-eslint": "^8.46.4",\n    "vite": "^7.2.4"\n  },\n  "description": "Vite React TS",\n  "fontawesomeIcon": "fab fa-react text-blue-500"\n}\n'
     },
     {
       action: "file",
-      file: "src/routes/config.ts",
-      filecontent: configRouteTs
+      file: "postcss.config.js",
+      filecontent: 'export default {\n  plugins: {\n    "@tailwindcss/postcss": {},\n    autoprefixer: {},\n  },\n}'
     },
-    // Config files
+    {
+      action: "file",
+      file: "public/logo.svg",
+      filecontent: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">\n  <defs>\n    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">\n      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />\n      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />\n    </linearGradient>\n  </defs>\n  <rect width="512" height="512" rx="128" fill="url(#grad)" />\n  <path d="M375.3 325.7c22.1-24.9 36.7-56.3 36.7-91.7c0-79.5-72.7-144-162-144S88 154.5 88 234s72.7 144 162 144c20.3 0 39.7-3.4 57.6-9.6L368 400l-45.7-31.3c18.5-12.7 34.6-28 47-45.7v2.7z" fill="white" />\n  <circle cx="178" cy="234" r="20" fill="#6366f1"/>\n  <circle cx="250" cy="234" r="20" fill="#6366f1"/>\n  <circle cx="322" cy="234" r="20" fill="#6366f1"/>\n</svg>\n'
+    },
+    {
+      action: "file",
+      file: "render.yaml",
+      filecontent: "services:\n  - type: web\n    name: vite-react-app\n    env: static\n    buildCommand: npm install && npm run build\n    staticPublishPath: ./dist"
+    },
+    {
+      action: "file",
+      file: "src/App.tsx",
+      filecontent: "import Background from './components/Background';\nimport ChatContainer from './components/ChatContainer';\nimport Header from './components/Header';\n\nexport default function App() {\n    return (\n        <div className={`\n      h-[100vh]\n      w-[100vw]\n      overflow-hidden\n      bg-zinc-900   \n    `}>\n            <div className='w-full h-full'>\n                <Background />\n                <Header />\n                <ChatContainer />\n            </div>\n        </div>\n    );\n}"
+    },
+    {
+      action: "file",
+      file: "src/_FetchToWho.ts",
+      filecontent: 'import type { ChatItem } from "./app/chat";\n\n//@ts-ignore\nexport default async function FetchToWho( chats: ChatItem[]) {\n    // const lastChat = chats[chats.length - 1];\n    // if (!lastChat) return;\n    // const response = await fetch("https://api.openai.com/v1/chat/completions", {\n    //     method: "POST",\n    //     headers: {\n    //         "Content-Type": "application/json",\n    //         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`\n    //     },\n    //     body: JSON.stringify({\n    //         model: "gpt-3.5-turbo",\n    //         messages: [\n    //             { role: "system", content: "You are a helpful assistant." },\n    //             { role: "user", content: lastChat.message }\n    //         ]\n    //     })\n    // });\n    // const data = await response.json();\n    // return data.choices[0].message.content;\n\n    const lorem = "Please edit the FetchToWho function. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.";\n    return lorem;\n}\n'
+    },
+    {
+      action: "file",
+      file: "src/app/chat.ts",
+      filecontent: `import { create } from 'zustand';
+import { createSelectors } from './zustandSelector';
+
+export interface ChatItem {
+    id: number;
+    who: "user" | "system";
+    timestamp: number;
+    message: string;
+}
+
+interface chatContext {
+    chats: Array<ChatItem>;
+    textinput: string;
+    addChat: (chat: ChatItem) => void;
+    setTextinput: (textinput: string) => void;
+}
+
+const chatstate = create<chatContext>()((set) => ({
+    chats: [],
+    textinput: "",
+    addChat: (chat: ChatItem) => set((state) => ({
+        chats: [...state.chats, chat]
+    })),
+    setTextinput: (textinput: string) => set(() => ({
+        textinput: textinput
+    }))
+
+}));
+
+const useChatState = createSelectors(chatstate);
+export default useChatState;
+
+`
+    },
+    {
+      action: "file",
+      file: "src/app/zustandSelector.ts",
+      filecontent: "//from: https://docs.pmnd.rs/zustand/guides/auto-generating-selectors\nimport type { StoreApi, UseBoundStore } from 'zustand'\n\ntype WithSelectors<S> = S extends { getState: () => infer T }\n  ? S & { use: { [K in keyof T]: () => T[K] } }\n  : never\n\nexport const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(\n  _store: S\n) => {\n  let store = _store as WithSelectors<typeof _store>\n  store.use = {}\n  for (let k of Object.keys(store.getState())) {\n    ;(store.use as any)[k] = () => store((s) => s[k as keyof typeof s])\n  }\n\n  return store\n}\n"
+    },
+    {
+      action: "file",
+      file: "src/components/Background.tsx",
+      filecontent: 'export default function Background() {\n    return (\n        <>\n            <div className="absolute -top-[25%] -left-[10%]  w-[80%] h-[80%] bg-blue-800/10   rounded-full blur-[128px]"></div>\n            <div className="absolute bottom-[0%]  right-[0%] w-[80%] h-[40%] bg-purple-800/10 rounded-full blur-[128px]"></div>\n        </>\n    )\n}'
+    },
+    {
+      action: "file",
+      file: "src/components/ChatContainer.tsx",
+      filecontent: `import useChatState from '../app/chat';
+import TextInput from './TextInput';
+import ChatContents from './ChatContents';
+
+export default function ChatContainer() {
+    const chats = useChatState.use.chats();
+
+    return (
+        <div className="flex flex-col h-[calc(100vh-6rem)] w-full max-w-[900px] mx-auto relative font-sans">
+            {chats.length > 0 ? (
+                <>
+                    <ChatContents />
+                    <TextInput />
+                </>
+            ) : (
+                <div className="flex flex-col items-center justify-center h-full w-full p-4">
+                    <div className="flex  gap-4 items-center justify-center">
+                         <div className="w-10 h-10 mb-8">
+                            <img src="/logo.svg" alt="MonoChat Logo" className="w-full h-full object-contain" />
+                        </div>
+                         <h2 className="text-xl font-bold text-white mb-8">How can I help you today?</h2>
+                    </div>
+                    <TextInput />
+                </div>
+            )}
+        </div>
+    );
+}
+
+`
+    },
+    {
+      action: "file",
+      file: "src/components/ChatContents.tsx",
+      filecontent: "import { useEffect, useRef } from \"react\";\nimport useChatState from \"../app/chat\";\n\nexport default function ChatContents() {\n    const chats = useChatState.use.chats();\n    const messagesEndRef = useRef<HTMLDivElement>(null);\n\n    const scrollToBottom = () => {\n        messagesEndRef.current?.scrollIntoView({ behavior: \"smooth\" });\n    };\n\n    useEffect(() => {\n        scrollToBottom();\n    }, [chats]);\n\n    return (\n        <div className=\"flex-1 overflow-y-auto w-full px-4 scrollbar-hide\">\n            {chats.map((chat) => (\n                <div\n                    key={chat.id}\n                    className={`group flex w-full ${chat.who === 'user' ? 'justify-end' : 'justify-start'}`}\n                >\n                    <div className={`flex max-w-[85%] md:max-w-[80%] gap-4 ${chat.who === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>\n                        <div className={`flex flex-col ${chat.who === 'user' ? 'items-end' : 'items-start'}`}>\n                            <div className={`flex items-center gap-2 mb-1.5 opacity-90 ${chat.who === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>\n                                <span className=\"text-[10px] text-zinc-500\">\n                                    {new Date(chat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n                                </span>\n                            </div>\n                            <div\n                                className={`relative px-5 py-3 rounded-2xl text-md leading-relaxed  transition-transform duration-200 ${chat.who === 'user'\n                                    ? 'bg-zinc-800/80 text-white rounded-tr-sm border border-zinc-700/50 shadow-lg backdrop-blur-sm'\n                                    : ' text-zinc-100'\n                                    }`}\n                            >\n                                {chat.message}\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            ))}\n            <div ref={messagesEndRef} className=\"h-4\" />\n        </div>\n    )\n}"
+    },
+    {
+      action: "file",
+      file: "src/components/Header.tsx",
+      filecontent: '\nexport default function Header() {\n    return (\n        <div className="w-full h-12">\n            <div className="container px-4 max-w-7xl mx-auto h-full flex items-center gap-3">\n                <img src="/logo.svg" alt="MonoChat Logo" className="w-8 h-8" />\n                <h1 className="font-bold text-lg tracking-wide text-white">\n                    MonoChat\n                </h1>\n            </div>\n        </div>\n    )\n}'
+    },
+    {
+      action: "file",
+      file: "src/components/SendIcon.tsx",
+      filecontent: '\nexport default function SendIcon({ className }: { className?: string }) {\n    return (\n        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}>\n             <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />\n        </svg>\n    )\n}'
+    },
+    {
+      action: "file",
+      file: "src/components/TextInput.tsx",
+      filecontent: `import FetchToWho from "../_FetchToWho";
+import useChatState from "../app/chat";
+import SendIcon       from "./SendIcon";
+
+export default function TextInput() {
+    const chats          = useChatState.use.chats();
+    const textinput      = useChatState.use.textinput();
+    const setTextinput   = useChatState.use.setTextinput();
+    const addChat        = useChatState.use.addChat();
+
+    const handleSend = async () => {
+        if (!textinput.trim()) return;
+        addChat({
+            id: Date.now(),
+            who: "user",
+            timestamp: Date.now(),
+            message: textinput
+        });
+        setTextinput("");
+
+        const userChat = chats.filter((chat) => chat.who === "user");
+        const response = await FetchToWho(userChat);
+        addChat({
+            id: Date.now(),
+            who: "system",
+            timestamp: Date.now(),
+            message: response
+        });
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
+
+    return (
+        <div className="p-4 w-full">
+            <div className="w-full max-w-3xl mx-auto">
+                <div className="relative flex items-end gap-2 bg-zinc-900/80 hover:bg-zinc-900/90 focus-within:bg-black/90 transition-all duration-300 border border-white/10 rounded-[24px] p-2 pr-2 shadow-xl backdrop-blur-xl ring-1 ring-white/5 focus-within:ring-indigo-500/30">
+                    <textarea
+                        value={textinput}
+                        onChange={(e) => setTextinput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Message MonoChat..."
+                        className="w-full pl-4 py-3 bg-transparent active:bg-transparent border-none outline-none focus:outline-none text-zinc-100 placeholder:text-zinc-500 focus:ring-0 resize-none max-h-48 min-h-[44px] scrollbar-hide text-md leading-6"
+                        rows={1}
+                        style={{ height: 'auto', minHeight: '44px' }}
+                        onInput={(e) => {
+                            const target = e.target as HTMLTextAreaElement;
+                            target.style.height = 'auto';
+                            target.style.height = \`\${Math.min(target.scrollHeight, 192)}px\`;
+                        }}
+                    />
+                    <button
+                        onClick={handleSend}
+                        disabled={!textinput.trim()}
+                        className={\`p-2 rounded-full mb-1 transition-all duration-200 flex-shrink-0 \${textinput.trim()
+                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-500'
+                                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                            }\`}
+                    >
+                        <SendIcon className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+`
+    },
+    {
+      action: "file",
+      file: "src/index.css",
+      filecontent: '@import "tailwindcss";'
+    },
+    {
+      action: "file",
+      file: "src/main.tsx",
+      filecontent: "import React from 'react'\nimport ReactDOM from 'react-dom/client'\nimport App from './App'\nimport './index.css'\n\nReactDOM.createRoot(document.getElementById('root')!).render(\n  <React.StrictMode>\n    <App />\n  </React.StrictMode>,\n)"
+    },
+    {
+      action: "file",
+      file: "tailwind.config.js",
+      filecontent: `/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};`
+    },
+    {
+      action: "file",
+      file: "tsconfig.app.json",
+      filecontent: '{\n  "compilerOptions": {\n    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",\n    "target": "ES2022",\n    "useDefineForClassFields": true,\n    "lib": ["ES2022", "DOM", "DOM.Iterable"],\n    "module": "ESNext",\n    "types": ["vite/client"],\n    "skipLibCheck": true,\n\n    /* Bundler mode */\n    "moduleResolution": "bundler",\n    "allowImportingTsExtensions": true,\n    "verbatimModuleSyntax": true,\n    "moduleDetection": "force",\n    "noEmit": true,\n    "jsx": "react-jsx",\n\n    /* Linting */\n    "strict": true,\n    "noUnusedLocals": true,\n    "noUnusedParameters": true,\n    "erasableSyntaxOnly": true,\n    "noFallthroughCasesInSwitch": true,\n    "noUncheckedSideEffectImports": true\n  },\n  "include": ["src"]\n}\n'
+    },
     {
       action: "file",
       file: "tsconfig.json",
-      filecontent: tsconfigJson
+      filecontent: '{\n  "files": [],\n  "references": [\n    { "path": "./tsconfig.app.json" },\n    { "path": "./tsconfig.node.json" }\n  ]\n}\n'
     },
     {
       action: "file",
-      file: "tsup.config.ts",
-      filecontent: tsupConfig
-    },
-    // NPM scripts
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.dev=nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"]
+      file: "tsconfig.node.json",
+      filecontent: '{\n  "compilerOptions": {\n    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",\n    "target": "ES2023",\n    "lib": ["ES2023"],\n    "module": "ESNext",\n    "types": ["node"],\n    "skipLibCheck": true,\n\n    /* Bundler mode */\n    "moduleResolution": "bundler",\n    "allowImportingTsExtensions": true,\n    "verbatimModuleSyntax": true,\n    "moduleDetection": "force",\n    "noEmit": true,\n\n    /* Linting */\n    "strict": true,\n    "noUnusedLocals": true,\n    "noUnusedParameters": true,\n    "erasableSyntaxOnly": true,\n    "noFallthroughCasesInSwitch": true,\n    "noUncheckedSideEffectImports": true\n  },\n  "include": ["vite.config.ts"]\n}\n'
     },
     {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.build=tsup"]
+      action: "file",
+      file: "vercel.json",
+      filecontent: '{\n  "rewrites": [\n    {\n      "source": "/(.*)",\n      "destination": "/index.html"\n    }\n  ]\n}'
     },
     {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.start=node dist/index.js"]
+      action: "file",
+      file: "vite.config.ts",
+      filecontent: "import { defineConfig } from 'vite'\nimport react from '@vitejs/plugin-react'\n\n// https://vite.dev/config/\nexport default defineConfig({\n  plugins: [react()],\n})\n"
     },
     {
-      action: "command",
+      action: "root-command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.stop=npx -y kill-port 3500"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fa-solid fa-comments"]
+      args: ["install"]
     },
     {
       action: "command",
@@ -60149,8 +58912,6 @@ var AIChat = {
     }
   ]
 };
-
-// ../../packages/template/demo.ts
 var templates2 = [
   AIChat
 ];
