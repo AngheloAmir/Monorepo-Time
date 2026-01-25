@@ -61523,9 +61523,14 @@ var PythonConsole = {
       filecontent: python_default.indexHtml
     },
     {
+      action: "root-command",
+      cmd: "npm",
+      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon"]
+    },
+    {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.dev=python3 main.py"]
+      args: ["pkg", "set", "scripts.dev=nodemon --watch . --ext py --exec python3 main.py"]
     },
     {
       action: "command",
