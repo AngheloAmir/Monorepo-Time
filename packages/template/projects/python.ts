@@ -18,6 +18,16 @@ export const PythonConsole: ProjectTemplate = {
             filecontent: files.indexHtml
         },
         {
+            action: 'root-command',
+            cmd: 'npm',
+            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'nodemon']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.dev=nodemon --watch . --ext py --exec python3 main.py']
+        },
+        {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'scripts.start=python3 main.py']
