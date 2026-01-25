@@ -17,11 +17,15 @@ export const ViteReact: ProjectTemplate = {
       args: ['-y', 'create-vite@latest', '.', '--template', 'react-ts']
     },
     {
-      action: 'root-command',
+      action: 'command',
       cmd: 'npm',
-      args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'tailwindcss', '@tailwindcss/postcss', 'autoprefixer']
+      args: ['install']
     },
-
+    {
+      action: 'command',
+      cmd: 'npm',
+      args: ['install', '-D', 'tailwindcss@next', '@tailwindcss/postcss@next', 'autoprefixer']
+    },
     {
       action: 'file',
       file: 'postcss.config.js',

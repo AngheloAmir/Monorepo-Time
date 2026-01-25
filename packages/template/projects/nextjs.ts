@@ -17,11 +17,10 @@ export const NextJS: ProjectTemplate = {
             args: ['-y', 'create-next-app@latest', '.', '--typescript', '--tailwind', '--eslint', '--app', '--yes', '--use-npm']
         },
         {
-            action: 'root-command',
+            action: 'command',
             cmd: 'npm',
             args: ['install']
         },
-
         {
             action: 'file',
             file: 'tailwind.config.ts',

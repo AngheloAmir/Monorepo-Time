@@ -11,16 +11,15 @@ export const ServerlessExpressTS: ProjectTemplate = {
             cmd: 'npm',
             args: ['init', '-y']
         },
-        // Dependencies
         {
-            action: 'root-command',
+            action: 'command',
             cmd: 'npm',
-            args: ['install', '--workspace', '{{RELATIVE_PATH}}', 'express', 'cors', 'serverless-http']
+            args: ['install', 'express', 'cors', 'serverless-http']
         },
         {
-            action: 'root-command',
+            action: 'command',
             cmd: 'npm',
-            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'nodemon', 'typescript', 'ts-node', 'tsup', '@types/node', '@types/express', '@types/cors']
+            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', 'tsup', '@types/node', '@types/express', '@types/cors']
         },
         // App Files
         {

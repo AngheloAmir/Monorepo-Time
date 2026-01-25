@@ -18,9 +18,9 @@ export const PythonConsole: ProjectTemplate = {
             filecontent: files.indexHtml
         },
         {
-            action: 'root-command',
+            action: 'command',
             cmd: 'npm',
-            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'nodemon']
+            args: ['install', '-D', 'nodemon']
         },
         {
             action: 'command',

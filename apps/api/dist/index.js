@@ -58613,8 +58613,8 @@ var templates = [
 ];
 var database_default = templates;
 
-// ../../packages/template/demo.ts
-var AIChat = {
+// ../../packages/template/demo/monochat.ts
+var MonoChat = {
   name: "Chat To MonoChat",
   description: "React Frontend, needs custom backend",
   notes: "Vite React + TailwindCSS + TypeScript",
@@ -58901,7 +58901,7 @@ export default {
       filecontent: "import { defineConfig } from 'vite'\nimport react from '@vitejs/plugin-react'\n\n// https://vite.dev/config/\nexport default defineConfig({\n  plugins: [react()],\n})\n"
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
       args: ["install"]
     },
@@ -58912,8 +58912,11 @@ export default {
     }
   ]
 };
+var monochat_default = MonoChat;
+
+// ../../packages/template/demo.ts
 var templates2 = [
-  AIChat
+  monochat_default
 ];
 var demo_default = templates2;
 
@@ -59036,9 +59039,14 @@ var ViteReact = {
       args: ["-y", "create-vite@latest", ".", "--template", "react-ts"]
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "tailwindcss", "@tailwindcss/postcss", "autoprefixer"]
+      args: ["install"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "tailwindcss@next", "@tailwindcss/postcss@next", "autoprefixer"]
     },
     {
       action: "file",
@@ -59262,7 +59270,7 @@ var NextJS = {
       args: ["-y", "create-next-app@latest", ".", "--typescript", "--tailwind", "--eslint", "--app", "--yes", "--use-npm"]
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
       args: ["install"]
     },
@@ -59515,19 +59523,24 @@ var ExpressTS = {
       args: ["init", "-y"]
     },
     {
-      action: "root-command",
-      cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "express", "cors"]
+      action: "command",
+      cmd: "node",
+      args: ["-e", "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json'));if(p.name==='express'){p.name='express-app';fs.writeFileSync('package.json',JSON.stringify(p,null,2))}"]
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "@types/cors"]
+      args: ["install", "express", "cors"]
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "tsup"]
+      args: ["install", "-D", "nodemon", "typescript", "ts-node", "@types/node", "@types/express", "@types/cors"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "tsup"]
     },
     {
       action: "file",
@@ -59830,16 +59843,15 @@ var ServerlessExpressTS = {
       cmd: "npm",
       args: ["init", "-y"]
     },
-    // Dependencies
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "express", "cors", "serverless-http"]
+      args: ["install", "express", "cors", "serverless-http"]
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon", "typescript", "ts-node", "tsup", "@types/node", "@types/express", "@types/cors"]
+      args: ["install", "-D", "nodemon", "typescript", "ts-node", "tsup", "@types/node", "@types/express", "@types/cors"]
     },
     // App Files
     {
@@ -60283,9 +60295,9 @@ var PythonConsole = {
       filecontent: python_default.indexHtml
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "-D", "nodemon"]
+      args: ["install", "-D", "nodemon"]
     },
     {
       action: "command",
@@ -60380,9 +60392,9 @@ var N8NLocal = {
   notes: "Requires Node.js installed in your system.",
   templating: [
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "n8n"]
+      args: ["install", "n8n"]
     },
     {
       action: "command",
@@ -61249,9 +61261,9 @@ var StripeTemplate = {
       filecontent: testJs
     },
     {
-      action: "root-command",
+      action: "command",
       cmd: "npm",
-      args: ["install", "--workspace", "{{RELATIVE_PATH}}", "stripe"]
+      args: ["install", "stripe"]
     },
     {
       action: "command",

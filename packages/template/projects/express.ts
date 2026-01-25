@@ -12,19 +12,24 @@ export const ExpressTS: ProjectTemplate = {
             args: ['init', '-y']
         },
         {
-            action: 'root-command',
-            cmd: 'npm',
-            args: ['install', '--workspace', '{{RELATIVE_PATH}}', 'express', 'cors']
+            action: 'command',
+            cmd: 'node',
+            args: ['-e', "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json'));if(p.name==='express'){p.name='express-app';fs.writeFileSync('package.json',JSON.stringify(p,null,2))}"]
         },
         {
-            action: 'root-command',
+            action: 'command',
             cmd: 'npm',
-            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', '@types/cors']
+            args: ['install', 'express', 'cors']
         },
         {
-            action: 'root-command',
+            action: 'command',
             cmd: 'npm',
-            args: ['install', '--workspace', '{{RELATIVE_PATH}}', '-D', 'tsup']
+            args: ['install', '-D', 'nodemon', 'typescript', 'ts-node', '@types/node', '@types/express', '@types/cors']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['install', '-D', 'tsup']
         },
         {
             action: 'file',
