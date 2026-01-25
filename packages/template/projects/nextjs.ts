@@ -1,5 +1,5 @@
 import type { ProjectTemplate } from "..";
-import app from "./_nextapp";
+import app from "./files/_nextapp";
 
 export const NextJS: ProjectTemplate = {
     name: "Next.js TS",

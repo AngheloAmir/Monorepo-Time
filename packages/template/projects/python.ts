@@ -1,24 +1,21 @@
 import type { ProjectTemplate } from "..";
 
-const pythonFile = `print("Monorepo Time Console!")
-name = input("Please enter your name: ")
-print("Hello " + name)
-`;
+import files from "./files/_python";
 
 export const PythonConsole: ProjectTemplate = {
-    name: "Python Console",
-    description: "Simple Python Console Application",
+    name: "Python Backend",
+    description: "Simple Python Backend Application",
     notes: "Python 3 must be installed in your system.",
     templating: [
         {
             action: 'file',
             file: 'main.py',
-            filecontent: pythonFile
+            filecontent: files.mainPy
         },
         {
-            action: 'command',
-            cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.dev=python3 main.py']
+            action: 'file',
+            file: 'index.html',
+            filecontent: files.indexHtml
         },
         {
             action: 'command',
@@ -28,7 +25,12 @@ export const PythonConsole: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=Python Console']
+            args: ['pkg', 'set', 'description=Python Backend']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.stop=npx kill-port 3000']
         },
         {
             action: 'command',

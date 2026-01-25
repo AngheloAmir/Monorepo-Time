@@ -15,7 +15,6 @@ export const Supabase: ProjectTemplate = {
             cmd: 'npx',
             args: ['supabase', 'init']
         },
-
         {
             action: 'command',
             cmd: 'npm',

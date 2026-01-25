@@ -1,6 +1,5 @@
 import type { ProjectTemplate } from "..";
-import file from "./_viteapp";
-
+import file from "./files/_viteapp";
 
 export const ViteReact: ProjectTemplate = {
   name: 'Vite React TS',

@@ -55247,7 +55247,7 @@ __export(index_exports, {
   io: () => io2
 });
 module.exports = __toCommonJS(index_exports);
-var import_express24 = __toESM(require_express2());
+var import_express25 = __toESM(require_express2());
 var import_cors = __toESM(require_lib3());
 var import_path19 = __toESM(require("path"));
 
@@ -57645,7 +57645,7 @@ router17.post("/stop-all", async (req, res) => {
 var apidocker_default = router17;
 
 // src/routes/availabletemplates.ts
-var import_express21 = __toESM(require_express2());
+var import_express22 = __toESM(require_express2());
 
 // ../../packages/template/databases/mysql.ts
 var MySQL = {
@@ -57686,6 +57686,11 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "scripts.stop=echo 'Note: MySQL is running as a system service. Please stop it manually.'"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=MySQL (Local)"]
     },
     {
       action: "command",
@@ -57882,7 +57887,12 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-blue-300"]
+      args: ["pkg", "set", "description=PostgreSQL (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-blue-500"]
     }
   ]
 };
@@ -57916,7 +57926,12 @@ var Supabase = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-bolt text-green-400"]
+      args: ["pkg", "set", "description=Supabase (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-bolt text-green-500"]
     }
   ]
 };
@@ -58071,7 +58086,12 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-server text-red-400"]
+      args: ["pkg", "set", "description=Redis (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-server text-red-500"]
     }
   ]
 };
@@ -58229,6 +58249,11 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "description=MongoDB (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-leaf text-green-500"]
     }
   ]
@@ -58382,6 +58407,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fab fa-meetup text-green-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Meilisearch (Docker)"]
     },
     {
       action: "command",
@@ -58557,6 +58587,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fab fa-amazon text-blue-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=MinIO (Docker)"]
     },
     {
       action: "command",
@@ -60121,7 +60156,7 @@ var templates2 = [
 ];
 var demo_default = templates2;
 
-// ../../packages/template/projects/_viteapp.ts
+// ../../packages/template/projects/files/_viteapp.ts
 var file = `import { useState } from 'react'
 
 function App() {
@@ -60341,12 +60376,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fab fa-react text-blue-400"]
+      args: ["pkg", "set", "description=Vite React TS"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-react text-blue-500"]
     }
   ]
 };
 
-// ../../packages/template/projects/_nextapp.ts
+// ../../packages/template/projects/files/_nextapp.ts
 var app = `export default function Home() {
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-indigo-500 selection:text-white">
@@ -60580,12 +60620,17 @@ export default function RootLayout({
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "description=Next.js TS"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fab fa-js text-white"]
     }
   ]
 };
 
-// ../../packages/template/projects/express.ts
+// ../../packages/template/projects/files/_express.ts
 var expressFile = `import express, { Request, Response } from "express";
 import path from "path";
 import cors from "cors";
@@ -60692,6 +60737,13 @@ var htmlFile = `<!DOCTYPE html>
 </body>
 </html>
 `;
+var express_default = {
+  expressFile,
+  helloRouterFile,
+  htmlFile
+};
+
+// ../../packages/template/projects/express.ts
 var ExpressTS = {
   name: "Express.js TS",
   description: "Express.js TS template",
@@ -60720,17 +60772,17 @@ var ExpressTS = {
     {
       action: "file",
       file: "public/index.html",
-      filecontent: htmlFile
+      filecontent: express_default.htmlFile
     },
     {
       action: "file",
       file: "src/routes/hello.ts",
-      filecontent: helloRouterFile
+      filecontent: express_default.helloRouterFile
     },
     {
       action: "file",
       file: "src/index.ts",
-      filecontent: expressFile
+      filecontent: express_default.expressFile
     },
     {
       action: "file",
@@ -60808,12 +60860,17 @@ var ExpressTS = {
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "description=Express.js TS"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fab fa-node text-green-500"]
     }
   ]
 };
 
-// ../../packages/template/projects/serverless-express.ts
+// ../../packages/template/projects/files/_serverless.ts
 var htmlFile2 = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60990,6 +61047,19 @@ functions:
     events:
       - httpApi: '*'
 `;
+var serverless_default = {
+  htmlFile: htmlFile2,
+  appFile,
+  localFile,
+  vercelApiFile,
+  netlifyFunctionFile,
+  helloRouterFile: helloRouterFile2,
+  lambdaFile,
+  dockerFile,
+  serverlessYmlFile
+};
+
+// ../../packages/template/projects/serverless-express.ts
 var ServerlessExpressTS = {
   name: "Serverless Express TS",
   description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
@@ -61015,44 +61085,44 @@ var ServerlessExpressTS = {
     {
       action: "file",
       file: "public/index.html",
-      filecontent: htmlFile2
+      filecontent: serverless_default.htmlFile
     },
     {
       action: "file",
       file: "src/app.ts",
-      filecontent: appFile
+      filecontent: serverless_default.appFile
     },
     {
       action: "file",
       file: "src/local.ts",
-      filecontent: localFile
+      filecontent: serverless_default.localFile
     },
     {
       action: "file",
       file: "src/routes/hello.ts",
-      filecontent: helloRouterFile2
+      filecontent: serverless_default.helloRouterFile
     },
     // Serverless Entry Points
     {
       action: "file",
       file: "api/index.ts",
-      filecontent: vercelApiFile
+      filecontent: serverless_default.vercelApiFile
     },
     {
       action: "file",
       file: "netlify/functions/api.ts",
-      filecontent: netlifyFunctionFile
+      filecontent: serverless_default.netlifyFunctionFile
     },
     {
       action: "file",
       file: "src/lambda.ts",
-      filecontent: lambdaFile
+      filecontent: serverless_default.lambdaFile
     },
     // Container Configs
     {
       action: "file",
       file: "Dockerfile",
-      filecontent: dockerFile
+      filecontent: serverless_default.dockerFile
     },
     {
       action: "file",
@@ -61062,7 +61132,7 @@ var ServerlessExpressTS = {
     {
       action: "file",
       file: "serverless.yml",
-      filecontent: serverlessYmlFile
+      filecontent: serverless_default.serverlessYmlFile
     },
     // Config Files
     {
@@ -61143,10 +61213,91 @@ var ServerlessExpressTS = {
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "description=Serverless Express TS"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fab fa-aws text-orange-500"]
     }
   ]
 };
+
+// ../../packages/template/projects/files/_php.ts
+var phpContent = `<?php
+$file = 'visits.txt';
+if (!file_exists($file)) {
+    file_put_contents($file, 0);
+}
+$count = (int)file_get_contents($file);
+$count++;
+file_put_contents($file, $count);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Monorepo Time</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    </div>
+
+    <div class="z-10 text-center p-8 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 shadow-2xl max-w-lg w-full transform hover:scale-105 transition-transform duration-300">
+        <div class="mb-6">
+            <span class="text-4xl">\u{1F680}</span>
+        </div>
+        <h1 class="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            Monorepo Time
+        </h1>
+        <p class="text-gray-300 text-lg mb-6">
+            Your PHP application is up and running.
+        </p>
+        
+        <div class="bg-black/30 rounded-xl p-4 mb-6">
+            <p class="text-sm text-gray-400 uppercase tracking-widest mb-1">Total Visits</p>
+            <p class="text-3xl font-mono font-bold text-green-400">
+                <?php echo number_format($count); ?>
+            </p>
+        </div>
+
+        <div class="flex justify-center gap-4">
+            <a href="#" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-full font-medium transition-colors duration-200">
+                Documentation
+            </a>
+            <a href="#" class="px-6 py-2 bg-transparent border border-white/30 hover:bg-white/10 rounded-full font-medium transition-colors duration-200">
+                Learn More
+            </a>
+        </div>
+    </div>
+
+    <!-- Animation Keyframes -->
+    <style>
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+    </style>
+</body>
+</html>
+`;
 
 // ../../packages/template/projects/php.ts
 var PHP = {
@@ -61157,12 +61308,7 @@ var PHP = {
     {
       action: "file",
       file: "index.php",
-      filecontent: '<?php\n\necho "Hello World! Monorepo Time!";\n'
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.dev=php -S localhost:3000"]
+      filecontent: phpContent
     },
     {
       action: "command",
@@ -61177,7 +61323,12 @@ var PHP = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fab fa-php text-indigo-400"]
+      args: ["pkg", "set", "description=PHP"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-php text-indigo-500"]
     }
   ]
 };
@@ -61221,25 +61372,155 @@ var Laravel = {
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "description=Laravel"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fab fa-laravel text-red-500"]
     }
   ]
 };
 
-// ../../packages/template/projects/python.ts
-var pythonFile = `print("Monorepo Time Console!")
-name = input("Please enter your name: ")
-print("Hello " + name)
+// ../../packages/template/projects/files/_python.ts
+var mainPy = `import http.server
+import socketserver
+import os
+import sys
+
+# Define port, default to 3000 or use environment variable
+PORT = int(os.environ.get('PORT', 3000))
+
+class MyHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # Route: / -> Load index.html
+        if self.path == '/':
+            self.path = 'index.html'
+            return http.server.SimpleHTTPRequestHandler.do_GET(self)
+        
+        # Route: /test -> Return "Hello World"
+        elif self.path == '/test':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b"Hello World")
+            return
+            
+        # Default: Serve static files
+        return http.server.SimpleHTTPRequestHandler.do_GET(self)
+
+# Ensure index.html exists (though template should create it)
+if not os.path.exists('index.html'):
+    with open('index.html', 'w') as f:
+        f.write("<h1>Error: index.html not found</h1>")
+
+print(f"Python server is running at http://localhost:{PORT}")
+print("Press Ctrl+C to stop.")
+
+try:
+    # Allow address reuse to prevent "Address already in use" errors on restart
+    socketserver.TCPServer.allow_reuse_address = True
+    with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
+        httpd.serve_forever()
+except KeyboardInterrupt:
+    print("^C received, shutting down server")
+    sys.exit(0)
 `;
+var indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monorepo Time - Python Backend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        body { font-family: 'JetBrains Mono', monospace; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-gray-200 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Background Decor -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="z-10 w-full max-w-2xl px-4">
+        <div class="glass rounded-2xl p-8 md:p-12 shadow-2xl border border-white/5 transform transition-all hover:scale-[1.01]">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <span class="text-4xl">\u{1F40D}</span>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-yellow-300">
+                        Python Backend
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-mono text-green-400 uppercase tracking-widest">Online</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <p class="text-xl text-gray-300 leading-relaxed font-light">
+                    Python server is running.
+                </p>
+                
+                <div class="p-4 rounded-lg bg-black/30 border border-white/10 font-mono text-sm text-gray-400">
+                    <p>$ python main.py</p>
+                    <p class="text-green-400">>> Server started at http://localhost:3000</p>
+                </div>
+
+                <div class="pt-4 flex flex-col sm:flex-row gap-4">
+                    <a href="/test" class="group relative px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold text-white transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] overflow-hidden">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            Test Endpoint
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </span>
+                    </a>
+                    
+                    <a href="https://docs.python.org/3/library/http.server.html" target="_blank" class="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/5 rounded-lg font-bold text-gray-300 transition-colors text-center">
+                        Docs
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p>Powered by Python Standard Library & Tailwind CSS</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+var python_default = {
+  mainPy,
+  indexHtml
+};
+
+// ../../packages/template/projects/python.ts
 var PythonConsole = {
-  name: "Python Console",
-  description: "Simple Python Console Application",
+  name: "Python Backend",
+  description: "Simple Python Backend Application",
   notes: "Python 3 must be installed in your system.",
   templating: [
     {
       action: "file",
       file: "main.py",
-      filecontent: pythonFile
+      filecontent: python_default.mainPy
+    },
+    {
+      action: "file",
+      file: "index.html",
+      filecontent: python_default.indexHtml
     },
     {
       action: "command",
@@ -61250,6 +61531,16 @@ var PythonConsole = {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "scripts.start=python3 main.py"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Python Backend"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx kill-port 3000"]
     },
     {
       action: "command",
@@ -61294,7 +61585,12 @@ var DotNetConsole = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fab fa-windows text-blue-600"]
+      args: ["pkg", "set", "description=.NET Console"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-windows text-blue-500"]
     }
   ]
 };
@@ -61342,6 +61638,11 @@ var N8NLocal = {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-project-diagram text-red-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=N8N (Local)"]
     },
     {
       action: "command",
@@ -61584,7 +61885,7 @@ networks:
     driver: bridge`;
 
 // ../../packages/template/services_list/aws/indexHtml.ts
-var indexHtml = `<!DOCTYPE html>
+var indexHtml2 = `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
@@ -61920,7 +62221,7 @@ spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
 
 // ../../packages/template/services_list/aws.ts
 var AWSTemplate = {
-  name: "AWS Local",
+  name: "Localstack (Experimental)",
   description: "AWS LocalStack Environment with Manager",
   notes: "Requires Docker, Node.js, and AWS CLI installed.",
   templating: [
@@ -61947,7 +62248,7 @@ var AWSTemplate = {
     {
       action: "file",
       file: "index.html",
-      filecontent: indexHtml
+      filecontent: indexHtml2
     },
     {
       action: "command",
@@ -61977,7 +62278,12 @@ var AWSTemplate = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fab fa-aws text-orange-400"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-aws text-orange-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=AWS LocalStack Environment with Manager"]
     },
     {
       action: "command",
@@ -62158,7 +62464,7 @@ const stripe = new Stripe('sk_test_mock_123', {
 })();
 `;
 var StripeTemplate = {
-  name: "Stripe Mock",
+  name: "Stripe Mock (Experimental)",
   description: "Stripe API Mock Server",
   notes: "Runs the official stripe-mock image. Requires Docker.",
   templating: [
@@ -62210,6 +62516,11 @@ var StripeTemplate = {
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "description=Stripe Mock"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
@@ -62233,7 +62544,7 @@ var MonorepoTemplates = {
 var template_default = MonorepoTemplates;
 
 // src/routes/availabletemplates.ts
-var router18 = import_express21.default.Router();
+var router18 = import_express22.default.Router();
 router18.get("/", (req, res) => {
   try {
     const stripTemplating = (templates5) => {
@@ -62254,7 +62565,7 @@ router18.get("/", (req, res) => {
 var availabletemplates_default = router18;
 
 // src/routes/setworkspace/index.ts
-var import_express22 = __toESM(require_express2());
+var import_express23 = __toESM(require_express2());
 
 // src/routes/setworkspace/template.ts
 var import_path17 = __toESM(require("path"));
@@ -62448,7 +62759,7 @@ ${cmdErr.message}`);
 }
 
 // src/routes/setworkspace/index.ts
-var router19 = import_express22.default.Router();
+var router19 = import_express23.default.Router();
 router19.post("/", async (req, res) => {
   try {
     const { workspace, templatename } = req.body;
@@ -62503,12 +62814,12 @@ function setWorkspaceTemplateSocket(io3) {
 }
 
 // src/routes/stopTerminalWorkspace.ts
-var import_express23 = __toESM(require_express2());
+var import_express24 = __toESM(require_express2());
 var import_fs_extra13 = __toESM(require_lib4());
 var import_path18 = __toESM(require("path"));
 init_execa();
 var import_tree_kill = __toESM(require_tree_kill());
-var router20 = (0, import_express23.Router)();
+var router20 = (0, import_express24.Router)();
 async function killProcessTree(pid, signal = "SIGKILL") {
   return new Promise((resolve, reject) => {
     (0, import_tree_kill.default)(pid, signal, (err) => {
@@ -62683,14 +62994,14 @@ if (command === "init") {
     process.exit(1);
   });
 }
-var app2 = (0, import_express24.default)();
+var app2 = (0, import_express25.default)();
 var port2 = config_default.apiPort;
 app2.use((0, import_cors.default)({
   origin: true,
   credentials: true
 }));
-app2.use(import_express24.default.static("public"));
-app2.use(import_express24.default.json());
+app2.use(import_express25.default.static("public"));
+app2.use(import_express25.default.json());
 app2.use("/", tester_default);
 app2.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app2.use("/" + api_default.stopProcess, stopcmd_default);
@@ -62714,7 +63025,7 @@ app2.use("/" + api_default.docker, apidocker_default);
 app2.use("/" + api_default.availabletemplates, availabletemplates_default);
 app2.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
 var frontendPath = import_path19.default.join(__dirname, "../public");
-app2.use(import_express24.default.static(frontendPath));
+app2.use(import_express25.default.static(frontendPath));
 app2.get("*", (req, res) => {
   res.sendFile(import_path19.default.join(frontendPath, "index.html"));
 });

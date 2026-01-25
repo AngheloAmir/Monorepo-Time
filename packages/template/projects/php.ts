@@ -1,4 +1,5 @@
 import type { ProjectTemplate } from "..";
+import { phpContent } from "./files/_php";
 
 export const PHP: ProjectTemplate = {
     name: "PHP",
@@ -8,12 +9,7 @@ export const PHP: ProjectTemplate = {
         {
             action: 'file',
             file: 'index.php',
-            filecontent: '<?php\n\necho "Hello World! Monorepo Time!";\n'
-        },
-        {
-            action: 'command',
-            cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.dev=php -S localhost:3000']
+            filecontent: phpContent
         },
         {
             action: 'command',
