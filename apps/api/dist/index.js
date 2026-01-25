@@ -60157,8 +60157,7 @@ var templates2 = [
 var demo_default = templates2;
 
 // ../../packages/template/projects/files/_viteapp.ts
-var file = `import { useState } from 'react'
-
+var file = `
 function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-indigo-500 selection:text-white">
