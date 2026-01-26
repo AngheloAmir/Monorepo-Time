@@ -3,7 +3,7 @@ import type { ProjectTemplate } from "..";
 export const Meilisearch: ProjectTemplate = {
     name: "Meilisearch",
     description: "Meilisearch (Docker Compose)",
-    notes: "Requires Docker installed. Fast, open-source search engine.",
+    notes: "Requires Docker installed. Data stored in ./meili-data folder.",
     templating: [
         {
             action: 'file',
@@ -18,15 +18,22 @@ export const Meilisearch: ProjectTemplate = {
     ports:
       - "0:7700"
     volumes:
-      - meili-data:/meili_data
+      - ./meili-data:/meili_data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 5`
+        },
+        {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: `# Search engine data folder
+meili-data/
 
-volumes:
-  meili-data:`
+# Runtime file
+.runtime.json
+`
         },
         {
             action: 'file',

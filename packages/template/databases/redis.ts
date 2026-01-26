@@ -3,7 +3,7 @@ import type { ProjectTemplate } from "..";
 export const Redis: ProjectTemplate = {
     name: "Redis",
     description: "Redis (Docker Compose)",
-    notes: "Requires Docker installed.",
+    notes: "Requires Docker installed. Data stored in ./redis-data folder.",
     templating: [
         {
             action: 'file',
@@ -17,7 +17,7 @@ services:
     ports:
       - "0:6379"
     volumes:
-      - redis-data:/data
+      - ./redis-data:/data
     command: >
       redis-server
       --appendonly yes
@@ -27,12 +27,18 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
-      retries: 5
-
-volumes:
-  redis-data:`
+      retries: 5`
         },
+        {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: `# Database data folder
+redis-data/
 
+# Runtime file
+.runtime.json
+`
+        },
         {
             action: 'file',
             file: 'index.js',

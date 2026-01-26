@@ -60,15 +60,18 @@ export default function Turborepo(props: TurborepoProps) {
             terminalRef.current.clear();
             terminalRef.current.disconnect();
 
-            terminalRef.current.connect(rootDir, cmd);
-            terminalRef.current.fit();
+            // Register callbacks BEFORE connecting to avoid race conditions
+            // where the process exits before callbacks are set up
             terminalRef.current.onClose(() => {
                 setIsRunning(false);
             });
             terminalRef.current.onCrash(() => {
                 setIsRunning(false);
             });
+            
             setIsRunning(true);
+            terminalRef.current.connect(rootDir, cmd);
+            terminalRef.current.fit();
         }
     }
 

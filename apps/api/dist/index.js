@@ -57302,6 +57302,62 @@ var import_express17 = __toESM(require_express2());
 var import_fs_extra12 = __toESM(require_lib4());
 var import_path14 = __toESM(require("path"));
 var router15 = (0, import_express17.Router)();
+var defaultmonrepotime = {
+  notes: "",
+  crudtest: [
+    {
+      category: "Internal CRUD Test",
+      devurl: "",
+      produrl: "",
+      items: [
+        {
+          label: "Ping the Tool Server",
+          route: "/ping",
+          methods: "GET",
+          description: "Ping the tool server to check if it is running.",
+          sampleInput: "{}",
+          suggested: [],
+          expectedOutcome: '# You should see the word "pong" as a message \n\n{\n  "message": "pong"\n}'
+        },
+        {
+          label: "Check Post",
+          route: "/post",
+          methods: "POST",
+          description: "Send a POST request to check if it sending correctly",
+          sampleInput: '{\n "data": "test",\n "message": "test"\n}',
+          suggested: [
+            {
+              name: "Customer Data",
+              urlparams: "",
+              content: '{\n "name": "Demo Customer",\n "email": "demo@test.com",\n "phone": "123456789",\n "icon": "test icon"\n}'
+            }
+          ],
+          expectedOutcome: "# Note \nYou should see the mirror of your inputs"
+        },
+        {
+          label: "Check Stream",
+          route: "/stream",
+          methods: "STREAM",
+          description: "Send a stream request to check if it sending correctly",
+          sampleInput: "{ }",
+          suggested: [
+            {
+              name: "I Wandered Lonely as a Cloud",
+              "urlparams": "poem=I Wandered Lonely as a Cloud",
+              "content": "{}"
+            },
+            {
+              name: "The Sun Has Long Been Set",
+              urlparams: "poem=The Sun Has Long Been Set",
+              content: "{}"
+            }
+          ],
+          expectedOutcome: "# Note \nYou should see the stream of words"
+        }
+      ]
+    }
+  ]
+};
 router15.get("/", async (req, res) => {
   try {
     const sourcePath = import_path14.default.join(__dirname, "scaffold", "monorepotime.json");
@@ -57311,7 +57367,7 @@ router15.get("/", async (req, res) => {
       return;
     }
     if (!import_fs_extra12.default.existsSync(sourcePath)) {
-      await import_fs_extra12.default.writeJson(destPath, { notes: "", crudtest: [] }, { spaces: 4 });
+      await import_fs_extra12.default.writeJson(destPath, defaultmonrepotime, { spaces: 4 });
       res.json({ success: true, message: "Created monorepotime.json with default content (scaffold missing)" });
       return;
     }
@@ -57704,7 +57760,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
 var PostgreSQL = {
   name: "PostgreSQL",
   description: "PostgreSQL Database (Docker Compose)",
-  notes: "Requires Docker installed.",
+  notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
   templating: [
     {
       action: "file",
@@ -57722,7 +57778,7 @@ services:
     ports:
       - "0:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
       interval: 5s
@@ -57737,10 +57793,17 @@ services:
     ports:
       - "0:80"
     depends_on:
-      - postgres
+      - postgres`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Database data folder
+postgres-data/
 
-volumes:
-  postgres-data:`
+# Runtime file
+.runtime.json
+`
     },
     {
       action: "file",
@@ -57940,7 +58003,7 @@ var Supabase = {
 var Redis = {
   name: "Redis",
   description: "Redis (Docker Compose)",
-  notes: "Requires Docker installed.",
+  notes: "Requires Docker installed. Data stored in ./redis-data folder.",
   templating: [
     {
       action: "file",
@@ -57954,7 +58017,7 @@ services:
     ports:
       - "0:6379"
     volumes:
-      - redis-data:/data
+      - ./redis-data:/data
     command: >
       redis-server
       --appendonly yes
@@ -57964,10 +58027,17 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
-      retries: 5
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Database data folder
+redis-data/
 
-volumes:
-  redis-data:`
+# Runtime file
+.runtime.json
+`
     },
     {
       action: "file",
@@ -58100,7 +58170,7 @@ process.on('SIGTERM', cleanup);`
 var MongoDB = {
   name: "MongoDB",
   description: "MongoDB (Docker Compose)",
-  notes: "Requires Docker installed.",
+  notes: "Requires Docker installed. Data stored in ./mongo-data folder.",
   templating: [
     {
       action: "file",
@@ -58115,7 +58185,7 @@ var MongoDB = {
     ports:
       - "0:27017"
     volumes:
-      - mongo-data:/data/db
+      - ./mongo-data:/data/db
     command: ["mongod", "--quiet"]
     logging:
       driver: "none"
@@ -58123,10 +58193,17 @@ var MongoDB = {
       test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
       interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Database data folder
+mongo-data/
 
-volumes:
-  mongo-data:`
+# Runtime file
+.runtime.json
+`
     },
     {
       action: "file",
@@ -58263,7 +58340,7 @@ process.on('SIGTERM', cleanup);`
 var Meilisearch = {
   name: "Meilisearch",
   description: "Meilisearch (Docker Compose)",
-  notes: "Requires Docker installed. Fast, open-source search engine.",
+  notes: "Requires Docker installed. Data stored in ./meili-data folder.",
   templating: [
     {
       action: "file",
@@ -58278,15 +58355,22 @@ var Meilisearch = {
     ports:
       - "0:7700"
     volumes:
-      - meili-data:/meili_data
+      - ./meili-data:/meili_data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Search engine data folder
+meili-data/
 
-volumes:
-  meili-data:`
+# Runtime file
+.runtime.json
+`
     },
     {
       action: "file",
@@ -58425,7 +58509,7 @@ process.on('SIGTERM', cleanup);`
 var MinIO = {
   name: "MinIO",
   description: "MinIO Object Storage (S3 Compatible)",
-  notes: "Requires Docker installed. S3-compatible object storage.",
+  notes: "Requires Docker installed. Data stored in ./minio-data folder.",
   templating: [
     {
       action: "file",
@@ -58442,15 +58526,22 @@ var MinIO = {
       - "0:9000"
       - "0:9001"
     volumes:
-      - minio-data:/data
+      - ./minio-data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
-      retries: 3
+      retries: 3`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Object storage data folder
+minio-data/
 
-volumes:
-  minio-data:`
+# Runtime file
+.runtime.json
+`
     },
     {
       action: "file",
@@ -60370,46 +60461,173 @@ var templates3 = [
 ];
 var projecttemplate_default = templates3;
 
+// ../../packages/template/services_list/n8n/dockerCompose.ts
+var dockerCompose = `services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+    ports:
+      - "5678:5678"
+    volumes:
+      - ./n8n-data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:5678/healthz || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`;
+
+// ../../packages/template/services_list/n8n/gitignore.ts
+var gitignoreContent = `# N8N data folder (contains credentials and workflows)
+n8n-data/
+
+# Runtime file
+.runtime.json
+`;
+
+// ../../packages/template/services_list/n8n/server.ts
+var serverJs = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting N8N...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port n8n 5678', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const n8nPort = stdout.trim().split(':')[1];
+        if (!n8nPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify N8N is actually responding to HTTP
+        http.get(\`http://localhost:\${n8nPort}/healthz\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                console.clear();
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping N8N...');
+    try { 
+        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
+        if (runtime.containerIds) {
+            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
+            runtime.containerIds.forEach(id => {
+                exec(\`docker stop \${id}\`, () => {
+                    exec(\`docker rm -f \${id}\`);
+                });
+            });
+        }
+    } catch(e) {}
+    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+    
+    exec('docker compose stop', () => {
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
 // ../../packages/template/services_list/n8n.ts
 var N8NLocal = {
-  name: "N8N Local",
-  description: "N8N (Local)",
-  notes: "Requires Node.js installed in your system.",
+  name: "N8N Local Dockerized",
+  description: "N8N Workflow Automation",
+  notes: "Requires Docker installed. Data is stored in ./n8n-data folder.",
   templating: [
     {
-      action: "command",
-      cmd: "npm",
-      args: ["install", "n8n"]
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs
     },
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.dev=npx n8n"]
+      args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.start=npx n8n"]
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
     },
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.stop=npx kill-port 5678"]
+      args: ["pkg", "set", "description=N8N Workflow Automation (Docker)"]
     },
     {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-project-diagram text-red-500"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=N8N (Local)"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "name=$(basename $PWD)"]
     }
   ]
 };
@@ -60593,7 +60811,7 @@ module.exports = {
 };`;
 
 // ../../packages/template/services_list/aws/dockerCompose.ts
-var dockerCompose = `services:
+var dockerCompose2 = `services:
   localstack:
     image: localstack/localstack
     ports:
@@ -60605,7 +60823,7 @@ var dockerCompose = `services:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - AWS_DEFAULT_REGION=us-east-1
     volumes:
-      - localstack-data:/var/lib/localstack
+      - ./localstack-data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - cloud-net
@@ -60639,12 +60857,17 @@ var dockerCompose = `services:
     networks:
       - cloud-net
 
-volumes:
-  localstack-data: {}
-
 networks:
   cloud-net:
     driver: bridge`;
+
+// ../../packages/template/services_list/aws/gitignore.ts
+var gitignoreContent2 = `# LocalStack data folder
+localstack-data/
+
+# Runtime file
+.runtime.json
+`;
 
 // ../../packages/template/services_list/aws/indexHtml.ts
 var indexHtml2 = `<!DOCTYPE html>
@@ -60856,7 +61079,7 @@ dynamodb.createTable(params, function(err, data) {
 </html>`;
 
 // ../../packages/template/services_list/aws/server.ts
-var serverJs = `const http = require('http');
+var serverJs2 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -60985,12 +61208,17 @@ spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
 var AWSTemplate = {
   name: "Localstack (Experimental)",
   description: "AWS LocalStack Environment with Manager",
-  notes: "Requires Docker, Node.js, and AWS CLI installed.",
+  notes: "Requires Docker, Node.js, and AWS CLI. Data stored in ./localstack-data folder.",
   templating: [
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose
+      filecontent: dockerCompose2
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent2
     },
     {
       action: "file",
@@ -61000,7 +61228,7 @@ var AWSTemplate = {
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs
+      filecontent: serverJs2
     },
     {
       action: "file",
@@ -61030,6 +61258,11 @@ var AWSTemplate = {
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node server.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "scripts.dev=node server.js"]
     },
     {
@@ -61055,8 +61288,8 @@ var AWSTemplate = {
   ]
 };
 
-// ../../packages/template/services_list/stripe.ts
-var dockerCompose2 = `services:
+// ../../packages/template/services_list/stripe/dockerCompose.ts
+var dockerCompose3 = `services:
   stripe-mock:
     image: stripe/stripe-mock:latest
     container_name: stripe-mock
@@ -61069,7 +61302,14 @@ var dockerCompose2 = `services:
       timeout: 5s
       retries: 5
 `;
-var serverJs2 = `const http = require('http');
+
+// ../../packages/template/services_list/stripe/gitignore.ts
+var gitignoreContent3 = `# Runtime file
+.runtime.json
+`;
+
+// ../../packages/template/services_list/stripe/server.ts
+var serverJs3 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -61149,9 +61389,9 @@ const cleanup = () => {
     try {
         const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
         if (runtime.containerIds) {
-            console.log(\\\`Stopping \\\${runtime.containerIds.length} containers...\\\`);
+            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
             runtime.containerIds.forEach(id => {
-                exec(\\\`docker stop \\\${id}\\\`);
+                exec(\`docker stop \${id}\`);
             });
         }
     } catch(e) {}
@@ -61164,6 +61404,8 @@ const cleanup = () => {
 // Handle cleanup
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/services_list/stripe/test.ts
 var testJs = `const Stripe = require('stripe');
 
 // Initialize with a fake key and point to the mock server
@@ -61225,6 +61467,8 @@ const stripe = new Stripe('sk_test_mock_123', {
     }
 })();
 `;
+
+// ../../packages/template/services_list/stripe.ts
 var StripeTemplate = {
   name: "Stripe Mock (Experimental)",
   description: "Stripe API Mock Server",
@@ -61233,12 +61477,17 @@ var StripeTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose2
+      filecontent: dockerCompose3
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent3
     },
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs2
+      filecontent: serverJs3
     },
     {
       action: "file",

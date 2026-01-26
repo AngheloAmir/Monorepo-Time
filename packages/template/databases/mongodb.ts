@@ -3,7 +3,7 @@ import type { ProjectTemplate } from "..";
 export const MongoDB: ProjectTemplate = {
     name: "MongoDB",
     description: "MongoDB (Docker Compose)",
-    notes: "Requires Docker installed.",
+    notes: "Requires Docker installed. Data stored in ./mongo-data folder.",
     templating: [
         {
             action: 'file',
@@ -18,7 +18,7 @@ export const MongoDB: ProjectTemplate = {
     ports:
       - "0:27017"
     volumes:
-      - mongo-data:/data/db
+      - ./mongo-data:/data/db
     command: ["mongod", "--quiet"]
     logging:
       driver: "none"
@@ -26,10 +26,17 @@ export const MongoDB: ProjectTemplate = {
       test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
       interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 5`
+        },
+        {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: `# Database data folder
+mongo-data/
 
-volumes:
-  mongo-data:`
+# Runtime file
+.runtime.json
+`
         },
         {
             action: 'file',

@@ -1,6 +1,7 @@
 import type { ProjectTemplate } from "..";
 import { deployJs } from "./aws/deploy";
 import { dockerCompose } from "./aws/dockerCompose";
+import { gitignoreContent } from "./aws/gitignore";
 import { indexHtml } from "./aws/indexHtml";
 import { serverJs } from "./aws/server";
 import { stopJs } from "./aws/stop";
@@ -8,12 +9,17 @@ import { stopJs } from "./aws/stop";
 export const AWSTemplate: ProjectTemplate = {
     name: "Localstack (Experimental)",
     description: "AWS LocalStack Environment with Manager",
-    notes: "Requires Docker, Node.js, and AWS CLI installed.",
+    notes: "Requires Docker, Node.js, and AWS CLI. Data stored in ./localstack-data folder.",
     templating: [
         {
             action: 'file',
             file: 'docker-compose.yml',
             filecontent: dockerCompose
+        },
+        {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: gitignoreContent
         },
         {
             action: 'file',
@@ -49,6 +55,11 @@ export const AWSTemplate: ProjectTemplate = {
             action: 'file',
             file: 'examples/nodeserver/index.js',
             filecontent: 'exports.handler = async (event) => { return { statusCode: 200, body: JSON.stringify("Hello from Lambda!") }; };'
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'scripts.start=node server.js']
         },
         {
             action: 'command',

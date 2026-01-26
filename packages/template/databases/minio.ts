@@ -3,7 +3,7 @@ import type { ProjectTemplate } from "..";
 export const MinIO: ProjectTemplate = {
     name: "MinIO",
     description: "MinIO Object Storage (S3 Compatible)",
-    notes: "Requires Docker installed. S3-compatible object storage.",
+    notes: "Requires Docker installed. Data stored in ./minio-data folder.",
     templating: [
         {
             action: 'file',
@@ -20,15 +20,22 @@ export const MinIO: ProjectTemplate = {
       - "0:9000"
       - "0:9001"
     volumes:
-      - minio-data:/data
+      - ./minio-data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
-      retries: 3
+      retries: 3`
+        },
+        {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: `# Object storage data folder
+minio-data/
 
-volumes:
-  minio-data:`
+# Runtime file
+.runtime.json
+`
         },
         {
             action: 'file',

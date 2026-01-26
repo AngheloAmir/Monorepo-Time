@@ -1,44 +1,47 @@
 import type { ProjectTemplate } from "..";
+import { dockerCompose } from "./n8n/dockerCompose";
+import { gitignoreContent } from "./n8n/gitignore";
+import { serverJs } from "./n8n/server";
 
 export const N8NLocal: ProjectTemplate = {
-    name: "N8N Local",
-    description: "N8N (Local)",
-    notes: "Requires Node.js installed in your system.",
+    name: "N8N Local Dockerized",
+    description: "N8N Workflow Automation",
+    notes: "Requires Docker installed. Data is stored in ./n8n-data folder.",
     templating: [
         {
-            action: 'command',
-            cmd: 'npm',
-            args: ['install', 'n8n']
+            action: 'file',
+            file: 'docker-compose.yml',
+            filecontent: dockerCompose
+        },
+        {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: gitignoreContent
+        },
+        {
+            action: 'file',
+            file: 'index.js',
+            filecontent: serverJs
         },
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.dev=npx n8n']
+            args: ['pkg', 'set', 'scripts.start=node index.js']
         },
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.start=npx n8n']
+            args: ['pkg', 'set', 'scripts.stop=node -e \'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}\'']
         },
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.stop=npx kill-port 5678']
+            args: ['pkg', 'set', 'description=N8N Workflow Automation (Docker)']
         },
         {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-project-diagram text-red-500']
-        },
-        {
-            action: 'command',
-            cmd: 'npm',
-            args: ['pkg', 'set', 'description=N8N (Local)']
-        },
-        {
-            action: 'command',
-            cmd: 'npm',
-            args: ['pkg', 'set', 'name=$(basename $PWD)']
-        },
+        }
     ]
 };

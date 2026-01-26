@@ -3,7 +3,7 @@ import type { ProjectTemplate } from "..";
 export const PostgreSQL: ProjectTemplate = {
     name: "PostgreSQL",
     description: "PostgreSQL Database (Docker Compose)",
-    notes: "Requires Docker installed.",
+    notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
     templating: [
         {
             action: 'file',
@@ -21,7 +21,7 @@ services:
     ports:
       - "0:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
       interval: 5s
@@ -36,10 +36,17 @@ services:
     ports:
       - "0:80"
     depends_on:
-      - postgres
+      - postgres`
+        },
+        {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: `# Database data folder
+postgres-data/
 
-volumes:
-  postgres-data:`
+# Runtime file
+.runtime.json
+`
         },
         {
             action: 'file',

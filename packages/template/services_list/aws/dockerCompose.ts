@@ -10,7 +10,7 @@ export const dockerCompose = `services:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - AWS_DEFAULT_REGION=us-east-1
     volumes:
-      - localstack-data:/var/lib/localstack
+      - ./localstack-data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - cloud-net
@@ -43,9 +43,6 @@ export const dockerCompose = `services:
       - localstack
     networks:
       - cloud-net
-
-volumes:
-  localstack-data: {}
 
 networks:
   cloud-net:
