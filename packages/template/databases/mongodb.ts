@@ -12,6 +12,7 @@ export const MongoDB: ProjectTemplate = {
   mongodb:
     image: mongo:7.0
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password

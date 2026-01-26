@@ -12,6 +12,7 @@ export const Meilisearch: ProjectTemplate = {
   meilisearch:
     image: getmeili/meilisearch:v1.10
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       - MEILI_MASTER_KEY=masterKey
       - MEILI_ENV=development

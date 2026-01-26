@@ -57771,6 +57771,7 @@ services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -58014,6 +58015,7 @@ services:
   redis:
     image: redis:7.2-alpine
     restart: unless-stopped
+    user: "1000:1000"
     ports:
       - "0:6379"
     volumes:
@@ -58179,6 +58181,7 @@ var MongoDB = {
   mongodb:
     image: mongo:7.0
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
@@ -58349,6 +58352,7 @@ var Meilisearch = {
   meilisearch:
     image: getmeili/meilisearch:v1.10
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       - MEILI_MASTER_KEY=masterKey
       - MEILI_ENV=development
@@ -58519,6 +58523,7 @@ var MinIO = {
     image: minio/minio
     command: server /data --console-address ":9001"
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
@@ -60466,6 +60471,7 @@ var dockerCompose = `services:
   n8n:
     image: n8nio/n8n:latest
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
@@ -60814,6 +60820,7 @@ module.exports = {
 var dockerCompose2 = `services:
   localstack:
     image: localstack/localstack
+    user: "1000:1000"
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
       - "127.0.0.1:4510-4559:4510-4559"  # External services port range

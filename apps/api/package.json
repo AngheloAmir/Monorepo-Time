@@ -1,6 +1,6 @@
 {
   "name": "monorepotime",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "monorepo gui tool",
   "main": "dist/index.js",
   "scripts": {

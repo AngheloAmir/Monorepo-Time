@@ -1,6 +1,7 @@
 export const dockerCompose = `services:
   localstack:
     image: localstack/localstack
+    user: "1000:1000"
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
       - "127.0.0.1:4510-4559:4510-4559"  # External services port range

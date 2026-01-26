@@ -13,6 +13,7 @@ export const MinIO: ProjectTemplate = {
     image: minio/minio
     command: server /data --console-address ":9001"
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin

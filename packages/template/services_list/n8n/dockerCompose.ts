@@ -2,6 +2,7 @@ export const dockerCompose = `services:
   n8n:
     image: n8nio/n8n:latest
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin

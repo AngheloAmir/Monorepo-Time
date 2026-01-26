@@ -14,6 +14,7 @@ services:
   redis:
     image: redis:7.2-alpine
     restart: unless-stopped
+    user: "1000:1000"
     ports:
       - "0:6379"
     volumes:

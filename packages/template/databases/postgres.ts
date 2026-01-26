@@ -14,6 +14,7 @@ services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
