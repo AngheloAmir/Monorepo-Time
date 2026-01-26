@@ -29,8 +29,8 @@ export default function FloatingBtn() {
         <>
             <ButtonFloating
                 onClick={() => setShowTerminal(true)}
-                bottom={156}
-                right={16}
+                bottom={184}
+                right={32}
                 icon="fa-solid fa-terminal"
                 text="Root Terminal"
                 
@@ -38,8 +38,8 @@ export default function FloatingBtn() {
 
             <ButtonFloating
                 onClick={() => showHideFiles()}
-                bottom={82}
-                right={16}
+                bottom={104}
+                right={32}
                 icon={filesShow ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'}
                 text={filesShow ? 'Hide Files' : 'Show Files'}
                
@@ -47,10 +47,10 @@ export default function FloatingBtn() {
 
             <ButtonFloating
                 onClick={() => setShowWorkspaceNew(true)}
-                bottom={8}
-                right={16}
+                bottom={24}
+                right={32}
                 icon="fa-solid fa-plus"
-                text="Add Workspace"
+                text="Add Workspace App"
                
             />
         </>

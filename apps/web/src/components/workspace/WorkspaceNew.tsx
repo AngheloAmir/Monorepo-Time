@@ -97,7 +97,7 @@ export default function WorkspaceNew() {
     if (!showWorkspaceNew) return null;
     return (
         <ModalBody>
-            <ModalHeader close={close} title="New Workspace" description="Create a new workspace" />
+            <ModalHeader close={close} title="New Workspace App" description="Create a new application inside the workspace" />
 
             <div className="p-3 flex-1 overflow-y-auto text-md">
                 {error &&
@@ -207,7 +207,7 @@ export default function WorkspaceNew() {
                     <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
                     <span className="relative z-10 flex items-center gap-2">
                         <i className="fas fa-plus"></i>
-                        New Workspace
+                        Create New App
                     </span>
                 </button>
             </footer>

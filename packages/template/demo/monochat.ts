@@ -1,4 +1,4 @@
-import { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "..";
 
 const MonoChat: ProjectTemplate = {
     name: "Chat To MonoChat",

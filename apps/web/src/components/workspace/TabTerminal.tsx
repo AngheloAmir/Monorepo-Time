@@ -1,21 +1,39 @@
-import useWorkspaceState  from "../../appstates/workspace";
+import useWorkspaceState from "../../appstates/workspace";
 import TabTerminalWrapper from "./TabTerminal/TabTerminalWrapper";
-import HeaderItem         from "./TabTerminal/HeaderItem";
+import HeaderItem from "./TabTerminal/HeaderItem";
+import { useState } from "react";
 
 export default function TabTerminal() {
-    const workspace      = useWorkspaceState.use.workspace();
+    const workspace = useWorkspaceState.use.workspace();
     const activeTerminal = useWorkspaceState.use.activeTerminal();
+    const [viewMode, setViewMode] = useState<'normal' | 'maximized'>('normal');
+    const toggleMaximize = () => {
+        setViewMode(v => v === 'maximized' ? 'normal' : 'maximized');
+    };
 
     return (
-        <div className="w-full h-full flex flex-col">
+        <div className={`
+            flex flex-col
+                ${viewMode === 'maximized' ?
+                'absolute inset-0 z-50 w-full h-full bg-[#0a0a0a]' :
+                'w-full h-full relative'
+            }`}>
+
             <header className="flex-none w-full pt-1 flex h-9 flex-wrap select-none">
+                <button
+                    onClick={toggleMaximize}
+                    className="w-8 px-2 cursor-pointer select-none rounded-t-md bg-[#0a0a0a]/80 text-gray-500 hover:bg-[#121212] hover:text-gray-300 flex items-center justify-center transition-colors"
+                    title={viewMode === 'maximized' ? "Restore" : "Maximize"}
+                >
+                    <i className={`fas ${viewMode === 'maximized' ? 'fa-compress' : 'fa-expand'}`}></i>
+                </button>
                 {workspace.map((item) => {
-                    if (item.isRunningAs != null) 
-                        return <HeaderItem key={item.info.name}  workspace={item} />
+                    if (item.isRunningAs != null)
+                        return <HeaderItem key={item.info.name} workspace={item} />
                 })}
             </header>
 
-            <div className="flex-1 overflow-hidden px-4 py-1 border-t border-gray-900/80 relative">
+            <div className={`flex-1 overflow-hidden px-4 py-1 border-t border-gray-900/80 relative`}>
                 {(!activeTerminal || !workspace.some(w => w.info.name === activeTerminal && (w.isRunningAs === 'dev' || w.isRunningAs === 'start'))) && (
                     <div className="absolute inset-0 flex flex-col gap-4 items-center justify-center opacity-40 select-none pointer-events-none">
                         <div className="w-16 h-16  rounded-full flex items-center justify-center shadow-inner">
@@ -25,9 +43,9 @@ export default function TabTerminal() {
                     </div>
                 )}
 
-                { workspace.map((item) => (
+                {workspace.map((item) => (
                     <TabTerminalWrapper
-                        key={ item.info.name }
+                        key={item.info.name}
                         workspace={item}
                         visible={
                             activeTerminal == item.info.name && item.isRunningAs != null
