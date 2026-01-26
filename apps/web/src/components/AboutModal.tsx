@@ -32,18 +32,24 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                         Streamline your workflow, visualize dependencies, and execute commands effortlessly.
                     </p>
 
-                    {/* Footer / Links */}
-                    {/* <div className="flex gap-4 text-sm">
-                        <a href="https://github.com/AngheloAmir/Monorepo-Time" className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                            <i className="fab fa-github"></i> Repository
-                        </a>
-                    </div> */}
+                    {/** Buy me a coffe */}
+                    <a 
+                        href="https://buymeacoffee.com/angheloamir" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="group relative inline-flex items-center gap-2 px-6 py-3 bg-[#FFDD00] text-black font-bold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,221,0,0.4)] hover:bg-[#ffe233]"
+                    >
+                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                        <i className="fas fa-coffee text-xl transition-transform duration-300 group-hover:rotate-12"></i> 
+                        <span className="relative">Buy me a coffee</span>
+                    </a>
                 </div>
             </div>
             
              <style>{`
                 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                 @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+                @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
                 .animate-fadeIn { animation: fadeIn 0.2s ease-out forwards; }
                 .animate-scaleIn { animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
             `}</style>
