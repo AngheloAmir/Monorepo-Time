@@ -49,9 +49,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'redis-data');
 let containerId = null;
 
 console.log('Starting Redis...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created redis-data directory');
+}
 
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 

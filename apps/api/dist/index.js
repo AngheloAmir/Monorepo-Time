@@ -57815,9 +57815,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'postgres-data');
 let containerId = null;
 
 console.log('Starting PostgreSQL...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created postgres-data directory');
+}
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -58050,9 +58057,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'redis-data');
 let containerId = null;
 
 console.log('Starting Redis...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created redis-data directory');
+}
 
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
@@ -58217,9 +58231,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'mongo-data');
 let containerId = null;
 
 console.log('Starting MongoDB...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created mongo-data directory');
+}
 
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
 
@@ -58385,9 +58406,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'meili-data');
 let containerId = null;
 
 console.log('Starting Meilisearch...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created meili-data directory');
+}
 
 // Spawn Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -58557,9 +58585,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'minio-data');
 let containerId = null;
 
 console.log('Starting MinIO...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created minio-data directory');
+}
 
 // Spawn Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -60505,8 +60540,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'n8n-data');
 
 console.log('Starting N8N...');
+
+// Pre-create data directory to ensure correct permissions
+// Docker creates mount directories as root, causing permission issues
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created n8n-data directory');
+}
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -61093,9 +61136,16 @@ const { spawn, exec } = require('child_process');
 const deploy = require('./deploy');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'localstack-data');
 let currentPort = 3748;
 
 console.log("Starting AWS Local environment...");
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created localstack-data directory');
+}
 
 // Spawn Docker Compose
 const docker = spawn('docker', ['compose', 'up', '-d'], { stdio: 'inherit' });

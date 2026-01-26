@@ -47,9 +47,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'minio-data');
 let containerId = null;
 
 console.log('Starting MinIO...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created minio-data directory');
+}
 
 // Spawn Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });

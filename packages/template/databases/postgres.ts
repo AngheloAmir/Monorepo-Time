@@ -58,9 +58,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'postgres-data');
 let containerId = null;
 
 console.log('Starting PostgreSQL...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created postgres-data directory');
+}
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });

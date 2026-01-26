@@ -5,9 +5,16 @@ const { spawn, exec } = require('child_process');
 const deploy = require('./deploy');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'localstack-data');
 let currentPort = 3748;
 
 console.log("Starting AWS Local environment...");
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created localstack-data directory');
+}
 
 // Spawn Docker Compose
 const docker = spawn('docker', ['compose', 'up', '-d'], { stdio: 'inherit' });

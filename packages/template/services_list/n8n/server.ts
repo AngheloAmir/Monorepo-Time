@@ -4,8 +4,16 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'n8n-data');
 
 console.log('Starting N8N...');
+
+// Pre-create data directory to ensure correct permissions
+// Docker creates mount directories as root, causing permission issues
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created n8n-data directory');
+}
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
