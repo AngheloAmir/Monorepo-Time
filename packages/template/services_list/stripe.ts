@@ -57,7 +57,7 @@ export const StripeTemplate: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-credit-card text-green-500']
+            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-stripe text-orange-500']
         },
         {
             action: 'command',

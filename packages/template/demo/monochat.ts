@@ -154,6 +154,11 @@ const MonoChat: ProjectTemplate = {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'name=$(basename $PWD)']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-comments text-green-500']
         }
     ]
 }

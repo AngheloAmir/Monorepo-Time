@@ -61944,8 +61944,471 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
+// ../../packages/template/tools/hoppscotch.ts
+var HoppscotchTool = {
+  name: "Hoppscotch",
+  description: "API Testing Tool (Postman Alternative)",
+  notes: "Requires Docker. Self-hosted API development platform.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  hoppscotch:
+    image: hoppscotch/hoppscotch
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Hoppscotch...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port hoppscotch 3000', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify hoppscotch is responding
+        http.get(\`http://localhost:\${port}\`, (res) => {
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+
+                console.clear();
+                console.log('\\n==================================================');
+                console.log('Hoppscotch is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('--------------------------------------------------');
+                console.log('Open-source API development platform');
+                console.log('Alternative to Postman');
+                console.log('==================================================\\n');
+            });
+        }).on('error', () => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Hoppscotch...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Hoppscotch - API Testing Tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-paper-plane text-green-500"]
+    }
+  ]
+};
+
+// ../../packages/template/tools/mailpit.ts
+var MailpitTool = {
+  name: "Mailpit",
+  description: "Email Testing Tool",
+  notes: "Requires Docker. Catches all outgoing emails for testing.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  mailpit:
+    image: axllent/mailpit
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:8025"
+      - "0:1025"
+    environment:
+      - MP_SMTP_AUTH_ACCEPT_ANY=true
+      - MP_SMTP_AUTH_ALLOW_INSECURE=true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8025"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Mailpit...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port mailpit 8025', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const webPort = stdout.trim().split(':')[1];
+        if (!webPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Get SMTP port
+        exec('docker compose port mailpit 1025', (err2, stdout2, stderr2) => {
+            const smtpPort = stdout2 ? stdout2.trim().split(':')[1] : null;
+            if (!smtpPort) {
+                setTimeout(checkStatus, 2000);
+                return;
+            }
+
+            // Verify mailpit is responding
+            http.get(\`http://localhost:\${webPort}\`, (res) => {
+                exec('docker compose ps -q', (err3, stdout3) => {
+                    const containerIds = stdout3 ? stdout3.trim().split('\\n') : [];
+                    
+                    try {
+                        fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                            port: server.address().port, 
+                            pid: process.pid,
+                            containerIds: containerIds
+                        }));
+                    } catch(e) {
+                        console.error('Failed to write runtime file:', e);
+                    }
+
+                    console.clear();
+                    console.log('\\n==================================================');
+                    console.log('Mailpit is running!');
+                    console.log('--------------------------------------------------');
+                    console.log(\`Web UI:            http://localhost:\${webPort}\`);
+                    console.log(\`SMTP Server:       localhost:\${smtpPort}\`);
+                    console.log('--------------------------------------------------');
+                    console.log('Configure your app to send emails to:');
+                    console.log(\`  SMTP Host:       localhost\`);
+                    console.log(\`  SMTP Port:       \${smtpPort}\`);
+                    console.log('  No authentication required');
+                    console.log('==================================================\\n');
+                });
+            }).on('error', () => {
+                setTimeout(checkStatus, 2000);
+            });
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Mailpit...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Mailpit - Email Testing Tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-envelope text-purple-500"]
+    }
+  ]
+};
+
+// ../../packages/template/tools/cloudbeaver.ts
+var CloudbeaverTool = {
+  name: "CloudBeaver",
+  description: "Universal Database GUI (DBeaver Web)",
+  notes: "Requires Docker. Web-based database management tool.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  cloudbeaver:
+    image: dbeaver/cloudbeaver
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:8978"
+    volumes:
+      - cloudbeaver-data:/opt/cloudbeaver/workspace
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8978"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  cloudbeaver-data:`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting CloudBeaver...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port cloudbeaver 8978', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify cloudbeaver is responding
+        http.get(\`http://localhost:\${port}\`, (res) => {
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+
+                console.clear();
+                console.log('\\n==================================================');
+                console.log('CloudBeaver is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('--------------------------------------------------');
+                console.log('Universal database management tool');
+                console.log('Supports: PostgreSQL, MySQL, MongoDB, and more');
+                console.log('--------------------------------------------------');
+                console.log('First time setup:');
+                console.log('  1. Create admin account on first visit');
+                console.log('  2. Add database connections via UI');
+                console.log('  3. Use host.docker.internal for local DBs');
+                console.log('==================================================\\n');
+            });
+        }).on('error', () => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping CloudBeaver...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=CloudBeaver - Universal Database GUI"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-orange-500"]
+    }
+  ]
+};
+
 // ../../packages/template/tools.ts
 var tools = [
+  CloudbeaverTool,
+  HoppscotchTool,
+  MailpitTool,
   PgwebTool,
   MongoExpressTool,
   RedisCommanderTool

@@ -128,6 +128,15 @@ const getIcon = (name: string) => {
     if (n.includes('mongo')) return 'fas fa-leaf text-green-500';
     if (n.includes('n8n')) return 'fas fa-project-diagram text-red-500';
     if (n.includes('aws')) return 'fab fa-aws text-orange-400';
+    if (n.includes('hoppscotch')) return 'fas fa-paper-plane text-green-500';
+    if (n.includes('mailpit')) return 'fas fa-envelope text-blue-500';
+    if (n.includes('cloudbeaver')) return 'fas fa-database text-orange-500';
+    if (n.includes('pgweb')) return 'fas fa-database text-blue-500';
+    if (n.includes('mongo-express')) return 'fas fa-leaf text-green-500';
+    if (n.includes('redis-commander')) return 'fas fa-server text-red-400';
+    if (n.includes('chat to monochat')) return 'fas fa-comments text-green-500';
+    if (n.includes('localstack')) return 'fab fa-aws text-orange-500';
+    if (n.includes('stripe')) return 'fab fa-stripe text-orange-500';
     return 'fas fa-cube text-gray-400';
 }
 
