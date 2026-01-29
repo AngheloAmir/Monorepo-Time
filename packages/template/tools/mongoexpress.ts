@@ -18,6 +18,7 @@ export const MongoExpressTool: ProjectTemplate = {
     environment:
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      # ⚠️ UPDATE THE PORT BELOW TO MATCH YOUR MONGODB PORT
       - ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:27017/
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -99,14 +100,25 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('Mongo Express is running!');
-                console.log('--------------------------------------------------');
+                console.log('🍃 Mongo Express - MongoDB Web GUI');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('--------------------------------------------------');
-                console.log('Default MongoDB:   mongodb://admin:admin@host.docker.internal:27017/');
-                console.log('Edit docker-compose.yml to change connection string');
+                console.log('⚠️  IMPORTANT: CONFIGURE CONNECTION FIRST!');
+                console.log('--------------------------------------------------');
+                console.log('Edit docker-compose.yml and update:');
+                console.log('  ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:<PORT>/');
+                console.log('');
+                console.log('Replace <PORT> with your MongoDB mapped port.');
+                console.log('--------------------------------------------------');
+                console.log('🔐 IF USING BUILT-IN MONGODB TEMPLATE:');
+                console.log('   Username:       admin');
+                console.log('   Password:       admin');
+                console.log('   Check MongoDB terminal for its port!');
+                console.log('--------------------------------------------------');
+                console.log('After editing, restart with: npm run stop && npm run start');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {

@@ -61517,6 +61517,8 @@ var PgwebTool = {
     environment:
       - PGWEB_AUTH_USER=admin
       - PGWEB_AUTH_PASS=admin
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081"]
       interval: 10s
@@ -61595,13 +61597,23 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('Pgweb is running!');
-                console.log('--------------------------------------------------');
+                console.log('\u{1F418} Pgweb - PostgreSQL Web GUI');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('--------------------------------------------------');
-                console.log('Connect to any PostgreSQL database from the web UI');
+                console.log('\u{1F4CC} CONNECTION SETTINGS (in Pgweb UI):');
+                console.log('   Host:           host.docker.internal');
+                console.log('   Port:           <PostgreSQL mapped port>');
+                console.log('   SSL Mode:       disable');
+                console.log('--------------------------------------------------');
+                console.log('\u{1F510} IF USING BUILT-IN POSTGRESQL TEMPLATE:');
+                console.log('   Username:       admin');
+                console.log('   Password:       admin');
+                console.log('   Database:       db');
+                console.log('--------------------------------------------------');
+                console.log('\u{1F4A1} TIP: Check PostgreSQL terminal for its port!');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -61670,6 +61682,7 @@ var MongoExpressTool = {
     environment:
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      # \u26A0\uFE0F UPDATE THE PORT BELOW TO MATCH YOUR MONGODB PORT
       - ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:27017/
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -61751,14 +61764,25 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('Mongo Express is running!');
-                console.log('--------------------------------------------------');
+                console.log('\u{1F343} Mongo Express - MongoDB Web GUI');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('--------------------------------------------------');
-                console.log('Default MongoDB:   mongodb://admin:admin@host.docker.internal:27017/');
-                console.log('Edit docker-compose.yml to change connection string');
+                console.log('\u26A0\uFE0F  IMPORTANT: CONFIGURE CONNECTION FIRST!');
+                console.log('--------------------------------------------------');
+                console.log('Edit docker-compose.yml and update:');
+                console.log('  ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:<PORT>/');
+                console.log('');
+                console.log('Replace <PORT> with your MongoDB mapped port.');
+                console.log('--------------------------------------------------');
+                console.log('\u{1F510} IF USING BUILT-IN MONGODB TEMPLATE:');
+                console.log('   Username:       admin');
+                console.log('   Password:       admin');
+                console.log('   Check MongoDB terminal for its port!');
+                console.log('--------------------------------------------------');
+                console.log('After editing, restart with: npm run stop && npm run start');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -61827,6 +61851,7 @@ var RedisCommanderTool = {
     environment:
       - HTTP_USER=admin
       - HTTP_PASSWORD=admin
+      # \u26A0\uFE0F UPDATE THE PORT BELOW TO MATCH YOUR REDIS PORT
       - REDIS_HOSTS=local:host.docker.internal:6379
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -61908,14 +61933,24 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('Redis Commander is running!');
-                console.log('--------------------------------------------------');
+                console.log('\u{1F534} Redis Commander - Redis Web GUI');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('--------------------------------------------------');
-                console.log('Default Redis:     host.docker.internal:6379');
-                console.log('Edit docker-compose.yml REDIS_HOSTS to add more');
+                console.log('\u26A0\uFE0F  IMPORTANT: CONFIGURE CONNECTION FIRST!');
+                console.log('--------------------------------------------------');
+                console.log('Edit docker-compose.yml and update:');
+                console.log('  REDIS_HOSTS=local:host.docker.internal:<PORT>');
+                console.log('');
+                console.log('Replace <PORT> with your Redis mapped port.');
+                console.log('--------------------------------------------------');
+                console.log('\u{1F510} IF USING BUILT-IN REDIS TEMPLATE:');
+                console.log('   No password required (default)');
+                console.log('   Check Redis terminal for its port!');
+                console.log('--------------------------------------------------');
+                console.log('After editing, restart with: npm run stop && npm run start');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {

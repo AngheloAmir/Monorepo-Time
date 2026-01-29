@@ -18,6 +18,7 @@ export const RedisCommanderTool: ProjectTemplate = {
     environment:
       - HTTP_USER=admin
       - HTTP_PASSWORD=admin
+      # ⚠️ UPDATE THE PORT BELOW TO MATCH YOUR REDIS PORT
       - REDIS_HOSTS=local:host.docker.internal:6379
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -99,14 +100,24 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('Redis Commander is running!');
-                console.log('--------------------------------------------------');
+                console.log('🔴 Redis Commander - Redis Web GUI');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('--------------------------------------------------');
-                console.log('Default Redis:     host.docker.internal:6379');
-                console.log('Edit docker-compose.yml REDIS_HOSTS to add more');
+                console.log('⚠️  IMPORTANT: CONFIGURE CONNECTION FIRST!');
+                console.log('--------------------------------------------------');
+                console.log('Edit docker-compose.yml and update:');
+                console.log('  REDIS_HOSTS=local:host.docker.internal:<PORT>');
+                console.log('');
+                console.log('Replace <PORT> with your Redis mapped port.');
+                console.log('--------------------------------------------------');
+                console.log('🔐 IF USING BUILT-IN REDIS TEMPLATE:');
+                console.log('   No password required (default)');
+                console.log('   Check Redis terminal for its port!');
+                console.log('--------------------------------------------------');
+                console.log('After editing, restart with: npm run stop && npm run start');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
