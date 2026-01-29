@@ -10,7 +10,7 @@ export const YaadeTool: ProjectTemplate = {
             file: 'docker-compose.yml',
             filecontent: `services:
   yaade:
-    image: elestio/yaade
+    image: esperotech/yaade
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
