@@ -61556,6 +61556,7 @@ var StripeTemplate = {
 var dockerCompose4 = `services:
   postgres:
     image: postgres:13-alpine
+    pull_policy: if_not_present
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -61578,6 +61579,7 @@ var dockerCompose4 = `services:
 
   mattermost:
     image: mattermost/mattermost-team-edition:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -61589,7 +61591,7 @@ var dockerCompose4 = `services:
       postgres:
         condition: service_healthy
     ports:
-      - "8065:8065"
+      - "7201:8065"
     volumes:
       - mattermost_config:/mattermost/config:rw
       - mattermost_data:/mattermost/data:rw
@@ -61600,7 +61602,7 @@ var dockerCompose4 = `services:
     environment:
       - MM_SQLSETTINGS_DRIVERNAME=postgres
       - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:mmuser_password@postgres:5432/mattermost?sslmode=disable&connect_timeout=10
-      - MM_SERVICESETTINGS_SITEURL=http://localhost:8065
+      - MM_SERVICESETTINGS_SITEURL=http://localhost:7201
       - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8065/api/v4/system/ping || exit 1"]
@@ -61790,6 +61792,7 @@ var MattermostLocal = {
 var dockerCompose5 = `services:
   db:
     image: mariadb:10.6
+    pull_policy: if_not_present
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     volumes:
@@ -61808,9 +61811,10 @@ var dockerCompose5 = `services:
 
   nextcloud:
     image: nextcloud:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "0:80"
     links:
       - db
     depends_on:
@@ -62003,6 +62007,7 @@ var NextcloudLocal = {
 var dockerCompose6 = `services:
   mautic_db:
     image: mariadb:10.6
+    pull_policy: if_not_present
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
       - MYSQL_ROOT_PASSWORD=mautic
@@ -62021,16 +62026,17 @@ var dockerCompose6 = `services:
 
   mautic:
     image: mautic/mautic:v4
+    pull_policy: if_not_present
     environment:
       - MAUTIC_DB_HOST=mautic_db
       - MAUTIC_DB_USER=mautic
       - MAUTIC_DB_PASSWORD=mautic
       - MAUTIC_DB_NAME=mautic
       - MAUTIC_RUN_CRON_JOBS=true
-      - MAUTIC_ADMIN_EMAIL=admin@example.com
-      - MAUTIC_ADMIN_PASSWORD=mautic
+      - MAUTIC_ADMIN_EMAIL=admin@admin.com
+      - MAUTIC_ADMIN_PASSWORD=admin
     ports:
-      - "8080:80"
+      - "0:80"
     volumes:
       - mautic_data:/var/www/html
     links:

@@ -1,6 +1,7 @@
 export const dockerCompose = `services:
   mautic_db:
     image: mariadb:10.6
+    pull_policy: if_not_present
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
       - MYSQL_ROOT_PASSWORD=mautic
@@ -19,14 +20,15 @@ export const dockerCompose = `services:
 
   mautic:
     image: mautic/mautic:v4
+    pull_policy: if_not_present
     environment:
       - MAUTIC_DB_HOST=mautic_db
       - MAUTIC_DB_USER=mautic
       - MAUTIC_DB_PASSWORD=mautic
       - MAUTIC_DB_NAME=mautic
       - MAUTIC_RUN_CRON_JOBS=true
-      - MAUTIC_ADMIN_EMAIL=admin@example.com
-      - MAUTIC_ADMIN_PASSWORD=mautic
+      - MAUTIC_ADMIN_EMAIL=admin@admin.com
+      - MAUTIC_ADMIN_PASSWORD=admin
     ports:
       - "0:80"
     volumes:

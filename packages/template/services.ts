@@ -14,4 +14,4 @@ const templates: ProjectTemplate[] = [
     AWSTemplate,
     StripeTemplate,
 ];
-export default templates;
+export default templates;   

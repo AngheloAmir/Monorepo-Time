@@ -1,6 +1,7 @@
 export const dockerCompose = `services:
   postgres:
     image: postgres:13-alpine
+    pull_policy: if_not_present
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -23,6 +24,7 @@ export const dockerCompose = `services:
 
   mattermost:
     image: mattermost/mattermost-team-edition:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
@@ -34,7 +36,7 @@ export const dockerCompose = `services:
       postgres:
         condition: service_healthy
     ports:
-      - "8065:8065"
+      - "7201:8065"
     volumes:
       - mattermost_config:/mattermost/config:rw
       - mattermost_data:/mattermost/data:rw
@@ -45,7 +47,7 @@ export const dockerCompose = `services:
     environment:
       - MM_SQLSETTINGS_DRIVERNAME=postgres
       - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:mmuser_password@postgres:5432/mattermost?sslmode=disable&connect_timeout=10
-      - MM_SERVICESETTINGS_SITEURL=http://localhost:8065
+      - MM_SERVICESETTINGS_SITEURL=http://localhost:7201
       - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8065/api/v4/system/ping || exit 1"]
