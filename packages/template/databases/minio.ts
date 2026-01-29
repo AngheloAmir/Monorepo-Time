@@ -60,10 +60,14 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // Spawn Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -121,7 +125,7 @@ const checkStatus = () => {
                     }));
                 } catch(e) {}
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('MinIO Object Storage is running!');
                 console.log('--------------------------------------------------');

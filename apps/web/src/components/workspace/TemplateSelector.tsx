@@ -115,30 +115,30 @@ function TabItem({ name, icon, activeTab, setActiveTab }: { name: string, icon: 
 const getIcon = (name: string) => {
     const n = name.toLowerCase();
     if (n.includes('react')) return 'fab fa-react text-blue-400';
-    if (n.includes('next.js')) return 'fab fa-js text-white';
-    if (n.includes('express')) return 'fab fa-node text-green-500';
-    if (n.includes('php')) return 'fab fa-php text-indigo-400';
-    if (n.includes('laravel')) return 'fab fa-laravel text-red-500';
-    if (n.includes('.net')) return 'fab fa-windows text-blue-600';
-    if (n.includes('python')) return 'fab fa-python text-yellow-500';
-    if (n.includes('mysql')) return 'fas fa-database text-blue-500';
-    if (n.includes('postgres')) return 'fas fa-database text-blue-300';
-    if (n.includes('supabase')) return 'fas fa-bolt text-green-400';
-    if (n.includes('redis')) return 'fas fa-server text-red-400';
-    if (n.includes('mongo')) return 'fas fa-leaf text-green-500';
-    if (n.includes('n8n')) return 'fas fa-project-diagram text-red-500';
-    if (n.includes('aws')) return 'fab fa-aws text-orange-400';
-    if (n.includes('hoppscotch')) return 'fas fa-paper-plane text-green-500';
-    if (n.includes('mailpit')) return 'fas fa-envelope text-blue-500';
-    if (n.includes('cloudbeaver')) return 'fas fa-database text-orange-500';
-    if (n.includes('pgweb')) return 'fas fa-database text-blue-500';
-    if (n.includes('mongo-express')) return 'fas fa-leaf text-green-500';
-    if (n.includes('redis-commander')) return 'fas fa-server text-red-400';
-    if (n.includes('chat to monochat')) return 'fas fa-comments text-green-500';
-    if (n.includes('localstack')) return 'fab fa-aws text-orange-500';
-    if (n.includes('stripe')) return 'fab fa-stripe text-orange-500';
-    if (n.includes('yaade')) return 'fas fa-vial text-purple-500';
-    return 'fas fa-cube text-gray-400';
+    else if (n.includes('next.js')) return 'fab fa-js text-white';
+    else if (n.includes('express')) return 'fab fa-node text-green-500';
+    else if (n.includes('php')) return 'fab fa-php text-indigo-400';
+    else if (n.includes('laravel')) return 'fab fa-laravel text-red-500';
+    else if (n.includes('.net')) return 'fab fa-windows text-blue-600';
+    else if (n.includes('python')) return 'fab fa-python text-yellow-500';
+    else if (n.includes('mysql')) return 'fas fa-database text-blue-500';
+    else if (n.includes('postgres')) return 'fas fa-database text-blue-300';
+    else if (n.includes('supabase')) return 'fas fa-bolt text-green-400';
+    else if (n.includes('redis')) return 'fas fa-server text-red-400';
+    else if (n.includes('mongo')) return 'fas fa-leaf text-green-500';
+    else if (n.includes('n8n')) return 'fas fa-project-diagram text-red-500';
+    else if (n.includes('aws')) return 'fab fa-aws text-orange-400';
+    else if (n.includes('mailpit')) return 'fas fa-envelope text-blue-500';
+    else if (n.includes('cloudbeaver')) return 'fas fa-database text-orange-500';
+    else if (n.includes('pgweb')) return 'fas fa-database text-blue-500';
+    else if (n.includes('mongo-express')) return 'fas fa-leaf text-green-500';
+    else if (n.includes('redis-commander')) return 'fas fa-server text-red-400';
+    else if (n.includes('chat to monochat')) return 'fas fa-comments text-green-500';
+    else if (n.includes('localstack')) return 'fab fa-aws text-orange-500';
+    else if (n.includes('stripe')) return 'fab fa-stripe text-orange-500';
+    else if (n.includes('yaade')) return 'fas fa-vial text-purple-500';
+    else if (n.includes('mattermost')) return 'fas fa-comments text-green-500';
+    else return 'fas fa-cube text-gray-400';
 }
 
 //==============================================================================================

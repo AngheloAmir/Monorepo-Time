@@ -15,9 +15,12 @@ export const dockerCompose = `services:
     ports:
       - "5678:5678"
     volumes:
-      - ./n8n-data:/home/node/.n8n
+      - n8n_data:/home/node/.n8n
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:5678/healthz || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5`;
+      retries: 5
+
+volumes:
+  n8n_data:`;

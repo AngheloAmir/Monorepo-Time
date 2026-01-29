@@ -57827,10 +57827,14 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -57876,7 +57880,7 @@ const checkStatus = () => {
                 console.error('Failed to write runtime file:', e);
              }
 
-             console.clear();
+             process.stdout.write('\\\\x1Bc');
              console.log('\\n==================================================');
              console.log('PostgreSQL is running!');
              console.log('--------------------------------------------------');
@@ -58045,10 +58049,14 @@ if (!fs.existsSync(DATA_DIR)) {
     console.log('Created redis-data directory');
 }
 
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -58094,7 +58102,7 @@ const checkStatus = () => {
                 }));
             } catch(e) {}
 
-            console.clear();
+            process.stdout.write('\\\\x1Bc');
             console.log('\\n==================================================');
             console.log('Redis is running!');
             console.log('--------------------------------------------------');
@@ -58214,10 +58222,14 @@ if (!fs.existsSync(DATA_DIR)) {
     console.log('Created mongo-data directory');
 }
 
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 
@@ -58265,7 +58277,7 @@ const checkStatus = () => {
                 }));
             } catch(e) {}
 
-            console.clear();
+            process.stdout.write('\\\\x1Bc');
             console.log('\\n==================================================');
             console.log('MongoDB is running!');
             console.log('--------------------------------------------------');
@@ -58386,10 +58398,14 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // Spawn Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -58433,7 +58449,7 @@ const checkStatus = () => {
                 }));
             } catch(e) {}
 
-            console.clear();
+            process.stdout.write('\\\\x1Bc');
             console.log('\\n==================================================');
             console.log('Meilisearch is running!');
             console.log('--------------------------------------------------');
@@ -58561,10 +58577,14 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // Spawn Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -58622,7 +58642,7 @@ const checkStatus = () => {
                     }));
                 } catch(e) {}
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('MinIO Object Storage is running!');
                 console.log('--------------------------------------------------');
@@ -60483,18 +60503,18 @@ var dockerCompose = `services:
     ports:
       - "5678:5678"
     volumes:
-      - ./n8n-data:/home/node/.n8n
+      - n8n_data:/home/node/.n8n
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:5678/healthz || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5`;
+      retries: 5
+
+volumes:
+  n8n_data:`;
 
 // ../../packages/template/services_list/n8n/gitignore.ts
-var gitignoreContent = `# N8N data folder (contains credentials and workflows)
-n8n-data/
-
-# Runtime file
+var gitignoreContent = `# Runtime file
 .runtime.json
 `;
 
@@ -60505,22 +60525,19 @@ const fs = require('fs');
 const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-const DATA_DIR = path.join(__dirname, 'n8n-data');
+
 
 console.log('Starting N8N...');
 
-// Pre-create data directory to ensure correct permissions
-// Docker creates mount directories as root, causing permission issues
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    console.log('Created n8n-data directory');
-}
-
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -60568,7 +60585,7 @@ const checkStatus = () => {
                 } catch(e) {
                     console.error('Failed to write runtime file:', e);
                 }
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
             });
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry
@@ -61535,11 +61552,232 @@ var StripeTemplate = {
   ]
 };
 
+// ../../packages/template/services_list/mattermost/dockerCompose.ts
+var dockerCompose4 = `services:
+  postgres:
+    image: postgres:13-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 100
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=mattermost
+      - POSTGRES_USER=mmuser
+      - POSTGRES_PASSWORD=mmuser_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mmuser -d mattermost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mattermost:
+    image: mattermost/mattermost-team-edition:latest
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
+    read_only: false
+    tmpfs:
+      - /tmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8065:8065"
+    volumes:
+      - mattermost_config:/mattermost/config:rw
+      - mattermost_data:/mattermost/data:rw
+      - mattermost_logs:/mattermost/logs:rw
+      - mattermost_plugins:/mattermost/plugins:rw
+      - mattermost_client_plugins:/mattermost/client/plugins:rw
+      - mattermost_bleve_indexes:/mattermost/bleve-indexes:rw
+    environment:
+      - MM_SQLSETTINGS_DRIVERNAME=postgres
+      - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:mmuser_password@postgres:5432/mattermost?sslmode=disable&connect_timeout=10
+      - MM_SERVICESETTINGS_SITEURL=http://localhost:8065
+      - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8065/api/v4/system/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  mattermost_config:
+  mattermost_data:
+  mattermost_logs:
+  mattermost_plugins:
+  mattermost_client_plugins:
+  mattermost_bleve_indexes:`;
+
+// ../../packages/template/services_list/mattermost/gitignore.ts
+var gitignoreContent4 = `
+.runtime.json
+`;
+
+// ../../packages/template/services_list/mattermost/server.ts
+var serverJs4 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+
+console.log('Starting Mattermost...');
+
+// Start Docker Compose
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port mattermost 8065', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const mmPort = stdout.trim().split(':')[1];
+        if (!mmPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify Mattermost is actually responding to HTTP
+        // Api ping
+        http.get(\`http://localhost:\${mmPort}/api/v4/system/ping\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('Mattermost is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${mmPort}\`);
+                console.log('--------------------------------------------------');
+                console.log('Mattermost is a team communication platform');
+                console.log('--------------------------------------------------');
+                console.log('First time setup:');
+                console.log('  1. Create admin account on first visit');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Mattermost...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/services_list/mattermost.ts
+var MattermostLocal = {
+  name: "Mattermost Local",
+  description: "Mattermost Team Edition",
+  notes: "Requires Docker installed. Data is stored in Docker volumes. This uses the official Team Edition image with Postgres.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose4
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent4
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs4
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Mattermost Messaging (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-comments text-blue-500"]
+    }
+  ]
+};
+
 // ../../packages/template/services.ts
 var templates4 = [
   N8NLocal,
   AWSTemplate,
-  StripeTemplate
+  StripeTemplate,
+  MattermostLocal
 ];
 var services_default = templates4;
 
@@ -61590,10 +61828,14 @@ const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 console.log('Starting Pgweb...');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -61640,7 +61882,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('\u{1F418} Pgweb - PostgreSQL Web GUI');
                 console.log('==================================================');
@@ -61778,10 +62020,14 @@ if (dockerCompose.includes('CHANGE_ME')) {
 }
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -61828,7 +62074,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('\u{1F343} Mongo Express - MongoDB Web GUI');
                 console.log('==================================================');
@@ -61954,10 +62200,14 @@ if (dockerCompose.includes('CHANGE_ME')) {
 }
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -62004,7 +62254,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('\u{1F534} Redis Commander - Redis Web GUI');
                 console.log('==================================================');
@@ -62109,10 +62359,14 @@ const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 console.log('Starting Yaade...');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -62159,7 +62413,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('Yaade is running!');
                 console.log('--------------------------------------------------');
@@ -62264,10 +62518,14 @@ const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 console.log('Starting Mailpit...');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -62322,7 +62580,7 @@ const checkStatus = () => {
                         console.error('Failed to write runtime file:', e);
                     }
 
-                    console.clear();
+                    process.stdout.write('\\\\x1Bc');
                     console.log('\\n==================================================');
                     console.log('\u{1F4E7} Mailpit - Local Email Testing Server');
                     console.log('==================================================');
@@ -62448,10 +62706,14 @@ const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 console.log('Starting CloudBeaver...');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -62498,7 +62760,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('CloudBeaver is running!');
                 console.log('--------------------------------------------------');

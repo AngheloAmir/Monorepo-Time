@@ -69,10 +69,14 @@ if (dockerCompose.includes('CHANGE_ME')) {
 }
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
-    process.exit(code || 0);
+    if (code !== 0) process.exit(code);
+    // Follow logs
+    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    logs.on('close', (c) => process.exit(c || 0));
 });
 
 // Setup Control Server
@@ -119,7 +123,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                console.clear();
+                process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('🔴 Redis Commander - Redis Web GUI');
                 console.log('==================================================');
