@@ -56235,7 +56235,8 @@ route.get("/", async (req, res) => {
         buildCommand: pkg.scripts.build != "object" ? pkg.scripts.build : null,
         cleanCommand: pkg.scripts.clean != "object" ? pkg.scripts.clean : null,
         lintCommand: pkg.scripts.lint != "object" ? pkg.scripts.lint : null,
-        testCommand: pkg.scripts.test != "object" ? pkg.scripts.test : null
+        testCommand: pkg.scripts.test != "object" ? pkg.scripts.test : null,
+        appType: pkg.appType != "object" ? pkg.appType : null
       };
     }))).filter(Boolean);
     res.json({
@@ -56487,7 +56488,7 @@ router4.post("/", async (req, res) => {
       name: (reqBody.name || import_path5.default.basename(targetPath)).toLowerCase().replace(/\s+/g, "-"),
       version: "1.0.0",
       description: reqBody.description || "",
-      fontawesomeIcon: reqBody.fontawesomeIcon || "",
+      fontawesomeIcon: reqBody.fontawesomeIcon || "fa fa-cube text-blue-500",
       scripts: {
         dev: reqBody.devCommand || "",
         start: reqBody.startCommand || void 0,
@@ -58953,6 +58954,11 @@ export default {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "name=$(basename $PWD)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-comments text-green-500"]
     }
   ]
 };
@@ -61469,7 +61475,7 @@ var StripeTemplate = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-credit-card text-green-500"]
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-stripe text-orange-500"]
     },
     {
       action: "command",
@@ -61636,6 +61642,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-elephant text-blue-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     }
   ]
 };
@@ -61788,6 +61799,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-leaf text-green-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     }
   ]
 };
@@ -61940,6 +61956,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-server text-red-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     }
   ]
 };
@@ -62084,6 +62105,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-paper-plane text-green-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     }
   ]
 };
@@ -62244,6 +62270,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-envelope text-purple-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     }
   ]
 };
@@ -62400,6 +62431,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-orange-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     }
   ]
 };

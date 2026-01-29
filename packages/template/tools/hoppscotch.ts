@@ -139,6 +139,11 @@ process.on('SIGTERM', cleanup);`
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-paper-plane text-green-500']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'appType=tool']
         }
     ]
 };

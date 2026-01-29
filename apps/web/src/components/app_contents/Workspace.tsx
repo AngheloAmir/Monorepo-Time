@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import useWorkspaceState from "../../appstates/workspace"
+import { useEffect, useState } from "react";
+import useWorkspaceState, { type WorkspaceItem } from "../../appstates/workspace"
 import TabTerminal from "../workspace/TabTerminal";
 import WorkspaceCard from "../workspace/WorkSpaceCard";
 import WorkspaceOptionModal from "../workspace/WorkspaceOptionModal";
@@ -14,8 +14,10 @@ interface WorkspaceProps {
 }
 
 export default function Workspace(props: WorkspaceProps) {
-    const workspace = useWorkspaceState.use.workspace();
+    const [whichShow, setWhichShow] = useState("apps");
+    const workspace     = useWorkspaceState.use.workspace();
     const loadWorkspace = useWorkspaceState.use.loadWorkspace();
+    const [currentWorkspace, setCurrentWorkspace] = useState<WorkspaceItem[] | null>(null);
 
     useEffect(() => {
         if (props.isVisible) {
@@ -23,34 +25,67 @@ export default function Workspace(props: WorkspaceProps) {
         }
     }, [props.isVisible]);
 
+    useEffect(() => {
+        if (whichShow === "all") {
+            setCurrentWorkspace(workspace);
+        } else if (whichShow === "apps") {
+            setCurrentWorkspace(workspace.filter((item) => item.info.appType == undefined));
+        } else {
+            setCurrentWorkspace(workspace.filter((item) => item.info.appType === "tool"));
+        }
+    }, [whichShow, workspace]);
+
     return (
-        <div className={`relative flex flex-col w-full h-[calc(100vh-54px)] ${props.isVisible ? '' : 'hidden'}`}>
-            <div className="grid grid-rows-5 h-full min-h-0 gap-2">
-                <div className="row-span-3 min-h-0 grid grid-cols-4 gap-2 overflow-hidden p-2">
-                    <div className="col-span-3 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 p-2 relative">
-                        {workspace.map((item) => (
-                            <div key={item.info.name}>
-                                <WorkspaceCard {...item} />
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="col-span-1 h-full overflow-hidden">
-                        <GitControl />
-                    </div>
-                </div>
-
-                <div className="row-span-2">
-                    <TabTerminal />
-                </div>
+        <>
+            <div className="absolute top-2 left-2 z-10">
+                <button
+                    onClick={() => setWhichShow("all")}
+                    className={`${whichShow === "all" ? "bg-gradient-to-r from-blue-600 to-blue-500" : ""} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
+                >
+                    All Apps
+                </button>
+                <button
+                    onClick={() => setWhichShow("apps")}
+                    className={`${whichShow === "apps" ? "bg-gradient-to-r from-blue-600 to-blue-500" : ""} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
+                >
+                    Apps Only   
+                </button>
+                <button
+                    onClick={() => setWhichShow("tools")}
+                    className={`${whichShow === "tools" ? "bg-gradient-to-r from-blue-600 to-blue-500" : ""} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
+                >
+                    Tools Only
+                </button>
             </div>
+            
+            <div className={`relative flex flex-col w-full h-[calc(100vh-54px)] ${props.isVisible ? '' : 'hidden'}`}>
+                <div className="grid grid-rows-5 h-full min-h-0 gap-2">
+                    <div className="row-span-3 min-h-0 grid grid-cols-4 gap-2 overflow-hidden p-2">
+                        <div className="pt-10 col-span-3 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 p-2 relative">
+                            {currentWorkspace?.map((item) => (
+                                <div key={item.info.name}>
+                                    <WorkspaceCard {...item} />
+                                </div>
+                            ))}
+                        </div>
 
-            <FloatingBtn />
-            <WorkspaceOptionModal />
-            <WorkspaceNew />
-            <ModalTerminal />
-            <Loading />
-        </div>
+                        <div className="col-span-1 h-full overflow-hidden">
+                            <GitControl />
+                        </div>
+                    </div>
+
+                    <div className="row-span-2">
+                        <TabTerminal />
+                    </div>
+                </div>
+
+                <FloatingBtn />
+                <WorkspaceOptionModal />
+                <WorkspaceNew />
+                <ModalTerminal />
+                <Loading />
+            </div>
+        </>
     )
 }
 

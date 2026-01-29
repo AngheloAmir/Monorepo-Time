@@ -57,6 +57,7 @@ export interface WorkspaceInfo {
 
     //These are found inside of the package the json of the project
     fontawesomeIcon?: string;
+    appType?:     string;
     description?: string;
     
     devCommand?: string;

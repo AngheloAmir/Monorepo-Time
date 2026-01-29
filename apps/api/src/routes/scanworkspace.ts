@@ -157,15 +157,16 @@ route.get("/", async (req: Request, res: Response) => {
       return {
         name: pkg.name || path.basename(p),
         path: p,
-        fontawesomeIcon: (pkg.fontawesomeIcon != typeof null) ? pkg.fontawesomeIcon : null,
-        description:   (pkg.description != typeof null) ? pkg.description : null,
-        devCommand:   (pkg.scripts.dev != typeof null) ? pkg.scripts.dev : null,
-        startCommand: (pkg.scripts.start != typeof null) ? pkg.scripts.start : null,
-        stopCommand:  (pkg.scripts.stop != typeof null) ? pkg.scripts.stop : null,
-        buildCommand: (pkg.scripts.build != typeof null) ? pkg.scripts.build : null,
-        cleanCommand: (pkg.scripts.clean != typeof null) ? pkg.scripts.clean : null,
-        lintCommand:  (pkg.scripts.lint != typeof null) ? pkg.scripts.lint : null,
-        testCommand:  (pkg.scripts.test != typeof null) ? pkg.scripts.test : null,
+        fontawesomeIcon: (pkg.fontawesomeIcon != typeof null)  ? pkg.fontawesomeIcon : null,
+        description:     (pkg.description != typeof null)      ? pkg.description : null,
+        devCommand:      (pkg.scripts.dev != typeof null)      ? pkg.scripts.dev : null,
+        startCommand:    (pkg.scripts.start != typeof null)    ? pkg.scripts.start : null,
+        stopCommand:     (pkg.scripts.stop != typeof null)     ? pkg.scripts.stop : null,
+        buildCommand:    (pkg.scripts.build != typeof null)    ? pkg.scripts.build : null,
+        cleanCommand:    (pkg.scripts.clean != typeof null)    ? pkg.scripts.clean : null,
+        lintCommand:     (pkg.scripts.lint != typeof null)     ? pkg.scripts.lint : null,
+        testCommand:     (pkg.scripts.test != typeof null)     ? pkg.scripts.test : null,
+        appType:         (pkg.appType != typeof null)          ? pkg.appType : null,
       } as WorkspaceInfo;
     }))).filter(Boolean); // Filter out any failed reads
 
