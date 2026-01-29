@@ -1,26 +1,23 @@
 import type { ProjectTemplate } from "..";
 
-export const RedisCommanderTool: ProjectTemplate = {
-    name: "Redis Commander",
-    description: "Redis Web GUI",
-    notes: "Requires Docker. Connects to any Redis instance.",
+export const PgwebTool: ProjectTemplate = {
+    name: "Pgweb",
+    description: "PostgreSQL Web GUI (Lightweight)",
+    notes: "Requires Docker. Connects to any PostgreSQL database.",
     templating: [
         {
             action: 'file',
             file: 'docker-compose.yml',
             filecontent: `services:
-  redis-commander:
-    image: rediscommander/redis-commander
+  pgweb:
+    image: sosedoff/pgweb
     pull_policy: if_not_present
-    restart: "no"
+    restart: unless-stopped
     ports:
       - "0:8081"
     environment:
-      - HTTP_USER=admin
-      - HTTP_PASSWORD=admin
-      # ⚠️ IMPORTANT: Update the port below to match your Redis mapped port!
-      # Example: If Redis shows "0.0.0.0:32830->6379/tcp", use 32830
-      - REDIS_HOSTS=local:host.docker.internal:CHANGE_ME
+      - PGWEB_AUTH_USER=admin
+      - PGWEB_AUTH_PASS=admin
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
@@ -46,27 +43,7 @@ const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 
-console.log('Starting Redis Commander...');
-
-// Check if port is configured
-const dockerCompose = fs.readFileSync(path.join(__dirname, 'docker-compose.yml'), 'utf-8');
-if (dockerCompose.includes('CHANGE_ME')) {
-    console.log('');
-    console.log('==================================================');
-    console.log('⚠️  CONFIGURATION REQUIRED!');
-    console.log('==================================================');
-    console.log('');
-    console.log('1. First, start your Redis template and note its port');
-    console.log('   (Look for "0.0.0.0:XXXXX->6379/tcp" in docker ps)');
-    console.log('');
-    console.log('2. Edit docker-compose.yml in this folder');
-    console.log('   Replace CHANGE_ME with your Redis port');
-    console.log('');
-    console.log('3. Run npm run start again');
-    console.log('');
-    console.log('==================================================');
-    process.exit(1);
-}
+console.log('Starting Pgweb...');
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -93,7 +70,7 @@ server.listen(0, () => {
 
 // Check status loop
 const checkStatus = () => {
-    exec('docker compose port redis-commander 8081', (err, stdout, stderr) => {
+    exec('docker compose port pgweb 8081', (err, stdout, stderr) => {
         if (err || stderr || !stdout) {
             setTimeout(checkStatus, 2000);
             return;
@@ -104,7 +81,7 @@ const checkStatus = () => {
             return;
         }
 
-        // Verify redis-commander is responding
+        // Verify pgweb is responding
         http.get(\`http://localhost:\${port}\`, (res) => {
             exec('docker compose ps -q', (err2, stdout2) => {
                 const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
@@ -121,11 +98,23 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('🔴 Redis Commander - Redis Web GUI');
+                console.log('🐘 Pgweb - PostgreSQL Web GUI');
                 console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
+                console.log('--------------------------------------------------');
+                console.log('📌 CONNECTION SETTINGS (in Pgweb UI):');
+                console.log('   Host:           host.docker.internal');
+                console.log('   Port:           <PostgreSQL mapped port>');
+                console.log('   SSL Mode:       disable');
+                console.log('--------------------------------------------------');
+                console.log('🔐 IF USING BUILT-IN POSTGRESQL TEMPLATE:');
+                console.log('   Username:       admin');
+                console.log('   Password:       admin');
+                console.log('   Database:       db');
+                console.log('--------------------------------------------------');
+                console.log('💡 TIP: Check PostgreSQL terminal for its port!');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -137,7 +126,7 @@ const checkStatus = () => {
 setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
-    console.log('Stopping Redis Commander...');
+    console.log('Stopping Pgweb...');
     exec('docker compose down', (err, stdout, stderr) => {
         try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
@@ -160,12 +149,12 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=Redis Commander - Redis Web GUI']
+            args: ['pkg', 'set', 'description=Pgweb - PostgreSQL Web GUI']
         },
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-server text-red-500']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-elephant text-blue-500']
         },
         {
             action: 'command',

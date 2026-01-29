@@ -21,9 +21,7 @@ export const MongoDB: ProjectTemplate = {
       - "0:27017"
     volumes:
       - ./mongo-data:/data/db
-    command: ["mongod", "--quiet"]
-    logging:
-      driver: "none"
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
     healthcheck:
       test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
       interval: 10s

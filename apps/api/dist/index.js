@@ -58151,9 +58151,7 @@ var MongoDB = {
       - "0:27017"
     volumes:
       - ./mongo-data:/data/db
-    command: ["mongod", "--quiet"]
-    logging:
-      driver: "none"
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
     healthcheck:
       test: echo "db.runCommand('ping').ok" | mongosh localhost:27017/test --quiet
       interval: 10s
@@ -61676,14 +61674,15 @@ var MongoExpressTool = {
   mongo-express:
     image: mongo-express
     pull_policy: if_not_present
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "0:8081"
     environment:
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
-      # \u26A0\uFE0F UPDATE THE PORT BELOW TO MATCH YOUR MONGODB PORT
-      - ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:27017/
+      # \u26A0\uFE0F IMPORTANT: Update the port below to match your MongoDB mapped port!
+      # Example: If MongoDB shows "0.0.0.0:32825->27017/tcp", use 32825
+      - ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:CHANGE_ME/
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
@@ -61710,6 +61709,26 @@ const path = require('path');
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 
 console.log('Starting Mongo Express...');
+
+// Check if port is configured
+const dockerCompose = fs.readFileSync(path.join(__dirname, 'docker-compose.yml'), 'utf-8');
+if (dockerCompose.includes('CHANGE_ME')) {
+    console.log('');
+    console.log('==================================================');
+    console.log('\u26A0\uFE0F  CONFIGURATION REQUIRED!');
+    console.log('==================================================');
+    console.log('');
+    console.log('1. First, start your MongoDB template and note its port');
+    console.log('   (Look for "0.0.0.0:XXXXX->27017/tcp" in docker ps)');
+    console.log('');
+    console.log('2. Edit docker-compose.yml in this folder');
+    console.log('   Replace CHANGE_ME with your MongoDB port');
+    console.log('');
+    console.log('3. Run npm run start again');
+    console.log('');
+    console.log('==================================================');
+    process.exit(1);
+}
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -61769,20 +61788,6 @@ const checkStatus = () => {
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
-                console.log('--------------------------------------------------');
-                console.log('\u26A0\uFE0F  IMPORTANT: CONFIGURE CONNECTION FIRST!');
-                console.log('--------------------------------------------------');
-                console.log('Edit docker-compose.yml and update:');
-                console.log('  ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:<PORT>/');
-                console.log('');
-                console.log('Replace <PORT> with your MongoDB mapped port.');
-                console.log('--------------------------------------------------');
-                console.log('\u{1F510} IF USING BUILT-IN MONGODB TEMPLATE:');
-                console.log('   Username:       admin');
-                console.log('   Password:       admin');
-                console.log('   Check MongoDB terminal for its port!');
-                console.log('--------------------------------------------------');
-                console.log('After editing, restart with: npm run stop && npm run start');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -61845,14 +61850,15 @@ var RedisCommanderTool = {
   redis-commander:
     image: rediscommander/redis-commander
     pull_policy: if_not_present
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "0:8081"
     environment:
       - HTTP_USER=admin
       - HTTP_PASSWORD=admin
-      # \u26A0\uFE0F UPDATE THE PORT BELOW TO MATCH YOUR REDIS PORT
-      - REDIS_HOSTS=local:host.docker.internal:6379
+      # \u26A0\uFE0F IMPORTANT: Update the port below to match your Redis mapped port!
+      # Example: If Redis shows "0.0.0.0:32830->6379/tcp", use 32830
+      - REDIS_HOSTS=local:host.docker.internal:CHANGE_ME
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
@@ -61879,6 +61885,26 @@ const path = require('path');
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 
 console.log('Starting Redis Commander...');
+
+// Check if port is configured
+const dockerCompose = fs.readFileSync(path.join(__dirname, 'docker-compose.yml'), 'utf-8');
+if (dockerCompose.includes('CHANGE_ME')) {
+    console.log('');
+    console.log('==================================================');
+    console.log('\u26A0\uFE0F  CONFIGURATION REQUIRED!');
+    console.log('==================================================');
+    console.log('');
+    console.log('1. First, start your Redis template and note its port');
+    console.log('   (Look for "0.0.0.0:XXXXX->6379/tcp" in docker ps)');
+    console.log('');
+    console.log('2. Edit docker-compose.yml in this folder');
+    console.log('   Replace CHANGE_ME with your Redis port');
+    console.log('');
+    console.log('3. Run npm run start again');
+    console.log('');
+    console.log('==================================================');
+    process.exit(1);
+}
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -61938,19 +61964,6 @@ const checkStatus = () => {
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
-                console.log('--------------------------------------------------');
-                console.log('\u26A0\uFE0F  IMPORTANT: CONFIGURE CONNECTION FIRST!');
-                console.log('--------------------------------------------------');
-                console.log('Edit docker-compose.yml and update:');
-                console.log('  REDIS_HOSTS=local:host.docker.internal:<PORT>');
-                console.log('');
-                console.log('Replace <PORT> with your Redis mapped port.');
-                console.log('--------------------------------------------------');
-                console.log('\u{1F510} IF USING BUILT-IN REDIS TEMPLATE:');
-                console.log('   No password required (default)');
-                console.log('   Check Redis terminal for its port!');
-                console.log('--------------------------------------------------');
-                console.log('After editing, restart with: npm run stop && npm run start');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {

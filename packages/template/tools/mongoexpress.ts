@@ -12,14 +12,15 @@ export const MongoExpressTool: ProjectTemplate = {
   mongo-express:
     image: mongo-express
     pull_policy: if_not_present
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "0:8081"
     environment:
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
-      # ⚠️ UPDATE THE PORT BELOW TO MATCH YOUR MONGODB PORT
-      - ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:27017/
+      # ⚠️ IMPORTANT: Update the port below to match your MongoDB mapped port!
+      # Example: If MongoDB shows "0.0.0.0:32825->27017/tcp", use 32825
+      - ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:CHANGE_ME/
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
@@ -46,6 +47,26 @@ const path = require('path');
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 
 console.log('Starting Mongo Express...');
+
+// Check if port is configured
+const dockerCompose = fs.readFileSync(path.join(__dirname, 'docker-compose.yml'), 'utf-8');
+if (dockerCompose.includes('CHANGE_ME')) {
+    console.log('');
+    console.log('==================================================');
+    console.log('⚠️  CONFIGURATION REQUIRED!');
+    console.log('==================================================');
+    console.log('');
+    console.log('1. First, start your MongoDB template and note its port');
+    console.log('   (Look for "0.0.0.0:XXXXX->27017/tcp" in docker ps)');
+    console.log('');
+    console.log('2. Edit docker-compose.yml in this folder');
+    console.log('   Replace CHANGE_ME with your MongoDB port');
+    console.log('');
+    console.log('3. Run npm run start again');
+    console.log('');
+    console.log('==================================================');
+    process.exit(1);
+}
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -105,20 +126,6 @@ const checkStatus = () => {
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
-                console.log('--------------------------------------------------');
-                console.log('⚠️  IMPORTANT: CONFIGURE CONNECTION FIRST!');
-                console.log('--------------------------------------------------');
-                console.log('Edit docker-compose.yml and update:');
-                console.log('  ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:<PORT>/');
-                console.log('');
-                console.log('Replace <PORT> with your MongoDB mapped port.');
-                console.log('--------------------------------------------------');
-                console.log('🔐 IF USING BUILT-IN MONGODB TEMPLATE:');
-                console.log('   Username:       admin');
-                console.log('   Password:       admin');
-                console.log('   Check MongoDB terminal for its port!');
-                console.log('--------------------------------------------------');
-                console.log('After editing, restart with: npm run stop && npm run start');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
