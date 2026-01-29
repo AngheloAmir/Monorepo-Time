@@ -62610,16 +62610,16 @@ function stripAnsi(input) {
   return input.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 }
 
+// ../../packages/types/index.ts
+var TemplateCategories = ["project", "database", "services", "tool", "demo"];
+
 // src/routes/setworkspace/template.ts
 function findTemplate(templatename) {
-  const categories = ["project", "database", "services", "demo"];
-  for (const cat of categories) {
+  for (const cat of TemplateCategories) {
     const list = template_default[cat];
     if (Array.isArray(list)) {
       const match = list.find((t) => t.name === templatename);
-      if (match) {
-        return match;
-      }
+      if (match) return match;
     }
   }
   return null;
