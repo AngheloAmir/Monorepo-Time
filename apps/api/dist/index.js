@@ -61792,7 +61792,6 @@ var MattermostLocal = {
 var dockerCompose5 = `services:
   db:
     image: mariadb:10.6
-    pull_policy: if_not_present
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     volumes:
@@ -61811,7 +61810,6 @@ var dockerCompose5 = `services:
 
   nextcloud:
     image: nextcloud:latest
-    pull_policy: if_not_present
     restart: unless-stopped
     ports:
       - "0:80"
