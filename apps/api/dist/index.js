@@ -57778,29 +57778,18 @@ services:
     restart: unless-stopped
     user: "1000:1000"
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydatabase
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: db
     ports:
       - "0:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d mydatabase"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d db"]
       interval: 5s
       timeout: 5s
-      retries: 5
-
-  pgadmin:
-    image: dpage/pgadmin4
-    pull_policy: if_not_present
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - "0:80"
-    depends_on:
-      - postgres`
+      retries: 5`
     },
     {
       action: "file",
@@ -57822,7 +57811,6 @@ const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 const DATA_DIR = path.join(__dirname, 'postgres-data');
-let containerId = null;
 
 console.log('Starting PostgreSQL...');
 
@@ -57839,8 +57827,6 @@ child.on('close', (code) => {
     process.exit(code || 0);
 });
 
-
-
 // Setup Control Server
 const server = http.createServer((req, res) => {
     if (req.url === '/stop') {
@@ -57854,12 +57840,9 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(0, () => {
-    const port = server.address().port;
     // We update runtime file later when we get the container ID
 });
 
-// Info Loop
-// Check status loop
 // Check status loop
 const checkStatus = () => {
     exec('docker compose port postgres 5432', (err, stdout, stderr) => {
@@ -57873,50 +57856,30 @@ const checkStatus = () => {
             return;
         }
 
-        // Check pgAdmin port
-        exec('docker compose port pgadmin 80', (err2, stdout2, stderr2) => {
-            const pgAdminPort = (stdout2 && stdout2.trim()) ? stdout2.trim().split(':')[1] : null;
-            if (!pgAdminPort) {
-                setTimeout(checkStatus, 2000);
-                return;
-            }
+        // Capture Container IDs
+        exec('docker compose ps -q', (err2, stdout2) => {
+             const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+             
+             try {
+                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                    port: server.address().port, 
+                    pid: process.pid,
+                    containerIds: containerIds
+                }));
+             } catch(e) {
+                console.error('Failed to write runtime file:', e);
+             }
 
-            // Verify pgAdmin is actually responding to HTTP
-            http.get(\`http://localhost:\${pgAdminPort}\`, (res) => {
-                // Capture Container IDs
-                exec('docker compose ps -q', (err3, stdout3) => {
-                     const containerIds = stdout3 ? stdout3.trim().split('\\n') : [];
-                     
-                     try {
-                        fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                            port: server.address().port, 
-                            pid: process.pid,
-                            containerIds: containerIds
-                        }));
-                     } catch(e) {
-                        console.error('Failed to write runtime file:', e);
-                     }
-
-                     console.clear();
-                     console.log('\\n==================================================');
-                     console.log('PostgreSQL is running!');
-                     console.log('--------------------------------------------------');
-                     console.log(\`Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
-                     console.log('Username:          user');
-                     console.log('Password:          password');
-                     console.log('Database:          mydatabase');
-                     console.log(\`Port:              \${port}\`);
-                     console.log('--------------------------------------------------');
-                     console.log('pgAdmin 4 is running!');
-                     console.log(\`URL:               http://localhost:\${pgAdminPort}\`);
-                     console.log('Email:             admin@admin.com');
-                     console.log('Password:          root');
-                     console.log('==================================================\\n');
-                });
-            }).on('error', (e) => {
-                // Connection failed (ECONNREFUSED usually), retry
-                setTimeout(checkStatus, 2000);
-            });
+             console.clear();
+             console.log('\\n==================================================');
+             console.log('PostgreSQL is running!');
+             console.log('--------------------------------------------------');
+             console.log(\`Connection String: postgres://admin:admin@localhost:\${port}/db\`);
+             console.log('Username:          admin');
+             console.log('Password:          admin');
+             console.log('Database:          db');
+             console.log(\`Port:              \${port}\`);
+             console.log('==================================================\\n');
         });
     });
 };
@@ -58182,7 +58145,7 @@ var MongoDB = {
     user: "1000:1000"
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_PASSWORD: admin
     ports:
       - "0:27017"
     volumes:
@@ -58281,9 +58244,9 @@ const checkStatus = () => {
             console.log('\\n==================================================');
             console.log('MongoDB is running!');
             console.log('--------------------------------------------------');
-            console.log(\`Connection String: mongodb://admin:password@localhost:\${port}\`);
+            console.log(\`Connection String: mongodb://admin:admin@localhost:\${port}/db\`);
             console.log('Username:          admin');
-            console.log('Password:          password');
+            console.log('Password:          admin');
             console.log(\`Port:              \${port}\`);
 
             console.log('==================================================\\n');
@@ -58348,7 +58311,7 @@ var Meilisearch = {
     restart: unless-stopped
     user: "1000:1000"
     environment:
-      - MEILI_MASTER_KEY=masterKey
+      - MEILI_MASTER_KEY=admin
       - MEILI_ENV=development
     ports:
       - "0:7700"
@@ -58443,7 +58406,7 @@ const checkStatus = () => {
             console.log('Meilisearch is running!');
             console.log('--------------------------------------------------');
             console.log(\`URL:               http://localhost:\${port}\`);
-            console.log('Master Key:        masterKey');
+            console.log('Master Key:        admin');
             console.log(\`API Port:          \${port}\`);
             console.log('--------------------------------------------------');
             console.log('Docs: https://www.meilisearch.com/docs');
@@ -58515,8 +58478,8 @@ var MinIO = {
     restart: unless-stopped
     user: "1000:1000"
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=admin
     ports:
       - "0:9000"
       - "0:9001"
@@ -58626,8 +58589,8 @@ const checkStatus = () => {
                 console.log('--------------------------------------------------');
                 console.log(\`Console URL:       http://localhost:\${consolePort}\`);
                 console.log(\`API URL:           http://localhost:\${apiPort}\`);
-                console.log('Username:          minioadmin');
-                console.log('Password:          minioadmin');
+                console.log('Username:          admin');
+                console.log('Password:          admin');
                 console.log('--------------------------------------------------');
                 console.log('Docs: https://min.io/docs/minio/linux/index.html');
                 console.log('==================================================\\n');
@@ -61529,11 +61492,472 @@ var templates4 = [
 ];
 var services_default = templates4;
 
+// ../../packages/template/tools/pgweb.ts
+var PgwebTool = {
+  name: "Pgweb",
+  description: "PostgreSQL Web GUI (Lightweight)",
+  notes: "Requires Docker. Connects to any PostgreSQL database.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  pgweb:
+    image: sosedoff/pgweb
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:8081"
+    environment:
+      - PGWEB_AUTH_USER=admin
+      - PGWEB_AUTH_PASS=admin
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Pgweb...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port pgweb 8081', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify pgweb is responding
+        http.get(\`http://localhost:\${port}\`, (res) => {
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+
+                console.clear();
+                console.log('\\n==================================================');
+                console.log('Pgweb is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('Auth User:         admin');
+                console.log('Auth Password:     admin');
+                console.log('--------------------------------------------------');
+                console.log('Connect to any PostgreSQL database from the web UI');
+                console.log('==================================================\\n');
+            });
+        }).on('error', () => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Pgweb...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Pgweb - PostgreSQL Web GUI"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-elephant text-blue-500"]
+    }
+  ]
+};
+
+// ../../packages/template/tools/mongoexpress.ts
+var MongoExpressTool = {
+  name: "Mongo Express",
+  description: "MongoDB Web GUI",
+  notes: "Requires Docker. Connects to any MongoDB database.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  mongo-express:
+    image: mongo-express
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:8081"
+    environment:
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      - ME_CONFIG_MONGODB_URL=mongodb://admin:admin@host.docker.internal:27017/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Mongo Express...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port mongo-express 8081', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify mongo-express is responding
+        http.get(\`http://localhost:\${port}\`, (res) => {
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+
+                console.clear();
+                console.log('\\n==================================================');
+                console.log('Mongo Express is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('Auth User:         admin');
+                console.log('Auth Password:     admin');
+                console.log('--------------------------------------------------');
+                console.log('Default MongoDB:   mongodb://admin:admin@host.docker.internal:27017/');
+                console.log('Edit docker-compose.yml to change connection string');
+                console.log('==================================================\\n');
+            });
+        }).on('error', () => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Mongo Express...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Mongo Express - MongoDB Web GUI"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-leaf text-green-500"]
+    }
+  ]
+};
+
+// ../../packages/template/tools/rediscommander.ts
+var RedisCommanderTool = {
+  name: "Redis Commander",
+  description: "Redis Web GUI",
+  notes: "Requires Docker. Connects to any Redis instance.",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  redis-commander:
+    image: rediscommander/redis-commander
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:8081"
+    environment:
+      - HTTP_USER=admin
+      - HTTP_PASSWORD=admin
+      - REDIS_HOSTS=local:host.docker.internal:6379
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Redis Commander...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code || 0);
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port redis-commander 8081', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify redis-commander is responding
+        http.get(\`http://localhost:\${port}\`, (res) => {
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+
+                console.clear();
+                console.log('\\n==================================================');
+                console.log('Redis Commander is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('Auth User:         admin');
+                console.log('Auth Password:     admin');
+                console.log('--------------------------------------------------');
+                console.log('Default Redis:     host.docker.internal:6379');
+                console.log('Edit docker-compose.yml REDIS_HOSTS to add more');
+                console.log('==================================================\\n');
+            });
+        }).on('error', () => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Redis Commander...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Redis Commander - Redis Web GUI"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-server text-red-500"]
+    }
+  ]
+};
+
+// ../../packages/template/tools.ts
+var tools = [
+  PgwebTool,
+  MongoExpressTool,
+  RedisCommanderTool
+];
+var tools_default = tools;
+
 // ../../packages/template/index.ts
 var MonorepoTemplates = {
   project: projecttemplate_default,
   database: database_default,
   services: services_default,
+  tool: tools_default,
   demo: demo_default
 };
 var template_default = MonorepoTemplates;
@@ -61549,6 +61973,7 @@ router18.get("/", (req, res) => {
       project: stripTemplating(template_default.project),
       database: stripTemplating(template_default.database),
       services: stripTemplating(template_default.services),
+      tool: stripTemplating(template_default.tool),
       demo: stripTemplating(template_default.demo)
     };
     res.json(availableTemplates);

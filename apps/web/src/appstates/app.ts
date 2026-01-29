@@ -24,10 +24,11 @@ interface appContext {
     scaffoldRepo: () => Promise<{ success: boolean; error?: string }>;
     hideShowFileFolder: (filesShow: boolean, pathInclude: string[]) => Promise<{ isHidden: boolean }>;
     getTemplates: () => Promise<{
-        project: ProjectTemplate[],
+        project:  ProjectTemplate[],
         database: ProjectTemplate[],
         services: ProjectTemplate[],
-        demo: ProjectTemplate[],
+        tool:     ProjectTemplate[],
+        demo:     ProjectTemplate[],
     }>;
 }
 

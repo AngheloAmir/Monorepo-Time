@@ -2,6 +2,7 @@ import database  from "./database";
 import demo from "./demo";
 import templates from "./projecttemplate";
 import services  from "./services";
+import tools from "./tools";
 
 export interface ProcessTemplate {
     action:   "command" | "file" | "root-command";
@@ -22,6 +23,7 @@ const MonorepoTemplates =  {
     project:    templates,
     database:   database,
     services:   services,
+    tool:       tools,
     demo:       demo,
 }
 

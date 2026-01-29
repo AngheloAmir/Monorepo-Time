@@ -14,27 +14,30 @@ interface TemplateSelectorProps {
 export default function TemplateSelector(props: TemplateSelectorProps) {
     const getTemplates = useAppState.use.getTemplates();
     const [templates, setTemplates] = useState<{
-        project: ProjectTemplate[],
+        project:  ProjectTemplate[],
         database: ProjectTemplate[],
         services: ProjectTemplate[],
-        demo: ProjectTemplate[],
+        tool:     ProjectTemplate[],
+        demo:     ProjectTemplate[],
     }>({
-        project: [],
+        project:  [],
         database: [],
         services: [],
-        demo: [],
+        tool:     [],
+        demo:     [],
     });
-    const [activeTab, setActiveTab] = useState<'Project' | 'Database' | 'Services' | 'Demo'>('Project');
+    const [activeTab, setActiveTab] = useState<'Project' | 'Database' | 'Services' | 'Tool' | 'Demo'>('Project');
 
     useEffect(() => {
         if (!props.show) return;
         const loadTemplates = async () => {
             const data = await getTemplates();
             const temp = {
-                project: data.project || [],
-                database: data.database || [],
-                services: data.services || [],
-                demo: data.demo || [],
+                project:     data.project || [],
+                database:    data.database || [],
+                services:    data.services || [],
+                tool:        data.tool || [],
+                demo:        data.demo || [],
             }
             setTemplates(temp);
         }
@@ -43,7 +46,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
 
     if (!props.show) return null;
     return (
-        <ModalBody>
+        <ModalBody width="700px">
             <ModalHeader
                 close={() => props.onClose()}
                 title="Select Template"
@@ -53,9 +56,15 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                 <div className="w-48">
                     <TabItem name="Project" icon="fas fa-code" activeTab={activeTab} setActiveTab={setActiveTab} />
 
-                    <h2 className="text-sm font-bold text-gray-600 my-2 ml-2">For local testing</h2>
+                    <h2 className="text-sm font-bold text-white mt-4 ml-2 mb-1">
+                        Local Testing
+                        <span className="text-red-500 text-xs ml-1">
+                            *DOCKER
+                        </span>
+                    </h2>
                     <TabItem name="Database" icon="fas fa-database" activeTab={activeTab} setActiveTab={setActiveTab} />
                     <TabItem name="Services" icon="fas fa-server" activeTab={activeTab} setActiveTab={setActiveTab} />
+                    <TabItem name="Tool" icon="fas fa-tools" activeTab={activeTab} setActiveTab={setActiveTab} />
 
                     <h2 className="text-sm font-bold text-gray-600 my-2 ml-2">Sample Projects</h2>
                     <TabItem name="Demo" icon="fas fa-cube" activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -70,6 +79,9 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                             props.onSelect(name);
                         }}/>
                         <ProjectItem show={activeTab === 'Services'} project={templates.services} onClick={(name) => {
+                            props.onSelect(name);
+                        }}/>
+                        <ProjectItem show={activeTab === 'Tool'} project={templates.tool} onClick={(name) => {
                             props.onSelect(name);
                         }}/>
                         <ProjectItem show={activeTab === 'Demo'} project={templates.demo} onClick={(name) => {
