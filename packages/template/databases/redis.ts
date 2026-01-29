@@ -116,7 +116,10 @@ const checkStatus = () => {
             console.log('--------------------------------------------------');
             console.log(\`Connection String: redis://localhost:\${port}\`);
             console.log(\`Port:              \${port}\`);
-
+            console.log('--------------------------------------------------');
+            console.log('Docs: https://redis.io/docs');
+            console.log('To update to the latest version:');
+            console.log('  docker pull redis:latest');
             console.log('==================================================\\n');
         });
     });

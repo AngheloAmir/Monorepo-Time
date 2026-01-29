@@ -12,7 +12,7 @@ export const PostgreSQL: ProjectTemplate = {
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:latest
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -118,6 +118,9 @@ const checkStatus = () => {
              console.log('Password:          admin');
              console.log('Database:          db');
              console.log(\`Port:              \${port}\`);
+             console.log('--------------------------------------------------');
+             console.log('To update to the latest version:');
+             console.log('  docker pull postgres:latest');
              console.log('==================================================\\n');
         });
     });

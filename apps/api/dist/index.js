@@ -57756,6 +57756,11 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-blue-500"]
     }
   ]
@@ -57774,7 +57779,7 @@ var PostgreSQL = {
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:latest
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -57880,6 +57885,9 @@ const checkStatus = () => {
              console.log('Password:          admin');
              console.log('Database:          db');
              console.log(\`Port:              \${port}\`);
+             console.log('--------------------------------------------------');
+             console.log('To update to the latest version:');
+             console.log('  docker pull postgres:latest');
              console.log('==================================================\\n');
         });
     });
@@ -57921,6 +57929,11 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-database text-blue-500"]
     }
   ]
@@ -57956,6 +57969,11 @@ var Supabase = {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "description=Supabase (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",
@@ -58082,7 +58100,10 @@ const checkStatus = () => {
             console.log('--------------------------------------------------');
             console.log(\`Connection String: redis://localhost:\${port}\`);
             console.log(\`Port:              \${port}\`);
-
+            console.log('--------------------------------------------------');
+            console.log('Docs: https://redis.io/docs');
+            console.log('To update to the latest version:');
+            console.log('  docker pull redis:latest');
             console.log('==================================================\\n');
         });
     });
@@ -58124,6 +58145,11 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-server text-red-500"]
     }
   ]
@@ -58140,7 +58166,7 @@ var MongoDB = {
       file: "docker-compose.yml",
       filecontent: `services:
   mongodb:
-    image: mongo:7.0
+    image: mongo:latest
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -58247,7 +58273,9 @@ const checkStatus = () => {
             console.log('Username:          admin');
             console.log('Password:          admin');
             console.log(\`Port:              \${port}\`);
-
+            console.log('--------------------------------------------------');
+            console.log('To update to the latest version:');
+            console.log('  docker pull mongo:latest');
             console.log('==================================================\\n');
         });
     });
@@ -58285,6 +58313,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "description=MongoDB (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",
@@ -58409,6 +58442,8 @@ const checkStatus = () => {
             console.log(\`API Port:          \${port}\`);
             console.log('--------------------------------------------------');
             console.log('Docs: https://www.meilisearch.com/docs');
+            console.log('To update to the latest version:');
+            console.log('  docker pull getmeili/meilisearch:latest');
             console.log('==================================================\\n');
         });
     });
@@ -58451,6 +58486,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "description=Meilisearch (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",
@@ -58592,6 +58632,8 @@ const checkStatus = () => {
                 console.log('Password:          admin');
                 console.log('--------------------------------------------------');
                 console.log('Docs: https://min.io/docs/minio/linux/index.html');
+                console.log('To update to the latest version:');
+                console.log('  docker pull minio/minio');
                 console.log('==================================================\\n');
             });
         });
@@ -58635,6 +58677,11 @@ process.on('SIGTERM', cleanup);`
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "description=MinIO (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",

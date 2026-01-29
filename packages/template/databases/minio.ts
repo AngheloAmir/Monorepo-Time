@@ -131,6 +131,8 @@ const checkStatus = () => {
                 console.log('Password:          admin');
                 console.log('--------------------------------------------------');
                 console.log('Docs: https://min.io/docs/minio/linux/index.html');
+                console.log('To update to the latest version:');
+                console.log('  docker pull minio/minio');
                 console.log('==================================================\\n');
             });
         });

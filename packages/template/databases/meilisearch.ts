@@ -114,6 +114,8 @@ const checkStatus = () => {
             console.log(\`API Port:          \${port}\`);
             console.log('--------------------------------------------------');
             console.log('Docs: https://www.meilisearch.com/docs');
+            console.log('To update to the latest version:');
+            console.log('  docker pull getmeili/meilisearch:latest');
             console.log('==================================================\\n');
         });
     });
