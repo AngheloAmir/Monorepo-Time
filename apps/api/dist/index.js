@@ -61999,11 +61999,228 @@ var NextcloudLocal = {
   ]
 };
 
+// ../../packages/template/services_list/mautic/dockerCompose.ts
+var dockerCompose6 = `services:
+  mautic_db:
+    image: mariadb:10.6
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      - MYSQL_ROOT_PASSWORD=mautic
+      - MYSQL_DATABASE=mautic
+      - MYSQL_USER=mautic
+      - MYSQL_PASSWORD=mautic
+    volumes:
+      - mautic_db_data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pmautic || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  mautic:
+    image: mautic/mautic:v4
+    environment:
+      - MAUTIC_DB_HOST=mautic_db
+      - MAUTIC_DB_USER=mautic
+      - MAUTIC_DB_PASSWORD=mautic
+      - MAUTIC_DB_NAME=mautic
+      - MAUTIC_RUN_CRON_JOBS=true
+      - MAUTIC_ADMIN_EMAIL=admin@example.com
+      - MAUTIC_ADMIN_PASSWORD=mautic
+    ports:
+      - "8080:80"
+    volumes:
+      - mautic_data:/var/www/html
+    links:
+      - mautic_db
+    depends_on:
+      mautic_db:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mautic_db_data:
+  mautic_data:`;
+
+// ../../packages/template/services_list/mautic/gitignore.ts
+var gitignoreContent6 = `
+.runtime.json
+`;
+
+// ../../packages/template/services_list/mautic/server.ts
+var serverJs6 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Mautic...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            const lower = line.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write(line + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port mautic 80', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const mauticPort = stdout.trim().split(':')[1];
+        if (!mauticPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify Mautic is actually responding to HTTP
+        http.get(\`http://localhost:\${mauticPort}/\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('Mautic is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${mauticPort}\`);
+                console.log('--------------------------------------------------');
+                console.log('Open Source Marketing Automation');
+                console.log('--------------------------------------------------');
+                console.log('Default Credentials:');
+                console.log('  User: admin');
+                console.log('  Pass: mautic');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Mautic...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/services_list/mautic.ts
+var MauticLocal = {
+  name: "Mautic Local",
+  description: "Marketing Automation Platform",
+  notes: "Requires Docker installed. Data is stored in Docker volumes (mautic_data, mautic_db_data).",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose6
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent6
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs6
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Mautic Marketing Automation (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-bullhorn text-purple-500"]
+    }
+  ]
+};
+
 // ../../packages/template/services.ts
 var templates4 = [
   N8NLocal,
   MattermostLocal,
   NextcloudLocal,
+  MauticLocal,
   AWSTemplate,
   StripeTemplate
 ];

@@ -21,7 +21,7 @@ export const dockerCompose = `services:
     image: nextcloud:latest
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "0:80"
     links:
       - db
     depends_on:

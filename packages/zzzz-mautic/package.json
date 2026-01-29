@@ -1,0 +1,12 @@
+{
+  "name": "zzzz-mautic",
+  "version": "1.0.0",
+  "description": "Mautic Marketing Automation (Docker)",
+  "fontawesomeIcon": "fas fa-bullhorn text-purple-500",
+  "scripts": {
+    "dev": "",
+    "start": "node index.js",
+    "stop": "node -e 'const fs=require(\"fs\"); try{const p=JSON.parse(fs.readFileSync(\".runtime.json\")).port; fetch(\"http://localhost:\"+p+\"/stop\").catch(e=>{})}catch(e){}'"
+  },
+  "appType": "tool"
+}

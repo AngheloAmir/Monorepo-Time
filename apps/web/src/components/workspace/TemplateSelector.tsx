@@ -139,6 +139,7 @@ const getIcon = (name: string) => {
     else if (n.includes('yaade')) return 'fas fa-vial text-purple-500';
     else if (n.includes('mattermost')) return 'fas fa-comments text-green-500';
     else if (n.includes('nextcloud')) return 'fas fa-cloud text-blue-500';
+    else if (n.includes('mautic')) return 'fas fa-bullhorn text-purple-500';
     else return 'fas fa-cube text-gray-400';
 }
 
