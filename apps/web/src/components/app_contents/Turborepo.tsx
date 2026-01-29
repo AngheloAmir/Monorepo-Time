@@ -179,7 +179,7 @@ export default function Turborepo(props: TurborepoProps) {
                     <div className="w-full flex-1 min-h-0 p-1">
                         <InteractiveTerminal
                             ref={terminalRef}
-                            isInteractive={false}
+                            isInteractive={true}
                             className="h-full w-full"
                             socketUrl={config.serverPath}
                             onExit={() => {

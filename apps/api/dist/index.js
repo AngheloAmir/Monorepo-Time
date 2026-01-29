@@ -61984,7 +61984,7 @@ var YaadeTool = {
     volumes:
       - yaade-data:/app/data
     environment:
-      - YAADE_ADMIN_USERNAME=admin@admin.com
+      - YAADE_ADMIN_USERNAME=admin
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:9339"]
       interval: 10s
@@ -62069,7 +62069,8 @@ const checkStatus = () => {
                 console.log('Yaade is running!');
                 console.log('--------------------------------------------------');
                 console.log(\`URL:               http://localhost:\${port}\`);
-                console.log('Admin Email:       admin@admin.com');
+                console.log('Admin Username:    admin');
+                console.log('Admin Password:    password');
                 console.log('--------------------------------------------------');
                 console.log('Self-hosted API development environment');
                 console.log('Create collections, test APIs, collaborate');
@@ -62228,15 +62229,31 @@ const checkStatus = () => {
 
                     console.clear();
                     console.log('\\n==================================================');
-                    console.log('Mailpit is running!');
-                    console.log('--------------------------------------------------');
+                    console.log('\u{1F4E7} Mailpit - Local Email Testing Server');
+                    console.log('==================================================');
                     console.log(\`Web UI:            http://localhost:\${webPort}\`);
                     console.log(\`SMTP Server:       localhost:\${smtpPort}\`);
                     console.log('--------------------------------------------------');
-                    console.log('Configure your app to send emails to:');
-                    console.log(\`  SMTP Host:       localhost\`);
-                    console.log(\`  SMTP Port:       \${smtpPort}\`);
-                    console.log('  No authentication required');
+                    console.log('\u{1F4CC} GENERAL SMTP CONFIG:');
+                    console.log('   SMTP_HOST=localhost');
+                    console.log(\`   SMTP_PORT=\${smtpPort}\`);
+                    console.log('   SMTP_USER=        (leave empty)');
+                    console.log('   SMTP_PASS=        (leave empty)');
+                    console.log('--------------------------------------------------');
+                    console.log('\u{1F510} SUPABASE AUTH (.env):');
+                    console.log('   SMTP_HOST=localhost');
+                    console.log(\`   SMTP_PORT=\${smtpPort}\`);
+                    console.log('   SMTP_USER=');
+                    console.log('   SMTP_PASS=');
+                    console.log('   SMTP_ADMIN_EMAIL=admin@localhost');
+                    console.log('   SMTP_SENDER_NAME=Supabase');
+                    console.log('--------------------------------------------------');
+                    console.log('\u26A1 N8N AUTOMATION:');
+                    console.log('   Email Node -> SMTP Settings:');
+                    console.log(\`   Host: localhost | Port: \${smtpPort}\`);
+                    console.log('   SSL: Off | Auth: None');
+                    console.log('==================================================');
+                    console.log('All emails are caught locally - view them in Web UI');
                     console.log('==================================================\\n');
                 });
             }).on('error', () => {

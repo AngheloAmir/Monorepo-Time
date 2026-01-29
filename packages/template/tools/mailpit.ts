@@ -105,15 +105,31 @@ const checkStatus = () => {
 
                     console.clear();
                     console.log('\\n==================================================');
-                    console.log('Mailpit is running!');
-                    console.log('--------------------------------------------------');
+                    console.log('📧 Mailpit - Local Email Testing Server');
+                    console.log('==================================================');
                     console.log(\`Web UI:            http://localhost:\${webPort}\`);
                     console.log(\`SMTP Server:       localhost:\${smtpPort}\`);
                     console.log('--------------------------------------------------');
-                    console.log('Configure your app to send emails to:');
-                    console.log(\`  SMTP Host:       localhost\`);
-                    console.log(\`  SMTP Port:       \${smtpPort}\`);
-                    console.log('  No authentication required');
+                    console.log('📌 GENERAL SMTP CONFIG:');
+                    console.log('   SMTP_HOST=localhost');
+                    console.log(\`   SMTP_PORT=\${smtpPort}\`);
+                    console.log('   SMTP_USER=        (leave empty)');
+                    console.log('   SMTP_PASS=        (leave empty)');
+                    console.log('--------------------------------------------------');
+                    console.log('🔐 SUPABASE AUTH (.env):');
+                    console.log('   SMTP_HOST=localhost');
+                    console.log(\`   SMTP_PORT=\${smtpPort}\`);
+                    console.log('   SMTP_USER=');
+                    console.log('   SMTP_PASS=');
+                    console.log('   SMTP_ADMIN_EMAIL=admin@localhost');
+                    console.log('   SMTP_SENDER_NAME=Supabase');
+                    console.log('--------------------------------------------------');
+                    console.log('⚡ N8N AUTOMATION:');
+                    console.log('   Email Node -> SMTP Settings:');
+                    console.log(\`   Host: localhost | Port: \${smtpPort}\`);
+                    console.log('   SSL: Off | Auth: None');
+                    console.log('==================================================');
+                    console.log('All emails are caught locally - view them in Web UI');
                     console.log('==================================================\\n');
                 });
             }).on('error', () => {

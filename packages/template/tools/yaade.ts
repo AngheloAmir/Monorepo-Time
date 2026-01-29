@@ -18,7 +18,7 @@ export const YaadeTool: ProjectTemplate = {
     volumes:
       - yaade-data:/app/data
     environment:
-      - YAADE_ADMIN_USERNAME=admin@admin.com
+      - YAADE_ADMIN_USERNAME=admin
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:9339"]
       interval: 10s
@@ -103,7 +103,8 @@ const checkStatus = () => {
                 console.log('Yaade is running!');
                 console.log('--------------------------------------------------');
                 console.log(\`URL:               http://localhost:\${port}\`);
-                console.log('Admin Email:       admin@admin.com');
+                console.log('Admin Username:    admin');
+                console.log('Admin Password:    password');
                 console.log('--------------------------------------------------');
                 console.log('Self-hosted API development environment');
                 console.log('Create collections, test APIs, collaborate');
