@@ -61965,27 +61965,34 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
-// ../../packages/template/tools/hoppscotch.ts
-var HoppscotchTool = {
-  name: "Hoppscotch",
-  description: "API Testing Tool (Postman Alternative)",
-  notes: "Requires Docker. Self-hosted API development platform.",
+// ../../packages/template/tools/yaade.ts
+var YaadeTool = {
+  name: "Yaade",
+  description: "API Testing Tool (Self-Hosted)",
+  notes: "Requires Docker. Collaborative API development environment.",
   templating: [
     {
       action: "file",
       file: "docker-compose.yml",
       filecontent: `services:
-  hoppscotch:
-    image: hoppscotch/hoppscotch
+  yaade:
+    image: elestio/yaade
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:3000"
+      - "0:9339"
+    volumes:
+      - yaade-data:/app/data
+    environment:
+      - YAADE_ADMIN_USERNAME=admin@admin.com
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9339"]
       interval: 10s
       timeout: 5s
-      retries: 5`
+      retries: 5
+
+volumes:
+  yaade-data:`
     },
     {
       action: "file",
@@ -62004,7 +62011,7 @@ const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 
-console.log('Starting Hoppscotch...');
+console.log('Starting Yaade...');
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up'], { stdio: 'inherit' });
@@ -62031,7 +62038,7 @@ server.listen(0, () => {
 
 // Check status loop
 const checkStatus = () => {
-    exec('docker compose port hoppscotch 3000', (err, stdout, stderr) => {
+    exec('docker compose port yaade 9339', (err, stdout, stderr) => {
         if (err || stderr || !stdout) {
             setTimeout(checkStatus, 2000);
             return;
@@ -62042,7 +62049,7 @@ const checkStatus = () => {
             return;
         }
 
-        // Verify hoppscotch is responding
+        // Verify yaade is responding
         http.get(\`http://localhost:\${port}\`, (res) => {
             exec('docker compose ps -q', (err2, stdout2) => {
                 const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
@@ -62059,12 +62066,13 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('Hoppscotch is running!');
+                console.log('Yaade is running!');
                 console.log('--------------------------------------------------');
                 console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('Admin Email:       admin@admin.com');
                 console.log('--------------------------------------------------');
-                console.log('Open-source API development platform');
-                console.log('Alternative to Postman');
+                console.log('Self-hosted API development environment');
+                console.log('Create collections, test APIs, collaborate');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -62076,7 +62084,7 @@ const checkStatus = () => {
 setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
-    console.log('Stopping Hoppscotch...');
+    console.log('Stopping Yaade...');
     exec('docker compose down', (err, stdout, stderr) => {
         try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
@@ -62099,12 +62107,12 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "description=Hoppscotch - API Testing Tool"]
+      args: ["pkg", "set", "description=Yaade - API Testing Tool"]
     },
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-paper-plane text-green-500"]
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-vial text-purple-500"]
     },
     {
       action: "command",
@@ -62443,7 +62451,7 @@ process.on('SIGTERM', cleanup);`
 // ../../packages/template/tools.ts
 var tools = [
   CloudbeaverTool,
-  HoppscotchTool,
+  YaadeTool,
   MailpitTool,
   PgwebTool,
   MongoExpressTool,

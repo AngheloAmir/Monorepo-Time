@@ -137,6 +137,7 @@ const getIcon = (name: string) => {
     if (n.includes('chat to monochat')) return 'fas fa-comments text-green-500';
     if (n.includes('localstack')) return 'fab fa-aws text-orange-500';
     if (n.includes('stripe')) return 'fab fa-stripe text-orange-500';
+    if (n.includes('yaade')) return 'fas fa-vial text-purple-500';
     return 'fas fa-cube text-gray-400';
 }
 
