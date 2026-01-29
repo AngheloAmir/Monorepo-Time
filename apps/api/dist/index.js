@@ -59865,7 +59865,7 @@ import serverless from "serverless-http";
 export const handler = serverless(app);
 `;
 var dockerFile = `# Use the official Node.js image.
-FROM node:18-alpine
+FROM node:24-alpine
 
 # Create and change to the app directory.
 WORKDIR /usr/src/app
