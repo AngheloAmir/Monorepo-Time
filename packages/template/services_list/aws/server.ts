@@ -106,19 +106,11 @@ startServer(currentPort);
 
 const cleanup = () => {
     console.log("Stopping AWS Local environment...");
-    try {
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-            runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
-            });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
-    setTimeout(() => process.exit(0), 2000);
+    const child = spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
+    child.on('close', () => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
 };
 
 // Handle cleanup

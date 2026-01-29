@@ -111,10 +111,10 @@ const checkStatus = () => {
 
             console.clear();
             console.log('\\n==================================================');
-            console.log('🚀 Redis is running!');
+            console.log('Redis is running!');
             console.log('--------------------------------------------------');
-            console.log(\`🔌 Connection String: redis://localhost:\${port}\`);
-            console.log(\`🌐 Port:              \${port}\`);
+            console.log(\`Connection String: redis://localhost:\${port}\`);
+            console.log(\`Port:              \${port}\`);
 
             console.log('==================================================\\n');
         });
@@ -125,20 +125,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping Redis...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };

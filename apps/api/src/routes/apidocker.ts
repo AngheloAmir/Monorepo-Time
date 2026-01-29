@@ -95,7 +95,13 @@ function stopAllContainers(): Promise<{ success: boolean, message?: string, erro
                  return resolve({ success: false, error: err.message });
              }
              resolve({ success: true });
-         });
+        });
+
+        //make sure no networks are left
+        exec('docker network prune -f', (err) => {
+            if (err) return resolve({ success: false, error: err.message });
+            resolve({ success: true });
+        });
     });
 }
 

@@ -57671,6 +57671,10 @@ function stopAllContainers() {
       }
       resolve({ success: true });
     });
+    (0, import_child_process7.exec)("docker network prune -f", (err) => {
+      if (err) return resolve({ success: false, error: err.message });
+      resolve({ success: true });
+    });
   });
 }
 router17.get("/", async (req, res) => {
@@ -57893,18 +57897,18 @@ const checkStatus = () => {
 
                      console.clear();
                      console.log('\\n==================================================');
-                     console.log('\u{1F680} PostgreSQL is running!');
+                     console.log('PostgreSQL is running!');
                      console.log('--------------------------------------------------');
-                     console.log(\`\u{1F50C} Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
-                     console.log('\u{1F464} Username:          user');
-                     console.log('\u{1F511} Password:          password');
-                     console.log('\u{1F5C4}\uFE0F  Database:          mydatabase');
-                     console.log(\`\u{1F310} Port:              \${port}\`);
+                     console.log(\`Connection String: postgres://user:password@localhost:\${port}/mydatabase\`);
+                     console.log('Username:          user');
+                     console.log('Password:          password');
+                     console.log('Database:          mydatabase');
+                     console.log(\`Port:              \${port}\`);
                      console.log('--------------------------------------------------');
-                     console.log('\u{1F418} pgAdmin 4 is running!');
-                     console.log(\`\u{1F30D} URL:               http://localhost:\${pgAdminPort}\`);
-                     console.log('\u{1F4E7} Email:             admin@admin.com');
-                     console.log('\u{1F511} Password:          root');
+                     console.log('pgAdmin 4 is running!');
+                     console.log(\`URL:               http://localhost:\${pgAdminPort}\`);
+                     console.log('Email:             admin@admin.com');
+                     console.log('Password:          root');
                      console.log('==================================================\\n');
                 });
             }).on('error', (e) => {
@@ -57919,20 +57923,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping PostgreSQL...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };
@@ -58119,10 +58111,10 @@ const checkStatus = () => {
 
             console.clear();
             console.log('\\n==================================================');
-            console.log('\u{1F680} Redis is running!');
+            console.log('Redis is running!');
             console.log('--------------------------------------------------');
-            console.log(\`\u{1F50C} Connection String: redis://localhost:\${port}\`);
-            console.log(\`\u{1F310} Port:              \${port}\`);
+            console.log(\`Connection String: redis://localhost:\${port}\`);
+            console.log(\`Port:              \${port}\`);
 
             console.log('==================================================\\n');
         });
@@ -58133,20 +58125,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping Redis...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };
@@ -58295,12 +58275,12 @@ const checkStatus = () => {
 
             console.clear();
             console.log('\\n==================================================');
-            console.log('\u{1F680} MongoDB is running!');
+            console.log('MongoDB is running!');
             console.log('--------------------------------------------------');
-            console.log(\`\u{1F50C} Connection String: mongodb://admin:password@localhost:\${port}\`);
-            console.log('\u{1F464} Username:          admin');
-            console.log('\u{1F511} Password:          password');
-            console.log(\`\u{1F310} Port:              \${port}\`);
+            console.log(\`Connection String: mongodb://admin:password@localhost:\${port}\`);
+            console.log('Username:          admin');
+            console.log('Password:          password');
+            console.log(\`Port:              \${port}\`);
 
             console.log('==================================================\\n');
         });
@@ -58311,20 +58291,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping MongoDB...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };
@@ -58467,13 +58435,13 @@ const checkStatus = () => {
 
             console.clear();
             console.log('\\n==================================================');
-            console.log('\u{1F50D} Meilisearch is running!');
+            console.log('Meilisearch is running!');
             console.log('--------------------------------------------------');
-            console.log(\`\u{1F310} URL:               http://localhost:\${port}\`);
-            console.log('\u{1F511} Master Key:        masterKey');
-            console.log(\`\u{1F50C} API Port:          \${port}\`);
+            console.log(\`URL:               http://localhost:\${port}\`);
+            console.log('Master Key:        masterKey');
+            console.log(\`API Port:          \${port}\`);
             console.log('--------------------------------------------------');
-            console.log('\u{1F4DA} Docs: https://www.meilisearch.com/docs');
+            console.log('Docs: https://www.meilisearch.com/docs');
             console.log('==================================================\\n');
         });
     });
@@ -58483,20 +58451,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping Meilisearch...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };
@@ -58660,14 +58616,14 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('\u{1FAA3}  MinIO Object Storage is running!');
+                console.log('MinIO Object Storage is running!');
                 console.log('--------------------------------------------------');
-                console.log(\`\u{1F310} Console URL:       http://localhost:\${consolePort}\`);
-                console.log(\`\u{1F50C} API URL:           http://localhost:\${apiPort}\`);
-                console.log('\u{1F464} Username:          minioadmin');
-                console.log('\u{1F511} Password:          minioadmin');
+                console.log(\`Console URL:       http://localhost:\${consolePort}\`);
+                console.log(\`API URL:           http://localhost:\${apiPort}\`);
+                console.log('Username:          minioadmin');
+                console.log('Password:          minioadmin');
                 console.log('--------------------------------------------------');
-                console.log('\u{1F4DA} Docs: https://min.io/docs/minio/linux/index.html');
+                console.log('Docs: https://min.io/docs/minio/linux/index.html');
                 console.log('==================================================\\n');
             });
         });
@@ -58678,20 +58634,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping MinIO...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };
@@ -60616,20 +60560,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping N8N...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-            runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                    exec(\`docker rm -f \${id}\`);
-                });
-            });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };
@@ -61237,19 +61169,11 @@ startServer(currentPort);
 
 const cleanup = () => {
     console.log("Stopping AWS Local environment...");
-    try {
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-            runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
-            });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
-    setTimeout(() => process.exit(0), 2000);
+    const child = spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
+    child.on('close', () => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
 };
 
 // Handle cleanup
@@ -61443,19 +61367,11 @@ server.listen(0, () => {
 
 const cleanup = () => {
     console.log('Stopping Stripe Mock Server...');
-    try {
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-            console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-            runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`);
-            });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
-    setTimeout(() => process.exit(0), 2000);
+    const child = spawn('docker', ['compose', 'down'], { stdio: 'inherit' });
+    child.on('close', () => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
 };
 
 // Handle cleanup

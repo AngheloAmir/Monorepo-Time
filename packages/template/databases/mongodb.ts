@@ -112,12 +112,12 @@ const checkStatus = () => {
 
             console.clear();
             console.log('\\n==================================================');
-            console.log('🚀 MongoDB is running!');
+            console.log('MongoDB is running!');
             console.log('--------------------------------------------------');
-            console.log(\`🔌 Connection String: mongodb://admin:password@localhost:\${port}\`);
-            console.log('👤 Username:          admin');
-            console.log('🔑 Password:          password');
-            console.log(\`🌐 Port:              \${port}\`);
+            console.log(\`Connection String: mongodb://admin:password@localhost:\${port}\`);
+            console.log('Username:          admin');
+            console.log('Password:          password');
+            console.log(\`Port:              \${port}\`);
 
             console.log('==================================================\\n');
         });
@@ -128,20 +128,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping MongoDB...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };

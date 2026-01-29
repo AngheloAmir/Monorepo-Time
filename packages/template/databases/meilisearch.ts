@@ -106,13 +106,13 @@ const checkStatus = () => {
 
             console.clear();
             console.log('\\n==================================================');
-            console.log('🔍 Meilisearch is running!');
+            console.log('Meilisearch is running!');
             console.log('--------------------------------------------------');
-            console.log(\`🌐 URL:               http://localhost:\${port}\`);
-            console.log('🔑 Master Key:        masterKey');
-            console.log(\`🔌 API Port:          \${port}\`);
+            console.log(\`URL:               http://localhost:\${port}\`);
+            console.log('Master Key:        masterKey');
+            console.log(\`API Port:          \${port}\`);
             console.log('--------------------------------------------------');
-            console.log('📚 Docs: https://www.meilisearch.com/docs');
+            console.log('Docs: https://www.meilisearch.com/docs');
             console.log('==================================================\\n');
         });
     });
@@ -122,20 +122,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping Meilisearch...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };

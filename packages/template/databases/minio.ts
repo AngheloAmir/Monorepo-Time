@@ -122,14 +122,14 @@ const checkStatus = () => {
 
                 console.clear();
                 console.log('\\n==================================================');
-                console.log('🪣  MinIO Object Storage is running!');
+                console.log('MinIO Object Storage is running!');
                 console.log('--------------------------------------------------');
-                console.log(\`🌐 Console URL:       http://localhost:\${consolePort}\`);
-                console.log(\`🔌 API URL:           http://localhost:\${apiPort}\`);
-                console.log('👤 Username:          minioadmin');
-                console.log('🔑 Password:          minioadmin');
+                console.log(\`Console URL:       http://localhost:\${consolePort}\`);
+                console.log(\`API URL:           http://localhost:\${apiPort}\`);
+                console.log('Username:          minioadmin');
+                console.log('Password:          minioadmin');
                 console.log('--------------------------------------------------');
-                console.log('📚 Docs: https://min.io/docs/minio/linux/index.html');
+                console.log('Docs: https://min.io/docs/minio/linux/index.html');
                 console.log('==================================================\\n');
             });
         });
@@ -140,20 +140,8 @@ setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
     console.log('Stopping MinIO...');
-    try { 
-        const runtime = JSON.parse(fs.readFileSync(RUNTIME_FILE));
-        if (runtime.containerIds) {
-             console.log(\`Stopping \${runtime.containerIds.length} containers...\`);
-             runtime.containerIds.forEach(id => {
-                exec(\`docker stop \${id}\`, () => {
-                   exec(\`docker rm -f \${id}\`);
-                });
-             });
-        }
-    } catch(e) {}
-    try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-    
-    exec('docker compose stop', () => {
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);
     });
 };
