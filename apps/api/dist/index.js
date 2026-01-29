@@ -61639,8 +61639,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            const lower = line.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write(line + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -61772,12 +61786,226 @@ var MattermostLocal = {
   ]
 };
 
+// ../../packages/template/services_list/nextcloud/dockerCompose.ts
+var dockerCompose5 = `services:
+  db:
+    image: mariadb:10.6
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_PASSWORD=nextcloud_user_password
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud_user
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -padmin || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  nextcloud:
+    image: nextcloud:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    links:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - nextcloud_data:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=nextcloud_user_password
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud_user
+      - MYSQL_HOST=db
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/status.php || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nextcloud_data:
+  db_data:`;
+
+// ../../packages/template/services_list/nextcloud/gitignore.ts
+var gitignoreContent5 = `
+.runtime.json
+`;
+
+// ../../packages/template/services_list/nextcloud/server.ts
+var serverJs5 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Nextcloud...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            const lower = line.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write(line + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port nextcloud 80', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const ncPort = stdout.trim().split(':')[1];
+        if (!ncPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify Nextcloud is actually responding to HTTP
+        http.get(\`http://localhost:\${ncPort}/status.php\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('Nextcloud is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${ncPort}\`);
+                console.log('--------------------------------------------------');
+                console.log('A safe home for all your data');
+                console.log('--------------------------------------------------');
+                console.log('First time setup:');
+                console.log('  1. Create admin account on first visit');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Nextcloud...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/services_list/nextcloud.ts
+var NextcloudLocal = {
+  name: "Nextcloud Local",
+  description: "Nextcloud Office & Storage",
+  notes: "Requires Docker installed. Data is stored in Docker volumes (nextcloud_data, db_data).",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose5
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent5
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs5
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Nextcloud Server (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-cloud text-blue-500"]
+    }
+  ]
+};
+
 // ../../packages/template/services.ts
 var templates4 = [
   N8NLocal,
+  MattermostLocal,
+  NextcloudLocal,
   AWSTemplate,
-  StripeTemplate,
-  MattermostLocal
+  StripeTemplate
 ];
 var services_default = templates4;
 
