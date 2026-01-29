@@ -160,6 +160,11 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
+            args: ['pkg', 'set', 'appType=tool']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
             args: ['pkg', 'set', 'name=$(basename $PWD)']
         }
     ]
