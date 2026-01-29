@@ -8,6 +8,7 @@ import ModalTerminal from "../workspace/ModalTerminal";
 import FloatingBtn from "../workspace/FloatingBtn";
 import GitControl from "../workspace/GitControl";
 import Loading from "../workspace/Loading";
+import { WorkspaceTabToggle } from "../workspace/WorkspaceTabToggle";
 
 interface WorkspaceProps {
     isVisible: boolean
@@ -37,26 +38,7 @@ export default function Workspace(props: WorkspaceProps) {
 
     return (
         <>
-            <div className="absolute top-2 left-2 z-10">
-                <button
-                    onClick={() => setWhichShow("all")}
-                    className={`${whichShow === "all" ? "bg-gradient-to-r from-blue-600 to-blue-500" : ""} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
-                >
-                    All Apps
-                </button>
-                <button
-                    onClick={() => setWhichShow("apps")}
-                    className={`${whichShow === "apps" ? "bg-gradient-to-r from-blue-600 to-blue-500" : ""} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
-                >
-                    Apps Only   
-                </button>
-                <button
-                    onClick={() => setWhichShow("tools")}
-                    className={`${whichShow === "tools" ? "bg-gradient-to-r from-blue-600 to-blue-500" : ""} px-4 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
-                >
-                    Tools Only
-                </button>
-            </div>
+            <WorkspaceTabToggle whichShow={whichShow} setWhichShow={setWhichShow} />
             
             <div className={`relative flex flex-col w-full h-[calc(100vh-54px)] ${props.isVisible ? '' : 'hidden'}`}>
                 <div className="grid grid-rows-5 h-full min-h-0 gap-2">

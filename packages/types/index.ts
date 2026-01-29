@@ -90,6 +90,7 @@ export interface CrudItem {
     expectedOutcome: string,
 }
 
+export const TemplateCategories = ['project', 'database', 'services', 'tool', 'demo'] as const;
 export interface ProjectTemplate {
     name:        string;
     description: string;

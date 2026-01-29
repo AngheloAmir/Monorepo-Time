@@ -2,19 +2,17 @@ import MonorepoTemplates from 'template';
 import path from 'path';
 import { ensureDirectory, writeFile, findMonorepoRoot } from './utils';
 import { runCommand, preprocessCommand } from './command';
+import { TemplateCategories } from 'types';
 
 /**
  * Finds a template by name across all categories.
  */
 export function findTemplate(templatename: string) {
-    const categories = ['project', 'database', 'services', 'demo'] as const;
-    for (const cat of categories) {
+    for (const cat of TemplateCategories) {
         const list = MonorepoTemplates[cat];
         if (Array.isArray(list)) {
             const match = list.find(t => t.name === templatename);
-            if (match) {
-                return match;
-            }
+            if (match) return match;
         }
     }
     return null;
