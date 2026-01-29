@@ -57,7 +57,7 @@ export default function Workspace(props: WorkspaceProps) {
                     </div>
 
                     <div className="row-span-2">
-                        <TabTerminal />
+                        <TabTerminal whichShow={whichShow}/>
                     </div>
                 </div>
 

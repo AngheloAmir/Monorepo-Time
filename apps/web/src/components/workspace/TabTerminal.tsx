@@ -3,7 +3,7 @@ import TabTerminalWrapper from "./TabTerminal/TabTerminalWrapper";
 import HeaderItem from "./TabTerminal/HeaderItem";
 import { useState } from "react";
 
-export default function TabTerminal() {
+export default function TabTerminal({ whichShow }: { whichShow: string }) {
     const workspace = useWorkspaceState.use.workspace();
     const activeTerminal = useWorkspaceState.use.activeTerminal();
     const [viewMode, setViewMode] = useState<'normal' | 'maximized'>('normal');
@@ -28,7 +28,10 @@ export default function TabTerminal() {
                     <i className={`fas ${viewMode === 'maximized' ? 'fa-compress' : 'fa-expand'}`}></i>
                 </button>
                 {workspace.map((item) => {
-                    if (item.isRunningAs != null)
+                    if (item.isRunningAs != null &&
+                        ((whichShow === "all") ||
+                            (whichShow === "apps" && item.info.appType === undefined) ||
+                            (whichShow === "tools" && item.info.appType === "tool")))
                         return <HeaderItem key={item.info.name} workspace={item} />
                 })}
             </header>
@@ -47,8 +50,10 @@ export default function TabTerminal() {
                     <TabTerminalWrapper
                         key={item.info.name}
                         workspace={item}
-                        visible={
-                            activeTerminal == item.info.name && item.isRunningAs != null
+                        visible={   
+                            (whichShow === "all"    && activeTerminal == item.info.name && item.isRunningAs != null) ||
+                            (whichShow === "apps"   && activeTerminal == item.info.name && item.isRunningAs != null && item.info.appType === undefined) ||
+                            (whichShow === "tools"  && activeTerminal == item.info.name && item.isRunningAs != null && item.info.appType === "tool")
                         }
                     />
                 ))}
