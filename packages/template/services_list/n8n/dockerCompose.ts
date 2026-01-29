@@ -1,6 +1,7 @@
 export const dockerCompose = `services:
   n8n:
     image: n8nio/n8n:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     environment:

@@ -13,6 +13,7 @@ export const Redis: ProjectTemplate = {
 services:
   redis:
     image: redis:7.2-alpine
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     ports:

@@ -57774,6 +57774,7 @@ var PostgreSQL = {
 services:
   postgres:
     image: postgres:16-alpine
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     environment:
@@ -57792,6 +57793,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
+    pull_policy: if_not_present
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
@@ -58013,6 +58015,7 @@ var Redis = {
 services:
   redis:
     image: redis:7.2-alpine
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     ports:
@@ -58174,6 +58177,7 @@ var MongoDB = {
       filecontent: `services:
   mongodb:
     image: mongo:7.0
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     environment:
@@ -58340,6 +58344,7 @@ var Meilisearch = {
       filecontent: `services:
   meilisearch:
     image: getmeili/meilisearch:v1.10
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     environment:
@@ -58505,6 +58510,7 @@ var MinIO = {
       filecontent: `services:
   minio:
     image: minio/minio
+    pull_policy: if_not_present
     command: server /data --console-address ":9001"
     restart: unless-stopped
     user: "1000:1000"
@@ -60449,6 +60455,7 @@ var projecttemplate_default = templates3;
 var dockerCompose = `services:
   n8n:
     image: n8nio/n8n:latest
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     environment:
@@ -60795,6 +60802,7 @@ module.exports = {
 var dockerCompose2 = `services:
   localstack:
     image: localstack/localstack
+    pull_policy: if_not_present
     user: "1000:1000"
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
@@ -60812,6 +60820,7 @@ var dockerCompose2 = `services:
 
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin
+    pull_policy: if_not_present
     ports:
       - "8001:8001"
     environment:
@@ -60826,6 +60835,7 @@ var dockerCompose2 = `services:
 
   s3-manager:
     image: cloudlena/s3manager
+    pull_policy: if_not_present
     ports:
       - "8002:8080"
     environment:
@@ -61273,6 +61283,7 @@ var AWSTemplate = {
 var dockerCompose3 = `services:
   stripe-mock:
     image: stripe/stripe-mock:latest
+    pull_policy: if_not_present
     container_name: stripe-mock
     ports:
       - "12111:12111"

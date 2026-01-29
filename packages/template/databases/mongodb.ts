@@ -11,11 +11,12 @@ export const MongoDB: ProjectTemplate = {
             filecontent: `services:
   mongodb:
     image: mongo:7.0
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_PASSWORD: admin
     ports:
       - "0:27017"
     volumes:
@@ -114,9 +115,9 @@ const checkStatus = () => {
             console.log('\\n==================================================');
             console.log('MongoDB is running!');
             console.log('--------------------------------------------------');
-            console.log(\`Connection String: mongodb://admin:password@localhost:\${port}\`);
+            console.log(\`Connection String: mongodb://admin:admin@localhost:\${port}/db\`);
             console.log('Username:          admin');
-            console.log('Password:          password');
+            console.log('Password:          admin');
             console.log(\`Port:              \${port}\`);
 
             console.log('==================================================\\n');

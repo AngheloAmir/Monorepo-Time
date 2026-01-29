@@ -11,12 +11,13 @@ export const MinIO: ProjectTemplate = {
             filecontent: `services:
   minio:
     image: minio/minio
+    pull_policy: if_not_present
     command: server /data --console-address ":9001"
     restart: unless-stopped
     user: "1000:1000"
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=admin
     ports:
       - "0:9000"
       - "0:9001"
@@ -126,8 +127,8 @@ const checkStatus = () => {
                 console.log('--------------------------------------------------');
                 console.log(\`Console URL:       http://localhost:\${consolePort}\`);
                 console.log(\`API URL:           http://localhost:\${apiPort}\`);
-                console.log('Username:          minioadmin');
-                console.log('Password:          minioadmin');
+                console.log('Username:          admin');
+                console.log('Password:          admin');
                 console.log('--------------------------------------------------');
                 console.log('Docs: https://min.io/docs/minio/linux/index.html');
                 console.log('==================================================\\n');

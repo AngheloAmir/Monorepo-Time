@@ -1,6 +1,7 @@
 export const dockerCompose = `services:
   localstack:
     image: localstack/localstack
+    pull_policy: if_not_present
     user: "1000:1000"
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
@@ -18,6 +19,7 @@ export const dockerCompose = `services:
 
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin
+    pull_policy: if_not_present
     ports:
       - "8001:8001"
     environment:
@@ -32,6 +34,7 @@ export const dockerCompose = `services:
 
   s3-manager:
     image: cloudlena/s3manager
+    pull_policy: if_not_present
     ports:
       - "8002:8080"
     environment:

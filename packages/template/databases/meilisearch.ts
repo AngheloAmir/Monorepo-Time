@@ -11,10 +11,11 @@ export const Meilisearch: ProjectTemplate = {
             filecontent: `services:
   meilisearch:
     image: getmeili/meilisearch:v1.10
+    pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
     environment:
-      - MEILI_MASTER_KEY=masterKey
+      - MEILI_MASTER_KEY=admin
       - MEILI_ENV=development
     ports:
       - "0:7700"
@@ -109,7 +110,7 @@ const checkStatus = () => {
             console.log('Meilisearch is running!');
             console.log('--------------------------------------------------');
             console.log(\`URL:               http://localhost:\${port}\`);
-            console.log('Master Key:        masterKey');
+            console.log('Master Key:        admin');
             console.log(\`API Port:          \${port}\`);
             console.log('--------------------------------------------------');
             console.log('Docs: https://www.meilisearch.com/docs');
