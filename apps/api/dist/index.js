@@ -85202,9 +85202,8 @@ var PostgreSQL = {
 services:
   postgres:
     image: postgres:latest
-    pull_policy: if_not_present
+    pull_policy: missing
     restart: unless-stopped
-    user: "1000:1000"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
@@ -85212,7 +85211,7 @@ services:
     ports:
       - "0:5432"
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d db"]
       interval: 5s

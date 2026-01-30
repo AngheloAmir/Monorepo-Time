@@ -46,7 +46,7 @@ export default function TabTerminal({ whichShow }: { whichShow: string }) {
                         workspace={item}
                         visible={   
                             (whichShow === "all"    && activeTerminal == item.info.name && item.isRunningAs != null) ||
-                            (whichShow === "apps"   && activeTerminal == item.info.name && item.isRunningAs != null && item.info.appType === undefined) ||
+                            (whichShow === "apps"   && activeTerminal == item.info.name && item.isRunningAs != null && (item.info.appType === "database" || item.info.appType === undefined)) ||
                             (whichShow === "tools"  && activeTerminal == item.info.name && item.isRunningAs != null && item.info.appType === "tool")
                         }
                     />
