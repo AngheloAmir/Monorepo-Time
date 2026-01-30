@@ -142,7 +142,7 @@ export default function TemplateWindow( props: Props) {
 
             <footer className="p-2 px-6 pb-4 flex justify-end gap-4">
                 <button
-                    onClick={close}
+                    onClick={props.close}
                     className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden"
                 >
                     <span className="relative z-10">Cancel</span>
