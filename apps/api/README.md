@@ -2,14 +2,7 @@
 **Monorepo Time** provides a modern, interactive web interface to manage, visualize, and control your monorepo workspaces. Stop wrestling with endless terminal tabs and get a clear overview of your project structure, scripts, and build tasks.
 
 ## Installation
-
-Install as a dev dependency in your project:
-
-```bash
-npm install -D monorepotime
-```
-
-Then initialize it in your project:
+Initialize it in your project:
 
 ```bash
 npx monorepotime init
@@ -22,6 +15,9 @@ This will add the following script to your `package.json`:
   "packageManager": "npm@<the version of you package manager>",
   "scripts": {
     "monorepotime": "monorepotime"
+  },
+  "devDependencies": {
+    "monorepotime": "^<version>"
   }
 }
 ```

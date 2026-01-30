@@ -1,6 +1,6 @@
 {
   "name": "monorepotime",
-  "version": "1.1.19",
+  "version": "1.2.0",
   "description": "monorepo gui tool",
   "main": "dist/index.js",
   "scripts": {
@@ -10,13 +10,14 @@
     "stop": "npx -y kill-port 4793",
     "predep": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/",
     "publish": "npm publish --access public",
-    "beta": "npm publish --access public --tag beta"
+    "beta": "npm publish --access public --tag beta",
+    "g": "npm install -g ."
   },
   "dependencies": {
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "execa": "^9.6.1",
-    "express": "^4.19.2",
+    "express": "^5.2.1",
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.3",
     "open": "^11.0.0",

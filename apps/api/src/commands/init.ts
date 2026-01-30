@@ -7,19 +7,55 @@ import chalk from 'chalk';
  * This command adds the "monorepotime" script to the user's package.json
  */
 export async function initCommand() {
-  try {
-    // Find the package.json in the current working directory
-    const cwd = process.cwd();
-    const packageJsonPath = path.join(cwd, 'package.json');
+  const { execa } = await import('execa');
+  const cwd = process.cwd();
 
-    // Check if package.json exists
-    if (!await fs.pathExists(packageJsonPath)) {
-      console.error(chalk.red('❌ Error: package.json not found in the current directory.'));
-      console.log(chalk.yellow('Please run this command in the root of your project where package.json exists.'));
-      process.exit(1);
+  // Detect package manager
+  let pm = 'npm';
+  let installCmd = 'install';
+  let devFlag = '-D';
+
+  const lockfiles = {
+    'yarn.lock': 'yarn',
+    'pnpm-lock.yaml': 'pnpm',
+    'bun.lockb': 'bun',
+    'package-lock.json': 'npm'
+  };
+
+  // Check for lockfiles to determine package manager
+  for (const [file, manager] of Object.entries(lockfiles)) {
+    if (await fs.pathExists(path.join(cwd, file))) {
+      pm = manager;
+      break;
     }
+  }
 
-    // Read the package.json
+  // Fallback to user agent if no lockfile found
+  if (pm === 'npm' && process.env.npm_config_user_agent) {
+    if (process.env.npm_config_user_agent.startsWith('yarn')) pm = 'yarn';
+    else if (process.env.npm_config_user_agent.startsWith('pnpm')) pm = 'pnpm';
+    else if (process.env.npm_config_user_agent.startsWith('bun')) pm = 'bun';
+  }
+
+  // Set install command based on package manager
+  if (pm === 'yarn') {
+    installCmd = 'add';
+  } else if (pm === 'bun') {
+    installCmd = 'add';
+  }
+
+  console.log(chalk.green(`Detected package manager: ${pm}`));
+  console.log(chalk.green(`Installing monorepotime as dev dependency using ${pm}...`));
+
+  try {
+    await execa(pm, [installCmd, devFlag, 'monorepotime'], { stdio: 'inherit', cwd, shell: true });
+  } catch (error: any) {
+    console.error(chalk.red(`❌ Failed to install monorepotime using ${pm}:`), error.message);
+    console.log(chalk.yellow(`Please run "${pm} ${installCmd} ${devFlag} monorepotime" manually.`));
+  }
+
+  const packageJsonPath = path.join(cwd, 'package.json');
+  try {
     const packageJson = await fs.readJson(packageJsonPath);
 
     // Ensure scripts object exists
@@ -27,27 +63,24 @@ export async function initCommand() {
       packageJson.scripts = {};
     }
 
-    // Check if monorepotime script already exists
-    if (packageJson.scripts.monorepotime) {
-      console.log(chalk.yellow('⚠️  The "monorepotime" script already exists in your package.json:'));
-      console.log(chalk.cyan(`   "${packageJson.scripts.monorepotime}"`));
-      console.log(chalk.yellow('Skipping initialization.'));
-      return;
+    // Add monorepotime script
+    if (!packageJson.scripts.monorepotime) {
+      packageJson.scripts.monorepotime = 'monorepotime';
+      console.log(chalk.green(`Added "monorepotime" to package.json scripts`));
     }
 
-    // Add the monorepotime script
-    packageJson.scripts.monorepotime = 'monorepotime';
-
-    // Check if packageManager exists, if not, add it
+    // Add packageManager field if missing
     if (!packageJson.packageManager) {
+      // Get version of the package manager
       try {
-        const { stdout } = await import('execa').then(m => m.execa('npm', ['--version']));
-        if (stdout) {
-          packageJson.packageManager = `npm@${stdout.trim()}`;
-          console.log(chalk.green(`✅ Added "packageManager": "npm@${stdout.trim()}" to package.json`));
-        }
-      } catch (err) {
-        console.warn(chalk.yellow('⚠️  Could not determine npm version to set "packageManager". Skipping...'));
+        const { stdout } = await execa(pm, ['--version'], { shell: true });
+        const version = stdout.trim();
+        packageJson.packageManager = `${pm}@${version}`;
+        console.log(chalk.green(`Added "packageManager": "${pm}@${version}" to package.json`));
+      } catch (e) {
+         // If version check fails, default to generic latest or skip
+         packageJson.packageManager = `${pm}@latest`;
+         console.log(chalk.yellow(`Could not detect ${pm} version, defaulting to "latest"`));
       }
     }
 
@@ -55,17 +88,12 @@ export async function initCommand() {
     await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
 
     console.log(chalk.green('✅ Successfully initialized monorepotime!'));
-    console.log(chalk.cyan('\nAdded to your package.json:'));
-    console.log(chalk.white('  "scripts": {'));
-    console.log(chalk.white('    ...'));
-    console.log(chalk.green('    "monorepotime": "monorepotime"'));
-    console.log(chalk.white('  }'));
     console.log(chalk.cyan('\nYou can now run:'));
-    console.log(chalk.white('  npm run monorepotime'));
+    console.log(chalk.white(`  ${pm} run monorepotime`));
     console.log();
 
   } catch (error: any) {
-    console.error(chalk.red('❌ Error during initialization:'), error.message);
+    console.error(chalk.red('❌ Error updating package.json:'), error.message);
     process.exit(1);
   }
 }

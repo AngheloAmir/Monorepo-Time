@@ -1,5 +1,17 @@
 #!/usr/bin/env node
 
+import { initCommand } from './commands/init';
+const args = process.argv.slice(2);
+const command = args[0];
+if (command == 'init') {
+  initCommand().then(() => {
+    process.exit(0);
+  }).catch((error) => {
+    console.error('Error:', error);
+    process.exit(1);
+  });
+}
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -9,19 +21,6 @@ import open from 'open';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import net from 'net';
-import { initCommand } from './commands/init';
-
-// Handle CLI commands
-const args = process.argv.slice(2);
-const command = args[0];
-if (command === 'init') {
-  initCommand().then(() => {
-    process.exit(0);
-  }).catch((error) => {
-    console.error('Error:', error);
-    process.exit(1);
-  });
-}
 
 //routers
 import tester from './routes/_tester';
@@ -85,7 +84,7 @@ app.use("/" + apiRoute.setWorkspaceTemplate, setWorkspaceTemplate);
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');
 app.use(express.static(frontendPath));
-app.get('*', (req, res) => {
+app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
