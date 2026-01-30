@@ -149,6 +149,20 @@ route.get("/", async (req: Request, res: Response) => {
       projects = await scanRecursively();
     }
 
+    // Explicitly scan 'root/opensource' directory if it exists
+    const opensourceFolder = path.join(ROOT, "opensource");
+    if (await fs.pathExists(opensourceFolder)) {
+      const opensourceDirs = await resolveWorkspaceDirs(["opensource/*"]);
+      for (const dir of opensourceDirs) {
+        if (await isRunnableProject(dir)) {
+          const absoluteDir = path.resolve(dir);
+          if (!projects.includes(absoluteDir)) {
+            projects.push(absoluteDir);
+          }
+        }
+      }
+    }
+
     const projectInfos = (await Promise.all(projects.map(async (p) => {
       const pkgPath = path.join(p, "package.json");
       const pkg = await readJSON(pkgPath);

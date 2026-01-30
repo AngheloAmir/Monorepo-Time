@@ -83648,6 +83648,18 @@ route.get("/", async (req, res) => {
     } else {
       projects = await scanRecursively();
     }
+    const opensourceFolder = import_path2.default.join(ROOT, "opensource");
+    if (await import_fs_extra2.default.pathExists(opensourceFolder)) {
+      const opensourceDirs = await resolveWorkspaceDirs(["opensource/*"]);
+      for (const dir of opensourceDirs) {
+        if (await isRunnableProject(dir)) {
+          const absoluteDir = import_path2.default.resolve(dir);
+          if (!projects.includes(absoluteDir)) {
+            projects.push(absoluteDir);
+          }
+        }
+      }
+    }
     const projectInfos = (await Promise.all(projects.map(async (p) => {
       const pkgPath = import_path2.default.join(p, "package.json");
       const pkg = await readJSON(pkgPath);
