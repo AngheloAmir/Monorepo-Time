@@ -15,9 +15,9 @@ router.post("/", async (req: Request, res: Response) => {
         let targetPath = reqBody.path;
 
         if (targetPath) {
-            const dir = path.dirname(targetPath);
+            const dir          = path.dirname(targetPath);
             const specificName = path.basename(targetPath);
-            targetPath = path.join(dir, specificName.replace(/\s+/g, "-"));
+            targetPath         = path.join(dir, specificName.replace(/\s+/g, "-"));
         }
 
         if (!targetPath) {

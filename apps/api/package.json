@@ -11,7 +11,7 @@
     "predep": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/",
     "publish": "npm publish --access public",
     "beta": "npm publish --access public --tag beta",
-    "g": "npm install -g ."
+    "localtest": "npm run build && npm install -g ."
   },
   "dependencies": {
     "chalk": "^4.1.2",

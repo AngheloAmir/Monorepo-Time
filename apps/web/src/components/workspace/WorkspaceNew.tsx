@@ -35,10 +35,14 @@ export default function WorkspaceNew() {
 
     useEffect(() => {
         if (showWorkspaceNew) {
-            setWorkspaceCopy(clearInfo);
             const loadPaths = async () => {
-                const data = await listWorkspaceDir();
+                const data  = await listWorkspaceDir();
                 setpaths(data);
+
+                setWorkspaceCopy({
+                    ...clearInfo,
+                    path: data[0].path || ''
+                });
             }
             loadPaths();
         }
@@ -120,9 +124,9 @@ export default function WorkspaceNew() {
                     />
 
                     <SelectField
-                        label="Path"
+                        label="Workspace Directory"
                         icon="fas fa-folder"
-                        placeholder="Select a workspace path"
+                        placeholder="Select a workspace directory"
                         value={workspaceCopy?.path || ''}
                         onChange={(e) => {
                             if (!workspaceCopy) return;

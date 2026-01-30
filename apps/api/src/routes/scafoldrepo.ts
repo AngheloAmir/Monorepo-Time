@@ -6,16 +6,15 @@ import { ROOT } from "./rootPath";
 
 const router = Router();
 const packageJsonPath = path.join(ROOT, "package.json");
-const turboJsonPath = path.join(ROOT, "turbo.json");
-const SCAFFOLD_DIR = path.join(__dirname, 'scaffold');
+const turboJsonPath   = path.join(ROOT, "turbo.json");
+const SCAFFOLD_DIR    = path.join(__dirname, 'scaffold');
 
 router.get("/", async (req: Request, res: Response) => {
     try {
-        await CreatePackageJsonIfNotExist();
         await AddWorkspaceToPackageJsonIfNotExist();
         await InstallTurborepoIfNotYet();
         await AddTurboJsonIfNotExist();
-        await CreateWorkSpaceDirsIfNotExist();
+        await CreateWorkSpaceDirsIfNotExist(); //this creates apps*, packages*, opensource
         await CreateGitIgnoreIfNotExist();
         await InitializeGitIfNotExist();
 
@@ -29,29 +28,6 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
-async function CreatePackageJsonIfNotExist() {
-    if (!fs.existsSync(packageJsonPath)) {
-        const rootDirName = path.basename(ROOT);
-        const pkgName = rootDirName.toLowerCase().replace(/\s+/g, '-');
-
-        const defaultPkg = {
-            name: pkgName,
-            version: "1.0.0",
-            private: true,
-            scripts: {
-                "build": "turbo run build",
-                "dev": "monorepotime",
-                "lint": "turbo run lint"
-            },
-            devDependencies: {
-                "monorepotime": "*"
-            },
-            workspaces: []
-        };
-        await fs.writeJson(packageJsonPath, defaultPkg, { spaces: 2 });
-        console.log("[scafoldrepo] Created package.json");
-    }
-}
 
 async function AddWorkspaceToPackageJsonIfNotExist() {
     const pkg = await fs.readJson(packageJsonPath);
@@ -121,11 +97,9 @@ async function AddTurboJsonIfNotExist() {
 async function CreateWorkSpaceDirsIfNotExist() {
     if (!fs.existsSync(packageJsonPath)) return;
 
-    const pkg = await fs.readJson(packageJsonPath);
-    const workspaces = Array.isArray(pkg.workspaces) ? pkg.workspaces : [];
-
-    // Check configuration to determine if folders should be created
-    const shouldCreateApps = workspaces.some((w: string) => w.startsWith("apps/") || w === "apps");
+    const pkg                  = await fs.readJson(packageJsonPath);
+    const workspaces           = Array.isArray(pkg.workspaces) ? pkg.workspaces : [];
+    const shouldCreateApps     = workspaces.some((w: string) => w.startsWith("apps/") || w === "apps");
     const shouldCreatePackages = workspaces.some((w: string) => w.startsWith("packages/") || w === "packages");
 
     if (shouldCreateApps) {
@@ -134,21 +108,16 @@ async function CreateWorkSpaceDirsIfNotExist() {
 
     if (shouldCreatePackages) {
         await fs.ensureDir(path.join(ROOT, 'packages'));
-
-        // Create types package only if packages directory is valid/created
         const typesPackagePath = path.join(ROOT, "packages", "types");
         if (!fs.existsSync(typesPackagePath)) {
             await fs.ensureDir(typesPackagePath);
-            
             try {
-                // Try to use scaffold files if available
                 if (fs.existsSync(path.join(SCAFFOLD_DIR, 'index.ts'))) {
                     const indexContent = await fs.readFile(path.join(SCAFFOLD_DIR, 'index.ts'), 'utf-8');
                     await fs.writeFile(path.join(typesPackagePath, "index.ts"), indexContent);
                 } else {
                     await fs.writeFile(path.join(typesPackagePath, "index.ts"), "export type {};");
                 }
-
                 if (fs.existsSync(path.join(SCAFFOLD_DIR, 'package.json'))) {
                     const pkgContent = await fs.readJson(path.join(SCAFFOLD_DIR, 'package.json'));
                     await fs.writeJson(path.join(typesPackagePath, "package.json"), pkgContent, { spaces: 4 });
@@ -167,6 +136,8 @@ async function CreateWorkSpaceDirsIfNotExist() {
             }
         }
     }
+
+    await fs.ensureDir(path.join(ROOT, 'opensource'));
 }
 
 async function CreateGitIgnoreIfNotExist() {
@@ -208,7 +179,9 @@ async function CreateGitIgnoreIfNotExist() {
             ".idea",
             ".vscode",
             "!.vscode/extensions.json",
-            "!.vscode/settings.json"
+            "!.vscode/settings.json",
+            ".agent",
+            ""
         ].join("\n");
         await fs.writeFile(gitIgnorePath, ignoreContent);
         console.log("[scafoldrepo] Created .gitignore");
