@@ -2,6 +2,9 @@ import express from 'express';
 import { Server, Socket } from 'socket.io';
 import { WorkspaceInfo } from 'types';
 import { findTemplate, executeTemplate } from './template';
+import { findMonorepoRoot } from './utils';
+import path from 'path';
+import { promises as fs } from 'fs';
 
 const router = express.Router();
 
@@ -26,16 +29,26 @@ export function setWorkspaceTemplateSocket(io: Server) {
                 return;
             }
 
-            const workspacePath = workspace.path;
+            let workspacePath = workspace.path;
             const template      = findTemplate(templatename);
             if (!template) {
                 socket.emit('template:error', { error: `Template '${templatename}' not found` });
                 return;
             }
 
+            if (template.type === 'tool') {
+                const root           = await findMonorepoRoot(workspacePath);
+                const toolFolderName = template.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+                workspacePath        = path.join(root, 'opensource', toolFolderName);
 
-            console.log('template', template);
-
+                try {
+                    await fs.access(workspacePath);
+                    socket.emit('template:error', { error: `Tool '${template.name}' is already installed at ${workspacePath}.` });
+                    return;
+                } catch {
+                    // Directory does not exist, proceed
+                }
+            }
 
             socket.emit('template:progress', { message: `Starting template '${templatename}'...` });
             console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);

@@ -6,8 +6,8 @@ import useAppState from "../../appstates/app";
 
 interface TemplateSelectorProps {
     show: boolean;
-    onClose: () => void;
-    onSelect: (name: string) => void;
+    onClose:  () => void;
+    onSelect: (name: string, type: string) => void;
 }
 
 
@@ -72,20 +72,20 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
 
                 <div className="flex-1 w-full h-[500px] overflow-y-auto">
                     <div className="flex flex-col gap-2">
-                        <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={(name) => {
-                            props.onSelect(name);
+                        <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={(name, type) => {
+                            props.onSelect(name, type);
                         }}/>
-                        <ProjectItem show={activeTab === 'Database'} project={templates.database} onClick={(name) => {
-                            props.onSelect(name);
+                        <ProjectItem show={activeTab === 'Database'} project={templates.database} onClick={(name, type) => {
+                            props.onSelect(name, type);
                         }}/>
-                        <ProjectItem show={activeTab === 'Services'} project={templates.services} onClick={(name) => {
-                            props.onSelect(name);
+                        <ProjectItem show={activeTab === 'Services'} project={templates.services} onClick={(name, type) => {
+                            props.onSelect(name, type);
                         }}/>
-                        <ProjectItem show={activeTab === 'Tool'} project={templates.tool} onClick={(name) => {
-                            props.onSelect(name);
+                        <ProjectItem show={activeTab === 'Tool'} project={templates.tool} onClick={(name, type) => {
+                            props.onSelect(name, type);
                         }}/>
-                        <ProjectItem show={activeTab === 'Demo'} project={templates.demo} onClick={(name) => {
-                            props.onSelect(name);
+                        <ProjectItem show={activeTab === 'Demo'} project={templates.demo} onClick={(name, type) => {
+                            props.onSelect(name, type);
                         }}/>
                     </div>
                 </div>
@@ -144,7 +144,7 @@ const getIcon = (name: string) => {
 }
 
 //==============================================================================================
-function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], onClick: (project: string) => void, show: boolean }) {
+function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], onClick: (project: string, type: string) => void, show: boolean }) {
     if(!show) return null;
     
     return (
@@ -152,7 +152,7 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
             {project.map((project, index) => (
                 <button
                     key={index}
-                    onClick={() => onClick(project.name)}
+                    onClick={() => onClick(project.name, project.type)}
                     className="flex items-center p-2 hover:bg-gray-800 text-left w-full"
                 >
                     <div className="flex-1 min-w-0">
