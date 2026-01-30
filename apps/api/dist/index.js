@@ -90976,6 +90976,18 @@ function setWorkspaceTemplateSocket(io3) {
           return;
         } catch {
         }
+        await import_fs4.promises.mkdir(workspacePath, { recursive: true });
+        const toolName = template.name.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+        const pkgPath = import_path18.default.join(workspacePath, "package.json");
+        let pkgData = { name: toolName, version: "0.0.0", private: true };
+        try {
+          const currentFile = await import_fs4.promises.readFile(pkgPath, "utf-8");
+          const parsed = JSON.parse(currentFile);
+          pkgData = { ...parsed, name: toolName };
+        } catch {
+        }
+        await import_fs4.promises.writeFile(pkgPath, JSON.stringify(pkgData, null, 2));
+        socket.emit("template:progress", { message: "Configured package.json" });
       }
       socket.emit("template:progress", { message: `Starting template '${templatename}'...` });
       console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);

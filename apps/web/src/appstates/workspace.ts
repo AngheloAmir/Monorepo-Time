@@ -305,7 +305,7 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
 
     createNewWorkspace: async (workspaceName: WorkspaceInfo) => {
         if (config.useDemo) return true;
-
+ 
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.newWorkspace}`, {
                 method: 'POST',

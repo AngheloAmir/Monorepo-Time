@@ -66,14 +66,22 @@ export default function WorkspaceNew() {
         try {
             setWorkspaceLoading(true);
             setShowWorkspaceNew(false);
-            const response = await createNewWorkspace(newWorkspaceToAdd);
-            if (response) {
-                if (template)
-                    await setWorkspaceTemplate(newWorkspaceToAdd, template);
-                else {
-                    setWorkspaceLoading(false);
-                    setShowNewTerminalWindow(newWorkspaceToAdd);
+
+            if (templateType != 'tool') {
+                //add a new folder
+                const response = await createNewWorkspace(newWorkspaceToAdd);
+                if (response) {
+                    if (template)
+                        //this one sets the content if this is a template based workspace
+                        await setWorkspaceTemplate(newWorkspaceToAdd, template);
+                    else {
+                        setWorkspaceLoading(false);
+                        setShowNewTerminalWindow(newWorkspaceToAdd);
+                    }
                 }
+            } else {
+                //this one sets the content if this is a tool based workspace
+                await setWorkspaceTemplate(newWorkspaceToAdd, template);
             }
         } catch (error) {
             if (window.isLoadingCancelled) return;

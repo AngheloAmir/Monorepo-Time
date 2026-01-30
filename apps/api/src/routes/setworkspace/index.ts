@@ -30,24 +30,37 @@ export function setWorkspaceTemplateSocket(io: Server) {
             }
 
             let workspacePath = workspace.path;
-            const template      = findTemplate(templatename);
+            const template = findTemplate(templatename);
             if (!template) {
                 socket.emit('template:error', { error: `Template '${templatename}' not found` });
                 return;
             }
 
             if (template.type === 'tool') {
-                const root           = await findMonorepoRoot(workspacePath);
+                const root = await findMonorepoRoot(workspacePath);
                 const toolFolderName = template.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-                workspacePath        = path.join(root, 'opensource', toolFolderName);
+                workspacePath = path.join(root, 'opensource', toolFolderName);
 
                 try {
                     await fs.access(workspacePath);
                     socket.emit('template:error', { error: `Tool '${template.name}' is already installed at ${workspacePath}.` });
                     return;
-                } catch {
-                    // Directory does not exist, proceed
-                }
+                } catch { }
+
+                // Create the directory since we are about to write to it
+                await fs.mkdir(workspacePath, { recursive: true });
+
+                const toolName   = template.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+                const pkgPath    = path.join(workspacePath, 'package.json');
+                let pkgData: any = { name: toolName, version: '0.0.0', private: true };
+
+                try {
+                    const currentFile = await fs.readFile(pkgPath, 'utf-8');
+                    const parsed      = JSON.parse(currentFile);
+                    pkgData           = { ...parsed, name: toolName };
+                } catch { }
+                await fs.writeFile(pkgPath, JSON.stringify(pkgData, null, 2));
+                socket.emit('template:progress', { message: 'Configured package.json' });
             }
 
             socket.emit('template:progress', { message: `Starting template '${templatename}'...` });
