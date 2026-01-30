@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from ".";
+import type { ProjectTemplate } from "../types";
 import { ViteReact } from "./projects/vite-react";
 import { NextJS } from "./projects/nextjs";
 import { ExpressTS } from "./projects/express";

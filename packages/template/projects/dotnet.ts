@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 const netFile = `// See https://aka.ms/new-console-template for more information
 Console.WriteLine("Monorepo Time Console!");
@@ -11,6 +11,7 @@ export const DotNetConsole: ProjectTemplate = {
     name: ".NET Console",
     description: "Simple .NET Console Application",
     notes: ".NET SDK must be installed in your system.",
+    type: "app",
     templating: [
         {
             action: 'command',

@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const RedisCommanderTool: ProjectTemplate = {
     name: "Redis Commander",
     description: "Redis Web GUI",
     notes: "Requires Docker. Connects to any Redis instance.",
+    type: "tool",
     templating: [
         {
             action: 'file',

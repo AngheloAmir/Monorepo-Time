@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from ".";
+import type { ProjectTemplate } from "../types";
 import { PgwebTool } from "./tools/pgweb";
 import { MongoExpressTool } from "./tools/mongoexpress";
 import { RedisCommanderTool } from "./tools/rediscommander";

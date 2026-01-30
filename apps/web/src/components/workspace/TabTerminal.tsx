@@ -1,6 +1,6 @@
 import useWorkspaceState from "../../appstates/workspace";
 import TabTerminalWrapper from "./TabTerminal/TabTerminalWrapper";
-import HeaderItem from "./TabTerminal/HeaderItem";
+import TabTerminalHeaderContainer from "./TabTerminal/TabTerminalHeaderContainer";
 import { useState } from "react";
 
 export default function TabTerminal({ whichShow }: { whichShow: string }) {
@@ -27,13 +27,7 @@ export default function TabTerminal({ whichShow }: { whichShow: string }) {
                 >
                     <i className={`fas ${viewMode === 'maximized' ? 'fa-compress' : 'fa-expand'}`}></i>
                 </button>
-                {workspace.map((item) => {
-                    if (item.isRunningAs != null &&
-                        ((whichShow === "all") ||
-                            (whichShow === "apps" && item.info.appType === undefined) ||
-                            (whichShow === "tools" && item.info.appType === "tool")))
-                        return <HeaderItem key={item.info.name} workspace={item} />
-                })}
+                <TabTerminalHeaderContainer whichShow={whichShow} />
             </header>
 
             <div className={`flex-1 overflow-hidden px-4 py-1 border-t border-gray-900/80 relative`}>

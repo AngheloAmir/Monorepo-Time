@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import { dockerCompose } from "./n8n/dockerCompose";
 import { gitignoreContent } from "./n8n/gitignore";
 import { serverJs } from "./n8n/server";
@@ -7,6 +7,7 @@ export const N8NLocal: ProjectTemplate = {
     name: "N8N Local Dockerized",
     description: "N8N Workflow Automation",
     notes: "Requires Docker installed. Data is stored in ./n8n-data folder.",
+    type: "app",
     templating: [
         {
             action: 'file',

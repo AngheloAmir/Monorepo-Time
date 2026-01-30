@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 const MonoChat: ProjectTemplate = {
     name: "Chat To MonoChat",
     description: "React Frontend, needs custom backend",
     notes: "Vite React + TailwindCSS + TypeScript",
+    type: "app",
     templating: [
         {
             action: 'command',

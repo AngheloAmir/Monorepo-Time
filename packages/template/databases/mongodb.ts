@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const MongoDB: ProjectTemplate = {
     name: "MongoDB",
     description: "MongoDB (Docker Compose)",
     notes: "Requires Docker installed. Data stored in ./mongo-data folder.",
+    type: "database",
     templating: [
         {
             action: 'file',

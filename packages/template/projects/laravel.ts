@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const Laravel: ProjectTemplate = {
     name: "Laravel",
     description: "Laravel PHP Framework template",
     notes: "Composer and PHP must be installed in your system.",
+    type: "app",
     templating: [
         {
             action: 'command',

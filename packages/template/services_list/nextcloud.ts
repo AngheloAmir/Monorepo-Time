@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import { dockerCompose } from "./nextcloud/dockerCompose";
 import { gitignoreContent } from "./nextcloud/gitignore";
 import { serverJs } from "./nextcloud/server";
@@ -7,6 +7,7 @@ export const NextcloudLocal: ProjectTemplate = {
     name: "Nextcloud Local",
     description: "Nextcloud Office & Storage",
     notes: "Requires Docker installed. Data is stored in Docker volumes (nextcloud_data, db_data).",
+    type: "tool",
     templating: [
         {
             action: 'file',

@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import { dockerCompose } from "./mautic/dockerCompose";
 import { gitignoreContent } from "./mautic/gitignore";
 import { serverJs } from "./mautic/server";
@@ -7,6 +7,7 @@ export const MauticLocal: ProjectTemplate = {
     name: "Mautic Local",
     description: "Marketing Automation Platform",
     notes: "Requires Docker installed. Data is stored in Docker volumes (mautic_data, mautic_db_data).",
+    type: "tool",
     templating: [
         {
             action: 'file',

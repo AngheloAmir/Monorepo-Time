@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from ".";
+import type { ProjectTemplate } from "../types";
 import MonoChat from "./demo/monochat";
 
 const templates: ProjectTemplate[] = [

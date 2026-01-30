@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const Supabase: ProjectTemplate = {
     name: "Supabase",
     description: "Supabase (Docker)",
     notes: "Requires Docker installed.",
+    type: "database",
     templating: [
         {
             action: 'command',

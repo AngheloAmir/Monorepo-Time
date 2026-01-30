@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import { dockerCompose } from "./mattermost/dockerCompose";
 import { gitignoreContent } from "./mattermost/gitignore";
 import { serverJs } from "./mattermost/server";
@@ -7,6 +7,7 @@ export const MattermostLocal: ProjectTemplate = {
     name: "Mattermost Local",
     description: "Mattermost Team Edition",
     notes: "Requires Docker installed. Data is stored in Docker volumes. This uses the official Team Edition image with Postgres.",
+    type: "tool",
     templating: [
         {
             action: 'file',

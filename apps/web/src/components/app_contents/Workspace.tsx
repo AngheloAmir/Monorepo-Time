@@ -30,7 +30,7 @@ export default function Workspace(props: WorkspaceProps) {
         if (whichShow === "all") {
             setCurrentWorkspace(workspace);
         } else if (whichShow === "apps") {
-            setCurrentWorkspace(workspace.filter((item) => item.info.appType == undefined));
+            setCurrentWorkspace(workspace.filter((item) => item.info.appType == undefined || item.info.appType === "database"));
         } else {
             setCurrentWorkspace(workspace.filter((item) => item.info.appType === "tool"));
         }

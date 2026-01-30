@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const Meilisearch: ProjectTemplate = {
     name: "Meilisearch",
     description: "Meilisearch (Docker Compose)",
     notes: "Requires Docker installed. Data stored in ./meili-data folder.",
+    type: "database",
     templating: [
         {
             action: 'file',

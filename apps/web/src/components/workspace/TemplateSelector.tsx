@@ -149,8 +149,9 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
     
     return (
         <>
-            {project.map((project) => (
+            {project.map((project, index) => (
                 <button
+                    key={index}
                     onClick={() => onClick(project.name)}
                     className="flex items-center p-2 hover:bg-gray-800 text-left w-full"
                 >

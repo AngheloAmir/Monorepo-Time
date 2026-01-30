@@ -1,13 +1,14 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import app from "./files/_nextapp";
 
 export const NextJS: ProjectTemplate = {
     name: "Next.js TS",
     description: "Next.js TS template",
     notes: "Node.js and NPM must be installed.",
+    type: "app",
     templating: [
         {
-            action: 'command',
+            action: 'command',  
             cmd: 'rm -rf ./* ./.[!.]*',
             args: []
         },

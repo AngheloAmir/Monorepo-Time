@@ -1,10 +1,11 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import files from "./files/_express";
 
 export const ExpressTS: ProjectTemplate = {
     name: "Express.js TS",
     description: "Express.js TS template",
     notes: "Node.js and NPM must be installed.",
+    type: "app",
     templating: [
         {
             action: 'command',

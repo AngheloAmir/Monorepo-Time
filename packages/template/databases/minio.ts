@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const MinIO: ProjectTemplate = {
     name: "MinIO",
     description: "MinIO Object Storage (S3 Compatible)",
     notes: "Requires Docker installed. Data stored in ./minio-data folder.",
+    type: "database",
     templating: [
         {
             action: 'file',

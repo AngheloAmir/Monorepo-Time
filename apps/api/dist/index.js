@@ -84303,7 +84303,6 @@ var turboJsonPath = import_path9.default.join(ROOT3, "turbo.json");
 var SCAFFOLD_DIR = import_path9.default.join(__dirname, "scaffold");
 router9.get("/", async (req, res) => {
   try {
-    await CreatePackageJsonIfNotExist();
     await AddWorkspaceToPackageJsonIfNotExist();
     await InstallTurborepoIfNotYet();
     await AddTurboJsonIfNotExist();
@@ -84319,28 +84318,6 @@ router9.get("/", async (req, res) => {
     });
   }
 });
-async function CreatePackageJsonIfNotExist() {
-  if (!import_fs_extra8.default.existsSync(packageJsonPath)) {
-    const rootDirName = import_path9.default.basename(ROOT3);
-    const pkgName = rootDirName.toLowerCase().replace(/\s+/g, "-");
-    const defaultPkg = {
-      name: pkgName,
-      version: "1.0.0",
-      private: true,
-      scripts: {
-        "build": "turbo run build",
-        "dev": "monorepotime",
-        "lint": "turbo run lint"
-      },
-      devDependencies: {
-        "monorepotime": "*"
-      },
-      workspaces: []
-    };
-    await import_fs_extra8.default.writeJson(packageJsonPath, defaultPkg, { spaces: 2 });
-    console.log("[scafoldrepo] Created package.json");
-  }
-}
 async function AddWorkspaceToPackageJsonIfNotExist() {
   const pkg = await import_fs_extra8.default.readJson(packageJsonPath);
   let changed = false;
@@ -84437,6 +84414,7 @@ async function CreateWorkSpaceDirsIfNotExist() {
       }
     }
   }
+  await import_fs_extra8.default.ensureDir(import_path9.default.join(ROOT3, "opensource"));
 }
 async function CreateGitIgnoreIfNotExist() {
   const gitIgnorePath = import_path9.default.join(ROOT3, ".gitignore");
@@ -84477,7 +84455,9 @@ async function CreateGitIgnoreIfNotExist() {
       ".idea",
       ".vscode",
       "!.vscode/extensions.json",
-      "!.vscode/settings.json"
+      "!.vscode/settings.json",
+      ".agent",
+      ""
     ].join("\n");
     await import_fs_extra8.default.writeFile(gitIgnorePath, ignoreContent);
     console.log("[scafoldrepo] Created .gitignore");
@@ -85141,6 +85121,7 @@ var MySQL = {
   name: "MySQL",
   description: "MySQL Database (Local)",
   notes: "Requires MySQL installed in your system.",
+  type: "database",
   templating: [
     {
       action: "command",
@@ -85184,7 +85165,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "appType=database"]
     },
     {
       action: "command",
@@ -85199,6 +85180,7 @@ var PostgreSQL = {
   name: "PostgreSQL",
   description: "PostgreSQL Database (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
+  type: "database",
   templating: [
     {
       action: "file",
@@ -85361,7 +85343,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "appType=database"]
     },
     {
       action: "command",
@@ -85376,6 +85358,7 @@ var Supabase = {
   name: "Supabase",
   description: "Supabase (Docker)",
   notes: "Requires Docker installed.",
+  type: "database",
   templating: [
     {
       action: "command",
@@ -85405,7 +85388,7 @@ var Supabase = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "appType=database"]
     },
     {
       action: "command",
@@ -85420,6 +85403,7 @@ var Redis = {
   name: "Redis",
   description: "Redis (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./redis-data folder.",
+  type: "database",
   templating: [
     {
       action: "file",
@@ -85581,7 +85565,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "appType=database"]
     },
     {
       action: "command",
@@ -85596,6 +85580,7 @@ var MongoDB = {
   name: "MongoDB",
   description: "MongoDB (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./mongo-data folder.",
+  type: "database",
   templating: [
     {
       action: "file",
@@ -85757,7 +85742,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "appType=database"]
     },
     {
       action: "command",
@@ -85772,6 +85757,7 @@ var Meilisearch = {
   name: "Meilisearch",
   description: "Meilisearch (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./meili-data folder.",
+  type: "database",
   templating: [
     {
       action: "file",
@@ -85934,7 +85920,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "appType=database"]
     },
     {
       action: "command",
@@ -85949,6 +85935,7 @@ var MinIO = {
   name: "MinIO",
   description: "MinIO Object Storage (S3 Compatible)",
   notes: "Requires Docker installed. Data stored in ./minio-data folder.",
+  type: "database",
   templating: [
     {
       action: "file",
@@ -86129,7 +86116,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "appType=database"]
     },
     {
       action: "command",
@@ -86156,6 +86143,7 @@ var MonoChat = {
   name: "Chat To MonoChat",
   description: "React Frontend, needs custom backend",
   notes: "Vite React + TailwindCSS + TypeScript",
+  type: "app",
   templating: [
     {
       action: "command",
@@ -86570,6 +86558,7 @@ var ViteReact = {
   name: "Vite React TS",
   description: "Vite React TS template",
   notes: "Node.js and NPM must be installed.",
+  type: "app",
   templating: [
     {
       action: "command",
@@ -86786,6 +86775,7 @@ var NextJS = {
   name: "Next.js TS",
   description: "Next.js TS template",
   notes: "Node.js and NPM must be installed.",
+  type: "app",
   templating: [
     {
       action: "command",
@@ -87044,6 +87034,7 @@ var ExpressTS = {
   name: "Express.js TS",
   description: "Express.js TS template",
   notes: "Node.js and NPM must be installed.",
+  type: "app",
   templating: [
     {
       action: "command",
@@ -87365,6 +87356,7 @@ var ServerlessExpressTS = {
   name: "Serverless Express TS",
   description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
   notes: "Node.js and NPM must be installed.",
+  type: "app",
   templating: [
     {
       action: "command",
@@ -87604,6 +87596,7 @@ var PHP = {
   name: "PHP",
   description: "Simple PHP project template",
   notes: "PHP must be installed in your system.",
+  type: "app",
   templating: [
     {
       action: "file",
@@ -87638,6 +87631,7 @@ var Laravel = {
   name: "Laravel",
   description: "Laravel PHP Framework template",
   notes: "Composer and PHP must be installed in your system.",
+  type: "app",
   templating: [
     {
       action: "command",
@@ -87811,6 +87805,7 @@ var PythonConsole = {
   name: "Python Backend",
   description: "Simple Python Backend Application",
   notes: "Python 3 must be installed in your system.",
+  type: "app",
   templating: [
     {
       action: "file",
@@ -87866,6 +87861,7 @@ var DotNetConsole = {
   name: ".NET Console",
   description: "Simple .NET Console Application",
   notes: ".NET SDK must be installed in your system.",
+  type: "app",
   templating: [
     {
       action: "command",
@@ -88040,6 +88036,7 @@ var N8NLocal = {
   name: "N8N Local Dockerized",
   description: "N8N Workflow Automation",
   notes: "Requires Docker installed. Data is stored in ./n8n-data folder.",
+  type: "app",
   templating: [
     {
       action: "file",
@@ -88659,6 +88656,7 @@ var AWSTemplate = {
   name: "Localstack (Experimental)",
   description: "AWS LocalStack Environment with Manager",
   notes: "Requires Docker, Node.js, and AWS CLI. Data stored in ./localstack-data folder.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -88916,6 +88914,7 @@ var StripeTemplate = {
   name: "Stripe Mock (Experimental)",
   description: "Stripe API Mock Server",
   notes: "Runs the official stripe-mock image. Requires Docker.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -89172,6 +89171,7 @@ var MattermostLocal = {
   name: "Mattermost Local",
   description: "Mattermost Team Edition",
   notes: "Requires Docker installed. Data is stored in Docker volumes. This uses the official Team Edition image with Postgres.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -89385,6 +89385,7 @@ var NextcloudLocal = {
   name: "Nextcloud Local",
   description: "Nextcloud Office & Storage",
   notes: "Requires Docker installed. Data is stored in Docker volumes (nextcloud_data, db_data).",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -89603,6 +89604,7 @@ var MauticLocal = {
   name: "Mautic Local",
   description: "Marketing Automation Platform",
   notes: "Requires Docker installed. Data is stored in Docker volumes (mautic_data, mautic_db_data).",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -89663,6 +89665,7 @@ var PgwebTool = {
   name: "Pgweb",
   description: "PostgreSQL Web GUI (Lightweight)",
   notes: "Requires Docker. Connects to any PostgreSQL database.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -89832,6 +89835,7 @@ var MongoExpressTool = {
   name: "Mongo Express",
   description: "MongoDB Web GUI",
   notes: "Requires Docker. Connects to any MongoDB database.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -90012,6 +90016,7 @@ var RedisCommanderTool = {
   name: "Redis Commander",
   description: "Redis Web GUI",
   notes: "Requires Docker. Connects to any Redis instance.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -90192,6 +90197,7 @@ var YaadeTool = {
   name: "Yaade",
   description: "API Testing Tool (Self-Hosted)",
   notes: "Requires Docker. Collaborative API development environment.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -90354,6 +90360,7 @@ var MailpitTool = {
   name: "Mailpit",
   description: "Email Testing Tool",
   notes: "Requires Docker. Catches all outgoing emails for testing.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -90539,6 +90546,7 @@ var CloudbeaverTool = {
   name: "CloudBeaver",
   description: "Universal Database GUI (DBeaver Web)",
   notes: "Requires Docker. Web-based database management tool.",
+  type: "tool",
   templating: [
     {
       action: "file",
@@ -90939,25 +90947,7 @@ ${cmdErr.message}`);
 // src/routes/setworkspace/index.ts
 var router19 = import_express23.default.Router();
 router19.post("/", async (req, res) => {
-  try {
-    const { workspace, templatename } = req.body;
-    if (!workspace || !workspace.path || !templatename) {
-      return res.status(400).json({ error: "Missing workspace info or template name" });
-    }
-    const workspacePath = workspace.path;
-    console.log("workspacePath", workspacePath);
-    console.log("templatename", templatename);
-    const template = findTemplate(templatename);
-    if (!template) {
-      return res.status(404).json({ error: `Template '${templatename}' not found` });
-    }
-    console.log(`Applying template '${templatename}' to ${workspacePath}...`);
-    await executeTemplate(template, workspacePath);
-    res.json({ success: true, message: "Template applied successfully" });
-  } catch (error) {
-    console.error("Error setting workspace template:", error);
-    res.status(500).json({ error: "Failed to apply template: " + error.message });
-  }
+  res.status(400).json({ error: "This endpoint is deprecated. Please use the socket endpoint." });
 });
 var setworkspace_default = router19;
 function setWorkspaceTemplateSocket(io3) {
@@ -90974,6 +90964,7 @@ function setWorkspaceTemplateSocket(io3) {
         socket.emit("template:error", { error: `Template '${templatename}' not found` });
         return;
       }
+      console.log("template", template);
       socket.emit("template:progress", { message: `Starting template '${templatename}'...` });
       console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);
       try {

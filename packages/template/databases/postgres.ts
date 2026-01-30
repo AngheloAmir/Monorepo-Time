@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const PostgreSQL: ProjectTemplate = {
     name: "PostgreSQL",
     description: "PostgreSQL Database (Docker Compose)",
     notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
+    type: "database",
     templating: [
         {
             action: 'file',

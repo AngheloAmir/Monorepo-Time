@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const Redis: ProjectTemplate = {
     name: "Redis",
     description: "Redis (Docker Compose)",
     notes: "Requires Docker installed. Data stored in ./redis-data folder.",
+    type: "database",
     templating: [
         {
             action: 'file',

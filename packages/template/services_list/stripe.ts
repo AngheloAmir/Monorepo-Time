@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import { dockerCompose } from "./stripe/dockerCompose";
 import { gitignoreContent } from "./stripe/gitignore";
 import { serverJs } from "./stripe/server";
@@ -8,6 +8,7 @@ export const StripeTemplate: ProjectTemplate = {
     name: "Stripe Mock (Experimental)",
     description: "Stripe API Mock Server",
     notes: "Runs the official stripe-mock image. Requires Docker.",
+    type: "tool",
     templating: [
         {
             action: 'file',

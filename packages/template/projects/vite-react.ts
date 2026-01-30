@@ -1,10 +1,11 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import file from "./files/_viteapp";
 
 export const ViteReact: ProjectTemplate = {
   name: 'Vite React TS',
   description: 'Vite React TS template',
   notes: "Node.js and NPM must be installed.",
+  type: "app",
   templating: [
     {
       action: 'command',

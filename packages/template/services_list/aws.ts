@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import { deployJs } from "./aws/deploy";
 import { dockerCompose } from "./aws/dockerCompose";
 import { gitignoreContent } from "./aws/gitignore";
@@ -10,6 +10,7 @@ export const AWSTemplate: ProjectTemplate = {
     name: "Localstack (Experimental)",
     description: "AWS LocalStack Environment with Manager",
     notes: "Requires Docker, Node.js, and AWS CLI. Data stored in ./localstack-data folder.",
+    type: "tool",
     templating: [
         {
             action: 'file',

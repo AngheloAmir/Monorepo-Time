@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const MySQL: ProjectTemplate = {
     name: "MySQL",
     description: "MySQL Database (Local)",
     notes: "Requires MySQL installed in your system.",
+    type: "database",
     templating: [
         {
             action: 'command',

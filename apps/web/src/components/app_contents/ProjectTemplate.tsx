@@ -1,5 +1,5 @@
 import MonorepoTemplates from "template";
-import type { ProjectTemplate as IProjectTemplate } from "template";
+import type { ProjectTemplate } from "types";
 
 interface ProjectTemplateProps {
     isVisible: boolean;
@@ -16,7 +16,7 @@ export default function ProjectTemplate(props: ProjectTemplateProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8">
-                {templates.map((template: IProjectTemplate, index: number) => (
+                {templates.map((template: ProjectTemplate, index: number) => (
                     <TemplateCard key={index} template={template} />
                 ))}
             </div>
@@ -24,7 +24,7 @@ export default function ProjectTemplate(props: ProjectTemplateProps) {
     );
 }
 
-function TemplateCard({ template }: { template: IProjectTemplate }) {
+function TemplateCard({ template }: { template: ProjectTemplate }) {
     return (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 hover:shadow-lg transition-all duration-200 group flex flex-col gap-4">
             <div className="flex items-start justify-between">

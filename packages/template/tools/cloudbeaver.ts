@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const CloudbeaverTool: ProjectTemplate = {
     name: "CloudBeaver",
     description: "Universal Database GUI (DBeaver Web)",
     notes: "Requires Docker. Web-based database management tool.",
+    type: "tool",
     templating: [
         {
             action: 'file',

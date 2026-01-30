@@ -1,10 +1,11 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 import { phpContent } from "./files/_php";
 
 export const PHP: ProjectTemplate = {
     name: "PHP",
     description: "Simple PHP project template",
     notes: "PHP must be installed in your system.",
+    type: "app",
     templating: [
         {
             action: 'file',

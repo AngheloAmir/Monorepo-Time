@@ -91,8 +91,18 @@ export interface CrudItem {
 }
 
 export const TemplateCategories = ['project', 'database', 'services', 'tool', 'demo'] as const;
+export interface ProcessTemplate {
+    action:   "command" | "file" | "root-command";
+    cmd?:     string;
+    args?:    string[];
+    file?:    string;
+    filecontent?: string;
+}
+
 export interface ProjectTemplate {
     name:        string;
     description: string;
     notes:       string;
+    type:        "app" | "database" | "tool";
+    templating:  ProcessTemplate[];
 }

@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const MailpitTool: ProjectTemplate = {
     name: "Mailpit",
     description: "Email Testing Tool",
     notes: "Requires Docker. Catches all outgoing emails for testing.",
+    type: "tool",
     templating: [
         {
             action: 'file',

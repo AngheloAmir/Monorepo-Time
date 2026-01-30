@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const YaadeTool: ProjectTemplate = {
     name: "Yaade",
     description: "API Testing Tool (Self-Hosted)",
     notes: "Requires Docker. Collaborative API development environment.",
+    type: "tool",
     templating: [
         {
             action: 'file',

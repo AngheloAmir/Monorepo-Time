@@ -1,11 +1,11 @@
-import type { ProjectTemplate } from "..";
-
+import type { ProjectTemplate } from "../../types";
 import files from "./files/_python";
 
 export const PythonConsole: ProjectTemplate = {
     name: "Python Backend",
     description: "Simple Python Backend Application",
     notes: "Python 3 must be installed in your system.",
+    type: "app",
     templating: [
         {
             action: 'file',

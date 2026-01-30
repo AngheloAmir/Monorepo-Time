@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const PgwebTool: ProjectTemplate = {
     name: "Pgweb",
     description: "PostgreSQL Web GUI (Lightweight)",
     notes: "Requires Docker. Connects to any PostgreSQL database.",
+    type: "tool",
     templating: [
         {
             action: 'file',

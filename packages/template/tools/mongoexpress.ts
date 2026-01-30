@@ -1,9 +1,10 @@
-import type { ProjectTemplate } from "..";
+import type { ProjectTemplate } from "../../types";
 
 export const MongoExpressTool: ProjectTemplate = {
     name: "Mongo Express",
     description: "MongoDB Web GUI",
     notes: "Requires Docker. Connects to any MongoDB database.",
+    type: "tool",
     templating: [
         {
             action: 'file',

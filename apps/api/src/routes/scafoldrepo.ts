@@ -28,7 +28,6 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
-
 async function AddWorkspaceToPackageJsonIfNotExist() {
     const pkg = await fs.readJson(packageJsonPath);
     let changed = false;

@@ -7,31 +7,7 @@ const router = express.Router();
 
 // HTTP route for backwards compatibility
 router.post('/', async (req, res) => {
-    try {
-        const { workspace, templatename } = req.body as { workspace: WorkspaceInfo, templatename: string };
-
-        if (!workspace || !workspace.path || !templatename) {
-            return res.status(400).json({ error: "Missing workspace info or template name" });
-        }
-
-        const workspacePath = workspace.path;
-        console.log('workspacePath', workspacePath);
-        console.log('templatename', templatename);
-
-        const template = findTemplate(templatename);
-        if (!template) {
-            return res.status(404).json({ error: `Template '${templatename}' not found` });
-        }
-
-        console.log(`Applying template '${templatename}' to ${workspacePath}...`);
-        await executeTemplate(template, workspacePath);
-
-        res.json({ success: true, message: "Template applied successfully" });
-
-    } catch (error: any) {
-        console.error("Error setting workspace template:", error);
-        res.status(500).json({ error: "Failed to apply template: " + error.message });
-    }
+    res.status(400).json({ error: "This endpoint is deprecated. Please use the socket endpoint." });
 });
 
 export default router;
@@ -51,12 +27,15 @@ export function setWorkspaceTemplateSocket(io: Server) {
             }
 
             const workspacePath = workspace.path;
-            const template = findTemplate(templatename);
-
+            const template      = findTemplate(templatename);
             if (!template) {
                 socket.emit('template:error', { error: `Template '${templatename}' not found` });
                 return;
             }
+
+
+            console.log('template', template);
+
 
             socket.emit('template:progress', { message: `Starting template '${templatename}'...` });
             console.log(`[Socket] Applying template '${templatename}' to ${workspacePath}...`);
