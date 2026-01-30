@@ -2,14 +2,15 @@
   "name": "monorepo_time",
   "version": "1.0.0",
   "packageManager": "npm@11.6.2",
-  "description": "",
+  "description": "CloudBeaver - Universal Database GUI",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cd apps/web && npm run dev   && cd ../api && npm run dev",
     "build": "cd apps/web && npm run build && cd ../api && npm run build",
-    "start": "cd apps/web && npm run start && cd ../api && npm run start",
-    "dep": "npm run build -w monorepotime && rm -rf \"/home/anghelo/Desktop/Link to Projects/monotime/test/node_modules/monorepotime/dist\" && cp -r \"/home/anghelo/Desktop/Link to Projects/monotime/MonoTime/apps/api/dist\" \"/home/anghelo/Desktop/Link to Projects/monotime/test/node_modules/monorepotime/dist\""
+    "start": "node index.js",
+    "dep": "npm run build -w monorepotime && rm -rf \"/home/anghelo/Desktop/Link to Projects/monotime/test/node_modules/monorepotime/dist\" && cp -r \"/home/anghelo/Desktop/Link to Projects/monotime/MonoTime/apps/api/dist\" \"/home/anghelo/Desktop/Link to Projects/monotime/test/node_modules/monorepotime/dist\"",
+    "stop": "node -e 'const fs=require(\"fs\"); try{const p=JSON.parse(fs.readFileSync(\".runtime.json\")).port; fetch(\"http://localhost:\"+p+\"/stop\").catch(e=>{})}catch(e){}'"
   },
   "keywords": [],
   "workspaces": [
@@ -25,5 +26,7 @@
   "dependencies": {
     "@heroui/react": "^2.8.7",
     "framer-motion": "^12.29.0"
-  }
+  },
+  "fontawesomeIcon": "fas fa-database text-orange-500",
+  "appType": "tool"
 }

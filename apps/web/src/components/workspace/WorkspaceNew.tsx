@@ -44,7 +44,7 @@ export default function WorkspaceNew() {
     }
 
     async function createWorkspace() {
-        if (workspaceCopy.name === '' || workspaceCopy.path === '') {
+        if (templateType !== 'tool' && (workspaceCopy.name === '' || workspaceCopy.path === '')) {
             setError('Package name and path is required');
             return;
         }
