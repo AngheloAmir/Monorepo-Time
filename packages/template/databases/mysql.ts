@@ -48,7 +48,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'appType=tool']
+            args: ['pkg', 'set', 'appType=database']
         },
         {
             action: 'command',

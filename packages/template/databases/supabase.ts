@@ -33,7 +33,7 @@ export const Supabase: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'appType=tool']
+            args: ['pkg', 'set', 'appType=database']
         },
         {
             action: 'command',
