@@ -14,8 +14,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            const lower = line.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write(line + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
