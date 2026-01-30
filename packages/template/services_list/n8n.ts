@@ -4,9 +4,9 @@ import { gitignoreContent } from "./n8n/gitignore";
 import { serverJs } from "./n8n/server";
 
 export const N8NLocal: ProjectTemplate = {
-    name: "N8N Local Dockerized",
+    name: "N8N Local",
     description: "N8N Workflow Automation",
-    notes: "Requires Docker installed. Data is stored in ./n8n-data folder.",
+    notes: "Local N8N instance for testing workflows",
     type: "app",
     templating: [
         {

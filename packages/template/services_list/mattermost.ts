@@ -5,8 +5,8 @@ import { serverJs } from "./mattermost/server";
 
 export const MattermostLocal: ProjectTemplate = {
     name: "Mattermost Local",
-    description: "Mattermost Team Edition",
-    notes: "Requires Docker installed. Data is stored in Docker volumes. This uses the official Team Edition image with Postgres.",
+    description: "Mattermost Team",
+    notes: "Open source version of Discord",
     type: "tool",
     templating: [
         {

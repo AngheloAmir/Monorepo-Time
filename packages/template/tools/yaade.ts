@@ -60,9 +60,16 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            const lower = line.toLowerCase();
+            // Remove Docker prefix if present
+            let cleanLine = line.replace(/^[^|]+\|\s+/, '');
+            
+            const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write(line + '\\n');
+                // Remove thread info and standard Vert.x logging prefix
+                cleanLine = cleanLine.replace(/^\[.*?\]\s*/, '')
+                                     .replace(/ERROR\s+.*?\s+-\s+(?:.*?\s+-\s+-\s+)?\[.*?\]\s*/, '');
+                
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };

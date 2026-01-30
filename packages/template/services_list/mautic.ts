@@ -6,7 +6,7 @@ import { serverJs } from "./mautic/server";
 export const MauticLocal: ProjectTemplate = {
     name: "Mautic Local",
     description: "Marketing Automation Platform",
-    notes: "Requires Docker installed. Data is stored in Docker volumes (mautic_data, mautic_db_data).",
+    notes: "Local Mautic instance for testing workflows",
     type: "tool",
     templating: [
         {

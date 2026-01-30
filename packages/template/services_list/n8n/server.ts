@@ -21,9 +21,10 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            const lower = line.toLowerCase();
+            let cleanLine = line.replace(/^[^|]+\|\s+/, '');
+            const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write(line + '\\n');
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };
@@ -78,7 +79,8 @@ const checkStatus = () => {
                 } catch(e) {
                     console.error('Failed to write runtime file:', e);
                 }
-                process.stdout.write('\\\\x1Bc');
+
+                console.log('N8N is running at http://localhost:\${n8nPort}');
             });
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry

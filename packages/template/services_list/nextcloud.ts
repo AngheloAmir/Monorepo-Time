@@ -6,7 +6,7 @@ import { serverJs } from "./nextcloud/server";
 export const NextcloudLocal: ProjectTemplate = {
     name: "Nextcloud Local",
     description: "Nextcloud Office & Storage",
-    notes: "Requires Docker installed. Data is stored in Docker volumes (nextcloud_data, db_data).",
+    notes: "Can be used with N8N that acts like GDrive",
     type: "tool",
     templating: [
         {

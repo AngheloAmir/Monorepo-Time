@@ -7,7 +7,7 @@ import { testJs } from "./stripe/test";
 export const StripeTemplate: ProjectTemplate = {
     name: "Stripe Mock (Experimental)",
     description: "Stripe API Mock Server",
-    notes: "Runs the official stripe-mock image. Requires Docker.",
+    notes: "Runs the official stripe-mock image.",
     type: "tool",
     templating: [
         {

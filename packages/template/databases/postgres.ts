@@ -2,7 +2,7 @@ import type { ProjectTemplate } from "../../types";
 
 export const PostgreSQL: ProjectTemplate = {
     name: "PostgreSQL",
-    description: "PostgreSQL Database (Docker Compose)",
+    description: "PostgreSQL (Docker Compose)",
     notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
     type: "database",
     templating: [
@@ -71,9 +71,10 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            const lower = line.toLowerCase();
+            let cleanLine = line.replace(/^[^|]+\|\s+/, '');
+            const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write(line + '\\n');
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };

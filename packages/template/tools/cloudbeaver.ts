@@ -60,9 +60,10 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            const lower = line.toLowerCase();
+            let cleanLine = line.replace(/^[^|]+\|\s+/, '');
+            const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write(line + '\\n');
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };
@@ -121,6 +122,7 @@ const checkStatus = () => {
                 console.log('CloudBeaver is running!');
                 console.log('--------------------------------------------------');
                 console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`Note: After opening the URL, please RELOAD THE PAGE to ensure proper functionality.\`);
                 console.log('--------------------------------------------------');
                 console.log('Universal database management tool');
                 console.log('Supports: PostgreSQL, MySQL, MongoDB, and more');

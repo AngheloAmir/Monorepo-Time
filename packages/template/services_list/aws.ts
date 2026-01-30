@@ -8,8 +8,8 @@ import { stopJs } from "./aws/stop";
 
 export const AWSTemplate: ProjectTemplate = {
     name: "Localstack (Experimental)",
-    description: "AWS LocalStack Environment with Manager",
-    notes: "Requires Docker, Node.js, and AWS CLI. Data stored in ./localstack-data folder.",
+    description: "AWS LocalStack with Manager",
+    notes: "For local testing with LocalStack",
     type: "tool",
     templating: [
         {

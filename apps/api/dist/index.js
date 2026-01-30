@@ -85253,8 +85253,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -85477,8 +85491,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -85651,8 +85679,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -85828,8 +85870,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -86008,8 +86064,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -87970,8 +88040,23 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -88020,7 +88105,8 @@ const checkStatus = () => {
                 } catch(e) {
                     console.error('Failed to write runtime file:', e);
                 }
-                process.stdout.write('\\\\x1Bc');
+
+                console.log('N8N is running at http://localhost:\${n8nPort}');
             });
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry
@@ -89086,9 +89172,10 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            const lower = line.toLowerCase();
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write(line + '\\n');
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };
@@ -89301,9 +89388,10 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            const lower = line.toLowerCase();
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write(line + '\\n');
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };
@@ -89520,9 +89608,10 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            const lower = line.toLowerCase();
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write(line + '\\n');
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };
@@ -89724,8 +89813,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -89917,8 +90020,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -90098,8 +90215,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -90258,8 +90389,28 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            // Remove Docker prefix if present
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                // Remove thread info and standard Vert.x logging prefix
+                cleanLine = cleanLine.replace(/^[.*?]s*/, '')
+                                     .replace(/ERRORs+.*?s+-s+(?:.*?s+-s+-s+)?[.*?]s*/, '');
+                
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -90418,8 +90569,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -90607,8 +90772,22 @@ const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { std
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
-    // Follow logs
-    const logs = spawn('docker', ['compose', 'logs', '-f'], { stdio: 'inherit' });
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
 });
 
@@ -90661,6 +90840,7 @@ const checkStatus = () => {
                 console.log('CloudBeaver is running!');
                 console.log('--------------------------------------------------');
                 console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`Note: After opening the URL, please RELOAD THE PAGE to ensure proper functionality.\`);
                 console.log('--------------------------------------------------');
                 console.log('Universal database management tool');
                 console.log('Supports: PostgreSQL, MySQL, MongoDB, and more');
