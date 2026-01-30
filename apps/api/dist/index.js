@@ -85190,7 +85190,7 @@ const EDITOR_URL = 'http://localhost/phpmyadmin'; // Change this to your preferr
 // ../../packages/template/databases/postgres.ts
 var PostgreSQL = {
   name: "PostgreSQL",
-  description: "PostgreSQL Database (Docker Compose)",
+  description: "PostgreSQL (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
   type: "database",
   templating: [
@@ -85618,7 +85618,7 @@ process.on('SIGTERM', cleanup);`
 var MongoDB = {
   name: "MongoDB",
   description: "MongoDB (Docker Compose)",
-  notes: "Requires Docker installed. Data stored in ./mongo-data folder.",
+  notes: "Data stored in ./mongo-data folder.",
   type: "database",
   templating: [
     {
@@ -85809,7 +85809,7 @@ process.on('SIGTERM', cleanup);`
 var Meilisearch = {
   name: "Meilisearch",
   description: "Meilisearch (Docker Compose)",
-  notes: "Requires Docker installed. Data stored in ./meili-data folder.",
+  notes: "Data stored in ./meili-data folder.",
   type: "database",
   templating: [
     {
@@ -86001,7 +86001,7 @@ process.on('SIGTERM', cleanup);`
 var MinIO = {
   name: "MinIO",
   description: "MinIO Object Storage (S3 Compatible)",
-  notes: "Requires Docker installed. Data stored in ./minio-data folder.",
+  notes: "Data stored in ./minio-data folder.",
   type: "database",
   templating: [
     {
@@ -88130,9 +88130,9 @@ process.on('SIGTERM', cleanup);`;
 
 // ../../packages/template/services_list/n8n.ts
 var N8NLocal = {
-  name: "N8N Local Dockerized",
+  name: "N8N Local",
   description: "N8N Workflow Automation",
-  notes: "Requires Docker installed. Data is stored in ./n8n-data folder.",
+  notes: "Local N8N instance for testing workflows",
   type: "app",
   templating: [
     {
@@ -88751,8 +88751,8 @@ spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
 // ../../packages/template/services_list/aws.ts
 var AWSTemplate = {
   name: "Localstack (Experimental)",
-  description: "AWS LocalStack Environment with Manager",
-  notes: "Requires Docker, Node.js, and AWS CLI. Data stored in ./localstack-data folder.",
+  description: "AWS LocalStack with Manager",
+  notes: "For local testing with LocalStack",
   type: "tool",
   templating: [
     {
@@ -89010,7 +89010,7 @@ const stripe = new Stripe('sk_test_mock_123', {
 var StripeTemplate = {
   name: "Stripe Mock (Experimental)",
   description: "Stripe API Mock Server",
-  notes: "Runs the official stripe-mock image. Requires Docker.",
+  notes: "Runs the official stripe-mock image.",
   type: "tool",
   templating: [
     {
@@ -89267,8 +89267,8 @@ process.on('SIGTERM', cleanup);`;
 // ../../packages/template/services_list/mattermost.ts
 var MattermostLocal = {
   name: "Mattermost Local",
-  description: "Mattermost Team Edition",
-  notes: "Requires Docker installed. Data is stored in Docker volumes. This uses the official Team Edition image with Postgres.",
+  description: "Mattermost Team",
+  notes: "Open source version of Discord",
   type: "tool",
   templating: [
     {
@@ -89483,7 +89483,7 @@ process.on('SIGTERM', cleanup);`;
 var NextcloudLocal = {
   name: "Nextcloud Local",
   description: "Nextcloud Office & Storage",
-  notes: "Requires Docker installed. Data is stored in Docker volumes (nextcloud_data, db_data).",
+  notes: "Can be used with N8N that acts like GDrive",
   type: "tool",
   templating: [
     {
@@ -89703,7 +89703,7 @@ process.on('SIGTERM', cleanup);`;
 var MauticLocal = {
   name: "Mautic Local",
   description: "Marketing Automation Platform",
-  notes: "Requires Docker installed. Data is stored in Docker volumes (mautic_data, mautic_db_data).",
+  notes: "Local Mautic instance for testing workflows",
   type: "tool",
   templating: [
     {
