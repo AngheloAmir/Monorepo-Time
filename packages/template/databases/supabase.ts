@@ -5,6 +5,7 @@ export const Supabase: ProjectTemplate = {
     description: "Supabase (Docker)",
     notes: "Requires Docker installed.",
     type: "database",
+    icon: "fas fa-bolt text-green-400",
     templating: [
         {
             action: 'command',

@@ -6,6 +6,7 @@ export const ServerlessExpressTS: ProjectTemplate = {
     description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
     notes: "Node.js and NPM must be installed.",
     type: "app",
+    icon: "fab fa-node text-green-500",
     templating: [
         {
             action: 'command',

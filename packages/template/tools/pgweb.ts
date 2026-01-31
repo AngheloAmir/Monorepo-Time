@@ -5,6 +5,7 @@ export const PgwebTool: ProjectTemplate = {
     description: "PostgreSQL Web GUI (Lightweight)",
     notes: "Requires Docker. Connects to any PostgreSQL database.",
     type: "tool",
+    icon: "fas fa-database text-blue-500",
     templating: [
         {
             action: 'file',

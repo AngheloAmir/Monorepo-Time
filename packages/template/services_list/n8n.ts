@@ -8,6 +8,7 @@ export const N8NLocal: ProjectTemplate = {
     description: "N8N Workflow Automation",
     notes: "Local N8N instance for testing workflows",
     type: "app",
+    icon: "fas fa-project-diagram text-red-500",
     templating: [
         {
             action: 'file',

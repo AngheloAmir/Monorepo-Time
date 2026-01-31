@@ -5,6 +5,7 @@ export const Laravel: ProjectTemplate = {
     description: "Laravel PHP Framework template",
     notes: "Composer and PHP must be installed in your system.",
     type: "app",
+    icon: "fab fa-laravel text-red-500",
     templating: [
         {
             action: 'command',

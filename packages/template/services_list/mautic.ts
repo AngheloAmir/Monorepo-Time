@@ -8,6 +8,7 @@ export const MauticLocal: ProjectTemplate = {
     description: "Marketing Automation Platform",
     notes: "Local Mautic instance for testing workflows",
     type: "tool",
+    icon: "fas fa-bullhorn text-purple-500",
     templating: [
         {
             action: 'file',

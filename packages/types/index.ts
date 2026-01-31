@@ -105,4 +105,5 @@ export interface ProjectTemplate {
     notes:       string;
     type:        "app" | "database" | "tool";
     templating:  ProcessTemplate[];
+    icon:        string;
 }

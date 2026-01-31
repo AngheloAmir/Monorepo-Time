@@ -8,6 +8,7 @@ export const MattermostLocal: ProjectTemplate = {
     description: "Mattermost Team",
     notes: "Open source version of Discord",
     type: "tool",
+    icon: "fas fa-comments text-green-500",
     templating: [
         {
             action: 'file',

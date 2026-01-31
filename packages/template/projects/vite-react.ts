@@ -6,6 +6,7 @@ export const ViteReact: ProjectTemplate = {
   description: 'Vite React TS template',
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  icon: "fab fa-react text-blue-400",
   templating: [
     {
       action: 'command',

@@ -6,6 +6,7 @@ export const NextJS: ProjectTemplate = {
     description: "Next.js TS template",
     notes: "Node.js and NPM must be installed.",
     type: "app",
+    icon: "fab fa-js text-white",
     templating: [
         {
             action: 'command',  

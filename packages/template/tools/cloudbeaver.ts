@@ -5,6 +5,7 @@ export const CloudbeaverTool: ProjectTemplate = {
     description: "Universal Database GUI (DBeaver Web)",
     notes: "Requires Docker. Web-based database management tool.",
     type: "tool",
+    icon: "fas fa-database text-orange-500",
     templating: [
         {
             action: 'file',

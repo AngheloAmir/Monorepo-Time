@@ -5,6 +5,7 @@ export const MySQL: ProjectTemplate = {
     description: "MySQL Database (Local)",
     notes: "Requires MySQL installed in your system.",
     type: "database",
+    icon: "fas fa-database text-blue-500",
     templating: [
         {
             action: 'command',

@@ -5,6 +5,7 @@ export const EzBookkeepingLocal: ProjectTemplate = {
     description: "Personal finance manager (Docker)",
     notes: "Requires Docker installed. Data stored in ./ezbookkeeping-data folder.",
     type: "app",
+    icon: "fas fa-wallet text-green-500",
     templating: [
         {
             action: 'file',

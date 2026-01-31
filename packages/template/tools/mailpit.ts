@@ -5,6 +5,7 @@ export const MailpitTool: ProjectTemplate = {
     description: "Email Testing Tool",
     notes: "Requires Docker. Catches all outgoing emails for testing.",
     type: "tool",
+    icon: "fas fa-envelope text-blue-500",
     templating: [
         {
             action: 'file',

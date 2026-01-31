@@ -5,6 +5,7 @@ export const RedisCommanderTool: ProjectTemplate = {
     description: "Redis Web GUI",
     notes: "Requires Docker. Connects to any Redis instance.",
     type: "tool",
+    icon: "fas fa-server text-red-400",
     templating: [
         {
             action: 'file',

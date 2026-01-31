@@ -11,6 +11,7 @@ export const AWSTemplate: ProjectTemplate = {
     description: "AWS LocalStack with Manager",
     notes: "For local testing with LocalStack",
     type: "tool",
+    icon: "fab fa-aws text-orange-400",
     templating: [
         {
             action: 'file',

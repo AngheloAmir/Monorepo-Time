@@ -6,6 +6,7 @@ export const ExpressTS: ProjectTemplate = {
     description: "Express.js TS template",
     notes: "Node.js and NPM must be installed.",
     type: "app",
+    icon: "fab fa-node text-green-500",
     templating: [
         {
             action: 'command',

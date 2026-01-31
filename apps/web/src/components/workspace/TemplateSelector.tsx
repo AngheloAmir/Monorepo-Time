@@ -112,38 +112,6 @@ function TabItem({ name, icon, activeTab, setActiveTab }: { name: string, icon: 
 }
 
 //==============================================================================================
-const getIcon = (name: string) => {
-    const n = name.toLowerCase();
-    if (n.includes('react')) return 'fab fa-react text-blue-400';
-    else if (n.includes('next.js')) return 'fab fa-js text-white';
-    else if (n.includes('express')) return 'fab fa-node text-green-500';
-    else if (n.includes('php')) return 'fab fa-php text-indigo-400';
-    else if (n.includes('laravel')) return 'fab fa-laravel text-red-500';
-    else if (n.includes('.net')) return 'fab fa-windows text-blue-600';
-    else if (n.includes('python')) return 'fab fa-python text-yellow-500';
-    else if (n.includes('mysql')) return 'fas fa-database text-blue-500';
-    else if (n.includes('postgres')) return 'fas fa-database text-blue-300';
-    else if (n.includes('supabase')) return 'fas fa-bolt text-green-400';
-    else if (n.includes('redis')) return 'fas fa-server text-red-400';
-    else if (n.includes('mongo')) return 'fas fa-leaf text-green-500';
-    else if (n.includes('n8n')) return 'fas fa-project-diagram text-red-500';
-    else if (n.includes('aws')) return 'fab fa-aws text-orange-400';
-    else if (n.includes('mailpit')) return 'fas fa-envelope text-blue-500';
-    else if (n.includes('cloudbeaver')) return 'fas fa-database text-orange-500';
-    else if (n.includes('pgweb')) return 'fas fa-database text-blue-500';
-    else if (n.includes('mongo-express')) return 'fas fa-leaf text-green-500';
-    else if (n.includes('redis-commander')) return 'fas fa-server text-red-400';
-    else if (n.includes('chat to monochat')) return 'fas fa-comments text-green-500';
-    else if (n.includes('localstack')) return 'fab fa-aws text-orange-500';
-    else if (n.includes('stripe')) return 'fab fa-stripe text-orange-500';
-    else if (n.includes('yaade')) return 'fas fa-vial text-purple-500';
-    else if (n.includes('mattermost')) return 'fas fa-comments text-green-500';
-    else if (n.includes('nextcloud')) return 'fas fa-cloud text-blue-500';
-    else if (n.includes('mautic')) return 'fas fa-bullhorn text-purple-500';
-    else return 'fas fa-cube text-gray-400';
-}
-
-//==============================================================================================
 function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], onClick: (project: string, type: string) => void, show: boolean }) {
     if(!show) return null;
     
@@ -157,7 +125,7 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
                 >
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                            <i className={`${getIcon(project.name)} text-xl`}></i> 
+                            <i className={`${project.icon} text-xl`}></i> 
                             <span className="font-bold text-gray-200 group-hover:text-white text-base truncate">{project.name}</span>
                         </div>
                         <div className="text-xs text-gray-500 group-hover:text-gray-400 mt-1 leading-relaxed">

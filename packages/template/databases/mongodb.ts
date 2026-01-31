@@ -5,6 +5,7 @@ export const MongoDB: ProjectTemplate = {
     description: "MongoDB (Docker Compose)",
     notes: "Data stored in ./mongo-data folder.",
     type: "database",
+    icon: "fas fa-leaf text-green-500",
     templating: [
         {
             action: 'file',

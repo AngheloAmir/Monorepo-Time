@@ -5,6 +5,7 @@ export const Redis: ProjectTemplate = {
     description: "Redis (Docker Compose)",
     notes: "Requires Docker installed. Data stored in ./redis-data folder.",
     type: "database",
+    icon: "fas fa-server text-red-400",
     templating: [
         {
             action: 'file',
