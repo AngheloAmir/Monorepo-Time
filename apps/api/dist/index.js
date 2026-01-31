@@ -87413,8 +87413,346 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
+// ../../packages/template/opensource-app/webstudio/dockerCompose.ts
+var dockerCompose4 = `services:
+  webstudio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: if_not_present
+    ports:
+      - "5173:5173"
+    volumes:
+      - webstudio_data:/app
+    environment:
+      - DEV_LOGIN=true
+      - AUTH_SECRET=webstudio-dev-secret-key-12345
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
+
+volumes:
+  webstudio_data:`;
+
+// ../../packages/template/opensource-app/webstudio/adockerfile.ts
+var dockerfile = `FROM node:20-slim
+
+# Install required tools
+RUN apt-get update && apt-get install -y \\
+    git \\
+    curl \\
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pnpm globally
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 5173
+
+ENTRYPOINT ["/entrypoint.sh"]`;
+
+// ../../packages/template/opensource-app/webstudio/entrypoint.ts
+var entrypoint = `#!/bin/bash
+
+cd /app
+
+echo "==================================================="
+echo "Webstudio Development Environment"
+echo "==================================================="
+
+# Check if webstudio directory has a valid git repo
+if [ -d "/app/webstudio/.git" ]; then
+    echo "Webstudio repository found. Using existing code..."
+    cd /app/webstudio
+else
+    # Remove any partial/corrupted directory and clone fresh
+    echo "Cloning Webstudio repository..."
+    echo "This may take a few minutes..."
+    rm -rf /app/webstudio 2>/dev/null || true
+    
+    if ! git clone --depth 1 https://github.com/webstudio-is/webstudio.git /app/webstudio; then
+        echo "ERROR: Failed to clone repository!"
+        echo "Sleeping to prevent restart loop..."
+        sleep 3600
+        exit 1
+    fi
+    cd /app/webstudio
+fi
+
+# Create .env.development for dev login
+echo "Setting up dev environment..."
+mkdir -p apps/builder
+cat > apps/builder/.env.development << 'ENVEOF'
+DEV_LOGIN=true
+AUTH_SECRET=webstudio-dev-secret-key-12345
+ENVEOF
+
+# Install dependencies
+echo "==================================================="
+echo "Installing dependencies with pnpm..."
+echo "This may take several minutes on first run..."
+echo "==================================================="
+
+if ! pnpm install; then
+    echo "ERROR: Failed to install dependencies!"
+    echo "Sleeping to prevent restart loop..."
+    sleep 3600
+    exit 1
+fi
+
+echo ""
+echo "==================================================="
+echo "Starting Webstudio development server..."
+echo "==================================================="
+echo ""
+echo "URL: http://localhost:5173"
+echo ""
+echo "Dev Login Instructions:"
+echo "  1. Click 'Login with Secret' button"
+echo "  2. Enter: webstudio-dev-secret-key-12345"
+echo ""
+echo "To login as different user:"
+echo "  Use: webstudio-dev-secret-key-12345:email@example.com"
+echo "==================================================="
+echo ""
+
+# Run dev server - this should keep running
+exec pnpm dev
+`;
+
+// ../../packages/template/opensource-app/webstudio/gitignore.ts
+var gitignoreContent4 = `
+*
+!.gitignore
+`;
+
+// ../../packages/template/opensource-app/webstudio/server.ts
+var serverJs4 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const PORT = 5173;
+
+console.log('\\n==================================================');
+console.log('Starting Webstudio Development Environment...');
+console.log('==================================================\\n');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '--build', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    console.log('\\nBuilding and starting containers...');
+    console.log('This may take 5-10 minutes on first run...\\n');
+    
+    // Follow logs - show everything during setup
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=100'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    let serverReady = false;
+    
+    const processLine = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            
+            // Check if server is ready
+            if (lower.includes('local:') || lower.includes('ready in') || lower.includes('listening on')) {
+                if (!serverReady) {
+                    serverReady = true;
+                    showReadyMessage();
+                }
+            }
+            
+            // Show all output during setup, filter only after ready
+            if (!serverReady) {
+                // During setup - show everything
+                if (lower.includes('error') || lower.includes('fatal') || lower.includes('warn')) {
+                    process.stdout.write('\\x1b[31m' + cleanLine + '\\x1b[0m\\n');
+                } else if (lower.includes('progress') || lower.includes('packages') || lower.includes('added') || lower.includes('done')) {
+                    process.stdout.write('\\x1b[32m' + cleanLine + '\\x1b[0m\\n');
+                } else {
+                    process.stdout.write(cleanLine + '\\n');
+                }
+            } else {
+                // After ready - only show errors
+                if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                    process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+                }
+            }
+        });
+    };
+
+    logs.stdout.on('data', processLine);
+    logs.stderr.on('data', processLine);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+const showReadyMessage = () => {
+    // Capture Container IDs
+    exec('docker compose ps -q', (err, stdout) => {
+        const containerIds = stdout ? stdout.trim().split('\\n') : [];
+        
+        try {
+            fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                port: server.address().port, 
+                pid: process.pid,
+                containerIds: containerIds
+            }));
+        } catch(e) {
+            console.error('Failed to write runtime file:', e);
+        }
+        
+        console.log('\\n==================================================');
+        console.log('\\x1b[32mWebstudio is running!\\x1b[0m');
+        console.log('--------------------------------------------------');
+        console.log('URL:          http://localhost:' + PORT);
+        console.log('--------------------------------------------------');
+        console.log('\\x1b[33mDev Login Instructions:\\x1b[0m');
+        console.log('  1. Click "Login with Secret" button');
+        console.log('  2. Enter: webstudio-dev-secret-key-12345');
+        console.log('--------------------------------------------------');
+        console.log('To login as a different user:');
+        console.log('  Use: webstudio-dev-secret-key-12345:email@example.com');
+        console.log('==================================================\\n');
+    });
+};
+
+// Setup Control Server for stop command
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose ps --format json', (err, stdout) => {
+        if (err || !stdout) {
+            setTimeout(checkStatus, 5000);
+            return;
+        }
+        
+        try {
+            // Check if webstudio container is running
+            const containers = stdout.trim().split('\\n').filter(l => l).map(l => JSON.parse(l));
+            const webstudio = containers.find(c => c.Service === 'webstudio');
+            
+            if (webstudio && webstudio.State === 'running') {
+                // Verify HTTP response
+                http.get('http://localhost:' + PORT, (res) => {
+                    if (!fs.existsSync(RUNTIME_FILE)) {
+                        showReadyMessage();
+                    }
+                }).on('error', () => {
+                    setTimeout(checkStatus, 5000);
+                });
+            } else {
+                setTimeout(checkStatus, 5000);
+            }
+        } catch (e) {
+            setTimeout(checkStatus, 5000);
+        }
+    });
+};
+
+setTimeout(checkStatus, 10000);
+
+const cleanup = () => {
+    console.log('\\nStopping Webstudio...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/webstudio.ts
+var WebstudioLocal = {
+  name: "Webstudio Local",
+  description: "Webstudio Builder",
+  notes: "Open source visual builder (Docker Dev Mode with Node 20)",
+  type: "opensource-app",
+  category: "Open Source",
+  icon: "fas fa-palette text-blue-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose4
+    },
+    {
+      action: "file",
+      file: "Dockerfile",
+      filecontent: dockerfile
+    },
+    {
+      action: "file",
+      file: "entrypoint.sh",
+      filecontent: entrypoint
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent4
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs4
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Webstudio Visual Builder (Docker Dev)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-palette text-blue-500"]
+    }
+  ]
+};
+
 // ../../packages/template/opensource.ts
 var OpenSourceTemplates = [
+  WebstudioLocal,
   MattermostLocal,
   NextcloudLocal,
   MauticLocal,
@@ -88955,7 +89293,7 @@ var templates3 = [
 var projecttemplate_default = templates3;
 
 // ../../packages/template/services/n8n/dockerCompose.ts
-var dockerCompose4 = `services:
+var dockerCompose5 = `services:
   n8n:
     image: n8nio/n8n:latest
     pull_policy: if_not_present
@@ -88983,12 +89321,12 @@ volumes:
   n8n_data:`;
 
 // ../../packages/template/services/n8n/gitignore.ts
-var gitignoreContent4 = `# Runtime file
+var gitignoreContent5 = `# Runtime file
 .runtime.json
 `;
 
 // ../../packages/template/services/n8n/server.ts
-var serverJs4 = `const http = require('http');
+var serverJs5 = `const http = require('http');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -89104,17 +89442,17 @@ var N8NLocal = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose4
+      filecontent: dockerCompose5
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent4
+      filecontent: gitignoreContent5
     },
     {
       action: "file",
       file: "index.js",
-      filecontent: serverJs4
+      filecontent: serverJs5
     },
     {
       action: "command",
@@ -89318,7 +89656,7 @@ module.exports = {
 };`;
 
 // ../../packages/template/services/aws/dockerCompose.ts
-var dockerCompose5 = `services:
+var dockerCompose6 = `services:
   localstack:
     image: localstack/localstack
     pull_policy: if_not_present
@@ -89373,7 +89711,7 @@ networks:
     driver: bridge`;
 
 // ../../packages/template/services/aws/gitignore.ts
-var gitignoreContent5 = `# LocalStack data folder
+var gitignoreContent6 = `# LocalStack data folder
 localstack-data/
 
 # Runtime file
@@ -89590,7 +89928,7 @@ dynamodb.createTable(params, function(err, data) {
 </html>`;
 
 // ../../packages/template/services/aws/server.ts
-var serverJs5 = `const http = require('http');
+var serverJs6 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -89726,12 +90064,12 @@ var AWSTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose5
+      filecontent: dockerCompose6
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent5
+      filecontent: gitignoreContent6
     },
     {
       action: "file",
@@ -89741,7 +90079,7 @@ var AWSTemplate = {
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs5
+      filecontent: serverJs6
     },
     {
       action: "file",
@@ -89802,7 +90140,7 @@ var AWSTemplate = {
 };
 
 // ../../packages/template/services/stripe/dockerCompose.ts
-var dockerCompose6 = `services:
+var dockerCompose7 = `services:
   stripe-mock:
     image: stripe/stripe-mock:latest
     pull_policy: if_not_present
@@ -89818,12 +90156,12 @@ var dockerCompose6 = `services:
 `;
 
 // ../../packages/template/services/stripe/gitignore.ts
-var gitignoreContent6 = `# Runtime file
+var gitignoreContent7 = `# Runtime file
 .runtime.json
 `;
 
 // ../../packages/template/services/stripe/server.ts
-var serverJs6 = `const http = require('http');
+var serverJs7 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -89986,17 +90324,17 @@ var StripeTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose6
+      filecontent: dockerCompose7
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent6
+      filecontent: gitignoreContent7
     },
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs6
+      filecontent: serverJs7
     },
     {
       action: "file",
