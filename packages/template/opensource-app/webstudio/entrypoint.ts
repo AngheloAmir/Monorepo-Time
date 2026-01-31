@@ -36,7 +36,7 @@ ENVEOF
 # Install dependencies
 echo "==================================================="
 echo "Installing dependencies with pnpm..."
-echo "This may take several minutes on first run..."
+echo "This MAY TAKE AN HOUR OR MORE ON FIRST RUN because it will download upto 2GB of data and put inside the container..."
 echo "==================================================="
 
 if ! pnpm install; then
