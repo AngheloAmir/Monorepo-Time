@@ -6,8 +6,10 @@ RUN apt-get update && apt-get install -y \\
     curl \\
     && rm -rf /var/lib/apt/lists/*
 
-# Install pnpm globally
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm globally - download it NOW during build, not at runtime
+RUN corepack enable && corepack prepare pnpm@9.14.4 --activate
+# Verify pnpm is installed
+RUN pnpm --version
 
 WORKDIR /app
 
@@ -18,3 +20,4 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 5173
 
 ENTRYPOINT ["/entrypoint.sh"]`;
+

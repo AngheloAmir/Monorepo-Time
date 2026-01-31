@@ -33,13 +33,84 @@ DEV_LOGIN=true
 AUTH_SECRET=webstudio-dev-secret-key-12345
 ENVEOF
 
-# Install dependencies
+# Patch vite.config.ts to disable HTTPS and use localhost
+echo "Patching Vite config for HTTP mode..."
+cat > apps/builder/vite.config.ts << 'VITEEOF'
+import path, { resolve } from "node:path";
+import { defineConfig } from "vite";
+import { vitePlugin as remix } from "@remix-run/dev";
+import { existsSync } from "node:fs";
+import fg from "fast-glob";
+
+const rootDir = ["..", "../..", "../../.."]
+  .map((dir) => path.join(__dirname, dir))
+  .find((dir) => existsSync(path.join(dir, ".git")));
+
+const hasPrivateFolders =
+  fg.sync([path.join(rootDir ?? "", "packages/*/private-src/*")], {
+    ignore: ["**/node_modules/**"],
+  }).length > 0;
+
+const conditions = hasPrivateFolders
+  ? ["webstudio-private", "webstudio"]
+  : ["webstudio"];
+
+export default defineConfig(({ mode }) => {
+  return {
+    plugins: [
+      remix({
+        future: {
+          v3_lazyRouteDiscovery: false,
+          v3_relativeSplatPath: false,
+          v3_singleFetch: false,
+          v3_fetcherPersist: false,
+          v3_throwAbortReason: false,
+        },
+      }),
+    ],
+    resolve: {
+      conditions: [...conditions, "browser", "development|production"],
+      alias: [
+        {
+          find: "~",
+          replacement: resolve("app"),
+        },
+        {
+          find: "@supabase/node-fetch",
+          replacement: resolve("./app/shared/empty.ts"),
+        },
+      ],
+    },
+    ssr: {
+      resolve: {
+        conditions: [...conditions, "node", "development|production"],
+      },
+    },
+    define: {
+      "process.env.NODE_ENV": JSON.stringify(mode),
+    },
+    server: {
+      host: "0.0.0.0",
+      port: 5173,
+      // No HTTPS - plain HTTP for local development
+    },
+    envPrefix: "GITHUB_",
+  };
+});
+VITEEOF
+
+# Install dependencies with verbose output
 echo "==================================================="
 echo "Installing dependencies with pnpm..."
-echo "This MAY TAKE AN HOUR OR MORE ON FIRST RUN because it will download upto 2GB of data and put inside the container..."
+echo "This will take a few minutes..."
 echo "==================================================="
+echo ""
 
-if ! pnpm install; then
+# Use append-only reporter for better progress visibility in Docker
+export TERM=xterm-256color
+export FORCE_COLOR=1
+
+if ! pnpm install --reporter=append-only; then
     echo "ERROR: Failed to install dependencies!"
     echo "Sleeping to prevent restart loop..."
     sleep 3600
@@ -65,4 +136,3 @@ echo ""
 # Run dev server - this should keep running
 exec pnpm dev
 `;
-
