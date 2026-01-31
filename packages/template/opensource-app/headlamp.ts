@@ -4,7 +4,7 @@ export const HeadlampTool: ProjectTemplate = {
     name: "Headlamp",
     description: "Kubernetes Web UI",
     notes: "Requires Docker. Connects to local or remote Kubernetes clusters.",
-    type: "tool",
+    type: "opensource-app",
     category: "Tool",
     icon: "fas fa-cubes text-blue-500",
     templating: [

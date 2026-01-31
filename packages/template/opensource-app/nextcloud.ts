@@ -7,7 +7,7 @@ export const NextcloudLocal: ProjectTemplate = {
     name: "Nextcloud Local",
     description: "Nextcloud Office & Storage",
     notes: "Can be used with N8N that acts like GDrive",
-    type: "tool",
+    type: "opensource-app",
     category: "Open Source",
     icon: "fas fa-cloud text-blue-500",
     templating: [

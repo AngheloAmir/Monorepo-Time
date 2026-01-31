@@ -96,7 +96,7 @@ export default function WorkspaceNew() {
 
     return (
         <>
-            {templateType == 'tool' ?
+            {templateType == 'tool' || templateType == 'opensource-app' ?
                 <ToolWindow
                     template={template}
                     setTemplate={setTemplate}

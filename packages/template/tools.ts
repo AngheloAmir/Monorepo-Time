@@ -5,8 +5,6 @@ import { RedisCommanderTool } from "./tools/rediscommander";
 import { YaadeTool } from "./tools/yaade";
 import { MailpitTool } from "./tools/mailpit";
 import { CloudbeaverTool } from "./tools/cloudbeaver";
-import { HeadlampTool } from "./tools/headlamp";
-import { LocalKubernetesTool } from "./tools/kubernetes";
 
 const tools: ProjectTemplate[] = [
     CloudbeaverTool,
@@ -15,7 +13,5 @@ const tools: ProjectTemplate[] = [
     PgwebTool,
     MongoExpressTool,
     RedisCommanderTool,
-    HeadlampTool,
-    LocalKubernetesTool,
 ];
 export default tools;

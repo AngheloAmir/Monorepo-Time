@@ -13,12 +13,12 @@ export default function ToolWindow(props: {
         <ModalBody>
             <ModalHeader 
                 close={props.close} 
-                title="Add a Monorepo Tool"
-                description="Add a tool and place it in opensource folder" />
+                title="Add Open Source App"
+                description="Bundle it with your monorepo to allow developer to use the same tool as you do" />
             <div className="p-3 flex-1 overflow-y-auto text-md">
                 <div className="flex flex-row w-full gap-6 px-5 mb-5">
                     <InputField
-                        label="Tool Name"
+                        label="App Name"
                         icon="fas fa-cube"
                         placeholder=""
                         value={props.template}
@@ -37,6 +37,10 @@ export default function ToolWindow(props: {
                             Select
                         </span>
                     </button>
+                </div>
+
+                <div className="text-sm text-gray-500 ml-4">
+                    * it will be place in opensource folder
                 </div>
             </div>
 

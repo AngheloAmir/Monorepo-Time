@@ -45,8 +45,8 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
         <ModalBody width="700px">
             <ModalHeader
                 close={() => props.onClose()}
-                title="Select Template"
-                description="Choose a template to initialize your workspace"
+                title="Select Template or Open-source App"
+                description="Choose a template or bundle an open-source app"
             />
             <div className="flex-1 flex flex-row gap-2 overflow-hidden p-2">
                 <div className="w-48">

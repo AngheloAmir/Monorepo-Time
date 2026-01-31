@@ -85134,6 +85134,7 @@ var MySQL = {
   description: "MySQL Database (Local)",
   notes: "Requires MySQL installed in your system.",
   type: "database",
+  category: "Database",
   icon: "fas fa-database text-blue-500",
   templating: [
     {
@@ -85194,6 +85195,7 @@ var PostgreSQL = {
   description: "PostgreSQL (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
   type: "database",
+  category: "Database",
   icon: "fas fa-database text-blue-300",
   templating: [
     {
@@ -85211,7 +85213,7 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: db
     ports:
-      - "0:5432"
+      - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql
     healthcheck:
@@ -85386,6 +85388,7 @@ var Supabase = {
   description: "Supabase (Docker)",
   notes: "Requires Docker installed.",
   type: "database",
+  category: "Database",
   icon: "fas fa-bolt text-green-400",
   templating: [
     {
@@ -85432,6 +85435,7 @@ var Redis = {
   description: "Redis (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./redis-data folder.",
   type: "database",
+  category: "Database",
   icon: "fas fa-server text-red-400",
   templating: [
     {
@@ -85446,7 +85450,7 @@ services:
     restart: unless-stopped
     user: "1000:1000"
     ports:
-      - "0:6379"
+      - "6379:6379"
     volumes:
       - ./redis-data:/data
     command: >
@@ -85624,6 +85628,7 @@ var MongoDB = {
   description: "MongoDB (Docker Compose)",
   notes: "Data stored in ./mongo-data folder.",
   type: "database",
+  category: "Database",
   icon: "fas fa-leaf text-green-500",
   templating: [
     {
@@ -85639,7 +85644,7 @@ var MongoDB = {
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
     ports:
-      - "0:27017"
+      - "27017:27017"
     volumes:
       - ./mongo-data:/data/db
     command: ["mongod", "--quiet", "--logpath", "/dev/null"]
@@ -85816,6 +85821,7 @@ var Meilisearch = {
   description: "Meilisearch (Docker Compose)",
   notes: "Data stored in ./meili-data folder.",
   type: "database",
+  category: "Database",
   icon: "fas fa-search text-pink-500",
   templating: [
     {
@@ -85831,7 +85837,7 @@ var Meilisearch = {
       - MEILI_MASTER_KEY=admin
       - MEILI_ENV=development
     ports:
-      - "0:7700"
+      - "7700:7700"
     volumes:
       - ./meili-data:/meili_data
     healthcheck:
@@ -86009,6 +86015,7 @@ var MinIO = {
   description: "MinIO Object Storage (S3 Compatible)",
   notes: "Data stored in ./minio-data folder.",
   type: "database",
+  category: "Database",
   icon: "fas fa-database text-red-500",
   templating: [
     {
@@ -86025,8 +86032,8 @@ var MinIO = {
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=admin
     ports:
-      - "0:9000"
-      - "0:9001"
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - ./minio-data:/data
     healthcheck:
@@ -86232,6 +86239,7 @@ var MonoChat = {
   description: "React Frontend, needs custom backend",
   notes: "Vite React + TailwindCSS + TypeScript",
   type: "app",
+  category: "Demo",
   icon: "fas fa-comments text-green-500",
   templating: [
     {
@@ -86540,6 +86548,880 @@ var templates2 = [
 ];
 var demo_default = templates2;
 
+// ../../packages/template/opensource-app/mattermost/dockerCompose.ts
+var dockerCompose = `services:
+  postgres:
+    image: postgres:13-alpine
+    pull_policy: if_not_present
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 100
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=mattermost
+      - POSTGRES_USER=mmuser
+      - POSTGRES_PASSWORD=mmuser_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mmuser -d mattermost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mattermost:
+    image: mattermost/mattermost-team-edition:latest
+    pull_policy: if_not_present
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
+    read_only: false
+    tmpfs:
+      - /tmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "7200:8065"
+    volumes:
+      - mattermost_config:/mattermost/config:rw
+      - mattermost_data:/mattermost/data:rw
+      - mattermost_logs:/mattermost/logs:rw
+      - mattermost_plugins:/mattermost/plugins:rw
+      - mattermost_client_plugins:/mattermost/client/plugins:rw
+      - mattermost_bleve_indexes:/mattermost/bleve-indexes:rw
+    environment:
+      - MM_SQLSETTINGS_DRIVERNAME=postgres
+      - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:mmuser_password@postgres:5432/mattermost?sslmode=disable&connect_timeout=10
+      - MM_SERVICESETTINGS_SITEURL=http://localhost:7201
+      - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8065/api/v4/system/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  mattermost_config:
+  mattermost_data:
+  mattermost_logs:
+  mattermost_plugins:
+  mattermost_client_plugins:
+  mattermost_bleve_indexes:`;
+
+// ../../packages/template/opensource-app/mattermost/gitignore.ts
+var gitignoreContent = `
+.runtime.json
+`;
+
+// ../../packages/template/opensource-app/mattermost/server.ts
+var serverJs = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+
+console.log('Starting Mattermost...');
+
+// Start Docker Compose
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port mattermost 8065', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const mmPort = stdout.trim().split(':')[1];
+        if (!mmPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify Mattermost is actually responding to HTTP
+        // Api ping
+        http.get(\`http://localhost:\${mmPort}/api/v4/system/ping\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('Mattermost is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${mmPort}\`);
+                console.log('--------------------------------------------------');
+                console.log('Mattermost is a team communication platform');
+                console.log('--------------------------------------------------');
+                console.log('First time setup:');
+                console.log('  1. Create admin account on first visit');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Mattermost...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/mattermost.ts
+var MattermostLocal = {
+  name: "Mattermost Local",
+  description: "Mattermost Team",
+  notes: "Open source version of Discord",
+  type: "tool",
+  category: "Open Source",
+  icon: "fas fa-comments text-green-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Mattermost Messaging (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-comments text-blue-500"]
+    }
+  ]
+};
+
+// ../../packages/template/opensource-app/nextcloud/dockerCompose.ts
+var dockerCompose2 = `services:
+  db:
+    image: mariadb:10.6
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_PASSWORD=nextcloud_user_password
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud_user
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -padmin || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  nextcloud:
+    image: nextcloud:latest
+    restart: unless-stopped
+    ports:
+      - "4300:80"
+    links:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - nextcloud_data:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=nextcloud_user_password
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud_user
+      - MYSQL_HOST=db
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/status.php || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nextcloud_data:
+  db_data:`;
+
+// ../../packages/template/opensource-app/nextcloud/gitignore.ts
+var gitignoreContent2 = `
+.runtime.json
+`;
+
+// ../../packages/template/opensource-app/nextcloud/server.ts
+var serverJs2 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Nextcloud...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port nextcloud 80', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const ncPort = stdout.trim().split(':')[1];
+        if (!ncPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify Nextcloud is actually responding to HTTP
+        http.get(\`http://localhost:\${ncPort}/status.php\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('Nextcloud is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${ncPort}\`);
+                console.log('--------------------------------------------------');
+                console.log('A safe home for all your data');
+                console.log('--------------------------------------------------');
+                console.log('First time setup:');
+                console.log('  1. Create admin account on first visit');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Nextcloud...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/nextcloud.ts
+var NextcloudLocal = {
+  name: "Nextcloud Local",
+  description: "Nextcloud Office & Storage",
+  notes: "Can be used with N8N that acts like GDrive",
+  type: "tool",
+  category: "Open Source",
+  icon: "fas fa-cloud text-blue-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose2
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent2
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs2
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Nextcloud Server (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-cloud text-blue-500"]
+    }
+  ]
+};
+
+// ../../packages/template/opensource-app/mautic/dockerCompose.ts
+var dockerCompose3 = `services:
+  mautic_db:
+    image: mariadb:10.6
+    pull_policy: if_not_present
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      - MYSQL_ROOT_PASSWORD=mautic
+      - MYSQL_DATABASE=mautic
+      - MYSQL_USER=mautic
+      - MYSQL_PASSWORD=mautic
+    volumes:
+      - mautic_db_data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pmautic || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  mautic:
+    image: mautic/mautic:v4
+    pull_policy: if_not_present
+    environment:
+      - MAUTIC_DB_HOST=mautic_db
+      - MAUTIC_DB_USER=mautic
+      - MAUTIC_DB_PASSWORD=mautic
+      - MAUTIC_DB_NAME=mautic
+      - MAUTIC_RUN_CRON_JOBS=true
+      - MAUTIC_ADMIN_EMAIL=admin@admin.com
+      - MAUTIC_ADMIN_PASSWORD=admin
+    ports:
+      - "4310:80"
+    volumes:
+      - mautic_data:/var/www/html
+    links:
+      - mautic_db
+    depends_on:
+      mautic_db:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mautic_db_data:
+  mautic_data:`;
+
+// ../../packages/template/opensource-app/mautic/gitignore.ts
+var gitignoreContent3 = `
+.runtime.json
+`;
+
+// ../../packages/template/opensource-app/mautic/server.ts
+var serverJs3 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Mautic...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port mautic 80', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const mauticPort = stdout.trim().split(':')[1];
+        if (!mauticPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify Mautic is actually responding to HTTP
+        http.get(\`http://localhost:\${mauticPort}/\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('Mautic is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${mauticPort}\`);
+                console.log('--------------------------------------------------');
+                console.log('Open Source Marketing Automation');
+                console.log('--------------------------------------------------');
+                console.log('Default Credentials:');
+                console.log('  User: admin');
+                console.log('  Pass: mautic');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Mautic...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/mautic.ts
+var MauticLocal = {
+  name: "Mautic Local",
+  description: "Marketing Automation Platform",
+  notes: "Local Mautic instance for testing workflows",
+  type: "tool",
+  category: "Open Source",
+  icon: "fas fa-bullhorn text-purple-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose3
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent3
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs3
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Mautic Marketing Automation (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-bullhorn text-purple-500"]
+    }
+  ]
+};
+
+// ../../packages/template/opensource-app/ezbookkeeping.ts
+var EzBookkeepingLocal = {
+  name: "EzBookkeeping",
+  description: "Personal finance manager (Docker)",
+  notes: "Requires Docker installed. Data stored in ./ezbookkeeping-data folder.",
+  type: "app",
+  category: "Open Source",
+  icon: "fas fa-wallet text-green-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `
+services:
+  ezbookkeeping:
+    image: mayswind/ezbookkeeping:latest
+    pull_policy: missing
+    restart: unless-stopped
+    ports:
+      - "4320:8080"
+    volumes:
+      - ./ezbookkeeping-data:/data
+    environment:
+      - EBK_DB_TYPE=sqlite3
+      - EBK_DB_PATH=/data/ezbookkeeping.db
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Data folder
+ezbookkeeping-data/
+
+# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'ezbookkeeping-data');
+
+console.log('Starting EzBookkeeping...');
+
+// Pre-create data directory
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created ezbookkeeping-data directory');
+}
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port ezbookkeeping 8080', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Capture Container IDs
+        exec('docker compose ps -q', (err2, stdout2) => {
+             const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+             
+             try {
+                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                    port: server.address().port, 
+                    pid: process.pid,
+                    containerIds: containerIds
+                }));
+             } catch(e) {
+                console.error('Failed to write runtime file:', e);
+             }
+
+             process.stdout.write('\\\\x1Bc');
+             console.log('\\n==================================================');
+             console.log('EzBookkeeping is running!');
+             console.log('--------------------------------------------------');
+             console.log(\`URL:               http://localhost:\${port}\`);
+             console.log('--------------------------------------------------');
+             console.log('To update to the latest version:');
+             console.log('  docker pull mayswind/ezbookkeeping:latest');
+             console.log('==================================================\\n');
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping EzBookkeeping...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=EzBookkeeping (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=app"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-wallet text-green-500"]
+    }
+  ]
+};
+
+// ../../packages/template/opensource.ts
+var OpenSourceTemplates = [
+  MattermostLocal,
+  NextcloudLocal,
+  MauticLocal,
+  EzBookkeepingLocal
+];
+var opensource_default = OpenSourceTemplates;
+
 // ../../packages/template/projects/files/_viteapp.ts
 var file = `
 function App() {
@@ -86648,6 +87530,7 @@ var ViteReact = {
   description: "Vite React TS template",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  category: "Project",
   icon: "fab fa-react text-blue-400",
   templating: [
     {
@@ -86866,6 +87749,7 @@ var NextJS = {
   description: "Next.js TS template",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  category: "Project",
   icon: "fab fa-js text-white",
   templating: [
     {
@@ -87126,6 +88010,7 @@ var ExpressTS = {
   description: "Express.js TS template",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  category: "Project",
   icon: "fab fa-node text-green-500",
   templating: [
     {
@@ -87449,6 +88334,7 @@ var ServerlessExpressTS = {
   description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  category: "Project",
   icon: "fab fa-node text-green-500",
   templating: [
     {
@@ -87690,6 +88576,7 @@ var PHP = {
   description: "Simple PHP project template",
   notes: "PHP must be installed in your system.",
   type: "app",
+  category: "Project",
   icon: "fab fa-php text-indigo-400",
   templating: [
     {
@@ -87726,6 +88613,7 @@ var Laravel = {
   description: "Laravel PHP Framework template",
   notes: "Composer and PHP must be installed in your system.",
   type: "app",
+  category: "Project",
   icon: "fab fa-laravel text-red-500",
   templating: [
     {
@@ -87901,6 +88789,7 @@ var PythonConsole = {
   description: "Simple Python Backend Application",
   notes: "Python 3 must be installed in your system.",
   type: "app",
+  category: "Project",
   icon: "fab fa-python text-yellow-500",
   templating: [
     {
@@ -87958,6 +88847,7 @@ var DotNetConsole = {
   description: "Simple .NET Console Application",
   notes: ".NET SDK must be installed in your system.",
   type: "app",
+  category: "Project",
   icon: "fab fa-windows text-blue-600",
   templating: [
     {
@@ -88006,8 +88896,8 @@ var templates3 = [
 ];
 var projecttemplate_default = templates3;
 
-// ../../packages/template/services_list/n8n/dockerCompose.ts
-var dockerCompose = `services:
+// ../../packages/template/services/n8n/dockerCompose.ts
+var dockerCompose4 = `services:
   n8n:
     image: n8nio/n8n:latest
     pull_policy: if_not_present
@@ -88034,13 +88924,13 @@ var dockerCompose = `services:
 volumes:
   n8n_data:`;
 
-// ../../packages/template/services_list/n8n/gitignore.ts
-var gitignoreContent = `# Runtime file
+// ../../packages/template/services/n8n/gitignore.ts
+var gitignoreContent4 = `# Runtime file
 .runtime.json
 `;
 
-// ../../packages/template/services_list/n8n/server.ts
-var serverJs = `const http = require('http');
+// ../../packages/template/services/n8n/server.ts
+var serverJs4 = `const http = require('http');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -88144,28 +89034,29 @@ const cleanup = () => {
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);`;
 
-// ../../packages/template/services_list/n8n.ts
+// ../../packages/template/services/n8n.ts
 var N8NLocal = {
   name: "N8N Local",
   description: "N8N Workflow Automation",
   notes: "Local N8N instance for testing workflows",
   type: "app",
+  category: "Service",
   icon: "fas fa-project-diagram text-red-500",
   templating: [
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose
+      filecontent: dockerCompose4
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent
+      filecontent: gitignoreContent4
     },
     {
       action: "file",
       file: "index.js",
-      filecontent: serverJs
+      filecontent: serverJs4
     },
     {
       action: "command",
@@ -88190,7 +89081,7 @@ var N8NLocal = {
   ]
 };
 
-// ../../packages/template/services_list/aws/deploy.ts
+// ../../packages/template/services/aws/deploy.ts
 var deployJs = `const path = require("path");
 const { spawn } = require("child_process");
 
@@ -88368,8 +89259,8 @@ module.exports = {
   }
 };`;
 
-// ../../packages/template/services_list/aws/dockerCompose.ts
-var dockerCompose2 = `services:
+// ../../packages/template/services/aws/dockerCompose.ts
+var dockerCompose5 = `services:
   localstack:
     image: localstack/localstack
     pull_policy: if_not_present
@@ -88392,7 +89283,7 @@ var dockerCompose2 = `services:
     image: aaronshaf/dynamodb-admin
     pull_policy: if_not_present
     ports:
-      - "8001:8001"
+      - "4330:8001"
     environment:
       - DYNAMO_ENDPOINT=http://localstack:4566
       - AWS_REGION=us-east-1
@@ -88407,7 +89298,7 @@ var dockerCompose2 = `services:
     image: cloudlena/s3manager
     pull_policy: if_not_present
     ports:
-      - "8002:8080"
+      - "4340:8080"
     environment:
       - ACCESS_KEY_ID=test
       - SECRET_ACCESS_KEY=test
@@ -88423,15 +89314,15 @@ networks:
   cloud-net:
     driver: bridge`;
 
-// ../../packages/template/services_list/aws/gitignore.ts
-var gitignoreContent2 = `# LocalStack data folder
+// ../../packages/template/services/aws/gitignore.ts
+var gitignoreContent5 = `# LocalStack data folder
 localstack-data/
 
 # Runtime file
 .runtime.json
 `;
 
-// ../../packages/template/services_list/aws/indexHtml.ts
+// ../../packages/template/services/aws/indexHtml.ts
 var indexHtml2 = `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -88640,8 +89531,8 @@ dynamodb.createTable(params, function(err, data) {
 </body>
 </html>`;
 
-// ../../packages/template/services_list/aws/server.ts
-var serverJs2 = `const http = require('http');
+// ../../packages/template/services/aws/server.ts
+var serverJs5 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -88760,28 +89651,29 @@ const cleanup = () => {
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);`;
 
-// ../../packages/template/services_list/aws/stop.ts
+// ../../packages/template/services/aws/stop.ts
 var stopJs = `const { spawn } = require('child_process');
 console.log("Stopping AWS Local environment...");
 spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
 
-// ../../packages/template/services_list/aws.ts
+// ../../packages/template/services/aws.ts
 var AWSTemplate = {
   name: "Localstack (Experimental)",
   description: "AWS LocalStack with Manager",
   notes: "For local testing with LocalStack",
   type: "tool",
+  category: "Service",
   icon: "fab fa-aws text-orange-400",
   templating: [
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose2
+      filecontent: dockerCompose5
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent2
+      filecontent: gitignoreContent5
     },
     {
       action: "file",
@@ -88791,7 +89683,7 @@ var AWSTemplate = {
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs2
+      filecontent: serverJs5
     },
     {
       action: "file",
@@ -88851,15 +89743,15 @@ var AWSTemplate = {
   ]
 };
 
-// ../../packages/template/services_list/stripe/dockerCompose.ts
-var dockerCompose3 = `services:
+// ../../packages/template/services/stripe/dockerCompose.ts
+var dockerCompose6 = `services:
   stripe-mock:
     image: stripe/stripe-mock:latest
     pull_policy: if_not_present
     container_name: stripe-mock
     ports:
-      - "12111:12111"
-      - "12112:12112"
+      - "4350:12111"
+      - "4360:12112"
     healthcheck:
       test: ["CMD", "/usr/bin/curl", "-f", "http://localhost:12111/"]
       interval: 5s
@@ -88867,13 +89759,13 @@ var dockerCompose3 = `services:
       retries: 5
 `;
 
-// ../../packages/template/services_list/stripe/gitignore.ts
-var gitignoreContent3 = `# Runtime file
+// ../../packages/template/services/stripe/gitignore.ts
+var gitignoreContent6 = `# Runtime file
 .runtime.json
 `;
 
-// ../../packages/template/services_list/stripe/server.ts
-var serverJs3 = `const http = require('http');
+// ../../packages/template/services/stripe/server.ts
+var serverJs6 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -88961,7 +89853,7 @@ const cleanup = () => {
 process.on('SIGINT', cleanup);
 process.on('SIGTERM', cleanup);`;
 
-// ../../packages/template/services_list/stripe/test.ts
+// ../../packages/template/services/stripe/test.ts
 var testJs = `const Stripe = require('stripe');
 
 // Initialize with a fake key and point to the mock server
@@ -89024,28 +89916,29 @@ const stripe = new Stripe('sk_test_mock_123', {
 })();
 `;
 
-// ../../packages/template/services_list/stripe.ts
+// ../../packages/template/services/stripe.ts
 var StripeTemplate = {
   name: "Stripe Mock (Experimental)",
   description: "Stripe API Mock Server",
   notes: "Runs the official stripe-mock image.",
   type: "tool",
+  category: "Service",
   icon: "fab fa-stripe text-orange-500",
   templating: [
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose3
+      filecontent: dockerCompose6
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent3
+      filecontent: gitignoreContent6
     },
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs3
+      filecontent: serverJs6
     },
     {
       action: "file",
@@ -89095,874 +89988,9 @@ var StripeTemplate = {
   ]
 };
 
-// ../../packages/template/services_list/mattermost/dockerCompose.ts
-var dockerCompose4 = `services:
-  postgres:
-    image: postgres:13-alpine
-    pull_policy: if_not_present
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 100
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /var/run/postgresql
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=mattermost
-      - POSTGRES_USER=mmuser
-      - POSTGRES_PASSWORD=mmuser_password
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mmuser -d mattermost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  mattermost:
-    image: mattermost/mattermost-team-edition:latest
-    pull_policy: if_not_present
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 200
-    read_only: false
-    tmpfs:
-      - /tmp
-    depends_on:
-      postgres:
-        condition: service_healthy
-    ports:
-      - "7201:8065"
-    volumes:
-      - mattermost_config:/mattermost/config:rw
-      - mattermost_data:/mattermost/data:rw
-      - mattermost_logs:/mattermost/logs:rw
-      - mattermost_plugins:/mattermost/plugins:rw
-      - mattermost_client_plugins:/mattermost/client/plugins:rw
-      - mattermost_bleve_indexes:/mattermost/bleve-indexes:rw
-    environment:
-      - MM_SQLSETTINGS_DRIVERNAME=postgres
-      - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:mmuser_password@postgres:5432/mattermost?sslmode=disable&connect_timeout=10
-      - MM_SERVICESETTINGS_SITEURL=http://localhost:7201
-      - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8065/api/v4/system/ping || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  postgres_data:
-  mattermost_config:
-  mattermost_data:
-  mattermost_logs:
-  mattermost_plugins:
-  mattermost_client_plugins:
-  mattermost_bleve_indexes:`;
-
-// ../../packages/template/services_list/mattermost/gitignore.ts
-var gitignoreContent4 = `
-.runtime.json
-`;
-
-// ../../packages/template/services_list/mattermost/server.ts
-var serverJs4 = `const http = require('http');
-const { spawn, exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-
-const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-
-
-console.log('Starting Mattermost...');
-
-// Start Docker Compose
-// Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
-
-child.on('close', (code) => {
-    if (code !== 0) process.exit(code);
-    
-    // Follow logs with filtering
-    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
-    
-    const printImportant = (data) => {
-        const lines = data.toString().split('\\n');
-        lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+|s+/, '');
-            const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
-            }
-        });
-    };
-
-    logs.stdout.on('data', printImportant);
-    logs.stderr.on('data', printImportant);
-    logs.on('close', (c) => process.exit(c || 0));
-});
-
-// Setup Control Server
-const server = http.createServer((req, res) => {
-    if (req.url === '/stop') {
-        res.writeHead(200);
-        res.end('Stopping...');
-        cleanup();
-    } else {
-        res.writeHead(404);
-        res.end();
-    }
-});
-
-server.listen(0, () => {
-    const port = server.address().port;
-    // We update runtime file later when we get the container ID
-});
-
-// Check status loop
-const checkStatus = () => {
-    exec('docker compose port mattermost 8065', (err, stdout, stderr) => {
-        if (err || stderr || !stdout) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-        const mmPort = stdout.trim().split(':')[1];
-        if (!mmPort) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-
-        // Verify Mattermost is actually responding to HTTP
-        // Api ping
-        http.get(\`http://localhost:\${mmPort}/api/v4/system/ping\`, (res) => {
-            // Capture Container IDs
-            exec('docker compose ps -q', (err2, stdout2) => {
-                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
-                
-                try {
-                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                        port: server.address().port, 
-                        pid: process.pid,
-                        containerIds: containerIds
-                    }));
-                } catch(e) {
-                    console.error('Failed to write runtime file:', e);
-                }
-                
-                process.stdout.write('\\\\x1Bc');
-                console.log('\\n==================================================');
-                console.log('Mattermost is running!');
-                console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${mmPort}\`);
-                console.log('--------------------------------------------------');
-                console.log('Mattermost is a team communication platform');
-                console.log('--------------------------------------------------');
-                console.log('First time setup:');
-                console.log('  1. Create admin account on first visit');
-                console.log('==================================================\\n');
-            });
-        }).on('error', (e) => {
-            // Connection failed (ECONNREFUSED usually), retry
-            setTimeout(checkStatus, 2000);
-        });
-    });
-};
-
-setTimeout(checkStatus, 3000);
-
-const cleanup = () => {
-    console.log('Stopping Mattermost...');
-    exec('docker compose down', (err, stdout, stderr) => {
-        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-        process.exit(0);
-    });
-};
-
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`;
-
-// ../../packages/template/services_list/mattermost.ts
-var MattermostLocal = {
-  name: "Mattermost Local",
-  description: "Mattermost Team",
-  notes: "Open source version of Discord",
-  type: "tool",
-  icon: "fas fa-comments text-green-500",
-  templating: [
-    {
-      action: "file",
-      file: "docker-compose.yml",
-      filecontent: dockerCompose4
-    },
-    {
-      action: "file",
-      file: ".gitignore",
-      filecontent: gitignoreContent4
-    },
-    {
-      action: "file",
-      file: "index.js",
-      filecontent: serverJs4
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.start=node index.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=Mattermost Messaging (Docker)"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-comments text-blue-500"]
-    }
-  ]
-};
-
-// ../../packages/template/services_list/nextcloud/dockerCompose.ts
-var dockerCompose5 = `services:
-  db:
-    image: mariadb:10.6
-    restart: unless-stopped
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    volumes:
-      - db_data:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=admin
-      - MYSQL_PASSWORD=nextcloud_user_password
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud_user
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -padmin || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-
-  nextcloud:
-    image: nextcloud:latest
-    restart: unless-stopped
-    ports:
-      - "0:80"
-    links:
-      - db
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - nextcloud_data:/var/www/html
-    environment:
-      - MYSQL_PASSWORD=nextcloud_user_password
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud_user
-      - MYSQL_HOST=db
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/status.php || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  nextcloud_data:
-  db_data:`;
-
-// ../../packages/template/services_list/nextcloud/gitignore.ts
-var gitignoreContent5 = `
-.runtime.json
-`;
-
-// ../../packages/template/services_list/nextcloud/server.ts
-var serverJs5 = `const http = require('http');
-const { spawn, exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-
-const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-
-console.log('Starting Nextcloud...');
-
-// Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
-
-child.on('close', (code) => {
-    if (code !== 0) process.exit(code);
-    
-    // Follow logs with filtering
-    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
-    
-    const printImportant = (data) => {
-        const lines = data.toString().split('\\n');
-        lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+|s+/, '');
-            const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
-            }
-        });
-    };
-
-    logs.stdout.on('data', printImportant);
-    logs.stderr.on('data', printImportant);
-    logs.on('close', (c) => process.exit(c || 0));
-});
-
-// Setup Control Server
-const server = http.createServer((req, res) => {
-    if (req.url === '/stop') {
-        res.writeHead(200);
-        res.end('Stopping...');
-        cleanup();
-    } else {
-        res.writeHead(404);
-        res.end();
-    }
-});
-
-server.listen(0, () => {
-    const port = server.address().port;
-    // We update runtime file later when we get the container ID
-});
-
-// Check status loop
-const checkStatus = () => {
-    exec('docker compose port nextcloud 80', (err, stdout, stderr) => {
-        if (err || stderr || !stdout) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-        const ncPort = stdout.trim().split(':')[1];
-        if (!ncPort) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-
-        // Verify Nextcloud is actually responding to HTTP
-        http.get(\`http://localhost:\${ncPort}/status.php\`, (res) => {
-            // Capture Container IDs
-            exec('docker compose ps -q', (err2, stdout2) => {
-                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
-                
-                try {
-                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                        port: server.address().port, 
-                        pid: process.pid,
-                        containerIds: containerIds
-                    }));
-                } catch(e) {
-                    console.error('Failed to write runtime file:', e);
-                }
-                
-                process.stdout.write('\\\\x1Bc');
-                console.log('\\n==================================================');
-                console.log('Nextcloud is running!');
-                console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${ncPort}\`);
-                console.log('--------------------------------------------------');
-                console.log('A safe home for all your data');
-                console.log('--------------------------------------------------');
-                console.log('First time setup:');
-                console.log('  1. Create admin account on first visit');
-                console.log('==================================================\\n');
-            });
-        }).on('error', (e) => {
-            // Connection failed (ECONNREFUSED usually), retry
-            setTimeout(checkStatus, 2000);
-        });
-    });
-};
-
-setTimeout(checkStatus, 3000);
-
-const cleanup = () => {
-    console.log('Stopping Nextcloud...');
-    exec('docker compose down', (err, stdout, stderr) => {
-        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-        process.exit(0);
-    });
-};
-
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`;
-
-// ../../packages/template/services_list/nextcloud.ts
-var NextcloudLocal = {
-  name: "Nextcloud Local",
-  description: "Nextcloud Office & Storage",
-  notes: "Can be used with N8N that acts like GDrive",
-  type: "tool",
-  icon: "fas fa-cloud text-blue-500",
-  templating: [
-    {
-      action: "file",
-      file: "docker-compose.yml",
-      filecontent: dockerCompose5
-    },
-    {
-      action: "file",
-      file: ".gitignore",
-      filecontent: gitignoreContent5
-    },
-    {
-      action: "file",
-      file: "index.js",
-      filecontent: serverJs5
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.start=node index.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=Nextcloud Server (Docker)"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-cloud text-blue-500"]
-    }
-  ]
-};
-
-// ../../packages/template/services_list/mautic/dockerCompose.ts
-var dockerCompose6 = `services:
-  mautic_db:
-    image: mariadb:10.6
-    pull_policy: if_not_present
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    environment:
-      - MYSQL_ROOT_PASSWORD=mautic
-      - MYSQL_DATABASE=mautic
-      - MYSQL_USER=mautic
-      - MYSQL_PASSWORD=mautic
-    volumes:
-      - mautic_db_data:/var/lib/mysql
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pmautic || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-
-  mautic:
-    image: mautic/mautic:v4
-    pull_policy: if_not_present
-    environment:
-      - MAUTIC_DB_HOST=mautic_db
-      - MAUTIC_DB_USER=mautic
-      - MAUTIC_DB_PASSWORD=mautic
-      - MAUTIC_DB_NAME=mautic
-      - MAUTIC_RUN_CRON_JOBS=true
-      - MAUTIC_ADMIN_EMAIL=admin@admin.com
-      - MAUTIC_ADMIN_PASSWORD=admin
-    ports:
-      - "0:80"
-    volumes:
-      - mautic_data:/var/www/html
-    links:
-      - mautic_db
-    depends_on:
-      mautic_db:
-        condition: service_healthy
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  mautic_db_data:
-  mautic_data:`;
-
-// ../../packages/template/services_list/mautic/gitignore.ts
-var gitignoreContent6 = `
-.runtime.json
-`;
-
-// ../../packages/template/services_list/mautic/server.ts
-var serverJs6 = `const http = require('http');
-const { spawn, exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-
-const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-
-console.log('Starting Mautic...');
-
-// Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
-
-child.on('close', (code) => {
-    if (code !== 0) process.exit(code);
-    
-    // Follow logs with filtering
-    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
-    
-    const printImportant = (data) => {
-        const lines = data.toString().split('\\n');
-        lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+|s+/, '');
-            const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
-            }
-        });
-    };
-
-    logs.stdout.on('data', printImportant);
-    logs.stderr.on('data', printImportant);
-    logs.on('close', (c) => process.exit(c || 0));
-});
-
-// Setup Control Server
-const server = http.createServer((req, res) => {
-    if (req.url === '/stop') {
-        res.writeHead(200);
-        res.end('Stopping...');
-        cleanup();
-    } else {
-        res.writeHead(404);
-        res.end();
-    }
-});
-
-server.listen(0, () => {
-    const port = server.address().port;
-});
-
-// Check status loop
-const checkStatus = () => {
-    exec('docker compose port mautic 80', (err, stdout, stderr) => {
-        if (err || stderr || !stdout) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-        const mauticPort = stdout.trim().split(':')[1];
-        if (!mauticPort) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-
-        // Verify Mautic is actually responding to HTTP
-        http.get(\`http://localhost:\${mauticPort}/\`, (res) => {
-            // Capture Container IDs
-            exec('docker compose ps -q', (err2, stdout2) => {
-                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
-                
-                try {
-                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                        port: server.address().port, 
-                        pid: process.pid,
-                        containerIds: containerIds
-                    }));
-                } catch(e) {
-                    console.error('Failed to write runtime file:', e);
-                }
-                
-                process.stdout.write('\\\\x1Bc');
-                console.log('\\n==================================================');
-                console.log('Mautic is running!');
-                console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${mauticPort}\`);
-                console.log('--------------------------------------------------');
-                console.log('Open Source Marketing Automation');
-                console.log('--------------------------------------------------');
-                console.log('Default Credentials:');
-                console.log('  User: admin');
-                console.log('  Pass: mautic');
-                console.log('==================================================\\n');
-            });
-        }).on('error', (e) => {
-            // Connection failed (ECONNREFUSED usually), retry
-            setTimeout(checkStatus, 2000);
-        });
-    });
-};
-
-setTimeout(checkStatus, 3000);
-
-const cleanup = () => {
-    console.log('Stopping Mautic...');
-    exec('docker compose down', (err, stdout, stderr) => {
-        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-        process.exit(0);
-    });
-};
-
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`;
-
-// ../../packages/template/services_list/mautic.ts
-var MauticLocal = {
-  name: "Mautic Local",
-  description: "Marketing Automation Platform",
-  notes: "Local Mautic instance for testing workflows",
-  type: "tool",
-  icon: "fas fa-bullhorn text-purple-500",
-  templating: [
-    {
-      action: "file",
-      file: "docker-compose.yml",
-      filecontent: dockerCompose6
-    },
-    {
-      action: "file",
-      file: ".gitignore",
-      filecontent: gitignoreContent6
-    },
-    {
-      action: "file",
-      file: "index.js",
-      filecontent: serverJs6
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.start=node index.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=Mautic Marketing Automation (Docker)"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-bullhorn text-purple-500"]
-    }
-  ]
-};
-
-// ../../packages/template/services_list/ezbookkeeping.ts
-var EzBookkeepingLocal = {
-  name: "EzBookkeeping",
-  description: "Personal finance manager (Docker)",
-  notes: "Requires Docker installed. Data stored in ./ezbookkeeping-data folder.",
-  type: "app",
-  icon: "fas fa-wallet text-green-500",
-  templating: [
-    {
-      action: "file",
-      file: "docker-compose.yml",
-      filecontent: `
-services:
-  ezbookkeeping:
-    image: mayswind/ezbookkeeping:latest
-    pull_policy: missing
-    restart: unless-stopped
-    ports:
-      - "0:8080"
-    volumes:
-      - ./ezbookkeeping-data:/data
-    environment:
-      - EBK_DB_TYPE=sqlite3
-      - EBK_DB_PATH=/data/ezbookkeeping.db
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "http://localhost:8080"]
-      interval: 10s
-      timeout: 5s
-      retries: 5`
-    },
-    {
-      action: "file",
-      file: ".gitignore",
-      filecontent: `# Data folder
-ezbookkeeping-data/
-
-# Runtime file
-.runtime.json
-`
-    },
-    {
-      action: "file",
-      file: "index.js",
-      filecontent: `const http = require('http');
-const { spawn, exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-
-const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-const DATA_DIR = path.join(__dirname, 'ezbookkeeping-data');
-
-console.log('Starting EzBookkeeping...');
-
-// Pre-create data directory
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-    console.log('Created ezbookkeeping-data directory');
-}
-
-// Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
-
-child.on('close', (code) => {
-    if (code !== 0) process.exit(code);
-    // Follow logs with filtering
-    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
-    
-    const printImportant = (data) => {
-        const lines = data.toString().split('\\n');
-        lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
-            const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
-            }
-        });
-    };
-
-    logs.stdout.on('data', printImportant);
-    logs.stderr.on('data', printImportant);
-    logs.on('close', (c) => process.exit(c || 0));
-});
-
-// Setup Control Server
-const server = http.createServer((req, res) => {
-    if (req.url === '/stop') {
-        res.writeHead(200);
-        res.end('Stopping...');
-        cleanup();
-    } else {
-        res.writeHead(404);
-        res.end();
-    }
-});
-
-server.listen(0, () => {
-    // We update runtime file later
-});
-
-// Check status loop
-const checkStatus = () => {
-    exec('docker compose port ezbookkeeping 8080', (err, stdout, stderr) => {
-        if (err || stderr || !stdout) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-        const port = stdout.trim().split(':')[1];
-        if (!port) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-
-        // Capture Container IDs
-        exec('docker compose ps -q', (err2, stdout2) => {
-             const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
-             
-             try {
-                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                    port: server.address().port, 
-                    pid: process.pid,
-                    containerIds: containerIds
-                }));
-             } catch(e) {
-                console.error('Failed to write runtime file:', e);
-             }
-
-             process.stdout.write('\\\\x1Bc');
-             console.log('\\n==================================================');
-             console.log('EzBookkeeping is running!');
-             console.log('--------------------------------------------------');
-             console.log(\`URL:               http://localhost:\${port}\`);
-             console.log('--------------------------------------------------');
-             console.log('To update to the latest version:');
-             console.log('  docker pull mayswind/ezbookkeeping:latest');
-             console.log('==================================================\\n');
-        });
-    });
-};
-
-setTimeout(checkStatus, 3000);
-
-const cleanup = () => {
-    console.log('Stopping EzBookkeeping...');
-    exec('docker compose down', (err, stdout, stderr) => {
-        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-        process.exit(0);
-    });
-};
-
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["install"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.start=node index.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=EzBookkeeping (Docker)"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "appType=app"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-wallet text-green-500"]
-    }
-  ]
-};
-
 // ../../packages/template/services.ts
 var templates4 = [
   N8NLocal,
-  MattermostLocal,
-  NextcloudLocal,
-  MauticLocal,
-  EzBookkeepingLocal,
   AWSTemplate,
   StripeTemplate
 ];
@@ -89974,6 +90002,7 @@ var PgwebTool = {
   description: "PostgreSQL Web GUI (Lightweight)",
   notes: "Requires Docker. Connects to any PostgreSQL database.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-database text-blue-500",
   templating: [
     {
@@ -89985,7 +90014,7 @@ var PgwebTool = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:8081"
+      - "4250:8081"
     environment:
       - PGWEB_AUTH_USER=admin
       - PGWEB_AUTH_PASS=admin
@@ -90159,6 +90188,7 @@ var MongoExpressTool = {
   description: "MongoDB Web GUI",
   notes: "Requires Docker. Connects to any MongoDB database.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-leaf text-green-500",
   templating: [
     {
@@ -90170,7 +90200,7 @@ var MongoExpressTool = {
     pull_policy: if_not_present
     restart: "no"
     ports:
-      - "0:8081"
+      - "4240:8081"
     environment:
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
@@ -90355,6 +90385,7 @@ var RedisCommanderTool = {
   description: "Redis Web GUI",
   notes: "Requires Docker. Connects to any Redis instance.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-server text-red-400",
   templating: [
     {
@@ -90366,7 +90397,7 @@ var RedisCommanderTool = {
     pull_policy: if_not_present
     restart: "no"
     ports:
-      - "0:8081"
+      - "4260:8081"
     environment:
       - HTTP_USER=admin
       - HTTP_PASSWORD=admin
@@ -90551,6 +90582,7 @@ var YaadeTool = {
   description: "API Testing Tool (Self-Hosted)",
   notes: "Requires Docker. Collaborative API development environment.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-vial text-purple-500",
   templating: [
     {
@@ -90562,7 +90594,7 @@ var YaadeTool = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:9339"
+      - "4290:9339"
     volumes:
       - yaade-data:/app/data
     environment:
@@ -90735,6 +90767,7 @@ var MailpitTool = {
   description: "Email Testing Tool",
   notes: "Requires Docker. Catches all outgoing emails for testing.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-envelope text-blue-500",
   templating: [
     {
@@ -90746,8 +90779,8 @@ var MailpitTool = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:8025"
-      - "0:1025"
+      - "4270:8025"
+      - "4280:1025"
     environment:
       - MP_SMTP_AUTH_ACCEPT_ANY=true
       - MP_SMTP_AUTH_ALLOW_INSECURE=true
@@ -90936,6 +90969,7 @@ var CloudbeaverTool = {
   description: "Universal Database GUI (DBeaver Web)",
   notes: "Requires Docker. Web-based database management tool.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-database text-orange-500",
   templating: [
     {
@@ -90947,7 +90981,7 @@ var CloudbeaverTool = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:8978"
+      - "4230:8978"
     volumes:
       - cloudbeaver-data:/opt/cloudbeaver/workspace
     extra_hosts:
@@ -91118,6 +91152,7 @@ var HeadlampTool = {
   description: "Kubernetes Web UI",
   notes: "Requires Docker. Connects to local or remote Kubernetes clusters.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-cubes text-blue-500",
   templating: [
     {
@@ -91129,7 +91164,7 @@ var HeadlampTool = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:4466"
+      - "4466:4466"
     volumes:
       # Mount kubeconfig so Headlamp can find your clusters
       # Typically ~/.kube/config on your host
@@ -91292,6 +91327,7 @@ var LocalKubernetesTool = {
   description: "K3s Cluster + Headlamp UI",
   notes: "Runs a K3s cluster in Docker and connects Headlamp automatically.",
   type: "tool",
+  category: "Tool",
   icon: "fas fa-cubes text-blue-600",
   templating: [
     {
@@ -91311,7 +91347,7 @@ var LocalKubernetesTool = {
       - K3S_KUBECONFIG_MODE=644
       - K3S_TOKEN=secret
     ports:
-      - "0:6443"
+      - "6443:6443"
     volumes:
       - ./k3s-config:/etc/rancher/k3s
       - k3s-data:/var/lib/rancher/k3s
@@ -91326,7 +91362,7 @@ var LocalKubernetesTool = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:4466"
+      - "4470:4466"
     volumes:
       - ./headlamp-config:/root/.kube
     depends_on:
@@ -91557,6 +91593,7 @@ var MonorepoTemplates = {
   project: projecttemplate_default,
   database: database_default,
   services: services_default,
+  opensource: opensource_default,
   tool: tools_default,
   demo: demo_default
 };
@@ -91573,6 +91610,7 @@ router18.get("/", (req, res) => {
       project: stripTemplating(template_default.project),
       database: stripTemplating(template_default.database),
       services: stripTemplating(template_default.services),
+      opensource: stripTemplating(template_default.opensource),
       tool: stripTemplating(template_default.tool),
       demo: stripTemplating(template_default.demo)
     };
@@ -91800,7 +91838,7 @@ function setWorkspaceTemplateSocket(io3) {
         socket.emit("template:error", { error: `Template '${templatename}' not found` });
         return;
       }
-      if (template.type === "tool") {
+      if (template.type === "tool" || template.type === "opensource-app") {
         const root = await findMonorepoRoot4(workspacePath);
         const toolFolderName = template.name.toLowerCase().replace(/[^a-z0-9-]/g, "-");
         workspacePath = import_path18.default.join(root, "opensource", toolFolderName);
