@@ -5,12 +5,14 @@ import { StripeTemplate } from "./services_list/stripe";
 import { MattermostLocal } from "./services_list/mattermost";
 import { NextcloudLocal } from "./services_list/nextcloud";
 import { MauticLocal } from "./services_list/mautic";
+import { EzBookkeepingLocal } from "./services_list/ezbookkeeping";
 
 const templates: ProjectTemplate[] = [
     N8NLocal,
     MattermostLocal,
     NextcloudLocal,
     MauticLocal,
+    EzBookkeepingLocal,
     AWSTemplate,
     StripeTemplate,
 ];
