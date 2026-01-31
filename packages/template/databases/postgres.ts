@@ -5,6 +5,7 @@ export const PostgreSQL: ProjectTemplate = {
     description: "PostgreSQL (Docker Compose)",
     notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
     type: "database",
+    category: "Database",
     icon: "fas fa-database text-blue-300",
     templating: [
         {

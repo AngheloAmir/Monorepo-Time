@@ -1,14 +1,15 @@
 import type { ProjectTemplate } from "../../types";
-import { dockerCompose } from "./mattermost/dockerCompose";
-import { gitignoreContent } from "./mattermost/gitignore";
-import { serverJs } from "./mattermost/server";
+import { dockerCompose } from "./nextcloud/dockerCompose";
+import { gitignoreContent } from "./nextcloud/gitignore";
+import { serverJs } from "./nextcloud/server";
 
-export const MattermostLocal: ProjectTemplate = {
-    name: "Mattermost Local",
-    description: "Mattermost Team",
-    notes: "Open source version of Discord",
+export const NextcloudLocal: ProjectTemplate = {
+    name: "Nextcloud Local",
+    description: "Nextcloud Office & Storage",
+    notes: "Can be used with N8N that acts like GDrive",
     type: "tool",
-    icon: "fas fa-comments text-green-500",
+    category: "Open Source",
+    icon: "fas fa-cloud text-blue-500",
     templating: [
         {
             action: 'file',
@@ -38,7 +39,7 @@ export const MattermostLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=Mattermost Messaging (Docker)']
+            args: ['pkg', 'set', 'description=Nextcloud Server (Docker)']
         },
         {
             action: 'command',
@@ -48,7 +49,7 @@ export const MattermostLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-comments text-blue-500']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-cloud text-blue-500']
         }
     ]
 };

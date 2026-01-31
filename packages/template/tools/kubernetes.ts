@@ -5,6 +5,7 @@ export const LocalKubernetesTool: ProjectTemplate = {
     description: "K3s Cluster + Headlamp UI",
     notes: "Runs a K3s cluster in Docker and connects Headlamp automatically.",
     type: "tool",
+    category: "Tool",
     icon: "fas fa-cubes text-blue-600",
     templating: [
         {

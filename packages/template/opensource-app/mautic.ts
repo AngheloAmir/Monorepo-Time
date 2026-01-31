@@ -1,14 +1,15 @@
 import type { ProjectTemplate } from "../../types";
-import { dockerCompose } from "./nextcloud/dockerCompose";
-import { gitignoreContent } from "./nextcloud/gitignore";
-import { serverJs } from "./nextcloud/server";
+import { dockerCompose } from "./mautic/dockerCompose";
+import { gitignoreContent } from "./mautic/gitignore";
+import { serverJs } from "./mautic/server";
 
-export const NextcloudLocal: ProjectTemplate = {
-    name: "Nextcloud Local",
-    description: "Nextcloud Office & Storage",
-    notes: "Can be used with N8N that acts like GDrive",
+export const MauticLocal: ProjectTemplate = {
+    name: "Mautic Local",
+    description: "Marketing Automation Platform",
+    notes: "Local Mautic instance for testing workflows",
     type: "tool",
-    icon: "fas fa-cloud text-blue-500",
+    category: "Open Source",
+    icon: "fas fa-bullhorn text-purple-500",
     templating: [
         {
             action: 'file',
@@ -38,7 +39,7 @@ export const NextcloudLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=Nextcloud Server (Docker)']
+            args: ['pkg', 'set', 'description=Mautic Marketing Automation (Docker)']
         },
         {
             action: 'command',
@@ -48,7 +49,7 @@ export const NextcloudLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-cloud text-blue-500']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-bullhorn text-purple-500']
         }
     ]
 };

@@ -5,6 +5,7 @@ const MonoChat: ProjectTemplate = {
     description: "React Frontend, needs custom backend",
     notes: "Vite React + TailwindCSS + TypeScript",
     type: "app",
+    category: "Demo",
     icon: "fas fa-comments text-green-500",
     templating: [
         {

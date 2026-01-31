@@ -5,6 +5,7 @@ export const YaadeTool: ProjectTemplate = {
     description: "API Testing Tool (Self-Hosted)",
     notes: "Requires Docker. Collaborative API development environment.",
     type: "tool",
+    category: "Tool",
     icon: "fas fa-vial text-purple-500",
     templating: [
         {

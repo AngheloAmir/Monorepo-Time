@@ -6,6 +6,7 @@ export const PythonConsole: ProjectTemplate = {
     description: "Simple Python Backend Application",
     notes: "Python 3 must be installed in your system.",
     type: "app",
+    category: "Project",
     icon: "fab fa-python text-yellow-500",
     templating: [
         {

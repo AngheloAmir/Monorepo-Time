@@ -5,6 +5,7 @@ export const HeadlampTool: ProjectTemplate = {
     description: "Kubernetes Web UI",
     notes: "Requires Docker. Connects to local or remote Kubernetes clusters.",
     type: "tool",
+    category: "Tool",
     icon: "fas fa-cubes text-blue-500",
     templating: [
         {

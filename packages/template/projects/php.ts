@@ -6,6 +6,7 @@ export const PHP: ProjectTemplate = {
     description: "Simple PHP project template",
     notes: "PHP must be installed in your system.",
     type: "app",
+    category: "Project",
     icon: "fab fa-php text-indigo-400",
     templating: [
         {

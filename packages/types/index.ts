@@ -91,6 +91,17 @@ export interface CrudItem {
 }
 
 export const TemplateCategories = ['project', 'database', 'services', 'tool', 'demo'] as const;
+
+/**
+ * @example
+ * export interface ProcessTemplate {
+    action:   "command" | "file" | "root-command";
+    cmd?:     string;
+    args?:    string[];
+    file?:    string;
+    filecontent?: string;
+}
+ */
 export interface ProcessTemplate {
     action:   "command" | "file" | "root-command";
     cmd?:     string;
@@ -99,11 +110,43 @@ export interface ProcessTemplate {
     filecontent?: string;
 }
 
+/**
+ * @example
 export interface ProjectTemplate {
     name:        string;
     description: string;
     notes:       string;
-    type:        "app" | "database" | "tool";
+    type:        "app" | "database" | "tool" | "opensource-app";
     templating:  ProcessTemplate[];
     icon:        string;
+}
+ */
+export interface ProjectTemplate {
+    name:        string;
+    description: string;
+    notes:       string;
+    type:        "app" | "database" | "tool" | "opensource-app";
+    icon:        string;
+    category:    string;
+    templating:  ProcessTemplate[];
+}
+
+/**
+ * @example
+ * export interface AvailbleTemplates {
+    project:    ProjectTemplate[],
+    database:   ProjectTemplate[],
+    services:   ProjectTemplate[],
+    opensource: ProjectTemplate[],
+    tool:       ProjectTemplate[],
+    demo:       ProjectTemplate[],
+}
+ */
+export interface AvailbleTemplates {
+    project:    ProjectTemplate[],
+    database:   ProjectTemplate[],
+    services:   ProjectTemplate[],
+    opensource: ProjectTemplate[],
+    tool:       ProjectTemplate[],
+    demo:       ProjectTemplate[],
 }

@@ -12,6 +12,7 @@ export const DotNetConsole: ProjectTemplate = {
     description: "Simple .NET Console Application",
     notes: ".NET SDK must be installed in your system.",
     type: "app",
+    category: "Project",
     icon: "fab fa-windows text-blue-600",
     templating: [
         {

@@ -36,7 +36,7 @@ export function setWorkspaceTemplateSocket(io: Server) {
                 return;
             }
 
-            if (template.type === 'tool') {
+            if (template.type === 'tool' || template.type === 'opensource-app') {
                 const root = await findMonorepoRoot(workspacePath);
                 const toolFolderName = template.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
                 workspacePath = path.join(root, 'opensource', toolFolderName);

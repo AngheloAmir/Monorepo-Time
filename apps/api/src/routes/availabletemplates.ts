@@ -1,6 +1,7 @@
 
 import express from 'express';
 import MonorepoTemplates from 'template';
+import { AvailbleTemplates } from 'types';
 
 const router = express.Router();
 
@@ -15,9 +16,10 @@ router.get('/', (req, res) => {
             project:    stripTemplating(MonorepoTemplates.project),
             database:   stripTemplating(MonorepoTemplates.database),
             services:   stripTemplating(MonorepoTemplates.services),
+            opensource: stripTemplating(MonorepoTemplates.opensource),
             tool:       stripTemplating(MonorepoTemplates.tool),
             demo:       stripTemplating(MonorepoTemplates.demo),
-        };
+        } as AvailbleTemplates;
 
         res.json(availableTemplates);
     } catch (error) {

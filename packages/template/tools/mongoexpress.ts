@@ -5,6 +5,7 @@ export const MongoExpressTool: ProjectTemplate = {
     description: "MongoDB Web GUI",
     notes: "Requires Docker. Connects to any MongoDB database.",
     type: "tool",
+    category: "Tool",
     icon: "fas fa-leaf text-green-500",
     templating: [
         {

@@ -1,4 +1,4 @@
-import type { ProjectTemplate } from "types";
+import type { AvailbleTemplates, ProjectTemplate } from "types";
 import ModalBody from "../ui/ModalBody";
 import ModalHeader from "../ui/ModalHeader";
 import { useEffect, useState } from "react";
@@ -13,31 +13,27 @@ interface TemplateSelectorProps {
 
 export default function TemplateSelector(props: TemplateSelectorProps) {
     const getTemplates = useAppState.use.getTemplates();
-    const [templates, setTemplates] = useState<{
-        project:  ProjectTemplate[],
-        database: ProjectTemplate[],
-        services: ProjectTemplate[],
-        tool:     ProjectTemplate[],
-        demo:     ProjectTemplate[],
-    }>({
+    const [templates, setTemplates] = useState<AvailbleTemplates>({
         project:  [],
         database: [],
         services: [],
+        opensource: [],
         tool:     [],
         demo:     [],
     });
-    const [activeTab, setActiveTab] = useState<'Project' | 'Database' | 'Services' | 'Tool' | 'Demo'>('Project');
+    const [activeTab, setActiveTab] = useState<string>('Project');
 
     useEffect(() => {
         if (!props.show) return;
         const loadTemplates = async () => {
             const data = await getTemplates();
             const temp = {
-                project:     data.project || [],
-                database:    data.database || [],
-                services:    data.services || [],
-                tool:        data.tool || [],
-                demo:        data.demo || [],
+                project:     data.project     || [],
+                database:    data.database    || [],
+                services:    data.services    || [],
+                opensource:  data.opensource  || [],
+                tool:        data.tool        || [],
+                demo:        data.demo        || [],
             }
             setTemplates(temp);
         }
@@ -56,14 +52,12 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                 <div className="w-48">
                     <TabItem name="Project" icon="fas fa-code" activeTab={activeTab} setActiveTab={setActiveTab} />
 
-                    <h2 className="text-sm font-bold text-white mt-4 ml-2 mb-1">
-                        Local Testing
-                        <span className="text-red-500 text-xs ml-1">
-                            *DOCKER
-                        </span>
+                    <h2 className="text-sm font-bold text-gray-600 my-2 ml-2 flex gap-2">
+                        <li className="fab fa-docker"></li>Docker Apps
                     </h2>
                     <TabItem name="Database" icon="fas fa-database" activeTab={activeTab} setActiveTab={setActiveTab} />
                     <TabItem name="Services" icon="fas fa-server" activeTab={activeTab} setActiveTab={setActiveTab} />
+                    <TabItem name="Open Source" icon="fa-brands fa-github" activeTab={activeTab} setActiveTab={setActiveTab} />
                     <TabItem name="Tool" icon="fas fa-tools" activeTab={activeTab} setActiveTab={setActiveTab} />
 
                     <h2 className="text-sm font-bold text-gray-600 my-2 ml-2">Sample Projects</h2>
@@ -79,6 +73,9 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                             props.onSelect(name, type);
                         }}/>
                         <ProjectItem show={activeTab === 'Services'} project={templates.services} onClick={(name, type) => {
+                            props.onSelect(name, type);
+                        }}/>
+                        <ProjectItem show={activeTab === 'Open Source'} project={templates.opensource} onClick={(name, type) => {
                             props.onSelect(name, type);
                         }}/>
                         <ProjectItem show={activeTab === 'Tool'} project={templates.tool} onClick={(name, type) => {

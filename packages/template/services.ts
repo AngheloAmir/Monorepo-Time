@@ -1,18 +1,10 @@
 import type { ProjectTemplate } from "../types";
-import { N8NLocal } from "./services_list/n8n";
-import { AWSTemplate } from "./services_list/aws";
-import { StripeTemplate } from "./services_list/stripe";
-import { MattermostLocal } from "./services_list/mattermost";
-import { NextcloudLocal } from "./services_list/nextcloud";
-import { MauticLocal } from "./services_list/mautic";
-import { EzBookkeepingLocal } from "./services_list/ezbookkeeping";
+import { N8NLocal } from "./services/n8n";
+import { AWSTemplate } from "./services/aws";
+import { StripeTemplate } from "./services/stripe";
 
 const templates: ProjectTemplate[] = [
     N8NLocal,
-    MattermostLocal,
-    NextcloudLocal,
-    MauticLocal,
-    EzBookkeepingLocal,
     AWSTemplate,
     StripeTemplate,
 ];

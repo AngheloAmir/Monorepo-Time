@@ -5,6 +5,7 @@ export const MinIO: ProjectTemplate = {
     description: "MinIO Object Storage (S3 Compatible)",
     notes: "Data stored in ./minio-data folder.",
     type: "database",
+    category: "Database",
     icon: "fas fa-database text-red-500",
     templating: [
         {

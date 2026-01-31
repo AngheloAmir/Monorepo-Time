@@ -1,14 +1,15 @@
 import type { ProjectTemplate } from "../../types";
-import { dockerCompose } from "./mautic/dockerCompose";
-import { gitignoreContent } from "./mautic/gitignore";
-import { serverJs } from "./mautic/server";
+import { dockerCompose } from "./mattermost/dockerCompose";
+import { gitignoreContent } from "./mattermost/gitignore";
+import { serverJs } from "./mattermost/server";
 
-export const MauticLocal: ProjectTemplate = {
-    name: "Mautic Local",
-    description: "Marketing Automation Platform",
-    notes: "Local Mautic instance for testing workflows",
+export const MattermostLocal: ProjectTemplate = {
+    name: "Mattermost Local",
+    description: "Mattermost Team",
+    notes: "Open source version of Discord",
     type: "tool",
-    icon: "fas fa-bullhorn text-purple-500",
+    category: "Open Source",
+    icon: "fas fa-comments text-green-500",
     templating: [
         {
             action: 'file',
@@ -38,7 +39,7 @@ export const MauticLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=Mautic Marketing Automation (Docker)']
+            args: ['pkg', 'set', 'description=Mattermost Messaging (Docker)']
         },
         {
             action: 'command',
@@ -48,7 +49,7 @@ export const MauticLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-bullhorn text-purple-500']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-comments text-blue-500']
         }
     ]
 };

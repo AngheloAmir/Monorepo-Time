@@ -9,6 +9,7 @@ export const StripeTemplate: ProjectTemplate = {
     description: "Stripe API Mock Server",
     notes: "Runs the official stripe-mock image.",
     type: "tool",
+    category: "Service",
     icon: "fab fa-stripe text-orange-500",
     templating: [
         {

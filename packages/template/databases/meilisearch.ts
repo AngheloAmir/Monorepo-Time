@@ -5,6 +5,7 @@ export const Meilisearch: ProjectTemplate = {
     description: "Meilisearch (Docker Compose)",
     notes: "Data stored in ./meili-data folder.",
     type: "database",
+    category: "Database",
     icon: "fas fa-search text-pink-500",
     templating: [
         {
