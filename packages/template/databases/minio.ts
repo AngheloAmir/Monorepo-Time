@@ -21,8 +21,8 @@ export const MinIO: ProjectTemplate = {
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=admin
     ports:
-      - "0:9000"
-      - "0:9001"
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - ./minio-data:/data
     healthcheck:

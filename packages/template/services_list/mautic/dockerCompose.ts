@@ -30,7 +30,7 @@ export const dockerCompose = `services:
       - MAUTIC_ADMIN_EMAIL=admin@admin.com
       - MAUTIC_ADMIN_PASSWORD=admin
     ports:
-      - "0:80"
+      - "4310:80"
     volumes:
       - mautic_data:/var/www/html
     links:

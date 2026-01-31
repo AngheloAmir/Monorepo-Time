@@ -16,7 +16,7 @@ export const CloudbeaverTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:8978"
+      - "4230:8978"
     volumes:
       - cloudbeaver-data:/opt/cloudbeaver/workspace
     extra_hosts:

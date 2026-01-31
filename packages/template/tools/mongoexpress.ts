@@ -16,7 +16,7 @@ export const MongoExpressTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: "no"
     ports:
-      - "0:8081"
+      - "4240:8081"
     environment:
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin

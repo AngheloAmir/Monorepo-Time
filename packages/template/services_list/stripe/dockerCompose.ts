@@ -4,8 +4,8 @@ export const dockerCompose = `services:
     pull_policy: if_not_present
     container_name: stripe-mock
     ports:
-      - "12111:12111"
-      - "12112:12112"
+      - "4350:12111"
+      - "4360:12112"
     healthcheck:
       test: ["CMD", "/usr/bin/curl", "-f", "http://localhost:12111/"]
       interval: 5s

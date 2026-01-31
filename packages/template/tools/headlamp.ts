@@ -16,7 +16,7 @@ export const HeadlampTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:4466"
+      - "4466:4466"
     volumes:
       # Mount kubeconfig so Headlamp can find your clusters
       # Typically ~/.kube/config on your host

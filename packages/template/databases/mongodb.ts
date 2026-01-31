@@ -20,7 +20,7 @@ export const MongoDB: ProjectTemplate = {
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
     ports:
-      - "0:27017"
+      - "27017:27017"
     volumes:
       - ./mongo-data:/data/db
     command: ["mongod", "--quiet", "--logpath", "/dev/null"]

@@ -20,7 +20,7 @@ export const Meilisearch: ProjectTemplate = {
       - MEILI_MASTER_KEY=admin
       - MEILI_ENV=development
     ports:
-      - "0:7700"
+      - "7700:7700"
     volumes:
       - ./meili-data:/meili_data
     healthcheck:

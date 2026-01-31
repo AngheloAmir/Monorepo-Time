@@ -21,7 +21,7 @@ export const dockerCompose = `services:
     image: aaronshaf/dynamodb-admin
     pull_policy: if_not_present
     ports:
-      - "8001:8001"
+      - "4330:8001"
     environment:
       - DYNAMO_ENDPOINT=http://localstack:4566
       - AWS_REGION=us-east-1
@@ -36,7 +36,7 @@ export const dockerCompose = `services:
     image: cloudlena/s3manager
     pull_policy: if_not_present
     ports:
-      - "8002:8080"
+      - "4340:8080"
     environment:
       - ACCESS_KEY_ID=test
       - SECRET_ACCESS_KEY=test

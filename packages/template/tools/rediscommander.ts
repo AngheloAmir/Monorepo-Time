@@ -16,7 +16,7 @@ export const RedisCommanderTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: "no"
     ports:
-      - "0:8081"
+      - "4260:8081"
     environment:
       - HTTP_USER=admin
       - HTTP_PASSWORD=admin

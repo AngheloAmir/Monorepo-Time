@@ -24,7 +24,7 @@ export const LocalKubernetesTool: ProjectTemplate = {
       - K3S_KUBECONFIG_MODE=644
       - K3S_TOKEN=secret
     ports:
-      - "0:6443"
+      - "6443:6443"
     volumes:
       - ./k3s-config:/etc/rancher/k3s
       - k3s-data:/var/lib/rancher/k3s
@@ -39,7 +39,7 @@ export const LocalKubernetesTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:4466"
+      - "4470:4466"
     volumes:
       - ./headlamp-config:/root/.kube
     depends_on:

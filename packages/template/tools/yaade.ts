@@ -16,7 +16,7 @@ export const YaadeTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:9339"
+      - "4290:9339"
     volumes:
       - yaade-data:/app/data
     environment:

@@ -16,8 +16,8 @@ export const MailpitTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:8025"
-      - "0:1025"
+      - "4270:8025"
+      - "4280:1025"
     environment:
       - MP_SMTP_AUTH_ACCEPT_ANY=true
       - MP_SMTP_AUTH_ALLOW_INSECURE=true

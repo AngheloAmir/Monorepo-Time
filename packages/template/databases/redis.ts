@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
     user: "1000:1000"
     ports:
-      - "0:6379"
+      - "6379:6379"
     volumes:
       - ./redis-data:/data
     command: >

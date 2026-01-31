@@ -36,7 +36,7 @@ export const dockerCompose = `services:
       postgres:
         condition: service_healthy
     ports:
-      - "7201:8065"
+      - "7200:8065"
     volumes:
       - mattermost_config:/mattermost/config:rw
       - mattermost_data:/mattermost/data:rw

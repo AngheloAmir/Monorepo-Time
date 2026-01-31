@@ -85134,6 +85134,7 @@ var MySQL = {
   description: "MySQL Database (Local)",
   notes: "Requires MySQL installed in your system.",
   type: "database",
+  icon: "fas fa-database text-blue-500",
   templating: [
     {
       action: "command",
@@ -85193,6 +85194,7 @@ var PostgreSQL = {
   description: "PostgreSQL (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./postgres-data folder.",
   type: "database",
+  icon: "fas fa-database text-blue-300",
   templating: [
     {
       action: "file",
@@ -85384,6 +85386,7 @@ var Supabase = {
   description: "Supabase (Docker)",
   notes: "Requires Docker installed.",
   type: "database",
+  icon: "fas fa-bolt text-green-400",
   templating: [
     {
       action: "command",
@@ -85429,6 +85432,7 @@ var Redis = {
   description: "Redis (Docker Compose)",
   notes: "Requires Docker installed. Data stored in ./redis-data folder.",
   type: "database",
+  icon: "fas fa-server text-red-400",
   templating: [
     {
       action: "file",
@@ -85620,6 +85624,7 @@ var MongoDB = {
   description: "MongoDB (Docker Compose)",
   notes: "Data stored in ./mongo-data folder.",
   type: "database",
+  icon: "fas fa-leaf text-green-500",
   templating: [
     {
       action: "file",
@@ -85811,6 +85816,7 @@ var Meilisearch = {
   description: "Meilisearch (Docker Compose)",
   notes: "Data stored in ./meili-data folder.",
   type: "database",
+  icon: "fas fa-search text-pink-500",
   templating: [
     {
       action: "file",
@@ -86003,6 +86009,7 @@ var MinIO = {
   description: "MinIO Object Storage (S3 Compatible)",
   notes: "Data stored in ./minio-data folder.",
   type: "database",
+  icon: "fas fa-database text-red-500",
   templating: [
     {
       action: "file",
@@ -86225,6 +86232,7 @@ var MonoChat = {
   description: "React Frontend, needs custom backend",
   notes: "Vite React + TailwindCSS + TypeScript",
   type: "app",
+  icon: "fas fa-comments text-green-500",
   templating: [
     {
       action: "command",
@@ -86640,6 +86648,7 @@ var ViteReact = {
   description: "Vite React TS template",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  icon: "fab fa-react text-blue-400",
   templating: [
     {
       action: "command",
@@ -86857,6 +86866,7 @@ var NextJS = {
   description: "Next.js TS template",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  icon: "fab fa-js text-white",
   templating: [
     {
       action: "command",
@@ -87116,6 +87126,7 @@ var ExpressTS = {
   description: "Express.js TS template",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  icon: "fab fa-node text-green-500",
   templating: [
     {
       action: "command",
@@ -87438,6 +87449,7 @@ var ServerlessExpressTS = {
   description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
   notes: "Node.js and NPM must be installed.",
   type: "app",
+  icon: "fab fa-node text-green-500",
   templating: [
     {
       action: "command",
@@ -87678,6 +87690,7 @@ var PHP = {
   description: "Simple PHP project template",
   notes: "PHP must be installed in your system.",
   type: "app",
+  icon: "fab fa-php text-indigo-400",
   templating: [
     {
       action: "file",
@@ -87713,6 +87726,7 @@ var Laravel = {
   description: "Laravel PHP Framework template",
   notes: "Composer and PHP must be installed in your system.",
   type: "app",
+  icon: "fab fa-laravel text-red-500",
   templating: [
     {
       action: "command",
@@ -87887,6 +87901,7 @@ var PythonConsole = {
   description: "Simple Python Backend Application",
   notes: "Python 3 must be installed in your system.",
   type: "app",
+  icon: "fab fa-python text-yellow-500",
   templating: [
     {
       action: "file",
@@ -87943,6 +87958,7 @@ var DotNetConsole = {
   description: "Simple .NET Console Application",
   notes: ".NET SDK must be installed in your system.",
   type: "app",
+  icon: "fab fa-windows text-blue-600",
   templating: [
     {
       action: "command",
@@ -88134,6 +88150,7 @@ var N8NLocal = {
   description: "N8N Workflow Automation",
   notes: "Local N8N instance for testing workflows",
   type: "app",
+  icon: "fas fa-project-diagram text-red-500",
   templating: [
     {
       action: "file",
@@ -88754,6 +88771,7 @@ var AWSTemplate = {
   description: "AWS LocalStack with Manager",
   notes: "For local testing with LocalStack",
   type: "tool",
+  icon: "fab fa-aws text-orange-400",
   templating: [
     {
       action: "file",
@@ -89012,6 +89030,7 @@ var StripeTemplate = {
   description: "Stripe API Mock Server",
   notes: "Runs the official stripe-mock image.",
   type: "tool",
+  icon: "fab fa-stripe text-orange-500",
   templating: [
     {
       action: "file",
@@ -89270,6 +89289,7 @@ var MattermostLocal = {
   description: "Mattermost Team",
   notes: "Open source version of Discord",
   type: "tool",
+  icon: "fas fa-comments text-green-500",
   templating: [
     {
       action: "file",
@@ -89485,6 +89505,7 @@ var NextcloudLocal = {
   description: "Nextcloud Office & Storage",
   notes: "Can be used with N8N that acts like GDrive",
   type: "tool",
+  icon: "fas fa-cloud text-blue-500",
   templating: [
     {
       action: "file",
@@ -89705,6 +89726,7 @@ var MauticLocal = {
   description: "Marketing Automation Platform",
   notes: "Local Mautic instance for testing workflows",
   type: "tool",
+  icon: "fas fa-bullhorn text-purple-500",
   templating: [
     {
       action: "file",
@@ -89749,12 +89771,198 @@ var MauticLocal = {
   ]
 };
 
+// ../../packages/template/services_list/ezbookkeeping.ts
+var EzBookkeepingLocal = {
+  name: "EzBookkeeping",
+  description: "Personal finance manager (Docker)",
+  notes: "Requires Docker installed. Data stored in ./ezbookkeeping-data folder.",
+  type: "app",
+  icon: "fas fa-wallet text-green-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `
+services:
+  ezbookkeeping:
+    image: mayswind/ezbookkeeping:latest
+    pull_policy: missing
+    restart: unless-stopped
+    ports:
+      - "0:8080"
+    volumes:
+      - ./ezbookkeeping-data:/data
+    environment:
+      - EBK_DB_TYPE=sqlite3
+      - EBK_DB_PATH=/data/ezbookkeeping.db
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Data folder
+ezbookkeeping-data/
+
+# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'ezbookkeeping-data');
+
+console.log('Starting EzBookkeeping...');
+
+// Pre-create data directory
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created ezbookkeeping-data directory');
+}
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port ezbookkeeping 8080', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Capture Container IDs
+        exec('docker compose ps -q', (err2, stdout2) => {
+             const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+             
+             try {
+                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                    port: server.address().port, 
+                    pid: process.pid,
+                    containerIds: containerIds
+                }));
+             } catch(e) {
+                console.error('Failed to write runtime file:', e);
+             }
+
+             process.stdout.write('\\\\x1Bc');
+             console.log('\\n==================================================');
+             console.log('EzBookkeeping is running!');
+             console.log('--------------------------------------------------');
+             console.log(\`URL:               http://localhost:\${port}\`);
+             console.log('--------------------------------------------------');
+             console.log('To update to the latest version:');
+             console.log('  docker pull mayswind/ezbookkeeping:latest');
+             console.log('==================================================\\n');
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping EzBookkeeping...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=EzBookkeeping (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=app"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-wallet text-green-500"]
+    }
+  ]
+};
+
 // ../../packages/template/services.ts
 var templates4 = [
   N8NLocal,
   MattermostLocal,
   NextcloudLocal,
   MauticLocal,
+  EzBookkeepingLocal,
   AWSTemplate,
   StripeTemplate
 ];
@@ -89766,6 +89974,7 @@ var PgwebTool = {
   description: "PostgreSQL Web GUI (Lightweight)",
   notes: "Requires Docker. Connects to any PostgreSQL database.",
   type: "tool",
+  icon: "fas fa-database text-blue-500",
   templating: [
     {
       action: "file",
@@ -89950,6 +90159,7 @@ var MongoExpressTool = {
   description: "MongoDB Web GUI",
   notes: "Requires Docker. Connects to any MongoDB database.",
   type: "tool",
+  icon: "fas fa-leaf text-green-500",
   templating: [
     {
       action: "file",
@@ -90145,6 +90355,7 @@ var RedisCommanderTool = {
   description: "Redis Web GUI",
   notes: "Requires Docker. Connects to any Redis instance.",
   type: "tool",
+  icon: "fas fa-server text-red-400",
   templating: [
     {
       action: "file",
@@ -90340,6 +90551,7 @@ var YaadeTool = {
   description: "API Testing Tool (Self-Hosted)",
   notes: "Requires Docker. Collaborative API development environment.",
   type: "tool",
+  icon: "fas fa-vial text-purple-500",
   templating: [
     {
       action: "file",
@@ -90523,6 +90735,7 @@ var MailpitTool = {
   description: "Email Testing Tool",
   notes: "Requires Docker. Catches all outgoing emails for testing.",
   type: "tool",
+  icon: "fas fa-envelope text-blue-500",
   templating: [
     {
       action: "file",
@@ -90723,6 +90936,7 @@ var CloudbeaverTool = {
   description: "Universal Database GUI (DBeaver Web)",
   notes: "Requires Docker. Web-based database management tool.",
   type: "tool",
+  icon: "fas fa-database text-orange-500",
   templating: [
     {
       action: "file",
@@ -90898,6 +91112,433 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
+// ../../packages/template/tools/headlamp.ts
+var HeadlampTool = {
+  name: "Headlamp",
+  description: "Kubernetes Web UI",
+  notes: "Requires Docker. Connects to local or remote Kubernetes clusters.",
+  type: "tool",
+  icon: "fas fa-cubes text-blue-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  headlamp:
+    image: ghcr.io/headlamp-k8s/headlamp:latest
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:4466"
+    volumes:
+      # Mount kubeconfig so Headlamp can find your clusters
+      # Typically ~/.kube/config on your host
+      - \${HOME}/.kube/config:/root/.kube/config:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4466"]
+      interval: 10s
+      timeout: 5s
+      retries: 5`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Headlamp...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port headlamp 4466', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify headlamp is responding
+        http.get(\`http://localhost:\${port}\`, (res) => {
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('\u2638\uFE0F  Headlamp - Kubernetes Web UI');
+                console.log('==================================================');
+                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('--------------------------------------------------');
+                console.log('\u{1F4A1} Note: Automatically tries to load ~/.kube/config');
+                console.log('   Ensure your Docker Desktop / Engines share');
+                console.log('   has access to your home directory.');
+                console.log('==================================================\\n');
+            });
+        }).on('error', () => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Headlamp...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Headlamp - Kubernetes Web UI"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-cubes text-blue-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    }
+  ]
+};
+
+// ../../packages/template/tools/kubernetes.ts
+var LocalKubernetesTool = {
+  name: "Local Kubernetes",
+  description: "K3s Cluster + Headlamp UI",
+  notes: "Runs a K3s cluster in Docker and connects Headlamp automatically.",
+  type: "tool",
+  icon: "fas fa-cubes text-blue-600",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  k3s:
+    image: rancher/k3s:latest
+    command: server --disable=traefik
+    privileged: true
+    pull_policy: if_not_present
+    restart: unless-stopped
+    tmpfs:
+      - /run
+      - /var/run
+    environment:
+      - K3S_KUBECONFIG_MODE=644
+      - K3S_TOKEN=secret
+    ports:
+      - "0:6443"
+    volumes:
+      - ./k3s-config:/etc/rancher/k3s
+      - k3s-data:/var/lib/rancher/k3s
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -f /etc/rancher/k3s/k3s.yaml"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  headlamp:
+    image: ghcr.io/headlamp-k8s/headlamp:latest
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "0:4466"
+    volumes:
+      - ./headlamp-config:/root/.kube
+    depends_on:
+      k3s:
+        condition: service_healthy
+    # Wait for the config file to be generated by our host script
+    command: ["/bin/sh", "-c", "echo 'Waiting for kubeconfig...'; while [ ! -f /root/.kube/config ]; do sleep 1; done; echo 'Config found, starting Headlamp...'; /headlamp-server -html-static-dir /headlamp/static"]
+
+volumes:
+  k3s-data:`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Local data
+k3s-config/
+k3s-data/
+headlamp-config/
+
+# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const K3S_CONFIG_DIR = path.join(__dirname, 'k3s-config');
+const HL_CONFIG_DIR = path.join(__dirname, 'headlamp-config');
+const K3S_FILE = path.join(K3S_CONFIG_DIR, 'k3s.yaml');
+const HL_FILE = path.join(HL_CONFIG_DIR, 'config');
+
+console.log('Starting Local Kubernetes (K3s + Headlamp)...');
+
+// Ensure directories exist
+if (!fs.existsSync(K3S_CONFIG_DIR)) fs.mkdirSync(K3S_CONFIG_DIR, { recursive: true });
+if (!fs.existsSync(HL_CONFIG_DIR)) fs.mkdirSync(HL_CONFIG_DIR, { recursive: true });
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+// Config Watcher & Transformer
+let configSynced = false;
+const syncConfig = () => {
+    if (configSynced) return;
+    
+    if (fs.existsSync(K3S_FILE)) {
+        try {
+            let content = fs.readFileSync(K3S_FILE, 'utf8');
+            if (content.length > 0) {
+                // Replace localhost with k3s service name for Docker networking
+                const dockerConfig = content.replace('server: https://127.0.0.1:6443', 'server: https://k3s:6443');
+                fs.writeFileSync(HL_FILE, dockerConfig);
+                console.log('\u2705 Kubeconfig synced to Headlamp');
+                configSynced = true;
+            }
+        } catch (e) {
+            console.error('Error syncing config:', e);
+        }
+    }
+};
+
+// Check for config every second until found
+const configInterval = setInterval(syncConfig, 2000);
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs for Headlamp mainly
+    const logs = spawn('docker', ['compose', 'logs', '-f', 'headlamp', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            if (line.includes('Headlamp')) {
+                console.log(line);
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => { /* Update runtime later */ });
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port headlamp 4466', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Also check if K3s is responsive on its external port
+        exec('docker compose port k3s 6443', (err2, stdout2) => {
+             const k3sHostPort = stdout2 ? stdout2.trim().split(':')[1] : null;
+             
+             // We want to generate a "Host Usable" kubeconfig too!
+             // The k3s.yaml file in ./k3s-config IS usable by the host since it says 127.0.0.1
+             // EXCEPT the port mapped by Docker might be random if we used "0:6443"!
+             // Wait, K3s internal certs are for 127.0.0.1.
+             // If Docker maps 0:6443 -> host:32145, then https://127.0.0.1:32145 works IF the cert accepts it.
+             // K3s certs usually allow localhost.
+             
+             // Let's create a host-usable config
+             if (k3sHostPort && fs.existsSync(K3S_FILE)) {
+                 try {
+                     let content = fs.readFileSync(K3S_FILE, 'utf8');
+                     const hostConfig = content.replace('server: https://127.0.0.1:6443', \`server: https://127.0.0.1:\${k3sHostPort}\`);
+                     fs.writeFileSync(path.join(__dirname, 'kubeconfig_host.yaml'), hostConfig);
+                 } catch(e) {}
+             }
+
+             exec('docker compose ps -q', (err3, stdout3) => {
+                const containerIds = stdout3 ? stdout3.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {}
+
+                process.stdout.write('\\\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('\u2638\uFE0F  Local Kubernetes (K3s)');
+                console.log('==================================================');
+                console.log(\`Headlamp UI:       http://localhost:\${port}\`);
+                console.log('--------------------------------------------------');
+                if (k3sHostPort) {
+                    console.log(\`K8s API:           https://127.0.0.1:\${k3sHostPort}\`);
+                    console.log(\`Host Kubeconfig:   \${path.join(__dirname, 'kubeconfig_host.yaml')}\`);
+                    console.log('To use with kubectl:');
+                    console.log(\`  export KUBECONFIG=\${path.join(__dirname, 'kubeconfig_host.yaml')}\`);
+                }
+                console.log('--------------------------------------------------');
+                console.log('Includes:');
+                console.log('  - K3s (Lightweight Kubernetes)');
+                console.log('  - Headlamp (Web UI)');
+                console.log('==================================================\\n');
+             });
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Cluster...');
+    clearInterval(configInterval);
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=K3s Kubernetes Cluster with Headlamp UI"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-cubes text-blue-600"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    }
+  ]
+};
+
 // ../../packages/template/tools.ts
 var tools = [
   CloudbeaverTool,
@@ -90905,7 +91546,9 @@ var tools = [
   MailpitTool,
   PgwebTool,
   MongoExpressTool,
-  RedisCommanderTool
+  RedisCommanderTool,
+  HeadlampTool,
+  LocalKubernetesTool
 ];
 var tools_default = tools;
 

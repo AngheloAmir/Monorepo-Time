@@ -17,7 +17,7 @@ services:
     pull_policy: missing
     restart: unless-stopped
     ports:
-      - "0:8080"
+      - "4320:8080"
     volumes:
       - ./ezbookkeeping-data:/data
     environment:

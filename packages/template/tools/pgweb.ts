@@ -16,7 +16,7 @@ export const PgwebTool: ProjectTemplate = {
     pull_policy: if_not_present
     restart: unless-stopped
     ports:
-      - "0:8081"
+      - "4250:8081"
     environment:
       - PGWEB_AUTH_USER=admin
       - PGWEB_AUTH_PASS=admin
