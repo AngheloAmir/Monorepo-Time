@@ -7,10 +7,14 @@ import { PHP } from "./projects/php";
 import { Laravel } from "./projects/laravel";
 import { PythonConsole } from "./projects/python";
 import { DotNetConsole } from "./projects/dotnet";
+import { PlasmicNextJS } from "./projects/plasmic";
+import { StrapiLocal } from "./projects/strapi";
 
 const templates: ProjectTemplate[] = [
     ViteReact,
     NextJS,
+    PlasmicNextJS,
+    StrapiLocal,
     ExpressTS,
     ServerlessExpressTS,
     PHP,
