@@ -44,7 +44,7 @@ export default function WorkspaceNew() {
     }
 
     async function createWorkspace() {
-        if (templateType !== 'tool' && (workspaceCopy.name === '' || workspaceCopy.path === '')) {
+        if ( (templateType !== 'tool' && templateType !== 'opensource-app') && (workspaceCopy.name === '' || workspaceCopy.path === '')) {
             setError('Package name and path is required');
             return;
         }
@@ -67,7 +67,7 @@ export default function WorkspaceNew() {
             setWorkspaceLoading(true);
             setShowWorkspaceNew(false);
 
-            if (templateType != 'tool') {
+            if (templateType != 'tool' && templateType != 'opensource-app') {
                 //add a new folder
                 const response = await createNewWorkspace(newWorkspaceToAdd);
                 if (response) {

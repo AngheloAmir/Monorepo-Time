@@ -23,13 +23,14 @@ export function setWorkspaceTemplateSocket(io: Server) {
 
         socket.on('template:start', async (data: { workspace: WorkspaceInfo, templatename: string }) => {
             const { workspace, templatename } = data;
-
-            if (!workspace || !workspace.path || !templatename) {
+       
+            if (!workspace && !templatename) {
                 socket.emit('template:error', { error: 'Missing workspace info or template name' });
                 return;
             }
 
-            let workspacePath = workspace.path;
+            // Default to current working directory if workspace path is missing (e.g. valid for tools/opensource added from root)
+            let workspacePath = workspace?.path || process.cwd();
             const template = findTemplate(templatename);
             if (!template) {
                 socket.emit('template:error', { error: `Template '${templatename}' not found` });
