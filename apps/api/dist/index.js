@@ -85205,7 +85205,7 @@ var PostgreSQL = {
 
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:16.2
     pull_policy: missing
     restart: unless-stopped
     environment:
@@ -85330,7 +85330,7 @@ const checkStatus = () => {
              console.log(\`Port:              \${port}\`);
              console.log('--------------------------------------------------');
              console.log('To update to the latest version:');
-             console.log('  docker pull postgres:latest');
+             console.log('  docker pull postgres:16.2');
              console.log('==================================================\\n');
         });
     });
@@ -85445,7 +85445,7 @@ var Redis = {
 
 services:
   redis:
-    image: redis:7.2-alpine
+    image: redis:7.4-alpine
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -85570,7 +85570,7 @@ const checkStatus = () => {
             console.log('--------------------------------------------------');
             console.log('Docs: https://redis.io/docs');
             console.log('To update to the latest version:');
-            console.log('  docker pull redis:latest');
+            console.log('  docker pull redis:7.4-alpine');
             console.log('==================================================\\n');
         });
     });
@@ -85636,7 +85636,7 @@ var MongoDB = {
       file: "docker-compose.yml",
       filecontent: `services:
   mongodb:
-    image: mongo:latest
+    image: mongo:8.0
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -85763,7 +85763,7 @@ const checkStatus = () => {
             console.log(\`Port:              \${port}\`);
             console.log('--------------------------------------------------');
             console.log('To update to the latest version:');
-            console.log('  docker pull mongo:latest');
+            console.log('  docker pull mongo:8.0');
             console.log('==================================================\\n');
         });
     });
@@ -85829,7 +85829,7 @@ var Meilisearch = {
       file: "docker-compose.yml",
       filecontent: `services:
   meilisearch:
-    image: getmeili/meilisearch:v1.10
+    image: getmeili/meilisearch:v1.11
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -85952,7 +85952,7 @@ const checkStatus = () => {
             console.log('--------------------------------------------------');
             console.log('Docs: https://www.meilisearch.com/docs');
             console.log('To update to the latest version:');
-            console.log('  docker pull getmeili/meilisearch:latest');
+            console.log('  docker pull getmeili/meilisearch:v1.11');
             console.log('==================================================\\n');
         });
     });
@@ -86023,7 +86023,7 @@ var MinIO = {
       file: "docker-compose.yml",
       filecontent: `services:
   minio:
-    image: minio/minio
+    image: alpine/minio:RELEASE.2025-10-15T17-29-55Z
     pull_policy: if_not_present
     command: server /data --console-address ":9001"
     restart: unless-stopped
@@ -86163,7 +86163,7 @@ const checkStatus = () => {
                 console.log('--------------------------------------------------');
                 console.log('Docs: https://min.io/docs/minio/linux/index.html');
                 console.log('To update to the latest version:');
-                console.log('  docker pull minio/minio');
+                console.log('  docker pull alpine/minio:RELEASE.2025-10-15T17-29-55Z');
                 console.log('==================================================\\n');
             });
         });
@@ -88957,7 +88957,7 @@ var projecttemplate_default = templates3;
 // ../../packages/template/services/n8n/dockerCompose.ts
 var dockerCompose4 = `services:
   n8n:
-    image: n8nio/n8n:latest
+    image: n8nio/n8n:1.29.0
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -89094,9 +89094,9 @@ process.on('SIGTERM', cleanup);`;
 
 // ../../packages/template/services/n8n.ts
 var N8NLocal = {
-  name: "N8N Local",
+  name: "N8N Local (Docker)",
   description: "N8N Workflow Automation",
-  notes: "Local N8N instance for testing workflows",
+  notes: "Requires Docker to run",
   type: "app",
   category: "Service",
   icon: "fas fa-project-diagram text-red-500",
@@ -89135,6 +89135,164 @@ var N8NLocal = {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-project-diagram text-red-500"]
+    }
+  ]
+};
+
+// ../../packages/template/services/n8n-native.ts
+var N8NNative = {
+  name: "N8N Native (Node 20)",
+  description: "N8N (Native Node.js)",
+  notes: "Runs n8n locally using NVM",
+  type: "app",
+  category: "Service",
+  icon: "fas fa-project-diagram text-green-500",
+  templating: [
+    {
+      action: "file",
+      file: "setup.sh",
+      filecontent: `#!/bin/bash
+set -e
+
+# Define NVM directory
+export NVM_DIR="$HOME/.nvm"
+
+# 1. Try to load NVM if it exists
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+elif [ -s "/usr/local/opt/nvm/nvm.sh" ]; then
+    . "/usr/local/opt/nvm/nvm.sh"
+fi
+
+# 2. Install NVM if not found
+if ! command -v nvm &> /dev/null; then
+    echo "Installing NVM..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    # Reload nvm
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+fi
+
+# 3. Verify NVM
+if ! command -v nvm &> /dev/null; then
+    echo "Error: Failed to install/load NVM."
+    exit 1
+fi
+
+# 4. Install Node 20 (ensure it exists)
+echo "Installing/Verifying Node 20..."
+nvm install 20
+
+# 5. Install n8n locally (using Node 20 in this shell only)
+echo "Installing n8n..."
+nvm use 20
+npm install n8n
+
+echo "Setup complete!"
+`
+    },
+    {
+      action: "file",
+      file: "setup.ps1",
+      filecontent: `$ErrorActionPreference = "Stop"
+
+# 1. Check for nvm
+if (Get-Command "nvm" -ErrorAction SilentlyContinue) {
+    Write-Host "NVM detected."
+    
+    # 2. Install Node 20
+    Write-Host "Installing Node 20..."
+    nvm install 20
+    # We don't force 'nvm use' globally here, just ensure it's installed
+} else {
+    Write-Host "NVM not found. Checking for Node.js..."
+    if (Get-Command "node" -ErrorAction SilentlyContinue) {
+        $version = node -v
+        Write-Host "Node version $version detected."
+    } else {
+        Write-Host "Please install Node.js v20+ or nvm-windows manually."
+        exit 1
+    }
+}
+
+# 3. Install n8n locally
+# Note: In PowerShell with nvm-windows, switching usually persists.
+# We will just proceed with npm install.
+Write-Host "Installing n8n..."
+npm install n8n
+
+Write-Host "Setup complete!"
+`
+    },
+    {
+      action: "file",
+      file: "start.sh",
+      filecontent: `#!/bin/bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# Force use of Node 20 for this session
+nvm use 20 &> /dev/null || nvm install 20
+
+echo "Starting n8n..."
+npx n8n start
+`
+    },
+    {
+      action: "file",
+      file: "start.ps1",
+      filecontent: `
+# Try to switch to 20 if nvm exists
+if (Get-Command "nvm" -ErrorAction SilentlyContinue) {
+    nvm use 20
+}
+
+Write-Host "Starting n8n..."
+npx n8n start
+`
+    },
+    {
+      action: "file",
+      file: "runner.js",
+      filecontent: `const { spawn } = require('child_process');
+const os = require('os');
+
+const isWindows = os.platform() === 'win32';
+const script = isWindows ? process.argv[2] + '.ps1' : process.argv[2] + '.sh';
+const cmd = isWindows ? 'powershell' : 'bash';
+const args = isWindows ? ['-ExecutionPolicy', 'Bypass', '-File', script] : [script];
+
+const child = spawn(cmd, args, { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    process.exit(code);
+});
+`
+    },
+    {
+      action: "file",
+      file: ".nvmrc",
+      filecontent: "20"
+    },
+    {
+      action: "command",
+      cmd: "node",
+      args: ["runner.js", "setup"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node runner.js start"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=N8N (Node 20)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-project-diagram text-green-500"]
     }
   ]
 };
@@ -89320,7 +89478,7 @@ module.exports = {
 // ../../packages/template/services/aws/dockerCompose.ts
 var dockerCompose5 = `services:
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack:4.0
     pull_policy: if_not_present
     user: "1000:1000"
     ports:
@@ -89804,7 +89962,7 @@ var AWSTemplate = {
 // ../../packages/template/services/stripe/dockerCompose.ts
 var dockerCompose6 = `services:
   stripe-mock:
-    image: stripe/stripe-mock:latest
+    image: stripe/stripe-mock:0.197.0
     pull_policy: if_not_present
     container_name: stripe-mock
     ports:
@@ -90060,7 +90218,7 @@ var LocalKubernetesTool = {
       file: "docker-compose.yml",
       filecontent: `services:
   k3s:
-    image: rancher/k3s:latest
+    image: rancher/k3s:v1.29.1-k3s1
     command: server --disable=traefik
     privileged: true
     pull_policy: if_not_present
@@ -90246,6 +90404,7 @@ process.on('SIGTERM', cleanup);`
 // ../../packages/template/services.ts
 var templates4 = [
   N8NLocal,
+  N8NNative,
   LocalKubernetesTool,
   AWSTemplate,
   StripeTemplate

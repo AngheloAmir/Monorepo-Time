@@ -66,7 +66,19 @@ const MonoChat: ProjectTemplate = {
         {
             action: 'file',
             file: 'src/_FetchToWho.ts',
-            filecontent: "import type { ChatItem } from \"./app/chat\";\n\n//@ts-ignore\nexport default async function FetchToWho( chats: ChatItem[]) {\n    // const lastChat = chats[chats.length - 1];\n    // if (!lastChat) return;\n    // const response = await fetch(\"https://api.openai.com/v1/chat/completions\", {\n    //     method: \"POST\",\n    //     headers: {\n    //         \"Content-Type\": \"application/json\",\n    //         \"Authorization\": `Bearer ${process.env.OPENAI_API_KEY}`\n    //     },\n    //     body: JSON.stringify({\n    //         model: \"gpt-3.5-turbo\",\n    //         messages: [\n    //             { role: \"system\", content: \"You are a helpful assistant.\" },\n    //             { role: \"user\", content: lastChat.message }\n    //         ]\n    //     })\n    // });\n    // const data = await response.json();\n    // return data.choices[0].message.content;\n\n    const lorem = \"Please edit the FetchToWho function. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.\";\n    return lorem;\n}\n"
+            filecontent: `
+interface ChatItem {
+    id: number;
+    who: "user" | "system";
+    timestamp: number;
+    message: string;
+}
+        
+export default async function FetchToWho( chats: ChatItem[]) {
+    const lorem = "Please edit the FetchToWho function. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.";
+    return lorem;
+}
+`
         },
         {
             action: 'file',
