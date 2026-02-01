@@ -1,0 +1,1 @@
+export const vercelJson = "{\n  \"rewrites\": [\n    {\n      \"source\": \"/(.*)\",\n      \"destination\": \"/index.html\"\n    }\n  ]\n}";

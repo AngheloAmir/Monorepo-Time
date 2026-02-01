@@ -1,0 +1,1 @@
+export const renderYaml = "services:\n  - type: web\n    name: vite-react-app\n    env: static\n    buildCommand: npm install && npm run build\n    staticPublishPath: ./dist";
