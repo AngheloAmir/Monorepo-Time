@@ -1,6 +1,6 @@
 export const dockerCompose = `services:
   stripe-mock:
-    image: stripe/stripe-mock:latest
+    image: stripe/stripe-mock:0.197.0
     pull_policy: if_not_present
     container_name: stripe-mock
     ports:

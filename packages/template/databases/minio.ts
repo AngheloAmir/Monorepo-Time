@@ -13,7 +13,7 @@ export const MinIO: ProjectTemplate = {
             file: 'docker-compose.yml',
             filecontent: `services:
   minio:
-    image: minio/minio
+    image: alpine/minio:RELEASE.2025-10-15T17-29-55Z
     pull_policy: if_not_present
     command: server /data --console-address ":9001"
     restart: unless-stopped
@@ -153,7 +153,7 @@ const checkStatus = () => {
                 console.log('--------------------------------------------------');
                 console.log('Docs: https://min.io/docs/minio/linux/index.html');
                 console.log('To update to the latest version:');
-                console.log('  docker pull minio/minio');
+                console.log('  docker pull alpine/minio:RELEASE.2025-10-15T17-29-55Z');
                 console.log('==================================================\\n');
             });
         });

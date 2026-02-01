@@ -13,7 +13,7 @@ export const MongoDB: ProjectTemplate = {
             file: 'docker-compose.yml',
             filecontent: `services:
   mongodb:
-    image: mongo:latest
+    image: mongo:8.0
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -140,7 +140,7 @@ const checkStatus = () => {
             console.log(\`Port:              \${port}\`);
             console.log('--------------------------------------------------');
             console.log('To update to the latest version:');
-            console.log('  docker pull mongo:latest');
+            console.log('  docker pull mongo:8.0');
             console.log('==================================================\\n');
         });
     });

@@ -1,6 +1,6 @@
 export const dockerCompose = `services:
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack:4.0
     pull_policy: if_not_present
     user: "1000:1000"
     ports:

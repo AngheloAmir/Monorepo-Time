@@ -13,7 +13,7 @@ export const LocalKubernetesTool: ProjectTemplate = {
             file: 'docker-compose.yml',
             filecontent: `services:
   k3s:
-    image: rancher/k3s:latest
+    image: rancher/k3s:v1.29.1-k3s1
     command: server --disable=traefik
     privileged: true
     pull_policy: if_not_present

@@ -15,7 +15,7 @@ export const Redis: ProjectTemplate = {
 
 services:
   redis:
-    image: redis:7.2-alpine
+    image: redis:7.4-alpine
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -140,7 +140,7 @@ const checkStatus = () => {
             console.log('--------------------------------------------------');
             console.log('Docs: https://redis.io/docs');
             console.log('To update to the latest version:');
-            console.log('  docker pull redis:latest');
+            console.log('  docker pull redis:7.4-alpine');
             console.log('==================================================\\n');
         });
     });

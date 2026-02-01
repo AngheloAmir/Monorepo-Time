@@ -15,7 +15,7 @@ export const PostgreSQL: ProjectTemplate = {
 
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:16.2
     pull_policy: missing
     restart: unless-stopped
     environment:
@@ -140,7 +140,7 @@ const checkStatus = () => {
              console.log(\`Port:              \${port}\`);
              console.log('--------------------------------------------------');
              console.log('To update to the latest version:');
-             console.log('  docker pull postgres:latest');
+             console.log('  docker pull postgres:16.2');
              console.log('==================================================\\n');
         });
     });

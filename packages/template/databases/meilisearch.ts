@@ -13,7 +13,7 @@ export const Meilisearch: ProjectTemplate = {
             file: 'docker-compose.yml',
             filecontent: `services:
   meilisearch:
-    image: getmeili/meilisearch:v1.10
+    image: getmeili/meilisearch:v1.11
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -136,7 +136,7 @@ const checkStatus = () => {
             console.log('--------------------------------------------------');
             console.log('Docs: https://www.meilisearch.com/docs');
             console.log('To update to the latest version:');
-            console.log('  docker pull getmeili/meilisearch:latest');
+            console.log('  docker pull getmeili/meilisearch:v1.11');
             console.log('==================================================\\n');
         });
     });
