@@ -5,11 +5,9 @@ import { RedisCommanderTool } from "./tools/rediscommander";
 import { YaadeTool } from "./tools/yaade";
 import { MailpitTool } from "./tools/mailpit";
 import { CloudbeaverTool } from "./tools/cloudbeaver";
-import { HeadlampTool } from "./tools/headlamp";
 
 const tools: ProjectTemplate[] = [
     CloudbeaverTool,
-    HeadlampTool,
     YaadeTool,
     MailpitTool,
     PgwebTool,

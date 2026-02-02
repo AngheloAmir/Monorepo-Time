@@ -90557,172 +90557,264 @@ var StripeTemplate = {
 // ../../packages/template/services/kubernetes.ts
 var LocalKubernetesTool = {
   name: "Local Kubernetes",
-  description: "K3s Cluster",
-  notes: "Runs a K3s cluster in Docker. Generates a kubeconfig for external tools.",
+  description: "Local K3s cluster for learning with Helm, Traefik, MetalLB, example app",
+  notes: "Non-root K3s, Helm auto-install, Traefik Ingress, MetalLB auto IP, example app",
   type: "tool",
   category: "Service",
   icon: "fas fa-cubes text-blue-600",
   templating: [
+    // =====================================================
+    // Pre-create folders (NON-ROOT OWNERSHIP)
+    // =====================================================
+    {
+      action: "file",
+      file: "k3s-config/.keep",
+      filecontent: "# pre-created to avoid root ownership\n"
+    },
+    {
+      action: "file",
+      file: "manifests/.keep",
+      filecontent: "# manifests folder\n"
+    },
+    // =====================================================
+    // docker-compose.yml
+    // =====================================================
     {
       action: "file",
       file: "docker-compose.yml",
       filecontent: `services:
   k3s:
     image: rancher/k3s:v1.29.1-k3s1
-    command: server --disable=traefik
+    container_name: k3s
     privileged: true
-    pull_policy: if_not_present
     restart: unless-stopped
+    environment:
+      - K3S_KUBECONFIG_MODE=644
+    command: >
+      server
+      --write-kubeconfig-mode=644
+      --disable=servicelb
+    ports:
+      - "6443:6443"
+      - "5245:80"
+      - "5246:443"
+    volumes:
+      - ./k3s-config:/etc/rancher/k3s
+      - ./manifests:/manifests
+      - k3s-data:/var/lib/rancher/k3s
     tmpfs:
       - /run
       - /var/run
-    environment:
-      - K3S_KUBECONFIG_MODE=644
-      - K3S_TOKEN=secret
-    ports:
-      - "6443:6443"
-    volumes:
-      - ./k3s-config:/etc/rancher/k3s
-      - k3s-data:/var/lib/rancher/k3s
-    healthcheck:
-      test: ["CMD", "sh", "-c", "test -f /etc/rancher/k3s/k3s.yaml"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
 volumes:
-  k3s-data:`
+  k3s-data:
+`
     },
+    // =====================================================
+    // .gitignore
+    // =====================================================
     {
       action: "file",
       file: ".gitignore",
-      filecontent: `# Local data
-k3s-config/
+      filecontent: `k3s-config/
 k3s-data/
-
-# Runtime file
 .runtime.json
 kubeconfig_host.yaml
 `
     },
+    // =====================================================
+    // index.js
+    // =====================================================
     {
       action: "file",
       file: "index.js",
-      filecontent: `const http = require('http');
-const { spawn, exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+      filecontent: `const { spawn, execSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
-const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-const K3S_CONFIG_DIR = path.join(__dirname, 'k3s-config');
-const K3S_FILE = path.join(K3S_CONFIG_DIR, 'k3s.yaml');
+const ROOT = __dirname;
+const K3S_YAML = path.join(ROOT, "k3s-config/k3s.yaml");
+const HOST_KUBECONFIG = path.join(ROOT, "kubeconfig_host.yaml");
 
-console.log('Starting Local Kubernetes (K3s)...');
+console.log("\u{1F680} Starting Local Kubernetes (K3s Learning Cluster)");
 
-// Ensure directories exist
-if (!fs.existsSync(K3S_CONFIG_DIR)) fs.mkdirSync(K3S_CONFIG_DIR, { recursive: true });
+// Ensure folders exist
+fs.mkdirSync(path.join(ROOT, "k3s-config"), { recursive: true });
+fs.mkdirSync(path.join(ROOT, "manifests"), { recursive: true });
 
-// Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+// Clean old containers and volumes
+spawn("docker", ["compose", "down"], { stdio: "inherit" });
+spawn("docker", ["compose", "up", "--remove-orphans"], { stdio: "inherit" });
 
-child.on('close', (code) => {
-    if (code !== 0) process.exit(code);
-    
-    // Follow logs for K3s
-    const logs = spawn('docker', ['compose', 'logs', '-f', 'k3s', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
-    
-    const printImportant = (data) => {
-        // Optional: Filter logs if needed
-    };
-
-    logs.stdout.on('data', printImportant);
-    logs.stderr.on('data', printImportant);
-    logs.on('close', (c) => process.exit(c || 0));
-});
-
-// Setup Control Server
-const server = http.createServer((req, res) => {
-    if (req.url === '/stop') {
-        res.writeHead(200);
-        res.end('Stopping...');
-        cleanup();
-    } else {
-        res.writeHead(404);
-        res.end();
+// Retry helper
+const execSyncRetry = (cmd, attempts = 15, delay = 2000) => {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return execSync(cmd, { stdio: "inherit" });
+    } catch {
+      process.stdout.write(\`\u23F3 Waiting for container... \${i+1}/\${attempts}\\r\`);
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delay);
     }
-});
-
-server.listen(0, () => { /* Update runtime later */ });
-
-// Check status loop
-const checkStatus = () => {
-    exec('docker compose port k3s 6443', (err, stdout, stderr) => {
-        if (err || stderr || !stdout) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-
-        const k3sHostPort = stdout.trim().split(':')[1];
-        if (!k3sHostPort) {
-             setTimeout(checkStatus, 2000);
-             return;
-        }
-
-        // Generate Host Usable Kubeconfig
-        if (fs.existsSync(K3S_FILE)) {
-             try {
-                 let content = fs.readFileSync(K3S_FILE, 'utf8');
-                 // Replace 127.0.0.1 with 127.0.0.1 (redundant but safe) + correct port
-                 const hostConfig = content.replace('server: https://127.0.0.1:6443', \`server: https://127.0.0.1:\${k3sHostPort}\`);
-                 fs.writeFileSync(path.join(__dirname, 'kubeconfig_host.yaml'), hostConfig);
-             } catch(e) {
-                 console.error("Error writing kubeconfig_host.yaml", e);
-             }
-        } else {
-             // Config not ready yet
-             setTimeout(checkStatus, 1000);
-             return;
-        }
-
-        exec('docker compose ps -q', (err2, stdout2) => {
-            const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
-            
-            try {
-                fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                    port: server.address().port, 
-                    pid: process.pid,
-                    containerIds: containerIds
-                }));
-            } catch(e) {}
-
-            process.stdout.write('\\x1Bc');
-            console.log('\\n==================================================');
-            console.log('\u2638\uFE0F  Local Kubernetes (K3s)');
-            console.log('==================================================');
-            console.log(\`K8s API:           https://127.0.0.1:\${k3sHostPort}\`);
-            console.log(\`Host Kubeconfig:   \${path.join(__dirname, 'kubeconfig_host.yaml')}\`);
-            console.log('--------------------------------------------------');
-            console.log('To use with Headlamp or kubectl:');
-            console.log(\`  export KUBECONFIG=\${path.join(__dirname, 'kubeconfig_host.yaml')}\`);
-            console.log('  OR load this file into Headlamp');
-            console.log('==================================================\\n');
-        });
-    });
+  }
+  throw new Error("Command failed after retries: " + cmd);
 };
 
-setTimeout(checkStatus, 3000);
+// Wait for kubeconfig file
+const waitForK3s = () => {
+  if (!fs.existsSync(K3S_YAML)) {
+    process.stdout.write(".");
+    return setTimeout(waitForK3s, 1000);
+  }
+  console.log("\\n\u2705 kubeconfig generated");
 
-const cleanup = () => {
-    console.log('Stopping Cluster...');
-    exec('docker compose down', (err, stdout, stderr) => {
-        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-        process.exit(0);
-    });
+  const kubeconfig = fs
+    .readFileSync(K3S_YAML, "utf8")
+    .replace(/https:\\/\\/127.0.0.1:\\d+/, "https://127.0.0.1:6443");
+
+  fs.writeFileSync(HOST_KUBECONFIG, kubeconfig);
+  waitForAPI();
 };
 
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`
+// Wait for API server ready
+const waitForAPI = () => {
+  try {
+    execSyncRetry("docker compose exec -T k3s kubectl get nodes");
+    console.log("\u2705 Kubernetes API ready");
+    bootstrap();
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+};
+
+// Install Helm, apply manifests
+const bootstrap = () => {
+  console.log("\u2699\uFE0F Installing Helm...");
+  execSyncRetry(
+    "docker compose exec -T k3s sh -c 'curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh'"
+  );
+
+  console.log("\u2699\uFE0F Applying manifests...");
+  execSyncRetry("docker compose exec -T k3s kubectl apply -f /manifests");
+
+  banner();
+};
+
+const banner = () => {
+  console.log(\`
+==================================================
+\u{1F393} KUBERNETES LEARNING CLUSTER READY
+==================================================
+K8s API:
+  https://127.0.0.1:6443
+
+Ingress (Traefik):
+  http://localhost:5245
+  https://localhost:5246
+
+Example App:
+  http://whoami.localhost:5245
+
+Kubectl:
+  export KUBECONFIG=\${HOST_KUBECONFIG}
+==================================================
+\`);
+};
+
+waitForK3s();
+
+process.on("SIGINT", () => execSync("docker compose down"));
+process.on("SIGTERM", () => execSync("docker compose down"));
+`
     },
+    // =====================================================
+    // MetalLB manifest
+    // =====================================================
+    {
+      action: "file",
+      file: "manifests/metallb.yaml",
+      filecontent: `apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller
+  namespace: metallb-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metallb
+  template:
+    metadata:
+      labels:
+        app: metallb
+    spec:
+      containers:
+        - name: controller
+          image: quay.io/metallb/controller:v0.13.12
+`
+    },
+    // =====================================================
+    // Example app whoami + Traefik ingress
+    // =====================================================
+    {
+      action: "file",
+      file: "manifests/whoami.yaml",
+      filecontent: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whoami
+  template:
+    metadata:
+      labels:
+        app: whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoami
+spec:
+  selector:
+    app: whoami
+  ports:
+    - port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whoami
+spec:
+  rules:
+    - host: whoami.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  number: 80
+`
+    },
+    // =====================================================
+    // package.json scripts
+    // =====================================================
     {
       action: "command",
       cmd: "npm",
@@ -90731,22 +90823,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=K3s Kubernetes Cluster"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-cubes text-blue-600"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
+      args: ["pkg", "set", "scripts.stop=docker compose down"]
     }
   ]
 };
@@ -91911,223 +91988,9 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
-// ../../packages/template/tools/headlamp.ts
-var HeadlampTool = {
-  name: "Headlamp",
-  description: "Kubernetes Web UI",
-  notes: "Requires Docker. Works with the 'Local Kubernetes' template - start that first!",
-  type: "opensource-app",
-  category: "Tool",
-  icon: "fas fa-cubes text-blue-500",
-  templating: [
-    {
-      action: "file",
-      file: "docker-compose.yml",
-      filecontent: `services:
-  headlamp:
-    image: ghcr.io/headlamp-k8s/headlamp:latest
-    pull_policy: if_not_present
-    restart: unless-stopped
-    ports:
-      - "4466:4466"
-    environment:
-      - HEADLAMP_CONFIG_KUBECONFIG=/home/headlamp/.kube/config
-    volumes:
-      # Mount the patched kubeconfig (generated by index.js)
-      - ./kubeconfig_docker.yaml:/home/headlamp/.kube/config:ro
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4466"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    extra_hosts:
-      # Allow container to reach host's localhost (for K3s API)
-      - "host.docker.internal:host-gateway"`
-    },
-    {
-      action: "file",
-      file: ".gitignore",
-      filecontent: `# Runtime file
-.runtime.json
-kubeconfig_docker.yaml
-`
-    },
-    {
-      action: "file",
-      file: "index.js",
-      filecontent: `const http = require('http');
-const { spawn, exec } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-
-const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
-const SOURCE_KUBECONFIG = path.join(__dirname, '../local-kubernetes/kubeconfig_host.yaml');
-const DOCKER_KUBECONFIG = path.join(__dirname, 'kubeconfig_docker.yaml');
-
-console.log('Starting Headlamp...');
-
-// Step 1: Patch kubeconfig for Docker (replace 127.0.0.1 with host.docker.internal)
-const patchKubeconfig = () => {
-    if (!fs.existsSync(SOURCE_KUBECONFIG)) {
-        console.log('\\x1b[33mWarning:\\x1b[0m Local Kubernetes kubeconfig not found at:');
-        console.log('  ' + SOURCE_KUBECONFIG);
-        console.log('\\nPlease start the Local Kubernetes template first!');
-        console.log('Expected folder structure:');
-        console.log('  tools/');
-        console.log('    local-kubernetes/   <- Start this first');
-        console.log('    headlamp/           <- This folder');
-        process.exit(1);
-    }
-
-    try {
-        let content = fs.readFileSync(SOURCE_KUBECONFIG, 'utf8');
-        // Replace localhost/127.0.0.1 with host.docker.internal for Docker access
-        content = content.replace(/server:\\s*https:\\/\\/127\\.0\\.0\\.1:/g, 'server: https://host.docker.internal:');
-        content = content.replace(/server:\\s*https:\\/\\/localhost:/g, 'server: https://host.docker.internal:');
-        fs.writeFileSync(DOCKER_KUBECONFIG, content);
-        console.log('Created Docker-compatible kubeconfig');
-    } catch(e) {
-        console.error('Failed to patch kubeconfig:', e.message);
-        process.exit(1);
-    }
-};
-
-patchKubeconfig();
-
-// Step 2: Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
-
-child.on('close', (code) => {
-    if (code !== 0) process.exit(code);
-    // Follow logs with filtering
-    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
-    
-    const printImportant = (data) => {
-        const lines = data.toString().split('\\n');
-        lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
-            const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
-            }
-        });
-    };
-
-    logs.stdout.on('data', printImportant);
-    logs.stderr.on('data', printImportant);
-    logs.on('close', (c) => process.exit(c || 0));
-});
-
-// Setup Control Server
-const server = http.createServer((req, res) => {
-    if (req.url === '/stop') {
-        res.writeHead(200);
-        res.end('Stopping...');
-        cleanup();
-    } else {
-        res.writeHead(404);
-        res.end();
-    }
-});
-
-server.listen(0, () => {
-    // We update runtime file later when we get the container ID
-});
-
-// Check status loop
-const checkStatus = () => {
-    exec('docker compose port headlamp 4466', (err, stdout, stderr) => {
-        if (err || stderr || !stdout) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-        const port = stdout.trim().split(':')[1];
-        if (!port) {
-            setTimeout(checkStatus, 2000);
-            return;
-        }
-
-        // Verify headlamp is responding
-        http.get(\`http://localhost:\${port}\`, (res) => {
-            exec('docker compose ps -q', (err2, stdout2) => {
-                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
-                
-                try {
-                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
-                        port: server.address().port, 
-                        pid: process.pid,
-                        containerIds: containerIds
-                    }));
-                } catch(e) {
-                    console.error('Failed to write runtime file:', e);
-                }
-
-                process.stdout.write('\\\\x1Bc');
-                console.log('\\n==================================================');
-                console.log('\u2638\uFE0F  Headlamp - Kubernetes Web UI');
-                console.log('==================================================');
-                console.log(\`URL:               http://localhost:\${port}\`);
-                console.log('--------------------------------------------------');
-                console.log('\u{1F517} Connected to: ../local-kubernetes');
-                console.log('   Kubeconfig patched for Docker networking');
-                console.log('--------------------------------------------------');
-                console.log('\u{1F4DA} n8n Integration:');
-                console.log('   Use Kubernetes node or HTTP Request');
-                console.log('   Docs: https://headlamp.dev/docs/latest/');
-                console.log('==================================================\\n');
-            });
-        }).on('error', () => {
-            setTimeout(checkStatus, 2000);
-        });
-    });
-};
-
-setTimeout(checkStatus, 3000);
-
-const cleanup = () => {
-    console.log('Stopping Headlamp...');
-    exec('docker compose down', (err, stdout, stderr) => {
-        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
-        try { fs.unlinkSync(DOCKER_KUBECONFIG); } catch(e) {}
-        process.exit(0);
-    });
-};
-
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);`
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.start=node index.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=Headlamp - Kubernetes Web UI"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "fontawesomeIcon=fas fa-cubes text-blue-500"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "appType=tool"]
-    }
-  ]
-};
-
 // ../../packages/template/tools.ts
 var tools = [
   CloudbeaverTool,
-  HeadlampTool,
   YaadeTool,
   MailpitTool,
   PgwebTool,
