@@ -72,8 +72,12 @@ const patchKubeconfig = () => {
         // Replace localhost/127.0.0.1 with host.docker.internal for Docker access
         content = content.replace(/server:\\s*https:\\/\\/127\\.0\\.0\\.1:/g, 'server: https://host.docker.internal:');
         content = content.replace(/server:\\s*https:\\/\\/localhost:/g, 'server: https://host.docker.internal:');
+        // Add insecure-skip-tls-verify since K3s certificate doesn't include host.docker.internal
+        content = content.replace(/(server:\\\\s*https:\\\\/\\\\/host\\\\.docker\\\\.internal:[^\\\\n]+)/g, '$1\\n    insecure-skip-tls-verify: true');
+        // Remove certificate-authority-data since we're skipping TLS verify
+        content = content.replace(/\\\\n\\\\s*certificate-authority-data:[^\\\\n]+/g, '');
         fs.writeFileSync(DOCKER_KUBECONFIG, content);
-        console.log('Created Docker-compatible kubeconfig');
+        console.log('Created Docker-compatible kubeconfig (TLS verification disabled)');
     } catch(e) {
         console.error('Failed to patch kubeconfig:', e.message);
         process.exit(1);
