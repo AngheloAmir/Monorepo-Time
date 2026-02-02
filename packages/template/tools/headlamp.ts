@@ -3,7 +3,7 @@ import type { ProjectTemplate } from "../../types";
 export const HeadlampTool: ProjectTemplate = {
     name: "Headlamp",
     description: "Kubernetes Web UI",
-    notes: "Requires Docker. Connects to local or remote Kubernetes clusters.",
+    notes: "Requires Docker. Works with the 'Local Kubernetes' template - start that first!",
     type: "opensource-app",
     category: "Tool",
     icon: "fas fa-cubes text-blue-500",
@@ -18,15 +18,21 @@ export const HeadlampTool: ProjectTemplate = {
     restart: unless-stopped
     ports:
       - "4466:4466"
+    environment:
+      # Disable in-cluster mode since we're running standalone
+      - HEADLAMP_CONFIG_KUBECONFIG=/home/headlamp/.kube/config
     volumes:
-      # Mount kubeconfig so Headlamp can find your clusters
-      # Typically ~/.kube/config on your host
-      - \${HOME}/.kube/config:/root/.kube/config:ro
+      # Mount kubeconfig from the Local Kubernetes template
+      # Point this to your Local Kubernetes project's kubeconfig_host.yaml
+      - ../local-kubernetes/kubeconfig_host.yaml:/home/headlamp/.kube/config:ro
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:4466"]
       interval: 10s
       timeout: 5s
-      retries: 5`
+      retries: 5
+    extra_hosts:
+      # Allow container to reach host's localhost (for K3s API)
+      - "host.docker.internal:host-gateway"`
         },
         {
             action: 'file',
@@ -122,9 +128,8 @@ const checkStatus = () => {
                 console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log('--------------------------------------------------');
-                console.log('💡 Note: Automatically tries to load ~/.kube/config');
-                console.log('   Ensure your Docker Desktop / Engines share');
-                console.log('   has access to your home directory.');
+                console.log('💡 Connects to: ../local-kubernetes/kubeconfig_host.yaml');
+                console.log('   Make sure Local Kubernetes is running first!');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
