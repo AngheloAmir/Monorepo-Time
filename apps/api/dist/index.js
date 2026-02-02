@@ -90554,267 +90554,481 @@ var StripeTemplate = {
   ]
 };
 
-// ../../packages/template/services/kubernetes.ts
-var LocalKubernetesTool = {
-  name: "Local Kubernetes",
-  description: "Local K3s cluster for learning with Helm, Traefik, MetalLB, example app",
-  notes: "Non-root K3s, Helm auto-install, Traefik Ingress, MetalLB auto IP, example app",
+// ../../packages/template/services/k3d-headlamp/dockerCompose.ts
+var dockerCompose7 = `# K3d + Headlamp Docker Compose Configuration
+# This file sets up Headlamp to connect to a k3d cluster
+# Note: k3d cluster is managed separately via k3d CLI
+
+services:
+  headlamp:
+    image: ghcr.io/headlamp-k8s/headlamp:latest
+    pull_policy: if_not_present
+    restart: unless-stopped
+    user: "\${UID:-1000}:\${GID:-1000}"
+    ports:
+      - "7000:4466"
+    extra_hosts:
+      - "host.k3d.internal:host-gateway"
+    volumes:
+      - ./.kube/config:/home/headlamp/.kube/config:ro      
+      - ./.headlamp_data:/home/headlamp/data
+    environment:
+      - HEADLAMP_CONFIG_CONF_MAX_CONNECTIONS=1000
+      - HOME=/home/headlamp
+    command:
+      - "-in-cluster=false"
+      - "-kubeconfig=/home/headlamp/.kube/config"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:4466/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  headlamp_data:`;
+
+// ../../packages/template/services/k3d-headlamp/gitignore.ts
+var gitignoreContent7 = `.runtime.json
+node_modules/
+.env.local
+.kube/
+*.log`;
+
+// ../../packages/template/services/k3d-headlamp/server.ts
+var serverJs7 = `const http = require('http');
+const { spawn, exec, execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const CLUSTER_NAME = 'learning-cluster';
+const HEADLAMP_PORT = 7000;
+
+// Helper to run commands with promise
+const runCommand = (cmd, args = [], options = {}) => {
+    return new Promise((resolve, reject) => {
+        const child = spawn(cmd, args, { stdio: 'inherit', ...options });
+        child.on('close', (code) => {
+            if (code === 0) resolve();
+            else reject(new Error(\`Command \${cmd} exited with code \${code}\`));
+        });
+        child.on('error', reject);
+    });
+};
+
+// Check if k3d is installed
+const checkK3d = () => {
+    try {
+        execSync('k3d --version', { stdio: 'pipe' });
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
+// Check if cluster exists
+const clusterExists = () => {
+    try {
+        const output = execSync(\`k3d cluster list -o json\`, { encoding: 'utf8' });
+        const clusters = JSON.parse(output);
+        return clusters.some(c => c.name === CLUSTER_NAME);
+    } catch (e) {
+        return false;
+    }
+};
+
+// Check if cluster is running
+const clusterRunning = () => {
+    try {
+        const output = execSync(\`k3d cluster list -o json\`, { encoding: 'utf8' });
+        const clusters = JSON.parse(output);
+        const cluster = clusters.find(c => c.name === CLUSTER_NAME);
+        return cluster && cluster.serversRunning > 0;
+    } catch (e) {
+        return false;
+    }
+};
+
+async function main() {
+    console.log('\\\\x1b[36m\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\\\\x1b[0m');
+    console.log('\\\\x1b[36m\u2551\\\\x1b[0m       \u{1F680} K3d + Headlamp Learning Environment               \\\\x1b[36m\u2551\\\\x1b[0m');
+    console.log('\\\\x1b[36m\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D\\\\x1b[0m');
+    console.log('');
+
+    // Check prerequisites
+    if (!checkK3d()) {
+        console.log('\\\\x1b[31m\u274C k3d is not installed!\\\\x1b[0m');
+        console.log('');
+        console.log('\\\\x1b[33mInstall k3d using one of these methods:\\\\x1b[0m');
+        console.log('  \u2022 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash');
+        console.log('  \u2022 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash');
+        console.log('  \u2022 brew install k3d (on macOS)');
+        console.log('');
+        process.exit(1);
+    }
+    console.log('\\\\x1b[32m\u2713 k3d is installed\\\\x1b[0m');
+
+    // Create or start cluster
+    if (!clusterExists()) {
+        console.log(\`\\\\n\\\\x1b[33mCreating k3d cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+        try {
+            await runCommand('k3d', [
+                'cluster', 'create', CLUSTER_NAME,
+                '--api-port', '6443',
+                '--servers', '1',
+                '--agents', '2',
+                '--port', '8080:80@loadbalancer',
+                '--port', '8443:443@loadbalancer',
+                '--tls-san', 'host.k3d.internal',
+                '--wait'
+            ]);
+            console.log(\`\\\\x1b[32m\u2713 Cluster "\${CLUSTER_NAME}" created successfully\\\\x1b[0m\`);
+        } catch (e) {
+            console.error('\\\\x1b[31m\u274C Failed to create cluster\\\\x1b[0m');
+            process.exit(1);
+        }
+    } else if (!clusterRunning()) {
+        console.log(\`\\\\n\\\\x1b[33mStarting existing cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+        try {
+            await runCommand('k3d', ['cluster', 'start', CLUSTER_NAME]);
+            console.log(\`\\\\x1b[32m\u2713 Cluster "\${CLUSTER_NAME}" started\\\\x1b[0m\`);
+        } catch (e) {
+            console.error('\\\\x1b[31m\u274C Failed to start cluster\\\\x1b[0m');
+            console.log('\\\\x1b[33mThis often happens if the cluster network was deleted or Docker was restarted.\\\\x1b[0m');
+            console.log('\\\\x1b[33mTry deleting and recreating the cluster:\\\\x1b[0m');
+            console.log(\`  k3d cluster delete \${CLUSTER_NAME}\`);
+            console.log('  npm run start');
+            process.exit(1);
+        }
+    } else {
+        console.log(\`\\\\x1b[32m\u2713 Cluster "\${CLUSTER_NAME}" is already running\\\\x1b[0m\`);
+    }
+
+    // Update kubeconfig
+    console.log('\\\\n\\\\x1b[33mUpdating kubeconfig...\\\\x1b[0m');
+    
+    // 1. Try to export config to local file (REQUIRED for Headlamp)
+    try {
+        let kubeconfig = execSync(\`k3d kubeconfig get \${CLUSTER_NAME}\`, { encoding: 'utf8' });
+        
+        // Fix connectivity: replace loopback IPs with host.k3d.internal for container access
+        kubeconfig = kubeconfig.replace(/0\\.0\\.0\\.0/g, 'host.k3d.internal');
+        kubeconfig = kubeconfig.replace(/127\\.0\\.0\\.1/g, 'host.k3d.internal');
+
+        // Fix TLS: Skip verification since host.k3d.internal is not in the default cert
+        // Replace certificate-authority-data with insecure-skip-tls-verify (preserves indentation)
+        kubeconfig = kubeconfig.replace(/certificate-authority-data:.*\\n/g, 'insecure-skip-tls-verify: true\\n    ');
+
+        const kubeDir = path.join(__dirname, '.kube');
+        if (!fs.existsSync(kubeDir)) {
+            fs.mkdirSync(kubeDir, { recursive: true, mode: 0o755 });
+        }
+        const kubePath = path.join(kubeDir, 'config');
+        fs.writeFileSync(kubePath, kubeconfig);
+        fs.chmodSync(kubePath, 0o644);
+        console.log('\\\\x1b[32m\u2713 Local kubeconfig updated (for container access)\\\\x1b[0m');
+    } catch (e) {
+        console.error('\\\\x1b[31m\u274C Failed to create local kubeconfig!\\\\x1b[0m');
+        console.error(e.message);
+        process.exit(1);
+    }
+
+    // 2. Try to merge into global config for user convenience (kubectl)
+    try {
+        execSync(\`k3d kubeconfig merge \${CLUSTER_NAME} --kubeconfig-merge-default\`, { stdio: 'pipe' });
+        console.log('\\\\x1b[32m\u2713 Global kubeconfig updated\\\\x1b[0m');
+    } catch (e) {
+        console.warn('\\\\x1b[33m\u26A0 Could not update global kubeconfig automatically\\\\x1b[0m');
+        console.log('\\\\x1b[90mHint: This is usually because /home/anghelo/.kube/config is a root-owned directory.\\\\x1b[0m');
+        console.log('\\\\x1b[90mFix it with: sudo rm -rf /home/anghelo/.kube/config\\\\x1b[0m');
+    }
+
+    // Start Headlamp via Docker Compose
+    console.log('\\\\n\\\\x1b[33mStarting Headlamp UI...\\\\x1b[0m');
+    const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit', cwd: __dirname });
+
+    child.on('close', (code) => {
+        if (code !== 0) process.exit(code);
+
+        // Follow logs with filtering
+        const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'], cwd: __dirname });
+
+        const printImportant = (data) => {
+            const lines = data.toString().split('\\\\n');
+            lines.forEach(line => {
+                let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+                const lower = cleanLine.toLowerCase();
+                if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                    process.stdout.write('\\\\x1b[31mError:\\\\x1b[0m ' + cleanLine + '\\\\n');
+                }
+            });
+        };
+
+        logs.stdout.on('data', printImportant);
+        logs.stderr.on('data', printImportant);
+        logs.on('close', (c) => process.exit(c || 0));
+    });
+
+    // Setup Control Server
+    const server = http.createServer((req, res) => {
+        if (req.url === '/stop') {
+            res.writeHead(200);
+            res.end('Stopping...');
+            cleanup();
+        } else {
+            res.writeHead(404);
+            res.end();
+        }
+    });
+
+    server.listen(0, () => {
+        const port = server.address().port;
+    });
+
+    // Check status loop
+    const checkStatus = () => {
+        exec(\`docker compose port headlamp 4466\`, { cwd: __dirname }, (err, stdout, stderr) => {
+            if (err || stderr || !stdout) {
+                setTimeout(checkStatus, 2000);
+                return;
+            }
+            const headlampPort = stdout.trim().split(':')[1];
+            if (!headlampPort) {
+                setTimeout(checkStatus, 2000);
+                return;
+            }
+
+            // Verify Headlamp is actually responding
+            http.get(\`http://localhost:\${headlampPort}/\`, (res) => {
+                // Capture Container IDs
+                exec('docker compose ps -q', { cwd: __dirname }, (err2, stdout2) => {
+                    const containerIds = stdout2 ? stdout2.trim().split('\\\\n') : [];
+
+                    try {
+                        fs.writeFileSync(RUNTIME_FILE, JSON.stringify({
+                            port: server.address().port,
+                            pid: process.pid,
+                            containerIds: containerIds,
+                            clusterName: CLUSTER_NAME
+                        }));
+                    } catch (e) {
+                        console.error('Failed to write runtime file:', e);
+                    }
+
+                    console.log('');
+                    console.log('\\\\x1b[36m\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                    \u{1F389} Setup Complete!                       \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\\\\x1b[0m');
+                    console.log(\`\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F4CA} Headlamp UI:   http://localhost:\${headlampPort}                    \\\\x1b[36m\u2551\\\\x1b[0m\`);
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F527} Cluster:       k3d-' + CLUSTER_NAME + '                       \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                                                              \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F4DA} Quick Commands:                                         \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl get nodes                                        \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl get pods --all-namespaces                        \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl create deployment nginx --image=nginx            \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl expose deployment nginx --port=80 --type=NodePort\\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                                                              \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F517} Documentation:                                          \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    K3d:      https://k3d.io/                                 \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    Headlamp: https://headlamp.dev/                          \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    K8s:      https://kubernetes.io/docs/                    \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                                                              \\\\x1b[36m\u2551\\\\x1b[0m');
+                    console.log('\\\\x1b[36m\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D\\\\x1b[0m');
+                    console.log('');
+                    console.log('\\\\x1b[33mPress Ctrl+C to stop the services\\\\x1b[0m');
+                });
+            }).on('error', (e) => {
+                setTimeout(checkStatus, 2000);
+            });
+        });
+    };
+
+    setTimeout(checkStatus, 3000);
+}
+
+const cleanup = () => {
+    console.log('\\\\n\\\\x1b[33mStopping services...\\\\x1b[0m');
+    exec('docker compose down', { cwd: __dirname }, (err, stdout, stderr) => {
+        console.log('\\\\x1b[32m\u2713 Headlamp stopped\\\\x1b[0m');
+
+        // Ask if user wants to stop the cluster too
+        const readline = require('readline');
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        rl.question('\\\\x1b[33mDo you want to stop the k3d cluster as well? (y/N): \\\\x1b[0m', (answer) => {
+            if (answer.toLowerCase() === 'y') {
+                console.log(\`\\\\x1b[33mStopping cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+                exec(\`k3d cluster stop \${CLUSTER_NAME}\`, () => {
+                    console.log('\\\\x1b[32m\u2713 Cluster stopped\\\\x1b[0m');
+                    console.log('\\\\x1b[90m(Run "npm run cluster:delete" to permanently delete the cluster)\\\\x1b[0m');
+                    try { fs.unlinkSync(RUNTIME_FILE); } catch (e) { }
+                    rl.close();
+                    process.exit(0);
+                });
+            } else {
+                console.log('\\\\x1b[90m(Cluster is still running. Run "npm run cluster:stop" to stop it later)\\\\x1b[0m');
+                try { fs.unlinkSync(RUNTIME_FILE); } catch (e) { }
+                rl.close();
+                process.exit(0);
+            }
+        });
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);
+
+main().catch(console.error);`;
+
+// ../../packages/template/services/k3d-headlamp/readme.ts
+var readmeContent = `# K3d + Headlamp Learning Environment
+
+A local Kubernetes learning environment using k3d (k3s in Docker) and Headlamp (Kubernetes UI).
+
+## \u{1F680} Quick Start
+
+\\\`\\\`\\\`bash
+npm run start
+\\\`\\\`\\\`
+
+This will:
+1. Check if k3d is installed
+2. Create a k3d cluster named "learning-cluster" (if not exists)
+3. Start Headlamp UI to visualize the cluster
+4. Provide quick reference commands
+
+## \u{1F4E6} Prerequisites
+
+- **Docker**: Required for running k3d
+- **k3d**: Install using one of these methods:
+  - \\\`curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash\\\`
+  - \\\`brew install k3d\\\` (macOS)
+  - \\\`choco install k3d\\\` (Windows)
+
+## \u{1F527} Available Commands
+
+| Command | Description |
+|---------|-------------|
+| \\\`npm run start\\\` | Start the learning environment |
+| \\\`npm run stop\\\` | Stop Headlamp and optionally the cluster |
+| \\\`npm run cluster:start\\\` | Start the k3d cluster |
+| \\\`npm run cluster:stop\\\` | Stop the k3d cluster |
+| \\\`npm run cluster:delete\\\` | Delete the k3d cluster |
+| \\\`npm run cluster:info\\\` | Show cluster information |
+
+## \u{1F393} Learning Resources
+
+### Kubernetes Basics
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [Kubernetes Tutorials](https://kubernetes.io/docs/tutorials/)
+- [Interactive Tutorial](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
+
+### K3d/K3s
+- [K3d Documentation](https://k3d.io/)
+- [K3s Documentation](https://docs.k3s.io/)
+
+### Headlamp
+- [Headlamp Documentation](https://headlamp.dev/docs/)
+
+## \u{1F4DA} Quick Examples
+
+### Deploy Nginx
+\\\`\\\`\\\`bash
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port=80 --type=NodePort
+kubectl get services
+\\\`\\\`\\\`
+
+### Deploy a Pod
+\\\`\\\`\\\`bash
+kubectl run my-pod --image=nginx --restart=Never
+kubectl get pods
+kubectl logs my-pod
+\\\`\\\`\\\`
+
+### Create a Namespace
+\\\`\\\`\\\`bash
+kubectl create namespace dev
+kubectl get namespaces
+\\\`\\\`\\\`
+
+### Scale Deployment
+\\\`\\\`\\\`bash
+kubectl scale deployment nginx --replicas=3
+kubectl get pods -w
+\\\`\\\`\\\`
+
+### Apply YAML Configuration
+\\\`\\\`\\\`bash
+kubectl apply -f my-deployment.yaml
+kubectl get all
+\\\`\\\`\\\`
+
+## \u{1F3D7}\uFE0F Cluster Architecture
+
+The k3d cluster created has:
+- 1 Server node (control plane)
+- 2 Agent nodes (workers)
+- LoadBalancer exposed on ports 8080 (HTTP) and 8443 (HTTPS)
+- API server on port 6443
+
+## \u2753 Troubleshooting
+
+### Cluster not accessible
+\\\`\\\`\\\`bash
+k3d kubeconfig merge learning-cluster --kubeconfig-merge-default
+kubectl cluster-info
+\\\`\\\`\\\`
+
+### Reset kubeconfig
+\\\`\\\`\\\`bash
+k3d kubeconfig get learning-cluster > ~/.kube/config
+\\\`\\\`\\\`
+
+### View cluster logs
+\\\`\\\`\\\`bash
+docker logs k3d-learning-cluster-server-0
+\\\`\\\`\\\`
+`;
+
+// ../../packages/template/services/k3d-headlamp.ts
+var K3dHeadlampTemplate = {
+  name: "K3d Headlamp",
+  description: "Local Kubernetes learning environment",
+  notes: "Requires k3d CLI installed",
   type: "tool",
   category: "Service",
-  icon: "fas fa-cubes text-blue-600",
+  icon: "fas fa-dharmachakra text-blue-500",
   templating: [
-    // =====================================================
-    // Pre-create folders (NON-ROOT OWNERSHIP)
-    // =====================================================
     {
-      action: "file",
-      file: "k3s-config/.keep",
-      filecontent: "# pre-created to avoid root ownership\n"
+      action: "command",
+      cmd: "mkdir",
+      args: [".kube", ".headlamp_data"]
     },
-    {
-      action: "file",
-      file: "manifests/.keep",
-      filecontent: "# manifests folder\n"
-    },
-    // =====================================================
-    // docker-compose.yml
-    // =====================================================
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: `services:
-  k3s:
-    image: rancher/k3s:v1.29.1-k3s1
-    container_name: k3s
-    privileged: true
-    restart: unless-stopped
-    environment:
-      - K3S_KUBECONFIG_MODE=644
-    command: >
-      server
-      --write-kubeconfig-mode=644
-      --disable=servicelb
-    ports:
-      - "6443:6443"
-      - "5245:80"
-      - "5246:443"
-    volumes:
-      - ./k3s-config:/etc/rancher/k3s
-      - ./manifests:/manifests
-      - k3s-data:/var/lib/rancher/k3s
-    tmpfs:
-      - /run
-      - /var/run
-
-volumes:
-  k3s-data:
-`
+      filecontent: dockerCompose7
     },
-    // =====================================================
-    // .gitignore
-    // =====================================================
     {
       action: "file",
       file: ".gitignore",
-      filecontent: `k3s-config/
-k3s-data/
-.runtime.json
-kubeconfig_host.yaml
-`
+      filecontent: gitignoreContent7
     },
-    // =====================================================
-    // index.js
-    // =====================================================
     {
       action: "file",
       file: "index.js",
-      filecontent: `const { spawn, execSync } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-
-const ROOT = __dirname;
-const K3S_YAML = path.join(ROOT, "k3s-config/k3s.yaml");
-const HOST_KUBECONFIG = path.join(ROOT, "kubeconfig_host.yaml");
-
-console.log("\u{1F680} Starting Local Kubernetes (K3s Learning Cluster)");
-
-// Ensure folders exist
-fs.mkdirSync(path.join(ROOT, "k3s-config"), { recursive: true });
-fs.mkdirSync(path.join(ROOT, "manifests"), { recursive: true });
-
-// Clean old containers and volumes
-spawn("docker", ["compose", "down"], { stdio: "inherit" });
-spawn("docker", ["compose", "up", "--remove-orphans"], { stdio: "inherit" });
-
-// Retry helper
-const execSyncRetry = (cmd, attempts = 15, delay = 2000) => {
-  for (let i = 0; i < attempts; i++) {
-    try {
-      return execSync(cmd, { stdio: "inherit" });
-    } catch {
-      process.stdout.write(\`\u23F3 Waiting for container... \${i+1}/\${attempts}\\r\`);
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, delay);
-    }
-  }
-  throw new Error("Command failed after retries: " + cmd);
-};
-
-// Wait for kubeconfig file
-const waitForK3s = () => {
-  if (!fs.existsSync(K3S_YAML)) {
-    process.stdout.write(".");
-    return setTimeout(waitForK3s, 1000);
-  }
-  console.log("\\n\u2705 kubeconfig generated");
-
-  const kubeconfig = fs
-    .readFileSync(K3S_YAML, "utf8")
-    .replace(/https:\\/\\/127.0.0.1:\\d+/, "https://127.0.0.1:6443");
-
-  fs.writeFileSync(HOST_KUBECONFIG, kubeconfig);
-  waitForAPI();
-};
-
-// Wait for API server ready
-const waitForAPI = () => {
-  try {
-    execSyncRetry("docker compose exec -T k3s kubectl get nodes");
-    console.log("\u2705 Kubernetes API ready");
-    bootstrap();
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
-  }
-};
-
-// Install Helm, apply manifests
-const bootstrap = () => {
-  console.log("\u2699\uFE0F Installing Helm...");
-  execSyncRetry(
-    "docker compose exec -T k3s sh -c 'curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sh'"
-  );
-
-  console.log("\u2699\uFE0F Applying manifests...");
-  execSyncRetry("docker compose exec -T k3s kubectl apply -f /manifests");
-
-  banner();
-};
-
-const banner = () => {
-  console.log(\`
-==================================================
-\u{1F393} KUBERNETES LEARNING CLUSTER READY
-==================================================
-K8s API:
-  https://127.0.0.1:6443
-
-Ingress (Traefik):
-  http://localhost:5245
-  https://localhost:5246
-
-Example App:
-  http://whoami.localhost:5245
-
-Kubectl:
-  export KUBECONFIG=\${HOST_KUBECONFIG}
-==================================================
-\`);
-};
-
-waitForK3s();
-
-process.on("SIGINT", () => execSync("docker compose down"));
-process.on("SIGTERM", () => execSync("docker compose down"));
-`
+      filecontent: serverJs7
     },
-    // =====================================================
-    // MetalLB manifest
-    // =====================================================
     {
       action: "file",
-      file: "manifests/metallb.yaml",
-      filecontent: `apiVersion: v1
-kind: Namespace
-metadata:
-  name: metallb-system
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: controller
-  namespace: metallb-system
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: metallb
-  template:
-    metadata:
-      labels:
-        app: metallb
-    spec:
-      containers:
-        - name: controller
-          image: quay.io/metallb/controller:v0.13.12
-`
+      file: "README.md",
+      filecontent: readmeContent
     },
-    // =====================================================
-    // Example app whoami + Traefik ingress
-    // =====================================================
-    {
-      action: "file",
-      file: "manifests/whoami.yaml",
-      filecontent: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: whoami
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: whoami
-  template:
-    metadata:
-      labels:
-        app: whoami
-    spec:
-      containers:
-        - name: whoami
-          image: traefik/whoami
-          ports:
-            - containerPort: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: whoami
-spec:
-  selector:
-    app: whoami
-  ports:
-    - port: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: whoami
-spec:
-  rules:
-    - host: whoami.localhost
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: whoami
-                port:
-                  number: 80
-`
-    },
-    // =====================================================
-    // package.json scripts
-    // =====================================================
     {
       action: "command",
       cmd: "npm",
@@ -90823,7 +91037,37 @@ spec:
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.stop=docker compose down"]
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.cluster:start=k3d cluster start learning-cluster"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.cluster:stop=k3d cluster stop learning-cluster"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.cluster:delete=k3d cluster delete learning-cluster"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.cluster:info=kubectl cluster-info && kubectl get nodes"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=K3d + Headlamp Kubernetes Learning Environment"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-dharmachakra text-blue-500"]
     }
   ]
 };
@@ -90832,9 +91076,9 @@ spec:
 var templates4 = [
   N8NLocal,
   N8NNative,
-  LocalKubernetesTool,
   AWSTemplate,
-  StripeTemplate
+  StripeTemplate,
+  K3dHeadlampTemplate
 ];
 var services_default = templates4;
 
