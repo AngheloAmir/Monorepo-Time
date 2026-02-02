@@ -86761,7 +86761,7 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
             const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
@@ -86823,14 +86823,18 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('Mattermost is running!');
+                console.log('\u{1F4AC} Mattermost Team Communication');
+                console.log('==================================================');
+                console.log(\`Web UI:            http://localhost:\${mmPort}\`);
+                console.log(\`API:               http://localhost:\${mmPort}/api/v4\`);
                 console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${mmPort}\`);
+                console.log('\u{1F4DD} First Time Setup:');
+                console.log('   Create admin account on first visit');
                 console.log('--------------------------------------------------');
-                console.log('Mattermost is a team communication platform');
-                console.log('--------------------------------------------------');
-                console.log('First time setup:');
-                console.log('  1. Create admin account on first visit');
+                console.log('\u{1F517} n8n Integration:');
+                console.log('   n8n has a native Mattermost node!');
+                console.log(\`   API URL: http://localhost:\${mmPort}/api/v4\`);
+                console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mattermost/');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {
@@ -86979,7 +86983,7 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
             const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
@@ -87040,14 +87044,18 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('Nextcloud is running!');
+                console.log('\u2601\uFE0F  Nextcloud - A Safe Home for All Your Data');
+                console.log('==================================================');
+                console.log(\`Web UI:            http://localhost:\${ncPort}\`);
+                console.log(\`WebDAV:            http://localhost:\${ncPort}/remote.php/dav\`);
                 console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${ncPort}\`);
+                console.log('\u{1F4DD} First Time Setup:');
+                console.log('   Create admin account on first visit');
                 console.log('--------------------------------------------------');
-                console.log('A safe home for all your data');
-                console.log('--------------------------------------------------');
-                console.log('First time setup:');
-                console.log('  1. Create admin account on first visit');
+                console.log('\u{1F517} n8n Integration:');
+                console.log('   n8n has a native Nextcloud node!');
+                console.log(\`   Host: http://localhost:\${ncPort}\`);
+                console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.nextcloud/');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {
@@ -87201,7 +87209,7 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+|s+/, '');
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
             const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
@@ -87261,15 +87269,19 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('Mautic is running!');
+                console.log('\u{1F4E2} Mautic - Open Source Marketing Automation');
+                console.log('==================================================');
+                console.log(\`Web UI:            http://localhost:\${mauticPort}\`);
+                console.log(\`API:               http://localhost:\${mauticPort}/api\`);
                 console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${mauticPort}\`);
+                console.log('\u{1F4E7} Default Credentials:');
+                console.log('   User: admin');
+                console.log('   Pass: mautic');
                 console.log('--------------------------------------------------');
-                console.log('Open Source Marketing Automation');
-                console.log('--------------------------------------------------');
-                console.log('Default Credentials:');
-                console.log('  User: admin');
-                console.log('  Pass: mautic');
+                console.log('\u{1F517} n8n Integration:');
+                console.log('   n8n has a native Mautic node!');
+                console.log(\`   API URL: http://localhost:\${mauticPort}/api\`);
+                console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mautic/');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {
@@ -87473,12 +87485,18 @@ const checkStatus = () => {
 
              process.stdout.write('\\\\x1Bc');
              console.log('\\n==================================================');
-             console.log('EzBookkeeping is running!');
+             console.log('\u{1F4B0} EzBookkeeping - Personal Finance Manager');
+             console.log('==================================================');
+             console.log(\`Web UI:            http://localhost:\${port}\`);
+             console.log(\`API:               http://localhost:\${port}/api\`);
              console.log('--------------------------------------------------');
-             console.log(\`URL:               http://localhost:\${port}\`);
+             console.log('\u{1F4DD} First Time Setup:');
+             console.log('   Create account on first visit');
              console.log('--------------------------------------------------');
-             console.log('To update to the latest version:');
-             console.log('  docker pull mayswind/ezbookkeeping:latest');
+             console.log('\u{1F517} n8n Integration:');
+             console.log('   Use HTTP Request node with the API');
+             console.log(\`   API URL: http://localhost:\${port}/api\`);
+             console.log('   Docs: https://github.com/mayswind/ezbookkeeping');
              console.log('==================================================\\n');
         });
     });
@@ -87520,7 +87538,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=app"]
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",
@@ -87691,7 +87709,7 @@ const checkStatus = () => {
                 console.log('--------------------------------------------------');
                 console.log('\u{1F517} n8n Integration:');
                 console.log('   Use the API at http://localhost:5003');
-                console.log('   Docs: https://docs.peppermint.sh/api');
+                console.log('   Docs: https://docs.peppermint.sh');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -87731,7 +87749,7 @@ process.on('SIGTERM', cleanup);`
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "appType=app"]
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",
