@@ -138,11 +138,6 @@ child.on('close', (code) => {
 `
         },
         {
-            action: 'file',
-            file: '.nvmrc',
-            filecontent: '20'
-        },
-        {
             action: 'command',
             cmd: 'node',
             args: ['runner.js', 'setup']
