@@ -1,9 +1,26 @@
 #!/usr/bin/env node
 
 import { initCommand } from './commands/init';
+import { versionCommand } from './commands/version';
+import { helpCommand } from './commands/help';
+
 const args = process.argv.slice(2);
 const command = args[0];
-if (command == 'init') {
+
+// Handle -v or --version command
+if (command === '-v' || command === '--version') {
+  versionCommand();
+  process.exit(0);
+}
+
+// Handle -help or --help command
+if (command === '-help' || command === '--help') {
+  helpCommand();
+  process.exit(0);
+}
+
+// Handle init command
+if (command === 'init') {
   initCommand().then(() => {
     process.exit(0);
   }).catch((error) => {
@@ -160,17 +177,14 @@ const findAvailablePort = (startPort: number): Promise<number> => {
   });
 };
 
-// Start the server with a free port
-if (command != 'init') {
+// Start the server with a free port (only when no command is provided)
+if (!command) {
   findAvailablePort(port).then((availablePort) => {
     // Update actualPort for CORS origin validation
     actualPort = availablePort;
     
     httpServer.listen(availablePort, () => {
       console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
-      if (!isDevelopment) {
-        console.log(`CORS restricted to: http://localhost:${availablePort}`);
-      }
 
       if (!isDevelopment) {
         open(`http://localhost:${availablePort}`);
