@@ -17,10 +17,12 @@ services:
       - ./.headlamp_data:/home/headlamp/data
     environment:
       - HEADLAMP_CONFIG_CONF_MAX_CONNECTIONS=1000
+      - HEADLAMP_CONFIG_ENABLE_DYNAMIC_CLUSTERS=true
       - HOME=/home/headlamp
     command:
       - "-in-cluster=false"
       - "-kubeconfig=/home/headlamp/.kube/config"
+      - "-enable-dynamic-clusters"
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:4466/ || exit 1"]
       interval: 10s
