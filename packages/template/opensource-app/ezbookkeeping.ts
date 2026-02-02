@@ -128,12 +128,18 @@ const checkStatus = () => {
 
              process.stdout.write('\\\\x1Bc');
              console.log('\\n==================================================');
-             console.log('EzBookkeeping is running!');
+             console.log('💰 EzBookkeeping - Personal Finance Manager');
+             console.log('==================================================');
+             console.log(\`Web UI:            http://localhost:\${port}\`);
+             console.log(\`API:               http://localhost:\${port}/api\`);
              console.log('--------------------------------------------------');
-             console.log(\`URL:               http://localhost:\${port}\`);
+             console.log('📝 First Time Setup:');
+             console.log('   Create account on first visit');
              console.log('--------------------------------------------------');
-             console.log('To update to the latest version:');
-             console.log('  docker pull mayswind/ezbookkeeping:latest');
+             console.log('🔗 n8n Integration:');
+             console.log('   Use HTTP Request node with the API');
+             console.log(\`   API URL: http://localhost:\${port}/api\`);
+             console.log('   Docs: https://github.com/mayswind/ezbookkeeping');
              console.log('==================================================\\n');
         });
     });
@@ -175,7 +181,7 @@ process.on('SIGTERM', cleanup);`
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'appType=app']
+            args: ['pkg', 'set', 'appType=tool']
         },
         {
             action: 'command',

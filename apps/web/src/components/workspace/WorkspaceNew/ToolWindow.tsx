@@ -40,7 +40,8 @@ export default function ToolWindow(props: {
                 </div>
 
                 <div className="text-sm text-gray-500 ml-4">
-                    * it will be place in opensource folder
+                    <p>* it will be place in opensource folder</p>
+                    <p>** Requires Docker installed in your system to run</p>
                 </div>
             </div>
 

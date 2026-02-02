@@ -21,7 +21,7 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+\|\s+/, '');
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
             const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
@@ -83,14 +83,18 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('Mattermost is running!');
+                console.log('💬 Mattermost Team Communication');
+                console.log('==================================================');
+                console.log(\`Web UI:            http://localhost:\${mmPort}\`);
+                console.log(\`API:               http://localhost:\${mmPort}/api/v4\`);
                 console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${mmPort}\`);
+                console.log('📝 First Time Setup:');
+                console.log('   Create admin account on first visit');
                 console.log('--------------------------------------------------');
-                console.log('Mattermost is a team communication platform');
-                console.log('--------------------------------------------------');
-                console.log('First time setup:');
-                console.log('  1. Create admin account on first visit');
+                console.log('🔗 n8n Integration:');
+                console.log('   n8n has a native Mattermost node!');
+                console.log(\`   API URL: http://localhost:\${mmPort}/api/v4\`);
+                console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mattermost/');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {

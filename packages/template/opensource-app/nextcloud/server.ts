@@ -19,7 +19,7 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+\|\s+/, '');
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
             const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
@@ -80,14 +80,18 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('Nextcloud is running!');
+                console.log('☁️  Nextcloud - A Safe Home for All Your Data');
+                console.log('==================================================');
+                console.log(\`Web UI:            http://localhost:\${ncPort}\`);
+                console.log(\`WebDAV:            http://localhost:\${ncPort}/remote.php/dav\`);
                 console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${ncPort}\`);
+                console.log('📝 First Time Setup:');
+                console.log('   Create admin account on first visit');
                 console.log('--------------------------------------------------');
-                console.log('A safe home for all your data');
-                console.log('--------------------------------------------------');
-                console.log('First time setup:');
-                console.log('  1. Create admin account on first visit');
+                console.log('🔗 n8n Integration:');
+                console.log('   n8n has a native Nextcloud node!');
+                console.log(\`   Host: http://localhost:\${ncPort}\`);
+                console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.nextcloud/');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {
