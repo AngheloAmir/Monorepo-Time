@@ -49,9 +49,30 @@ import stopTerminalWorkspace from './routes/stopTerminalWorkspace';
 
 const app = express();
 const port = config.apiPort;
+const isDevelopment = process.env.NODE_ENV === 'development'
+let actualPort      = port;
+
+const getCorsOrigin = () => {
+  if (isDevelopment) {
+    return true;
+  }
+  return [`http://localhost:${actualPort}`, `http://127.0.0.1:${actualPort}`];
+};
 
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    const allowedOrigins = getCorsOrigin();
+    if (!origin) {
+      return callback(null, true);
+    }
+    if (allowedOrigins === true) {
+      return callback(null, true);
+    }
+    if (Array.isArray(allowedOrigins) && allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error('CORS policy: Origin not allowed'));
+  },
   credentials: true,
 }));
 app.use(express.static('public'));
@@ -92,8 +113,24 @@ app.get(/(.*)/, (req, res) => {
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: (origin, callback) => {
+      // In development, allow all origins
+      if (isDevelopment) {
+        return callback(null, true);
+      }
+      // Allow requests with no origin (same-origin requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+      // In production, only allow requests from the API server itself
+      const allowedOrigins = [`http://localhost:${actualPort}`, `http://127.0.0.1:${actualPort}`];
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error('CORS policy: Origin not allowed'));
+    },
     methods: ["GET", "POST"],
+    credentials: true,
   },
   transports: ['websocket', 'polling']
 });
@@ -126,10 +163,16 @@ const findAvailablePort = (startPort: number): Promise<number> => {
 // Start the server with a free port
 if (command != 'init') {
   findAvailablePort(port).then((availablePort) => {
+    // Update actualPort for CORS origin validation
+    actualPort = availablePort;
+    
     httpServer.listen(availablePort, () => {
       console.log(`Monorepo Time is running at http://localhost:${availablePort}`);
+      if (!isDevelopment) {
+        console.log(`CORS restricted to: http://localhost:${availablePort}`);
+      }
 
-      if (process.env.NODE_ENV != 'development') {
+      if (!isDevelopment) {
         open(`http://localhost:${availablePort}`);
       }
 

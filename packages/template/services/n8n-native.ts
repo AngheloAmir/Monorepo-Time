@@ -88,27 +88,35 @@ Write-Host "Setup complete!"
             action: 'file',
             file: 'start.sh',
             filecontent: `#!/bin/bash
+# Ensure NVM is loaded
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 # Force use of Node 20 for this session
-nvm use 20 &> /dev/null || nvm install 20
+nvm use 20 || { echo "Failed to use Node 20, installing..."; nvm install 20 && nvm use 20; }
 
+# Verify Node version
+echo "Using Node version: $(node -v)"
+
+# Run n8n using the locally installed module
 echo "Starting n8n..."
-npx n8n start
+./node_modules/.bin/n8n start
 `
         },
         {
             action: 'file',
             file: 'start.ps1',
             filecontent: `
-# Try to switch to 20 if nvm exists
+# Try to switch to Node 20 if nvm exists
 if (Get-Command "nvm" -ErrorAction SilentlyContinue) {
     nvm use 20
 }
 
+# Verify Node version
+Write-Host "Using Node version: $(node -v)"
+
 Write-Host "Starting n8n..."
-npx n8n start
+node ./node_modules/n8n/bin/n8n start
 `
         },
         {
