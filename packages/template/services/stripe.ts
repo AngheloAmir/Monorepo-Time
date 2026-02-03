@@ -5,9 +5,9 @@ import { serverJs } from "./stripe/server";
 import { testJs } from "./stripe/test";
 
 export const StripeTemplate: ProjectTemplate = {
-    name: "Stripe Mock (Experimental)",
-    description: "Stripe API Mock Server",
-    notes: "Runs the official stripe-mock image.",
+    name: "Stripe Mock",
+    description: "Stripe API Server",
+    notes: "For learning and testing the official stripe-mock image.",
     type: "tool",
     category: "Service",
     icon: "fab fa-stripe text-orange-500",
@@ -36,11 +36,6 @@ export const StripeTemplate: ProjectTemplate = {
             action: 'command',
             cmd: 'npm',
             args: ['install', 'stripe']
-        },
-        {
-            action: 'command',
-            cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.dev=node server.js']
         },
         {
             action: 'command',

@@ -49,7 +49,7 @@ export default function Modal() {
                                     hideModal();
                                 }}
                                 autoFocus
-                                className={`w-[80%] mx-auto py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
+                                className={`w-[80%] mt-4 mx-auto py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
                             >
                                 OK
                             </button>
@@ -86,7 +86,7 @@ export default function Modal() {
                         )}
 
                         {currentModal === 'confirm' && (
-                            <div className="flex gap-4 justify-end">
+                            <div className="flex gap-4 justify-end mt-4">
                                 <button
                                     onClick={() => {
                                         callback && callback(false);

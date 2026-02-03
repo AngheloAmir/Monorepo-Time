@@ -7,9 +7,9 @@ import { serverJs } from "./aws/server";
 import { stopJs } from "./aws/stop";
 
 export const AWSTemplate: ProjectTemplate = {
-    name: "Localstack (Experimental)",
-    description: "AWS LocalStack with Manager",
-    notes: "For local testing with LocalStack",
+    name: "Localstack",
+    description: "Local AWS EC2 and S3 environment",
+    notes: "For learning and local testing with LocalStack",
     type: "tool",
     category: "Service",
     icon: "fab fa-aws text-orange-400",
@@ -63,11 +63,6 @@ export const AWSTemplate: ProjectTemplate = {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'scripts.start=node server.js']
-        },
-        {
-            action: 'command',
-            cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.dev=node server.js']
         },
         {
             action: 'command',

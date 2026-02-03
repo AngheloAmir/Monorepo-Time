@@ -63,12 +63,14 @@ import apiDocker from './routes/apidocker';
 import availableTemplates from './routes/availabletemplates';
 import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/setworkspace';
 import stopTerminalWorkspace from './routes/stopTerminalWorkspace';
+import deleteWorkspace from './routes/deleteWorkspace';
 
 const app = express();
 const port = config.apiPort;
 const isDevelopment = process.env.NODE_ENV === 'development'
 let actualPort      = port;
 
+//Handle Cors on production and in development mode
 const getCorsOrigin = () => {
   if (isDevelopment) {
     return true;
@@ -118,6 +120,7 @@ app.use("/" + apiRoute.processTree, processTree);
 app.use("/" + apiRoute.docker, apiDocker);
 app.use("/" + apiRoute.availabletemplates, availableTemplates);
 app.use("/" + apiRoute.setWorkspaceTemplate, setWorkspaceTemplate);
+app.use("/" + apiRoute.deleteWorkspace, deleteWorkspace);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');

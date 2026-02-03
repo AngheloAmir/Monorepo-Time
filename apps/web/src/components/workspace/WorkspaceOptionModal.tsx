@@ -4,12 +4,16 @@ import { type WorkspaceInfo } from "types";
 import InputField from "../ui/InputField";
 import ModalHeader from "../ui/ModalHeader";
 import ModalBody from "../ui/ModalBody";
+import useModal from "../../modal/modals";
 
 export default function WorkspaceOptionModal() {
-    const activeWorkspaceOptionModal = useWorkspaceState.use.activeWorkspaceOptionModal();
+    const workspace                     = useWorkspaceState.use.workspace();
+    const activeWorkspaceOptionModal    = useWorkspaceState.use.activeWorkspaceOptionModal();
     const setActiveWorkspaceOptionModal = useWorkspaceState.use.setActiveWorkspaceOptionModal();
     const updateWorkspace = useWorkspaceState.use.updateWorkspace();
-    const loadWorkspace = useWorkspaceState.use.loadWorkspace();
+    const loadWorkspace   = useWorkspaceState.use.loadWorkspace();
+    const deleteWorkspace = useWorkspaceState.use.deleteWorkspace();
+    const showModal       = useModal.use.showModal();
     const [workspaceCopy, setWorkspaceCopy] = useState<WorkspaceInfo | null>(null);
     const [packageName, setPackageName] = useState<string>('');
     const [error, setError] = useState<string>('');
@@ -41,6 +45,30 @@ export default function WorkspaceOptionModal() {
         close();
     }
 
+    async function deleteWorkspaceCurrent() {
+        if (!activeWorkspaceOptionModal) return;
+
+        //prevent if running
+        const current = workspace.find((w) => w.info.name === activeWorkspaceOptionModal.name);
+        if ( current?.isRunningAs) {
+           showModal('alert', 
+            'Workspace is running', 'Please stop the workspace before deleting it');
+           return;
+        }
+            
+        showModal('confirm', 
+            `Delete ${activeWorkspaceOptionModal.name}`,
+            `Are you sure you want to delete ${activeWorkspaceOptionModal.name}?\nIt can be reverse with GIT`, 
+            'warning', 
+            async (result) => {
+            if (result) {
+                await deleteWorkspace(activeWorkspaceOptionModal);
+                await loadWorkspace();
+                close();
+            }
+        });
+    }   
+ 
     if (!activeWorkspaceOptionModal) return null;
     return (
         <ModalBody>
@@ -128,7 +156,21 @@ export default function WorkspaceOptionModal() {
                 </div>
             </div>
 
-            <footer className="p-2 px-6 flex justify-end gap-4">
+            <footer className="p-2 px-6 flex gap-4">
+                <div className="flex-1" >
+                    <button
+                        onClick={deleteWorkspaceCurrent}
+                        className="group relative px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-400 rounded-lg"></div>
+                        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
+                        <span className="relative z-10 flex items-center gap-2">
+                            <i className="fas fa-trash"></i>
+                            Delete
+                        </span>
+                    </button>   
+                </div>
+
                 <button
                     onClick={close}
                     className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden"

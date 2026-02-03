@@ -99,6 +99,8 @@ const apiRoute = {
     availabletemplates: 'availabletemplates',
 
     setWorkspaceTemplate: 'setworkspacetemplate',
+
+    deleteWorkspace: 'deleteworkspace',
 }
 
 export default apiRoute;
