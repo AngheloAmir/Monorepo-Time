@@ -16,6 +16,7 @@ import CRUDTester from './components/app_contents/CrudTester';
 //import ProjectTemplate from './components/app_contents/ProjectTemplate';
 import AboutModal from './components/AboutModal';
 import config from 'config';
+import Cloudflare from './components/app_contents/Cloudflare';
 
 declare global {
     interface Window {
@@ -86,6 +87,13 @@ export default function App() {
                             onClick: () => navAction.setCurrentPage('turborepo') 
                         },
                         { 
+                            name: 'cloudflare',
+                            label: 'Cloudflare Tunnel',
+                            icon: 'fa fa-solid fa-cloud',
+                            isSelected: currentPage === 'cloudflare',
+                            onClick: () => navAction.setCurrentPage('cloudflare') 
+                        },
+                        { 
                             name: 'crud',
                             label: 'CRUD Tester',
                             icon: 'fa fa-microscope',
@@ -111,9 +119,10 @@ export default function App() {
                         <div className="absolute -bottom-[25%] -right-[10%] w-[50%] h-[50%] bg-fuchsia-600/20 rounded-full blur-[128px]"></div>
                     </div>
                     <div id="app-content" className="w-full max-w-[2100px] mx-auto h-full relative z-10">
-                        <Home isVisible={currentPage === "dashboard"} />
-                        <Workspace isVisible={currentPage === "workspace"} />
-                        <Turborepo isVisible={currentPage === "turborepo"} />
+                        <Home       isVisible={currentPage === "dashboard"} />
+                        <Workspace  isVisible={currentPage === "workspace"} />
+                        <Turborepo  isVisible={currentPage === "turborepo"} />
+                        <Cloudflare isVisible={currentPage === "cloudflare"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
                         {/* <ProjectTemplate isVisible={currentPage === "project-template"} /> */}
                     </div>

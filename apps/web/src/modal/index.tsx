@@ -1,6 +1,9 @@
 import useModal from "./modals";
 
 export default function Modal() {
+    const text = useModal.use.text();
+    const setText = useModal.use.setText();
+
     const currentModal = useModal.use.modal();
     const title = useModal.use.title();
     const message = useModal.use.message();
@@ -31,83 +34,109 @@ export default function Modal() {
                     <div className="relative w-[500px] min-h-[200px] max-h-[500px] flex flex-col rounded-xl overflow-hidden shadow-2xl shadow-blue-900/20">
                         {/* Gradient Border Background */}
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 pointer-events-none"></div>
-                        <div className="absolute inset-[1px] bg-[#0A0A0A] rounded-[10px] pointer-events-none"></div>
-                        
+                        <div className="absolute inset-[2px] bg-[#0A0A0A] rounded-[10px] pointer-events-none"></div>
+
                         <div className="relative z-10 p-6 flex flex-col h-full">
-                        <div className="flex-1  ">
-                            <div className="mb-2 flex gap-4">
-                                <i className={`${iconClass} text-3xl`}></i>
-                                <h2 className="text-xl font-bold mb-2 text-white">{title}</h2>
+                            <div className="flex-1  ">
+                                <div className="mb-2 flex gap-4">
+                                    <i className={`${iconClass} text-3xl`}></i>
+                                    <h2 className="text-xl font-bold mb-2 text-white">{title}</h2>
+                                </div>
+                                <p className="text-gray-300">{message}</p>
                             </div>
-                            <p className="text-gray-300">{message}</p>
-                        </div>
 
-                        {currentModal === 'alert' && (
-                             <button
-                                onClick={() => {
-                                    callback && callback(undefined);
-                                    hideModal();
-                                }}
-                                autoFocus
-                                className={`w-[80%] mt-4 mx-auto py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
-                            >
-                                OK
-                            </button>
-                        )}
-
-                        {currentModal === 'selection' && (
-                             <div className="flex flex-col gap-2 h-full overflow-y-auto pr-1">
-                                {(data as any[])?.map((item: any, index: number) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => {
-                                            callback && callback(item);
-                                            hideModal();
-                                        }}
-                                        className="flex items-center gap-3 w-full p-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors text-left group"
-                                    >
-                                        <div className="w-8 h-8 rounded bg-gray-600 flex items-center justify-center text-gray-400 group-hover:text-white transition-colors">
-                                           <i className={`fas ${item.info.fontawesomeIcon || 'fa-box'}`}></i>
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-white font-medium truncate">{item.info.name}</div>
-                                            <div className="text-gray-400 text-xs truncate">{item.info.path}</div>
-                                        </div>
-                                        <i className="fas fa-chevron-right text-gray-500 group-hover:text-white"></i>
-                                    </button>
-                                ))}
-                                <button
-                                    onClick={() => hideModal()}
-                                    className="mt-4 w-full py-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        )}
-
-                        {currentModal === 'confirm' && (
-                            <div className="flex gap-4 justify-end mt-4">
+                            {currentModal === 'alert' && (
                                 <button
                                     onClick={() => {
-                                        callback && callback(false);
+                                        callback && callback(undefined);
                                         hideModal();
                                     }}
-                                    className="px-4 py-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        callback && callback(true);
-                                        hideModal();
-                                    }}
-                                    className={`px-4 py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
+                                    autoFocus
+                                    className={`w-[80%] mt-4 mx-auto py-2 rounded-xl text-white shadow-lg font-bold ${btnClass}`}
                                 >
                                     OK
                                 </button>
-                            </div>
-                        )}
-                       
+                            )}
+
+                            {currentModal === 'selection' && (
+                                <div className="flex flex-col gap-2 h-full overflow-y-auto pr-1">
+                                    {(data as any[])?.map((item: any, index: number) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => {
+                                                callback && callback(item);
+                                                hideModal();
+                                            }}
+                                            className="flex items-center gap-3 w-full p-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors text-left group"
+                                        >
+                                            <div className="w-8 h-8 rounded bg-gray-600 flex items-center justify-center text-gray-400 group-hover:text-white transition-colors">
+                                                <i className={`fas ${item.info.fontawesomeIcon || 'fa-box'}`}></i>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-white font-medium truncate">{item.info.name}</div>
+                                                <div className="text-gray-400 text-xs truncate">{item.info.path}</div>
+                                            </div>
+                                            <i className="fas fa-chevron-right text-gray-500 group-hover:text-white"></i>
+                                        </button>
+                                    ))}
+                                    <button
+                                        onClick={() => hideModal()}
+                                        className="mt-4 w-full py-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            )}
+
+                            {currentModal === 'confirm' && (
+                                <div className="flex gap-4 justify-end mt-4">
+                                    <button
+                                        onClick={() => {
+                                            callback && callback(false);
+                                            hideModal();
+                                        }}
+                                        className="px-4 py-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            callback && callback(true);
+                                            hideModal();
+                                        }}
+                                        className={`py-2 w-[120px] rounded-xl text-white shadow-lg font-bold ${btnClass}`}
+                                    >
+                                        OK
+                                    </button>
+                                </div>
+                            )}
+
+                            {currentModal === 'prompt' && (
+                                <div className="flex flex-col gap-4 justify-end mt-4">
+                                    <input value={text} onChange={(e) => setText(e.target.value)} type="text" className="w-full p-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold" />
+                                    <div className="flex gap-4 justify-end mt-4">
+                                        <button
+                                            onClick={() => {
+                                                callback && callback(false);
+                                                hideModal();
+                                            }}
+                                            className="px-4 py-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                callback && callback(text);
+                                                hideModal();
+                                            }}
+                                            className={`py-2 w-[120px] rounded-xl text-white shadow-lg font-bold ${btnClass}`}
+                                        >
+                                            OK
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                     </div>
                 </div>

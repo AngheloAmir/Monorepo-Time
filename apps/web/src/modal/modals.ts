@@ -5,6 +5,9 @@ type ModalType   = 'alert'   | 'confirm' | 'prompt' | 'selection' | null;
 type ModalBanner = 'success' | 'warning' | 'error' | null;
 
 interface modalContext {
+    text: string;
+    setText: (text: string) => void;
+
     modal: ModalType;
     title:  string;
     message: string;
@@ -16,6 +19,11 @@ interface modalContext {
 }
 
 const modalstate = create<modalContext>()((set) => ({
+    text: "",
+    setText: (text: string) => {
+        set({ text });
+    },
+
     modal: null,
     title: "",
     message: "",
@@ -23,10 +31,10 @@ const modalstate = create<modalContext>()((set) => ({
     data: null,
     callback: () => {},
     showModal: (modal: ModalType, title: string, message: string, banner?: ModalBanner, callback?: (result: any) => void, data?: any) => {
-        set({ modal, title, message, banner, callback, data });
+        set({ modal, title, message, banner, callback, data, text: "" });
     },
     hideModal: () => {
-        set({ modal: null, title: "", message: "", banner: null, callback: () => {}, data: null });
+        set({ modal: null, title: "", message: "", banner: null, callback: () => {}, data: null, text: "" });
     }
 }));
 

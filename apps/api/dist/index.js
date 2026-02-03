@@ -85170,8 +85170,8 @@ var import_express22 = __toESM(require_express2());
 // ../../packages/template/databases/mysql.ts
 var MySQL = {
   name: "MariaDB",
-  description: "MariaDB (MySQL compatible) + Adminer",
-  notes: "Uses MariaDB (MySQL compatible) and Adminer for management.",
+  description: "MariaDB (MySQL compatible)",
+  notes: "Uses MariaDB (MySQL compatible).",
   type: "database",
   category: "Database",
   icon: "fas fa-database text-blue-500",
@@ -85203,14 +85203,6 @@ services:
       timeout: 5s
       retries: 60
       start_period: 40s
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "\${ADMINER_PORT:-8081}:8080"
-    depends_on:
-      - db
 `
     },
     {
@@ -85245,7 +85237,7 @@ const getPort = (startPort) => new Promise((resolve, reject) => {
 });
 
 async function main() {
-    console.log("Starting MySQL (MariaDB + Adminer)...");
+    console.log("Starting MySQL (MariaDB)...");
 
     // 0. Clean up any stale containers/networks from previous runs
     try {
@@ -85272,7 +85264,6 @@ async function main() {
 
     // Find Open Ports
     const DB_PORT = await getPort(3306);
-    const ADMINER_PORT = await getPort(8081);
 
     // 2. Start Docker Compose passing dynamic ports
     const child = spawn("docker", ["compose", "up", "-d", "--remove-orphans"], {
@@ -85280,7 +85271,6 @@ async function main() {
       env: { 
         ...process.env,
         DB_PORT,
-        ADMINER_PORT,
         UID: process.getuid ? process.getuid() : 1000, 
         GID: process.getgid ? process.getgid() : 1000 
       }
@@ -85364,12 +85354,14 @@ async function main() {
             console.log("--------------------------------------------------");
             console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${DB_PORT}/db\`);
             console.log("--------------------------------------------------");
-            console.log("Adminer Login Details:");
-            console.log("  URL:      http://localhost:" + ADMINER_PORT + "/?server=db&username=admin&db=db");
-            console.log("  Server:   db");
-            console.log("  Username: admin");
-            console.log("  Password: admin");
-            console.log("  Database: db");
+            console.log("CloudBeaver Setup Instructions:");
+            console.log("1. Open CloudBeaver");
+            console.log("2. Create a new connection -> MariaDB");
+            console.log("3. Host: localhost");
+            console.log(\`4. Port: \${DB_PORT}\`);
+            console.log("5. Database: db");
+            console.log("6. Username: admin");
+            console.log("7. Password: admin");
             console.log("==================================================\\n");
             console.log("Note: It takes a minute for the database to fully initialize");
           });
@@ -85406,7 +85398,7 @@ main();
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "description=MySQL (Percona 8 + Adminer)"]
+      args: ["pkg", "set", "description=MySQL (Percona 8)"]
     },
     {
       action: "command",
@@ -86497,7 +86489,28 @@ var renderYaml = "services:\n  - type: web\n    name: vite-react-app\n    env: s
 var AppTsx = "import Background from './components/Background';\nimport ChatContainer from './components/ChatContainer';\nimport Header from './components/Header';\n\nexport default function App() {\n    return (\n        <div className={`\n      h-[100vh]\n      w-[100vw]\n      overflow-hidden\n      bg-zinc-900   \n    `}>\n            <div className='w-full h-full'>\n                <Background />\n                <Header />\n                <ChatContainer />\n            </div>\n        </div>\n    );\n}";
 
 // ../../packages/template/demo/monochat/src/FetchToWho.ts
-var FetchToWhoTs = '\ninterface ChatItem {\n    id: number;\n    who: "user" | "system";\n    timestamp: number;\n    message: string;\n}\n        \nexport default async function FetchToWho( chats: ChatItem[]) {\n    const lorem = "Please edit the FetchToWho function. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.";\n    return lorem;\n}\n';
+var FetchToWhoTs = `
+interface ChatItem {
+    id: number;
+    who: "user" | "system";
+    timestamp: number;
+    message: string;
+}
+
+    if  (chats.length === 0) return "";
+    
+    const res = await fetch("http://localhost:5678/webhook/test", {
+        method: "POST",
+        headers: {
+            "content-type": "application/json"
+        },
+        body:JSON.stringify({
+            usermessage: chats[ chats.length - 1].message 
+         })
+    })
+    const text = await res.text();
+    return text;
+`;
 
 // ../../packages/template/demo/monochat/src/app/chat.ts
 var chatTs = `import { create } from 'zustand';
