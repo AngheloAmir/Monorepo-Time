@@ -16,7 +16,7 @@ services:
   db:
     image: percona:8
     restart: always
-    user: "\${UID}:\${GID}"
+    user: "\${UID:-1000}:\${GID:-1000}"
     environment:
       - MYSQL_ROOT_PASSWORD=admin
       - MYSQL_DATABASE=db
