@@ -86121,7 +86121,9 @@ child.on('close', (code) => {
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+|s+/, '');
             const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+            // Filter out HTTP request errors (400/401) which are normal during operation
+            const isHttpError = lower.includes('http request');
+            if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !isHttpError) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
@@ -89497,7 +89499,7 @@ var projecttemplate_default = templates3;
 // ../../packages/template/services/n8n/dockerCompose.ts
 var dockerCompose4 = `services:
   n8n:
-    image: n8nio/n8n:1.29.0
+    image: n8nio/n8n:2.7.1
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"
@@ -89616,7 +89618,7 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
-                console.log('N8N is running at http://localhost:\${n8nPort}');
+                console.log('N8N is running at http://localhost:' + n8nPort);
             });
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry

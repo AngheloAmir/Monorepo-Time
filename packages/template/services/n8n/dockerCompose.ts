@@ -1,6 +1,6 @@
 export const dockerCompose = `services:
   n8n:
-    image: n8nio/n8n:1.29.0
+    image: n8nio/n8n:2.7.1
     pull_policy: if_not_present
     restart: unless-stopped
     user: "1000:1000"

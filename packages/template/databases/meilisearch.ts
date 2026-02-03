@@ -74,7 +74,9 @@ child.on('close', (code) => {
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+\|\s+/, '');
             const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+            // Filter out HTTP request errors (400/401) which are normal during operation
+            const isHttpError = lower.includes('http request');
+            if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !isHttpError) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
