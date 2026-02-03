@@ -66,7 +66,7 @@ export default function Cloudflare(props: CloudflareProps) {
         <div className={`h-[92%] w-full p-4 gap-6 ${props.isVisible ? 'flex' : 'hidden'}`}>
             <div className="w-[360px] lg:w-[440px] xl:w-[480px]  flex-none h-full flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                    <TransparentCard title="Cloudflare" description="Commands" contentClassName="flex py-2 px-6">
+                    <TransparentCard title="Cloudflare" description="Commands" contentClassName="flex flex-col py-2 px-6">
                         <Button2
                             onClick={startTunnel}
                             name="Generate Tunnel"
@@ -75,11 +75,22 @@ export default function Cloudflare(props: CloudflareProps) {
                             icon="fas fa-cloud"
                             disabled={isRunning}
                         />
+                        <p className="text-gray-400 text-xs mt-2">
+                            * This app support only one tunnel at a time
+                            <br />
+                            ** Closing the browser, refeshing the page, or starting a new tunnel
+                            will close the previous tunnel.
+                            <br />
+                            *** Use only for testing purposes. I am not responsible for any
+                            issues caused by using this feature. It is a bad idea to use this
+                            feature in production as Cloudflare can close the tunnel at any time
+                            without any warning.
+                        </p>
                     </TransparentCard>
 
-                    <TransparentCard title="How to use Cloudflare Tunnel" description="" contentClassName="flex py-2 px-6">
+                    <TransparentCard title="Setup Cloudflare Tunnel" description="" contentClassName="flex py-2 px-6">
                         <p className="text-gray-400 text-sm">
-                            Before a tunnel service is created, download and install cloudflare tunnel on your machine.
+                            Before a tunnel service is created, download and install Cloudflare's CLI tool on your machine.
                             <br />
                             <br />
                             <a
@@ -141,10 +152,10 @@ export default function Cloudflare(props: CloudflareProps) {
                         className="h-full w-full"
                         socketUrl={config.serverPath}
                         onExit={() => {
-                            //setIsRunning(false);
+                            setIsRunning(false);
                         }}
                         onCrash={() => {
-                            //setIsRunning(false);
+                            setIsRunning(false);
                         }}
                     />
                 </div>
