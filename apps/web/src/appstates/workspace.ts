@@ -387,6 +387,8 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             socket.on('template:error', (data: { error: string }) => {
                 set({ loadMessage: `Error: ${data.error}` });
                 console.error('[Template Error]', data.error);
+
+                alert(data.error);
                 socket.disconnect();
                 reject(new Error(data.error));
             });
@@ -394,6 +396,8 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
             socket.on('connect_error', (err) => {
                 set({ loadMessage: `Connection error: ${err.message}` });
                 console.error('[Template Connect Error]', err);
+                
+                alert(err.message);
                 socket.disconnect();
                 reject(err);
             });

@@ -26,7 +26,7 @@ router.post("/", async (req: Request, res: Response) => {
 
         const nameToCheck = reqBody.name || path.basename(targetPath);
         if (await checkNameExists(nameToCheck)) {
-             return res.status(409).json({ error: `Workspace with name "${nameToCheck}" already exists.` });
+            return res.status(409).json({ error: `Workspace with name "${nameToCheck}" already exists.` });
         }
 
         await fs.ensureDir(targetPath);
