@@ -2,6 +2,7 @@ import type { ProjectTemplate } from "../../types";
 import { dockerCompose } from "./k3d-headlamp/dockerCompose";
 import { gitignoreContent } from "./k3d-headlamp/gitignore";
 import { serverJs } from "./k3d-headlamp/server";
+import { stopJs } from "./k3d-headlamp/stop";
 import { readmeContent } from "./k3d-headlamp/readme";
 
 export const K3dHeadlampTemplate: ProjectTemplate = {
@@ -43,9 +44,14 @@ export const K3dHeadlampTemplate: ProjectTemplate = {
             args: ['pkg', 'set', 'scripts.start=node index.js']
         },
         {
+            action: 'file',
+            file: 'stop.js',
+            filecontent: stopJs
+        },
+        {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.stop=node -e \'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}\'']
+            args: ['pkg', 'set', 'scripts.stop=node stop.js']
         },
         {
             action: 'command',
@@ -76,6 +82,11 @@ export const K3dHeadlampTemplate: ProjectTemplate = {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'fontawesomeIcon=fas fa-dharmachakra text-blue-500']
+        },
+        {
+            action: 'command',
+            cmd: 'npm',
+            args: ['pkg', 'set', 'appType=tool']
         }
     ]
 };

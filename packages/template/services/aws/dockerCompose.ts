@@ -32,17 +32,11 @@ export const dockerCompose = `services:
     networks:
       - cloud-net
 
-  s3-manager:
-    image: cloudlena/s3manager
+  s3-browser:
+    image: machines/filestash
     pull_policy: if_not_present
     ports:
-      - "4340:8080"
-    environment:
-      - ACCESS_KEY_ID=test
-      - SECRET_ACCESS_KEY=test
-      - REGION=us-east-1
-      - ENDPOINT=localstack:4566
-      - USE_SSL=false
+      - "4340:8334"
     depends_on:
       - localstack
     networks:

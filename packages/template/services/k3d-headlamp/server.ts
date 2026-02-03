@@ -53,27 +53,76 @@ const clusterRunning = () => {
 };
 
 async function main() {
-    console.log('\\\\x1b[36m╔══════════════════════════════════════════════════════════════╗\\\\x1b[0m');
-    console.log('\\\\x1b[36m║\\\\x1b[0m       🚀 K3d + Headlamp Learning Environment               \\\\x1b[36m║\\\\x1b[0m');
-    console.log('\\\\x1b[36m╚══════════════════════════════════════════════════════════════╝\\\\x1b[0m');
+    console.log('╔══════════════════════════════════════════════════════════════╗');
+    console.log('║       🚀 K3d + Headlamp Learning Environment               ║');
+    console.log('╚══════════════════════════════════════════════════════════════╝');
     console.log('');
 
-    // Check prerequisites
+    // Check all prerequisites
+    console.log('Checking dependencies...');
+    console.log('');
+    let hasErrors = false;
+
+    // Check Docker (required)
+    try {
+        execSync('docker --version', { stdio: 'pipe' });
+        console.log('✓ Docker is installed');
+    } catch (e) {
+        console.log('✗ ERROR: Docker is not installed!');
+        console.log('  K3d and Headlamp require Docker to run.');
+        console.log('  Install Docker: https://docs.docker.com/get-docker/');
+        hasErrors = true;
+    }
+
+    // Check Docker Compose (required for Headlamp)
+    try {
+        execSync('docker compose version', { stdio: 'pipe' });
+        console.log('✓ Docker Compose is installed');
+    } catch (e) {
+        console.log('✗ ERROR: Docker Compose is not installed!');
+        console.log('  Headlamp requires Docker Compose to run.');
+        console.log('  Install Docker Compose: https://docs.docker.com/compose/install/');
+        hasErrors = true;
+    }
+
+    // Check k3d (required)
     if (!checkK3d()) {
-        console.log('\\\\x1b[31m❌ k3d is not installed!\\\\x1b[0m');
-        console.log('');
-        console.log('\\\\x1b[33mInstall k3d using one of these methods:\\\\x1b[0m');
+        console.log('✗ ERROR: k3d is not installed!');
+        console.log('  Install k3d using one of these methods:');
         console.log('  • curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash');
         console.log('  • wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash');
         console.log('  • brew install k3d (on macOS)');
-        console.log('');
+        hasErrors = true;
+    } else {
+        console.log('✓ k3d is installed');
+    }
+
+    // Check kubectl (optional but recommended)
+    try {
+        execSync('kubectl version --client', { stdio: 'pipe' });
+        console.log('✓ kubectl is installed');
+    } catch (e) {
+        console.log('⚠ WARNING: kubectl is not installed');
+        console.log('  The kubectl commands in this guide will not work without it.');
+        console.log('  Install kubectl: https://kubernetes.io/docs/tasks/tools/');
+        console.log('  (You can still use Headlamp UI without kubectl)');
+    }
+
+    console.log('');
+
+    if (hasErrors) {
+        console.log('══════════════════════════════════════════════════════════════');
+        console.log('❌ Missing required dependencies. Please install them first.');
+        console.log('══════════════════════════════════════════════════════════════');
         process.exit(1);
     }
-    console.log('\\\\x1b[32m✓ k3d is installed\\\\x1b[0m');
+
+    console.log('✓ All required dependencies are installed');
+    console.log('');
 
     // Create or start cluster
     if (!clusterExists()) {
-        console.log(\`\\\\n\\\\x1b[33mCreating k3d cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+        console.log(\`\\\\nCreating k3d cluster "\${CLUSTER_NAME}"...\`);
         try {
             await runCommand('k3d', [
                 'cluster', 'create', CLUSTER_NAME,
@@ -85,30 +134,30 @@ async function main() {
                 '--tls-san', 'host.k3d.internal',
                 '--wait'
             ]);
-            console.log(\`\\\\x1b[32m✓ Cluster "\${CLUSTER_NAME}" created successfully\\\\x1b[0m\`);
+            console.log(\`✓ Cluster "\${CLUSTER_NAME}" created successfully\`);
         } catch (e) {
-            console.error('\\\\x1b[31m❌ Failed to create cluster\\\\x1b[0m');
+            console.error('❌ Failed to create cluster');
             process.exit(1);
         }
     } else if (!clusterRunning()) {
-        console.log(\`\\\\n\\\\x1b[33mStarting existing cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+        console.log(\`\\\\nStarting existing cluster "\${CLUSTER_NAME}"...\`);
         try {
             await runCommand('k3d', ['cluster', 'start', CLUSTER_NAME]);
-            console.log(\`\\\\x1b[32m✓ Cluster "\${CLUSTER_NAME}" started\\\\x1b[0m\`);
+            console.log(\`✓ Cluster "\${CLUSTER_NAME}" started\`);
         } catch (e) {
-            console.error('\\\\x1b[31m❌ Failed to start cluster\\\\x1b[0m');
-            console.log('\\\\x1b[33mThis often happens if the cluster network was deleted or Docker was restarted.\\\\x1b[0m');
-            console.log('\\\\x1b[33mTry deleting and recreating the cluster:\\\\x1b[0m');
+            console.error('❌ Failed to start cluster');
+            console.log('This often happens if the cluster network was deleted or Docker was restarted.');
+            console.log('Try deleting and recreating the cluster:');
             console.log(\`  k3d cluster delete \${CLUSTER_NAME}\`);
             console.log('  npm run start');
             process.exit(1);
         }
     } else {
-        console.log(\`\\\\x1b[32m✓ Cluster "\${CLUSTER_NAME}" is already running\\\\x1b[0m\`);
+        console.log(\`✓ Cluster "\${CLUSTER_NAME}" is already running\`);
     }
 
     // Update kubeconfig
-    console.log('\\\\n\\\\x1b[33mUpdating kubeconfig...\\\\x1b[0m');
+    console.log('\\\\nUpdating kubeconfig...');
     
     // 1. Try to export config to local file (REQUIRED for Headlamp)
     try {
@@ -129,9 +178,9 @@ async function main() {
         const kubePath = path.join(kubeDir, 'config');
         fs.writeFileSync(kubePath, kubeconfig);
         fs.chmodSync(kubePath, 0o644);
-        console.log('\\\\x1b[32m✓ Local kubeconfig updated (for container access)\\\\x1b[0m');
+        console.log('✓ Local kubeconfig updated (for container access)');
     } catch (e) {
-        console.error('\\\\x1b[31m❌ Failed to create local kubeconfig!\\\\x1b[0m');
+        console.error('❌ Failed to create local kubeconfig!');
         console.error(e.message);
         process.exit(1);
     }
@@ -139,15 +188,15 @@ async function main() {
     // 2. Try to merge into global config for user convenience (kubectl)
     try {
         execSync(\`k3d kubeconfig merge \${CLUSTER_NAME} --kubeconfig-merge-default\`, { stdio: 'pipe' });
-        console.log('\\\\x1b[32m✓ Global kubeconfig updated\\\\x1b[0m');
+        console.log('✓ Global kubeconfig updated');
     } catch (e) {
-        console.warn('\\\\x1b[33m⚠ Could not update global kubeconfig automatically\\\\x1b[0m');
-        console.log('\\\\x1b[90mHint: This is usually because /home/anghelo/.kube/config is a root-owned directory.\\\\x1b[0m');
-        console.log('\\\\x1b[90mFix it with: sudo rm -rf /home/anghelo/.kube/config\\\\x1b[0m');
+        console.warn('⚠ Could not update global kubeconfig automatically');
+        console.log('Hint: This is usually because /home/anghelo/.kube/config is a root-owned directory.');
+        console.log('Fix it with: sudo rm -rf /home/anghelo/.kube/config');
     }
 
     // Start Headlamp via Docker Compose
-    console.log('\\\\n\\\\x1b[33mStarting Headlamp UI...\\\\x1b[0m');
+    console.log('\\\\nStarting Headlamp UI...');
     const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit', cwd: __dirname });
 
     child.on('close', (code) => {
@@ -162,7 +211,7 @@ async function main() {
                 let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
                 const lower = cleanLine.toLowerCase();
                 if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                    process.stdout.write('\\\\x1b[31mError:\\\\x1b[0m ' + cleanLine + '\\\\n');
+                    process.stdout.write('Error: ' + cleanLine + '\\\\n');
                 }
             });
         };
@@ -219,27 +268,27 @@ async function main() {
                     }
 
                     console.log('');
-                    console.log('\\\\x1b[36m╔══════════════════════════════════════════════════════════════╗\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m                    🎉 Setup Complete!                       \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m╠══════════════════════════════════════════════════════════════╣\\\\x1b[0m');
-                    console.log(\`\\\\x1b[36m║\\\\x1b[0m  📊 Headlamp UI:   http://localhost:\${headlampPort}                    \\\\x1b[36m║\\\\x1b[0m\`);
-                    console.log('\\\\x1b[36m║\\\\x1b[0m  🔧 Cluster:       k3d-' + CLUSTER_NAME + '                       \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m╠══════════════════════════════════════════════════════════════╣\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m                                                              \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m  📚 Quick Commands:                                         \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m    kubectl get nodes                                        \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m    kubectl get pods --all-namespaces                        \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m    kubectl create deployment nginx --image=nginx            \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m    kubectl expose deployment nginx --port=80 --type=NodePort\\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m                                                              \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m  🔗 Documentation:                                          \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m    K3d:      https://k3d.io/                                 \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m    Headlamp: https://headlamp.dev/                          \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m    K8s:      https://kubernetes.io/docs/                    \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m║\\\\x1b[0m                                                              \\\\x1b[36m║\\\\x1b[0m');
-                    console.log('\\\\x1b[36m╚══════════════════════════════════════════════════════════════╝\\\\x1b[0m');
+                    console.log('╔══════════════════════════════════════════════════════════════╗');
+                    console.log('║                    🎉 Setup Complete!                       ║');
+                    console.log('╠══════════════════════════════════════════════════════════════╣');
+                    console.log(\`║  📊 Headlamp UI:   http://localhost:\${headlampPort}                    ║\`);
+                    console.log('║  🔧 Cluster:       k3d-' + CLUSTER_NAME + '                       ║');
+                    console.log('╠══════════════════════════════════════════════════════════════╣');
+                    console.log('║                                                              ║');
+                    console.log('║  📚 Quick Commands:                                         ║');
+                    console.log('║    kubectl get nodes                                        ║');
+                    console.log('║    kubectl get pods --all-namespaces                        ║');
+                    console.log('║    kubectl create deployment nginx --image=nginx            ║');
+                    console.log('║    kubectl expose deployment nginx --port=80 --type=NodePort║');
+                    console.log('║                                                              ║');
+                    console.log('║  🔗 Documentation:                                          ║');
+                    console.log('║    K3d:      https://k3d.io/                                 ║');
+                    console.log('║    Headlamp: https://headlamp.dev/                          ║');
+                    console.log('║    K8s:      https://kubernetes.io/docs/                    ║');
+                    console.log('║                                                              ║');
+                    console.log('╚══════════════════════════════════════════════════════════════╝');
                     console.log('');
-                    console.log('\\\\x1b[33mPress Ctrl+C to stop the services\\\\x1b[0m');
+                    console.log('Press Ctrl+C to stop the services');
                 });
             }).on('error', (e) => {
                 setTimeout(checkStatus, 2000);
@@ -251,9 +300,32 @@ async function main() {
 }
 
 const cleanup = () => {
-    console.log('\\\\n\\\\x1b[33mStopping services...\\\\x1b[0m');
-    exec('docker compose down', { cwd: __dirname }, (err, stdout, stderr) => {
-        console.log('\\\\x1b[32m✓ Headlamp stopped\\\\x1b[0m');
+    console.log('\\\\nStopping services...');
+    
+    // Read runtime file to get tracked container IDs
+    let runtimeData = { containerIds: [] };
+    try {
+        const content = fs.readFileSync(RUNTIME_FILE, 'utf8');
+        runtimeData = JSON.parse(content);
+    } catch (e) {
+        // Runtime file might not exist
+    }
+    
+    // Stop docker compose containers
+    exec('docker compose down --remove-orphans', { cwd: __dirname }, (err, stdout, stderr) => {
+        if (err) {
+            console.log('⚠ docker compose down failed, trying to stop containers directly...');
+            
+            // Fallback: stop containers by ID if we have them
+            if (runtimeData.containerIds && runtimeData.containerIds.length > 0) {
+                const ids = runtimeData.containerIds.join(' ');
+                exec(\`docker stop \${ids} 2>/dev/null; docker rm \${ids} 2>/dev/null\`, () => {
+                    console.log('✓ Containers stopped');
+                });
+            }
+        } else {
+            console.log('✓ Headlamp stopped');
+        }
 
         // Ask if user wants to stop the cluster too
         const readline = require('readline');
@@ -262,18 +334,18 @@ const cleanup = () => {
             output: process.stdout
         });
 
-        rl.question('\\\\x1b[33mDo you want to stop the k3d cluster as well? (y/N): \\\\x1b[0m', (answer) => {
+        rl.question('Do you want to stop the k3d cluster as well? (y/N): ', (answer) => {
             if (answer.toLowerCase() === 'y') {
-                console.log(\`\\\\x1b[33mStopping cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+                console.log(\`Stopping cluster "\${CLUSTER_NAME}"...\`);
                 exec(\`k3d cluster stop \${CLUSTER_NAME}\`, () => {
-                    console.log('\\\\x1b[32m✓ Cluster stopped\\\\x1b[0m');
-                    console.log('\\\\x1b[90m(Run "npm run cluster:delete" to permanently delete the cluster)\\\\x1b[0m');
+                    console.log('✓ Cluster stopped');
+                    console.log('(Run "npm run cluster:delete" to permanently delete the cluster)');
                     try { fs.unlinkSync(RUNTIME_FILE); } catch (e) { }
                     rl.close();
                     process.exit(0);
                 });
             } else {
-                console.log('\\\\x1b[90m(Cluster is still running. Run "npm run cluster:stop" to stop it later)\\\\x1b[0m');
+                console.log('(Cluster is still running. Run "npm run cluster:stop" to stop it later)');
                 try { fs.unlinkSync(RUNTIME_FILE); } catch (e) { }
                 rl.close();
                 process.exit(0);
