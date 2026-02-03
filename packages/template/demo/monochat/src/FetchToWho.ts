@@ -1,1 +1,22 @@
-export const FetchToWhoTs = "\ninterface ChatItem {\n    id: number;\n    who: \"user\" | \"system\";\n    timestamp: number;\n    message: string;\n}\n        \nexport default async function FetchToWho( chats: ChatItem[]) {\n    const lorem = \"Please edit the FetchToWho function. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.\";\n    return lorem;\n}\n";
+export const FetchToWhoTs = `
+interface ChatItem {
+    id: number;
+    who: "user" | "system";
+    timestamp: number;
+    message: string;
+}
+
+    if  (chats.length === 0) return "";
+    
+    const res = await fetch("http://localhost:5678/webhook/test", {
+        method: "POST",
+        headers: {
+            "content-type": "application/json"
+        },
+        body:JSON.stringify({
+            usermessage: chats[ chats.length - 1].message 
+         })
+    })
+    const text = await res.text();
+    return text;
+`;
