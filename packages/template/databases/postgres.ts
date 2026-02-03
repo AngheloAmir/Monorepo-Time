@@ -75,7 +75,7 @@ child.on('close', (code) => {
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+\|\s+/, '');
             const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+            if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !lower.includes('database system is starting up')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });

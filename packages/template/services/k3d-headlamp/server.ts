@@ -57,6 +57,9 @@ async function main() {
     console.log('║       🚀 K3d + Headlamp Learning Environment               ║');
     console.log('╚══════════════════════════════════════════════════════════════╝');
     console.log('');
+    console.log('Note: if you having errors, try to run: ');
+    console.log('k3d cluster delete learning-cluster');
+    console.log('');
 
     // Check all prerequisites
     console.log('Checking dependencies...');
@@ -131,7 +134,7 @@ async function main() {
                 '--agents', '2',
                 '--port', '8080:80@loadbalancer',
                 '--port', '8443:443@loadbalancer',
-                '--tls-san', 'host.k3d.internal',
+                '--k3s-arg', '--tls-san=host.k3d.internal@server:*',
                 '--wait'
             ]);
             console.log(\`✓ Cluster "\${CLUSTER_NAME}" created successfully\`);

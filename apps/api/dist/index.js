@@ -85192,7 +85192,7 @@ services:
       - MARIADB_PASSWORD=admin
 
     ports:
-      - "3306:3306"
+      - "\${DB_PORT:-3306}:3306"
 
     volumes:
       - ./mysql-data:/var/lib/mysql
@@ -85208,7 +85208,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - "8081:8080"
+      - "\${ADMINER_PORT:-8081}:8080"
     depends_on:
       - db
 `
@@ -85227,137 +85227,170 @@ node_modules/
       file: "index.js",
       filecontent: `
 const http = require("http");
-const { spawn, exec } = require("child_process");
+const { spawn, exec, execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
 const RUNTIME_FILE = path.join(__dirname, ".runtime.json");
 const DATA_DIR = path.join(__dirname, "mysql-data");
 
-console.log("Starting MySQL (MariaDB + Adminer)...");
-
-// 1. Ensure data directory exists so it's owned by you
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// 2. Start Docker Compose passing your current UID/GID
-const child = spawn("docker", ["compose", "up", "-d", "--remove-orphans"], {
-  stdio: "inherit",
-  env: { 
-    ...process.env, 
-    UID: process.getuid ? process.getuid() : 1000, 
-    GID: process.getgid ? process.getgid() : 1000 
-  }
-});
-
-child.on("close", (code) => {
-  if (code !== 0) {
-    console.error("Failed to start Docker containers.");
-    process.exit(code);
-  }
-
-  // Follow logs to catch startup errors
-  const logs = spawn("docker", ["compose", "logs", "-f", "--tail=0"], {
-    stdio: ["ignore", "pipe", "pipe"]
-  });
-
-  const printImportant = (data) => {
-    const lines = data.toString().split("\\n");
-    lines.forEach((line) => {
-      const clean = line.replace(/^[^|]+\\|\\s+/, "");
-      if (clean.toLowerCase().includes("error") || clean.toLowerCase().includes("fatal")) {
-        process.stdout.write("\\x1b[31mError:\\x1b[0m " + clean + "\\n");
-      }
+// Helper to find available port
+const getPort = (startPort) => new Promise((resolve, reject) => {
+    const s = http.createServer();
+    s.listen(startPort, () => {
+        const p = s.address().port;
+        s.close(() => resolve(p));
     });
-  };
-
-  logs.stdout.on("data", printImportant);
-  logs.stderr.on("data", printImportant);
+    s.on('error', () => resolve(getPort(startPort + 1)));
 });
 
-// 3. Control server
-const server = http.createServer((req, res) => {
-  if (req.url === "/stop") {
-    res.writeHead(200);
-    res.end("Stopping...");
-    cleanup();
-  } else {
-    res.writeHead(404);
-    res.end();
-  }
-});
+async function main() {
+    console.log("Starting MySQL (MariaDB + Adminer)...");
 
-server.listen(0);
-
-// 4. Check status
-const checkStatus = () => {
-  exec("docker compose port db 3306", (err, stdout) => {
-    if (err || !stdout) {
-      setTimeout(checkStatus, 2000);
-      return;
+    // 0. Clean up any stale containers/networks from previous runs
+    try {
+        execSync("docker compose down", { stdio: "ignore", cwd: __dirname });
+    } catch (e) {
+        // Ignore errors (e.g. if already down or docker not running)
     }
 
-    const port = stdout.trim().split(":")[1] || "3306";
+    // 1. Ensure data directory exists so it's owned by you
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
 
-    exec("docker compose ps -q db", (err2, stdout2) => {
-      const containerId = stdout2 ? stdout2.trim() : "";
-      if (!containerId) {
-        setTimeout(checkStatus, 2000);
-        return;
+    // Check permissions
+    try {
+      fs.accessSync(DATA_DIR, fs.constants.W_OK);
+    } catch (e) {
+      console.error("\\x1b[31mError: Cannot write to ./mysql-data directory.\\x1b[0m");
+      console.error("This is likely because it is owned by root from a previous run.");
+      console.error("Please run the following command to fix it:");
+      console.error("  sudo rm -rf " + DATA_DIR);
+      process.exit(1);
+    }
+
+    // Find Open Ports
+    const DB_PORT = await getPort(3306);
+    const ADMINER_PORT = await getPort(8081);
+
+    // 2. Start Docker Compose passing dynamic ports
+    const child = spawn("docker", ["compose", "up", "-d", "--remove-orphans"], {
+      stdio: "inherit",
+      env: { 
+        ...process.env,
+        DB_PORT,
+        ADMINER_PORT,
+        UID: process.getuid ? process.getuid() : 1000, 
+        GID: process.getgid ? process.getgid() : 1000 
+      }
+    });
+
+    child.on("close", (code) => {
+      if (code !== 0) {
+        console.error("Failed to start Docker containers.");
+        console.error("If you see a network error, try running:");
+        console.error("  docker compose down");
+        process.exit(code);
       }
 
-      // Check if the container is reportedly "healthy" (database is actually ready)
-      exec(\`docker inspect --format='{{.State.Health.Status}}' \${containerId}\`, (err3, stdout3) => {
-        const status = stdout3 ? stdout3.trim() : "unknown";
-
-        if (status !== "healthy") {
-           // Database is still initializing... wait and retry
-           process.stdout.write("."); 
-           setTimeout(checkStatus, 2000);
-           return;
-        }
-
-        // It is healthy! Write runtime file and show success message
-        fs.writeFileSync(
-          RUNTIME_FILE,
-          JSON.stringify({
-            port: server.address().port,
-            pid: process.pid,
-            containerId
-          })
-        );
-
-        process.stdout.write("\\x1Bc"); 
-        console.log("\\n==================================================");
-        console.log("MySQL is running!");
-        console.log("--------------------------------------------------");
-        console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${port}/db\`);
-        console.log("--------------------------------------------------");
-        console.log("Adminer Login Details:");
-        console.log("  URL:      http://localhost:8081/?server=db&username=admin&db=db");
-        console.log("  Server:   db");
-        console.log("  Username: admin");
-        console.log("  Password: admin");
-        console.log("  Database: db");
-        console.log("==================================================\\n");
+      // Follow logs to catch startup errors
+      const logs = spawn("docker", ["compose", "logs", "-f", "--tail=0"], {
+        stdio: ["ignore", "pipe", "pipe"]
       });
+
+      const printImportant = (data) => {
+        const lines = data.toString().split("\\n");
+        lines.forEach((line) => {
+          const clean = line.replace(/^[^|]+\\|\\s+/, "");
+          if (clean.toLowerCase().includes("error") || clean.toLowerCase().includes("fatal")) {
+            process.stdout.write("\\x1b[31mError:\\x1b[0m " + clean + "\\n");
+          }
+        });
+      };
+
+      logs.stdout.on("data", printImportant);
+      logs.stderr.on("data", printImportant);
     });
-  });
-};
 
-setTimeout(checkStatus, 3000);
+    // 3. Control server
+    const server = http.createServer((req, res) => {
+      if (req.url === "/stop") {
+        res.writeHead(200);
+        res.end("Stopping...");
+        cleanup();
+      } else {
+        res.writeHead(404);
+        res.end();
+      }
+    });
 
-const cleanup = () => {
-  console.log("Stopping containers...");
-  exec("docker compose down", () => {
-    try { fs.unlinkSync(RUNTIME_FILE); } catch {}
-    process.exit(0);
-  });
-};
+    server.listen(0);
 
-process.on("SIGINT", cleanup);
-process.on("SIGTERM", cleanup);
+    // 4. Check status
+    const checkStatus = () => {
+      // Use the actual port we assigned (DB_PORT) not what docker compose reports (it should match)
+      exec("docker compose ps -q db", (err2, stdout2) => {
+          const containerId = stdout2 ? stdout2.trim() : "";
+          if (!containerId) {
+            setTimeout(checkStatus, 2000);
+            return;
+          }
+
+          // Check if the container is reportedly "healthy" (database is actually ready)
+          exec(\`docker inspect --format='{{.State.Health.Status}}' \${containerId}\`, (err3, stdout3) => {
+            const status = stdout3 ? stdout3.trim() : "unknown";
+
+            if (status !== "healthy") {
+               // Database is still initializing... wait and retry
+               process.stdout.write("."); 
+               setTimeout(checkStatus, 2000);
+               return;
+            }
+
+            // It is healthy! Write runtime file and show success message
+            fs.writeFileSync(
+              RUNTIME_FILE,
+              JSON.stringify({
+                port: server.address().port,
+                pid: process.pid,
+                containerId
+              })
+            );
+
+            process.stdout.write("\\x1Bc"); 
+            console.log("\\n==================================================");
+            console.log("MySQL is running!");
+            console.log("--------------------------------------------------");
+            console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${DB_PORT}/db\`);
+            console.log("--------------------------------------------------");
+            console.log("Adminer Login Details:");
+            console.log("  URL:      http://localhost:" + ADMINER_PORT + "/?server=db&username=admin&db=db");
+            console.log("  Server:   db");
+            console.log("  Username: admin");
+            console.log("  Password: admin");
+            console.log("  Database: db");
+            console.log("==================================================\\n");
+            console.log("Note: It takes a minute for the database to fully initialize");
+          });
+        });
+    };
+
+    setTimeout(checkStatus, 3000);
+
+    const cleanup = () => {
+      console.log("Stopping containers...");
+      exec("docker compose down", () => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch {}
+        process.exit(0);
+      });
+    };
+
+    process.on("SIGINT", cleanup);
+    process.on("SIGTERM", cleanup);
+}
+
+main();
 `
     },
     {
@@ -85463,7 +85496,7 @@ child.on('close', (code) => {
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+|s+/, '');
             const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+            if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !lower.includes('database system is starting up')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
@@ -90928,6 +90961,9 @@ async function main() {
     console.log('\u2551       \u{1F680} K3d + Headlamp Learning Environment               \u2551');
     console.log('\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D');
     console.log('');
+    console.log('Note: if you having errors, try to run: ');
+    console.log('k3d cluster delete learning-cluster');
+    console.log('');
 
     // Check all prerequisites
     console.log('Checking dependencies...');
@@ -91002,7 +91038,7 @@ async function main() {
                 '--agents', '2',
                 '--port', '8080:80@loadbalancer',
                 '--port', '8443:443@loadbalancer',
-                '--tls-san', 'host.k3d.internal',
+                '--k3s-arg', '--tls-san=host.k3d.internal@server:*',
                 '--wait'
             ]);
             console.log(\`\u2713 Cluster "\${CLUSTER_NAME}" created successfully\`);
