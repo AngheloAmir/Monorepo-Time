@@ -85170,8 +85170,8 @@ var import_express22 = __toESM(require_express2());
 // ../../packages/template/databases/mysql.ts
 var MySQL = {
   name: "MySQL",
-  description: "MySQL (Percona 8 + Adminer)",
-  notes: "Uses Percona MySQL 8 and Adminer for management.",
+  description: "MySQL (MariaDB + Adminer)",
+  notes: "Uses MariaDB (MySQL compatible) and Adminer for management.",
   type: "database",
   category: "Database",
   icon: "fas fa-database text-blue-500",
@@ -85180,17 +85180,16 @@ var MySQL = {
       action: "file",
       file: "docker-compose.yml",
       filecontent: `
-version: '3.1'
-
 services:
   db:
-    image: percona:8
+    image: mariadb:latest
     restart: always
+    user: "\${UID:-1000}:\${GID:-1000}"
     environment:
-      - MYSQL_ROOT_PASSWORD=admin
-      - MYSQL_DATABASE=db
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=admin
+      - MARIADB_ROOT_PASSWORD=admin
+      - MARIADB_DATABASE=db
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=admin
 
     ports:
       - "3306:3306"
@@ -85199,7 +85198,7 @@ services:
       - ./mysql-data:/var/lib/mysql
 
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-u", "root", "--password=admin"]
       interval: 10s
       timeout: 5s
       retries: 60
@@ -85209,7 +85208,9 @@ services:
     image: adminer
     restart: always
     ports:
-      - "8080:8080"
+      - "8081:8080"
+    depends_on:
+      - db
 `
     },
     {
@@ -85233,7 +85234,7 @@ const path = require("path");
 const RUNTIME_FILE = path.join(__dirname, ".runtime.json");
 const DATA_DIR = path.join(__dirname, "mysql-data");
 
-console.log("Starting MySQL (Percona 8 + Adminer)...");
+console.log("Starting MySQL (MariaDB + Adminer)...");
 
 // 1. Ensure data directory exists so it's owned by you
 if (!fs.existsSync(DATA_DIR)) {
@@ -85301,25 +85302,46 @@ const checkStatus = () => {
 
     exec("docker compose ps -q db", (err2, stdout2) => {
       const containerId = stdout2 ? stdout2.trim() : "";
+      if (!containerId) {
+        setTimeout(checkStatus, 2000);
+        return;
+      }
 
-      fs.writeFileSync(
-        RUNTIME_FILE,
-        JSON.stringify({
-          port: server.address().port,
-          pid: process.pid,
-          containerId
-        })
-      );
+      // Check if the container is reportedly "healthy" (database is actually ready)
+      exec(\`docker inspect --format='{{.State.Health.Status}}' \${containerId}\`, (err3, stdout3) => {
+        const status = stdout3 ? stdout3.trim() : "unknown";
 
-      process.stdout.write("\\x1Bc"); 
-      console.log("\\n==================================================");
-      console.log("MySQL is running!");
-      console.log("--------------------------------------------------");
-      console.log(\`Connection: mysql://admin:admin@localhost:\${port}/db\`);
-      console.log("Admin UI:   http://localhost:8080");
-      console.log("Username:   admin");
-      console.log("Password:   admin");
-      console.log("==================================================\\n");
+        if (status !== "healthy") {
+           // Database is still initializing... wait and retry
+           process.stdout.write("."); 
+           setTimeout(checkStatus, 2000);
+           return;
+        }
+
+        // It is healthy! Write runtime file and show success message
+        fs.writeFileSync(
+          RUNTIME_FILE,
+          JSON.stringify({
+            port: server.address().port,
+            pid: process.pid,
+            containerId
+          })
+        );
+
+        process.stdout.write("\\x1Bc"); 
+        console.log("\\n==================================================");
+        console.log("MySQL is running!");
+        console.log("--------------------------------------------------");
+        console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${port}/db\`);
+        console.log("--------------------------------------------------");
+        console.log("Adminer Login Details:");
+        console.log("  URL:      http://localhost:8081/?server=db&username=admin&db=db");
+        console.log("  Server:   db");
+        console.log("  Username: admin");
+        console.log("  Password: admin");
+        console.log("  Database: db");
+        console.log("==================================================\\n");
+      });
     });
   });
 };
@@ -85347,6 +85369,11 @@ process.on("SIGTERM", cleanup);
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=MySQL (Percona 8 + Adminer)"]
     },
     {
       action: "command",
