@@ -83575,7 +83575,7 @@ On such a night as this is!
   const words = poem.split(" ");
   for (const word of words) {
     res.write(word + " ");
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 20));
   }
   res.end();
 });
