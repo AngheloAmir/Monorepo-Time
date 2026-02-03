@@ -130,9 +130,25 @@ const checkStatus = () => {
                 console.log('Supports: PostgreSQL, MySQL, MongoDB, and more');
                 console.log('--------------------------------------------------');
                 console.log('First time setup:');
-                console.log('  1. Create admin account on first visit');
+                console.log('  1. Create admin account on first visit (or Log In via Gear icon ⚙️)');
                 console.log('  2. Add database connections via UI');
+                console.log('     (If "Plug" icon is missing, you MUST Log In first)');
+                console.log('     (Click the plug+ icon in the top header, next to the SQL button)');
                 console.log('  3. Use host.docker.internal for local DBs');
+                console.log('--------------------------------------------------');
+                console.log('Example connecting to PostgreSQL (if using Docker based template):');
+                console.log('  Host: host.docker.internal');
+                console.log('  Port: 5432');
+                console.log('  User: admin');
+                console.log('  Password: admin');
+                console.log('  Database: db');
+                console.log('--------------------------------------------------');
+                console.log('Example connecting to MariaDB (if using Docker based template):');
+                console.log('  Host: host.docker.internal');
+                console.log('  Port: 3306');
+                console.log('  User: admin');
+                console.log('  Password: admin');
+                console.log('  Database: db');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {

@@ -1,8 +1,8 @@
 import type { ProjectTemplate } from "../../types";
 
 export const MySQL: ProjectTemplate = {
-  name: "MySQL",
-  description: "MySQL (MariaDB + Adminer)",
+  name: "MariaDB",
+  description: "MariaDB (MySQL compatible) + Adminer",
   notes: "Uses MariaDB (MySQL compatible) and Adminer for management.",
   type: "database",
   category: "Database",

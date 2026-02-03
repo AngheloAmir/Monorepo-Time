@@ -1,5 +1,4 @@
 import type { ProjectTemplate } from "../types";
-import { PgwebTool } from "./tools/pgweb";
 import { MongoExpressTool } from "./tools/mongoexpress";
 import { RedisCommanderTool } from "./tools/rediscommander";
 import { YaadeTool } from "./tools/yaade";
@@ -8,10 +7,9 @@ import { CloudbeaverTool } from "./tools/cloudbeaver";
 
 const tools: ProjectTemplate[] = [
     CloudbeaverTool,
-    YaadeTool,
-    MailpitTool,
-    PgwebTool,
     MongoExpressTool,
     RedisCommanderTool,
+    YaadeTool,
+    MailpitTool
 ];
 export default tools;

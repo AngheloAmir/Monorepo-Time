@@ -25,6 +25,11 @@ child.on('close', (code) => {
             const lower = cleanLine.toLowerCase();
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+                
+                if (lower.includes('sqlite_error') || lower.includes('queryfailederror')) {
+                     process.stdout.write('\\x1b[33mSuggestion: Your database might be corrupted.\\x1b[0m\\n');
+                     process.stdout.write('\\x1b[33mTry running: docker compose down -v\\x1b[0m\\n');
+                }
             }
         });
     };
