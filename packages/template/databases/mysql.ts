@@ -30,7 +30,7 @@ services:
       - ./mysql-data:/var/lib/mysql
 
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-u", "root", "--password=admin"]
       interval: 10s
       timeout: 5s
       retries: 60
@@ -134,29 +134,46 @@ const checkStatus = () => {
 
     exec("docker compose ps -q db", (err2, stdout2) => {
       const containerId = stdout2 ? stdout2.trim() : "";
+      if (!containerId) {
+        setTimeout(checkStatus, 2000);
+        return;
+      }
 
-      fs.writeFileSync(
-        RUNTIME_FILE,
-        JSON.stringify({
-          port: server.address().port,
-          pid: process.pid,
-          containerId
-        })
-      );
+      // Check if the container is reportedly "healthy" (database is actually ready)
+      exec(\`docker inspect --format='{{.State.Health.Status}}' \${containerId}\`, (err3, stdout3) => {
+        const status = stdout3 ? stdout3.trim() : "unknown";
 
-      process.stdout.write("\\x1Bc"); 
-      console.log("\\n==================================================");
-      console.log("MySQL is running!");
-      console.log("--------------------------------------------------");
-      console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${port}/db\`);
-      console.log("--------------------------------------------------");
-      console.log("Adminer Login Details:");
-      console.log("  URL:      http://localhost:8081/?server=db&username=admin&db=db");
-      console.log("  Server:   db");
-      console.log("  Username: admin");
-      console.log("  Password: admin");
-      console.log("  Database: db");
-      console.log("==================================================\\n");
+        if (status !== "healthy") {
+           // Database is still initializing... wait and retry
+           process.stdout.write("."); 
+           setTimeout(checkStatus, 2000);
+           return;
+        }
+
+        // It is healthy! Write runtime file and show success message
+        fs.writeFileSync(
+          RUNTIME_FILE,
+          JSON.stringify({
+            port: server.address().port,
+            pid: process.pid,
+            containerId
+          })
+        );
+
+        process.stdout.write("\\x1Bc"); 
+        console.log("\\n==================================================");
+        console.log("MySQL is running!");
+        console.log("--------------------------------------------------");
+        console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${port}/db\`);
+        console.log("--------------------------------------------------");
+        console.log("Adminer Login Details:");
+        console.log("  URL:      http://localhost:8081/?server=db&username=admin&db=db");
+        console.log("  Server:   db");
+        console.log("  Username: admin");
+        console.log("  Password: admin");
+        console.log("  Database: db");
+        console.log("==================================================\\n");
+      });
     });
   });
 };
