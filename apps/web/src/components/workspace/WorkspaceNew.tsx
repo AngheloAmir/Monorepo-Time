@@ -35,6 +35,7 @@ export default function WorkspaceNew() {
         if (showWorkspaceNew) {
             setTemplate('');
             setTemplateType('');
+            setError('');
         }
     }, [showWorkspaceNew]);
 

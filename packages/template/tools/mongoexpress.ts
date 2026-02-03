@@ -140,7 +140,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                process.stdout.write('\\\\x1Bc');
+                process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('🍃 Mongo Express - MongoDB Web GUI');
                 console.log('==================================================');

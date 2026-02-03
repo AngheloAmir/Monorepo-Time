@@ -36,6 +36,7 @@ function displayCredentials() {
             }));
         } catch(e) {}
 
+        process.stdout.write('\\x1Bc');
         console.log('\\n==================================================');
         console.log('💳 Stripe Mock Server is running!');
         console.log('--------------------------------------------------');

@@ -131,7 +131,7 @@ const checkStatus = () => {
                 }));
             } catch(e) {}
 
-            process.stdout.write('\\\\x1Bc');
+            process.stdout.write('\\x1Bc');
             console.log('\\n==================================================');
             console.log('Redis is running!');
             console.log('--------------------------------------------------');

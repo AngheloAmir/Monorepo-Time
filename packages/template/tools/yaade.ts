@@ -125,7 +125,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                process.stdout.write('\\\\x1Bc');
+                process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('Yaade is running!');
                 console.log('--------------------------------------------------');

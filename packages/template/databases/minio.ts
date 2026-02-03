@@ -142,7 +142,7 @@ const checkStatus = () => {
                     }));
                 } catch(e) {}
 
-                process.stdout.write('\\\\x1Bc');
+                process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('MinIO Object Storage is running!');
                 console.log('--------------------------------------------------');

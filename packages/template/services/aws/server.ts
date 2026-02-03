@@ -95,6 +95,7 @@ function displayCredentials() {
             }));
         } catch(e) {}
 
+        process.stdout.write('\\x1Bc');
         console.log('\\n==================================================');
         console.log('🚀 AWS LocalStack is running!');
         console.log('==================================================');

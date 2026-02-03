@@ -1,61 +1,4 @@
-import type { ProjectTemplate } from "../../types";
 
-export const MySQL: ProjectTemplate = {
-  name: "MySQL",
-  description: "MySQL (Percona 8 + Adminer)",
-  notes: "Uses Percona MySQL 8 and Adminer for management.",
-  type: "database",
-  category: "Database",
-  icon: "fas fa-database text-blue-500",
-  templating: [
-    {
-      action: "file",
-      file: "docker-compose.yml",
-      filecontent: `
-services:
-  db:
-    image: percona:8
-    restart: always
-    user: "\${UID}:\${GID}"
-    environment:
-      - MYSQL_ROOT_PASSWORD=admin
-      - MYSQL_DATABASE=db
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=admin
-
-    ports:
-      - "3306:3306"
-
-    volumes:
-      - ./mysql-data:/var/lib/mysql
-
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
-      interval: 10s
-      timeout: 5s
-      retries: 60
-      start_period: 40s
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8081:8080"
-`
-    },
-    {
-      action: "file",
-      file: ".gitignore",
-      filecontent: `
-mysql-data/
-.runtime.json
-node_modules/
-`
-    },
-    {
-      action: "file",
-      file: "index.js",
-      filecontent: `
 const http = require("http");
 const { spawn, exec } = require("child_process");
 const fs = require("fs");
@@ -93,11 +36,11 @@ child.on("close", (code) => {
   });
 
   const printImportant = (data) => {
-    const lines = data.toString().split("\\n");
+    const lines = data.toString().split("\n");
     lines.forEach((line) => {
-      const clean = line.replace(/^[^|]+\\|\\s+/, "");
+      const clean = line.replace(/^[^|]+\|\s+/, "");
       if (clean.toLowerCase().includes("error") || clean.toLowerCase().includes("fatal")) {
-        process.stdout.write("\\x1b[31mError:\\x1b[0m " + clean + "\\n");
+        process.stdout.write("\x1b[31mError:\x1b[0m " + clean + "\n");
       }
     });
   };
@@ -142,15 +85,15 @@ const checkStatus = () => {
         })
       );
 
-      process.stdout.write("\\x1Bc"); 
-      console.log("\\n==================================================");
+      process.stdout.write("\x1Bc"); 
+      console.log("\n==================================================");
       console.log("MySQL is running!");
       console.log("--------------------------------------------------");
-      console.log(\`Connection: mysql://admin:admin@localhost:\${port}/db\`);
+      console.log(`Connection: mysql://admin:admin@localhost:${port}/db`);
       console.log("Admin UI:   http://localhost:8081");
       console.log("Username:   admin");
       console.log("Password:   admin");
-      console.log("==================================================\\n");
+      console.log("==================================================\n");
     });
   });
 };
@@ -167,31 +110,3 @@ const cleanup = () => {
 
 process.on("SIGINT", cleanup);
 process.on("SIGTERM", cleanup);
-`
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["init", "-y"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "scripts.start=node index.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", "description=MySQL (Percona 8 + Adminer)"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
-      args: [
-        "pkg",
-        "set",
-        "scripts.stop=node -e 'const fs=require(\"fs\"); try{const p=JSON.parse(fs.readFileSync(\".runtime.json\")).port; fetch(\"http://localhost:\"+p+\"/stop\").catch(()=>{})}catch(e){}'"
-      ]
-    }
-  ]
-};

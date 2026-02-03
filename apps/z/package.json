@@ -1,0 +1,16 @@
+{
+  "name": "z",
+  "version": "1.0.0",
+  "description": "MySQL (Percona 8 + Adminer)",
+  "fontawesomeIcon": "fa fa-cube text-blue-500",
+  "scripts": {
+    "dev": "",
+    "start": "node index.js",
+    "stop": "node -e 'const fs=require(\"fs\"); try{const p=JSON.parse(fs.readFileSync(\".runtime.json\")).port; fetch(\"http://localhost:\"+p+\"/stop\").catch(()=>{})}catch(e){}'"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
