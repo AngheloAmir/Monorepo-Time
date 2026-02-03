@@ -89,54 +89,54 @@ var require_polyfills = __commonJS({
     }
     var chdir;
     module2.exports = patch;
-    function patch(fs24) {
+    function patch(fs25) {
       if (constants4.hasOwnProperty("O_SYMLINK") && process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
-        patchLchmod(fs24);
+        patchLchmod(fs25);
       }
-      if (!fs24.lutimes) {
-        patchLutimes(fs24);
+      if (!fs25.lutimes) {
+        patchLutimes(fs25);
       }
-      fs24.chown = chownFix(fs24.chown);
-      fs24.fchown = chownFix(fs24.fchown);
-      fs24.lchown = chownFix(fs24.lchown);
-      fs24.chmod = chmodFix(fs24.chmod);
-      fs24.fchmod = chmodFix(fs24.fchmod);
-      fs24.lchmod = chmodFix(fs24.lchmod);
-      fs24.chownSync = chownFixSync(fs24.chownSync);
-      fs24.fchownSync = chownFixSync(fs24.fchownSync);
-      fs24.lchownSync = chownFixSync(fs24.lchownSync);
-      fs24.chmodSync = chmodFixSync(fs24.chmodSync);
-      fs24.fchmodSync = chmodFixSync(fs24.fchmodSync);
-      fs24.lchmodSync = chmodFixSync(fs24.lchmodSync);
-      fs24.stat = statFix(fs24.stat);
-      fs24.fstat = statFix(fs24.fstat);
-      fs24.lstat = statFix(fs24.lstat);
-      fs24.statSync = statFixSync(fs24.statSync);
-      fs24.fstatSync = statFixSync(fs24.fstatSync);
-      fs24.lstatSync = statFixSync(fs24.lstatSync);
-      if (fs24.chmod && !fs24.lchmod) {
-        fs24.lchmod = function(path28, mode, cb) {
+      fs25.chown = chownFix(fs25.chown);
+      fs25.fchown = chownFix(fs25.fchown);
+      fs25.lchown = chownFix(fs25.lchown);
+      fs25.chmod = chmodFix(fs25.chmod);
+      fs25.fchmod = chmodFix(fs25.fchmod);
+      fs25.lchmod = chmodFix(fs25.lchmod);
+      fs25.chownSync = chownFixSync(fs25.chownSync);
+      fs25.fchownSync = chownFixSync(fs25.fchownSync);
+      fs25.lchownSync = chownFixSync(fs25.lchownSync);
+      fs25.chmodSync = chmodFixSync(fs25.chmodSync);
+      fs25.fchmodSync = chmodFixSync(fs25.fchmodSync);
+      fs25.lchmodSync = chmodFixSync(fs25.lchmodSync);
+      fs25.stat = statFix(fs25.stat);
+      fs25.fstat = statFix(fs25.fstat);
+      fs25.lstat = statFix(fs25.lstat);
+      fs25.statSync = statFixSync(fs25.statSync);
+      fs25.fstatSync = statFixSync(fs25.fstatSync);
+      fs25.lstatSync = statFixSync(fs25.lstatSync);
+      if (fs25.chmod && !fs25.lchmod) {
+        fs25.lchmod = function(path28, mode, cb) {
           if (cb) process.nextTick(cb);
         };
-        fs24.lchmodSync = function() {
+        fs25.lchmodSync = function() {
         };
       }
-      if (fs24.chown && !fs24.lchown) {
-        fs24.lchown = function(path28, uid, gid, cb) {
+      if (fs25.chown && !fs25.lchown) {
+        fs25.lchown = function(path28, uid, gid, cb) {
           if (cb) process.nextTick(cb);
         };
-        fs24.lchownSync = function() {
+        fs25.lchownSync = function() {
         };
       }
       if (platform3 === "win32") {
-        fs24.rename = typeof fs24.rename !== "function" ? fs24.rename : (function(fs$rename) {
+        fs25.rename = typeof fs25.rename !== "function" ? fs25.rename : (function(fs$rename) {
           function rename(from, to, cb) {
             var start = Date.now();
             var backoff = 0;
             fs$rename(from, to, function CB(er) {
               if (er && (er.code === "EACCES" || er.code === "EPERM" || er.code === "EBUSY") && Date.now() - start < 6e4) {
                 setTimeout(function() {
-                  fs24.stat(to, function(stater, st) {
+                  fs25.stat(to, function(stater, st) {
                     if (stater && stater.code === "ENOENT")
                       fs$rename(from, to, CB);
                     else
@@ -152,9 +152,9 @@ var require_polyfills = __commonJS({
           }
           if (Object.setPrototypeOf) Object.setPrototypeOf(rename, fs$rename);
           return rename;
-        })(fs24.rename);
+        })(fs25.rename);
       }
-      fs24.read = typeof fs24.read !== "function" ? fs24.read : (function(fs$read) {
+      fs25.read = typeof fs25.read !== "function" ? fs25.read : (function(fs$read) {
         function read(fd, buffer, offset, length, position, callback_) {
           var callback;
           if (callback_ && typeof callback_ === "function") {
@@ -162,22 +162,22 @@ var require_polyfills = __commonJS({
             callback = function(er, _, __) {
               if (er && er.code === "EAGAIN" && eagCounter < 10) {
                 eagCounter++;
-                return fs$read.call(fs24, fd, buffer, offset, length, position, callback);
+                return fs$read.call(fs25, fd, buffer, offset, length, position, callback);
               }
               callback_.apply(this, arguments);
             };
           }
-          return fs$read.call(fs24, fd, buffer, offset, length, position, callback);
+          return fs$read.call(fs25, fd, buffer, offset, length, position, callback);
         }
         if (Object.setPrototypeOf) Object.setPrototypeOf(read, fs$read);
         return read;
-      })(fs24.read);
-      fs24.readSync = typeof fs24.readSync !== "function" ? fs24.readSync : /* @__PURE__ */ (function(fs$readSync) {
+      })(fs25.read);
+      fs25.readSync = typeof fs25.readSync !== "function" ? fs25.readSync : /* @__PURE__ */ (function(fs$readSync) {
         return function(fd, buffer, offset, length, position) {
           var eagCounter = 0;
           while (true) {
             try {
-              return fs$readSync.call(fs24, fd, buffer, offset, length, position);
+              return fs$readSync.call(fs25, fd, buffer, offset, length, position);
             } catch (er) {
               if (er.code === "EAGAIN" && eagCounter < 10) {
                 eagCounter++;
@@ -187,10 +187,10 @@ var require_polyfills = __commonJS({
             }
           }
         };
-      })(fs24.readSync);
-      function patchLchmod(fs25) {
-        fs25.lchmod = function(path28, mode, callback) {
-          fs25.open(
+      })(fs25.readSync);
+      function patchLchmod(fs26) {
+        fs26.lchmod = function(path28, mode, callback) {
+          fs26.open(
             path28,
             constants4.O_WRONLY | constants4.O_SYMLINK,
             mode,
@@ -199,80 +199,80 @@ var require_polyfills = __commonJS({
                 if (callback) callback(err);
                 return;
               }
-              fs25.fchmod(fd, mode, function(err2) {
-                fs25.close(fd, function(err22) {
+              fs26.fchmod(fd, mode, function(err2) {
+                fs26.close(fd, function(err22) {
                   if (callback) callback(err2 || err22);
                 });
               });
             }
           );
         };
-        fs25.lchmodSync = function(path28, mode) {
-          var fd = fs25.openSync(path28, constants4.O_WRONLY | constants4.O_SYMLINK, mode);
+        fs26.lchmodSync = function(path28, mode) {
+          var fd = fs26.openSync(path28, constants4.O_WRONLY | constants4.O_SYMLINK, mode);
           var threw = true;
           var ret;
           try {
-            ret = fs25.fchmodSync(fd, mode);
+            ret = fs26.fchmodSync(fd, mode);
             threw = false;
           } finally {
             if (threw) {
               try {
-                fs25.closeSync(fd);
+                fs26.closeSync(fd);
               } catch (er) {
               }
             } else {
-              fs25.closeSync(fd);
+              fs26.closeSync(fd);
             }
           }
           return ret;
         };
       }
-      function patchLutimes(fs25) {
-        if (constants4.hasOwnProperty("O_SYMLINK") && fs25.futimes) {
-          fs25.lutimes = function(path28, at, mt, cb) {
-            fs25.open(path28, constants4.O_SYMLINK, function(er, fd) {
+      function patchLutimes(fs26) {
+        if (constants4.hasOwnProperty("O_SYMLINK") && fs26.futimes) {
+          fs26.lutimes = function(path28, at, mt, cb) {
+            fs26.open(path28, constants4.O_SYMLINK, function(er, fd) {
               if (er) {
                 if (cb) cb(er);
                 return;
               }
-              fs25.futimes(fd, at, mt, function(er2) {
-                fs25.close(fd, function(er22) {
+              fs26.futimes(fd, at, mt, function(er2) {
+                fs26.close(fd, function(er22) {
                   if (cb) cb(er2 || er22);
                 });
               });
             });
           };
-          fs25.lutimesSync = function(path28, at, mt) {
-            var fd = fs25.openSync(path28, constants4.O_SYMLINK);
+          fs26.lutimesSync = function(path28, at, mt) {
+            var fd = fs26.openSync(path28, constants4.O_SYMLINK);
             var ret;
             var threw = true;
             try {
-              ret = fs25.futimesSync(fd, at, mt);
+              ret = fs26.futimesSync(fd, at, mt);
               threw = false;
             } finally {
               if (threw) {
                 try {
-                  fs25.closeSync(fd);
+                  fs26.closeSync(fd);
                 } catch (er) {
                 }
               } else {
-                fs25.closeSync(fd);
+                fs26.closeSync(fd);
               }
             }
             return ret;
           };
-        } else if (fs25.futimes) {
-          fs25.lutimes = function(_a2, _b2, _c2, cb) {
+        } else if (fs26.futimes) {
+          fs26.lutimes = function(_a2, _b2, _c2, cb) {
             if (cb) process.nextTick(cb);
           };
-          fs25.lutimesSync = function() {
+          fs26.lutimesSync = function() {
           };
         }
       }
       function chmodFix(orig) {
         if (!orig) return orig;
         return function(target, mode, cb) {
-          return orig.call(fs24, target, mode, function(er) {
+          return orig.call(fs25, target, mode, function(er) {
             if (chownErOk(er)) er = null;
             if (cb) cb.apply(this, arguments);
           });
@@ -282,7 +282,7 @@ var require_polyfills = __commonJS({
         if (!orig) return orig;
         return function(target, mode) {
           try {
-            return orig.call(fs24, target, mode);
+            return orig.call(fs25, target, mode);
           } catch (er) {
             if (!chownErOk(er)) throw er;
           }
@@ -291,7 +291,7 @@ var require_polyfills = __commonJS({
       function chownFix(orig) {
         if (!orig) return orig;
         return function(target, uid, gid, cb) {
-          return orig.call(fs24, target, uid, gid, function(er) {
+          return orig.call(fs25, target, uid, gid, function(er) {
             if (chownErOk(er)) er = null;
             if (cb) cb.apply(this, arguments);
           });
@@ -301,7 +301,7 @@ var require_polyfills = __commonJS({
         if (!orig) return orig;
         return function(target, uid, gid) {
           try {
-            return orig.call(fs24, target, uid, gid);
+            return orig.call(fs25, target, uid, gid);
           } catch (er) {
             if (!chownErOk(er)) throw er;
           }
@@ -321,13 +321,13 @@ var require_polyfills = __commonJS({
             }
             if (cb) cb.apply(this, arguments);
           }
-          return options ? orig.call(fs24, target, options, callback) : orig.call(fs24, target, callback);
+          return options ? orig.call(fs25, target, options, callback) : orig.call(fs25, target, callback);
         };
       }
       function statFixSync(orig) {
         if (!orig) return orig;
         return function(target, options) {
-          var stats = options ? orig.call(fs24, target, options) : orig.call(fs24, target);
+          var stats = options ? orig.call(fs25, target, options) : orig.call(fs25, target);
           if (stats) {
             if (stats.uid < 0) stats.uid += 4294967296;
             if (stats.gid < 0) stats.gid += 4294967296;
@@ -357,7 +357,7 @@ var require_legacy_streams = __commonJS({
     "use strict";
     var Stream = require("stream").Stream;
     module2.exports = legacy;
-    function legacy(fs24) {
+    function legacy(fs25) {
       return {
         ReadStream,
         WriteStream
@@ -400,7 +400,7 @@ var require_legacy_streams = __commonJS({
           });
           return;
         }
-        fs24.open(this.path, this.flags, this.mode, function(err, fd) {
+        fs25.open(this.path, this.flags, this.mode, function(err, fd) {
           if (err) {
             self.emit("error", err);
             self.readable = false;
@@ -439,7 +439,7 @@ var require_legacy_streams = __commonJS({
         this.busy = false;
         this._queue = [];
         if (this.fd === null) {
-          this._open = fs24.open;
+          this._open = fs25.open;
           this._queue.push([this._open, this.path, this.flags, this.mode, void 0]);
           this.flush();
         }
@@ -475,7 +475,7 @@ var require_clone = __commonJS({
 var require_graceful_fs = __commonJS({
   "../../node_modules/graceful-fs/graceful-fs.js"(exports2, module2) {
     "use strict";
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var polyfills = require_polyfills();
     var legacy = require_legacy_streams();
     var clone = require_clone();
@@ -507,12 +507,12 @@ var require_graceful_fs = __commonJS({
         m = "GFS4: " + m.split(/\n/).join("\nGFS4: ");
         console.error(m);
       };
-    if (!fs24[gracefulQueue]) {
+    if (!fs25[gracefulQueue]) {
       queue = global[gracefulQueue] || [];
-      publishQueue(fs24, queue);
-      fs24.close = (function(fs$close) {
+      publishQueue(fs25, queue);
+      fs25.close = (function(fs$close) {
         function close(fd, cb) {
-          return fs$close.call(fs24, fd, function(err) {
+          return fs$close.call(fs25, fd, function(err) {
             if (!err) {
               resetQueue();
             }
@@ -524,40 +524,40 @@ var require_graceful_fs = __commonJS({
           value: fs$close
         });
         return close;
-      })(fs24.close);
-      fs24.closeSync = (function(fs$closeSync) {
+      })(fs25.close);
+      fs25.closeSync = (function(fs$closeSync) {
         function closeSync(fd) {
-          fs$closeSync.apply(fs24, arguments);
+          fs$closeSync.apply(fs25, arguments);
           resetQueue();
         }
         Object.defineProperty(closeSync, previousSymbol, {
           value: fs$closeSync
         });
         return closeSync;
-      })(fs24.closeSync);
+      })(fs25.closeSync);
       if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || "")) {
         process.on("exit", function() {
-          debug(fs24[gracefulQueue]);
-          require("assert").equal(fs24[gracefulQueue].length, 0);
+          debug(fs25[gracefulQueue]);
+          require("assert").equal(fs25[gracefulQueue].length, 0);
         });
       }
     }
     var queue;
     if (!global[gracefulQueue]) {
-      publishQueue(global, fs24[gracefulQueue]);
+      publishQueue(global, fs25[gracefulQueue]);
     }
-    module2.exports = patch(clone(fs24));
-    if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs24.__patched) {
-      module2.exports = patch(fs24);
-      fs24.__patched = true;
+    module2.exports = patch(clone(fs25));
+    if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs25.__patched) {
+      module2.exports = patch(fs25);
+      fs25.__patched = true;
     }
-    function patch(fs25) {
-      polyfills(fs25);
-      fs25.gracefulify = patch;
-      fs25.createReadStream = createReadStream2;
-      fs25.createWriteStream = createWriteStream2;
-      var fs$readFile = fs25.readFile;
-      fs25.readFile = readFile;
+    function patch(fs26) {
+      polyfills(fs26);
+      fs26.gracefulify = patch;
+      fs26.createReadStream = createReadStream2;
+      fs26.createWriteStream = createWriteStream2;
+      var fs$readFile = fs26.readFile;
+      fs26.readFile = readFile;
       function readFile(path28, options, cb) {
         if (typeof options === "function")
           cb = options, options = null;
@@ -573,8 +573,8 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$writeFile = fs25.writeFile;
-      fs25.writeFile = writeFile2;
+      var fs$writeFile = fs26.writeFile;
+      fs26.writeFile = writeFile2;
       function writeFile2(path28, data, options, cb) {
         if (typeof options === "function")
           cb = options, options = null;
@@ -590,9 +590,9 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$appendFile = fs25.appendFile;
+      var fs$appendFile = fs26.appendFile;
       if (fs$appendFile)
-        fs25.appendFile = appendFile;
+        fs26.appendFile = appendFile;
       function appendFile(path28, data, options, cb) {
         if (typeof options === "function")
           cb = options, options = null;
@@ -608,9 +608,9 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$copyFile = fs25.copyFile;
+      var fs$copyFile = fs26.copyFile;
       if (fs$copyFile)
-        fs25.copyFile = copyFile;
+        fs26.copyFile = copyFile;
       function copyFile(src, dest, flags, cb) {
         if (typeof flags === "function") {
           cb = flags;
@@ -628,8 +628,8 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$readdir = fs25.readdir;
-      fs25.readdir = readdir;
+      var fs$readdir = fs26.readdir;
+      fs26.readdir = readdir;
       var noReaddirOptionVersions = /^v[0-5]\./;
       function readdir(path28, options, cb) {
         if (typeof options === "function")
@@ -670,21 +670,21 @@ var require_graceful_fs = __commonJS({
         }
       }
       if (process.version.substr(0, 4) === "v0.8") {
-        var legStreams = legacy(fs25);
+        var legStreams = legacy(fs26);
         ReadStream = legStreams.ReadStream;
         WriteStream = legStreams.WriteStream;
       }
-      var fs$ReadStream = fs25.ReadStream;
+      var fs$ReadStream = fs26.ReadStream;
       if (fs$ReadStream) {
         ReadStream.prototype = Object.create(fs$ReadStream.prototype);
         ReadStream.prototype.open = ReadStream$open;
       }
-      var fs$WriteStream = fs25.WriteStream;
+      var fs$WriteStream = fs26.WriteStream;
       if (fs$WriteStream) {
         WriteStream.prototype = Object.create(fs$WriteStream.prototype);
         WriteStream.prototype.open = WriteStream$open;
       }
-      Object.defineProperty(fs25, "ReadStream", {
+      Object.defineProperty(fs26, "ReadStream", {
         get: function() {
           return ReadStream;
         },
@@ -694,7 +694,7 @@ var require_graceful_fs = __commonJS({
         enumerable: true,
         configurable: true
       });
-      Object.defineProperty(fs25, "WriteStream", {
+      Object.defineProperty(fs26, "WriteStream", {
         get: function() {
           return WriteStream;
         },
@@ -705,7 +705,7 @@ var require_graceful_fs = __commonJS({
         configurable: true
       });
       var FileReadStream = ReadStream;
-      Object.defineProperty(fs25, "FileReadStream", {
+      Object.defineProperty(fs26, "FileReadStream", {
         get: function() {
           return FileReadStream;
         },
@@ -716,7 +716,7 @@ var require_graceful_fs = __commonJS({
         configurable: true
       });
       var FileWriteStream = WriteStream;
-      Object.defineProperty(fs25, "FileWriteStream", {
+      Object.defineProperty(fs26, "FileWriteStream", {
         get: function() {
           return FileWriteStream;
         },
@@ -765,13 +765,13 @@ var require_graceful_fs = __commonJS({
         });
       }
       function createReadStream2(path28, options) {
-        return new fs25.ReadStream(path28, options);
+        return new fs26.ReadStream(path28, options);
       }
       function createWriteStream2(path28, options) {
-        return new fs25.WriteStream(path28, options);
+        return new fs26.WriteStream(path28, options);
       }
-      var fs$open = fs25.open;
-      fs25.open = open2;
+      var fs$open = fs26.open;
+      fs26.open = open2;
       function open2(path28, flags, mode, cb) {
         if (typeof mode === "function")
           cb = mode, mode = null;
@@ -787,20 +787,20 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      return fs25;
+      return fs26;
     }
     function enqueue(elem) {
       debug("ENQUEUE", elem[0].name, elem[1]);
-      fs24[gracefulQueue].push(elem);
+      fs25[gracefulQueue].push(elem);
       retry();
     }
     var retryTimer;
     function resetQueue() {
       var now = Date.now();
-      for (var i2 = 0; i2 < fs24[gracefulQueue].length; ++i2) {
-        if (fs24[gracefulQueue][i2].length > 2) {
-          fs24[gracefulQueue][i2][3] = now;
-          fs24[gracefulQueue][i2][4] = now;
+      for (var i2 = 0; i2 < fs25[gracefulQueue].length; ++i2) {
+        if (fs25[gracefulQueue][i2].length > 2) {
+          fs25[gracefulQueue][i2][3] = now;
+          fs25[gracefulQueue][i2][4] = now;
         }
       }
       retry();
@@ -808,9 +808,9 @@ var require_graceful_fs = __commonJS({
     function retry() {
       clearTimeout(retryTimer);
       retryTimer = void 0;
-      if (fs24[gracefulQueue].length === 0)
+      if (fs25[gracefulQueue].length === 0)
         return;
-      var elem = fs24[gracefulQueue].shift();
+      var elem = fs25[gracefulQueue].shift();
       var fn = elem[0];
       var args2 = elem[1];
       var err = elem[2];
@@ -832,7 +832,7 @@ var require_graceful_fs = __commonJS({
           debug("RETRY", fn.name, args2);
           fn.apply(null, args2.concat([startTime]));
         } else {
-          fs24[gracefulQueue].push(elem);
+          fs25[gracefulQueue].push(elem);
         }
       }
       if (retryTimer === void 0) {
@@ -847,7 +847,7 @@ var require_fs = __commonJS({
   "../../node_modules/fs-extra/lib/fs/index.js"(exports2) {
     "use strict";
     var u2 = require_universalify().fromCallback;
-    var fs24 = require_graceful_fs();
+    var fs25 = require_graceful_fs();
     var api = [
       "access",
       "appendFile",
@@ -888,26 +888,26 @@ var require_fs = __commonJS({
       "utimes",
       "writeFile"
     ].filter((key) => {
-      return typeof fs24[key] === "function";
+      return typeof fs25[key] === "function";
     });
-    Object.assign(exports2, fs24);
+    Object.assign(exports2, fs25);
     api.forEach((method) => {
-      exports2[method] = u2(fs24[method]);
+      exports2[method] = u2(fs25[method]);
     });
     exports2.exists = function(filename, callback) {
       if (typeof callback === "function") {
-        return fs24.exists(filename, callback);
+        return fs25.exists(filename, callback);
       }
       return new Promise((resolve) => {
-        return fs24.exists(filename, resolve);
+        return fs25.exists(filename, resolve);
       });
     };
     exports2.read = function(fd, buffer, offset, length, position, callback) {
       if (typeof callback === "function") {
-        return fs24.read(fd, buffer, offset, length, position, callback);
+        return fs25.read(fd, buffer, offset, length, position, callback);
       }
       return new Promise((resolve, reject) => {
-        fs24.read(fd, buffer, offset, length, position, (err, bytesRead, buffer2) => {
+        fs25.read(fd, buffer, offset, length, position, (err, bytesRead, buffer2) => {
           if (err) return reject(err);
           resolve({ bytesRead, buffer: buffer2 });
         });
@@ -915,10 +915,10 @@ var require_fs = __commonJS({
     };
     exports2.write = function(fd, buffer, ...args2) {
       if (typeof args2[args2.length - 1] === "function") {
-        return fs24.write(fd, buffer, ...args2);
+        return fs25.write(fd, buffer, ...args2);
       }
       return new Promise((resolve, reject) => {
-        fs24.write(fd, buffer, ...args2, (err, bytesWritten, buffer2) => {
+        fs25.write(fd, buffer, ...args2, (err, bytesWritten, buffer2) => {
           if (err) return reject(err);
           resolve({ bytesWritten, buffer: buffer2 });
         });
@@ -926,10 +926,10 @@ var require_fs = __commonJS({
     };
     exports2.readv = function(fd, buffers, ...args2) {
       if (typeof args2[args2.length - 1] === "function") {
-        return fs24.readv(fd, buffers, ...args2);
+        return fs25.readv(fd, buffers, ...args2);
       }
       return new Promise((resolve, reject) => {
-        fs24.readv(fd, buffers, ...args2, (err, bytesRead, buffers2) => {
+        fs25.readv(fd, buffers, ...args2, (err, bytesRead, buffers2) => {
           if (err) return reject(err);
           resolve({ bytesRead, buffers: buffers2 });
         });
@@ -937,17 +937,17 @@ var require_fs = __commonJS({
     };
     exports2.writev = function(fd, buffers, ...args2) {
       if (typeof args2[args2.length - 1] === "function") {
-        return fs24.writev(fd, buffers, ...args2);
+        return fs25.writev(fd, buffers, ...args2);
       }
       return new Promise((resolve, reject) => {
-        fs24.writev(fd, buffers, ...args2, (err, bytesWritten, buffers2) => {
+        fs25.writev(fd, buffers, ...args2, (err, bytesWritten, buffers2) => {
           if (err) return reject(err);
           resolve({ bytesWritten, buffers: buffers2 });
         });
       });
     };
-    if (typeof fs24.realpath.native === "function") {
-      exports2.realpath.native = u2(fs24.realpath.native);
+    if (typeof fs25.realpath.native === "function") {
+      exports2.realpath.native = u2(fs25.realpath.native);
     } else {
       process.emitWarning(
         "fs.realpath.native is not a function. Is fs being monkey-patched?",
@@ -980,7 +980,7 @@ var require_utils = __commonJS({
 var require_make_dir = __commonJS({
   "../../node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var { checkPath } = require_utils();
     var getMode = (options) => {
       const defaults = { mode: 511 };
@@ -989,14 +989,14 @@ var require_make_dir = __commonJS({
     };
     module2.exports.makeDir = async (dir, options) => {
       checkPath(dir);
-      return fs24.mkdir(dir, {
+      return fs25.mkdir(dir, {
         mode: getMode(options),
         recursive: true
       });
     };
     module2.exports.makeDirSync = (dir, options) => {
       checkPath(dir);
-      return fs24.mkdirSync(dir, {
+      return fs25.mkdirSync(dir, {
         mode: getMode(options),
         recursive: true
       });
@@ -1028,13 +1028,13 @@ var require_path_exists = __commonJS({
   "../../node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
     "use strict";
     var u2 = require_universalify().fromPromise;
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     function pathExists(path28) {
-      return fs24.access(path28).then(() => true).catch(() => false);
+      return fs25.access(path28).then(() => true).catch(() => false);
     }
     module2.exports = {
       pathExists: u2(pathExists),
-      pathExistsSync: fs24.existsSync
+      pathExistsSync: fs25.existsSync
     };
   }
 });
@@ -1043,16 +1043,16 @@ var require_path_exists = __commonJS({
 var require_utimes = __commonJS({
   "../../node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var u2 = require_universalify().fromPromise;
     async function utimesMillis(path28, atime, mtime) {
-      const fd = await fs24.open(path28, "r+");
+      const fd = await fs25.open(path28, "r+");
       let closeErr = null;
       try {
-        await fs24.futimes(fd, atime, mtime);
+        await fs25.futimes(fd, atime, mtime);
       } finally {
         try {
-          await fs24.close(fd);
+          await fs25.close(fd);
         } catch (e) {
           closeErr = e;
         }
@@ -1062,9 +1062,9 @@ var require_utimes = __commonJS({
       }
     }
     function utimesMillisSync(path28, atime, mtime) {
-      const fd = fs24.openSync(path28, "r+");
-      fs24.futimesSync(fd, atime, mtime);
-      return fs24.closeSync(fd);
+      const fd = fs25.openSync(path28, "r+");
+      fs25.futimesSync(fd, atime, mtime);
+      return fs25.closeSync(fd);
     }
     module2.exports = {
       utimesMillis: u2(utimesMillis),
@@ -1077,11 +1077,11 @@ var require_utimes = __commonJS({
 var require_stat = __commonJS({
   "../../node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var path28 = require("path");
     var u2 = require_universalify().fromPromise;
     function getStats2(src, dest, opts) {
-      const statFunc = opts.dereference ? (file2) => fs24.stat(file2, { bigint: true }) : (file2) => fs24.lstat(file2, { bigint: true });
+      const statFunc = opts.dereference ? (file2) => fs25.stat(file2, { bigint: true }) : (file2) => fs25.lstat(file2, { bigint: true });
       return Promise.all([
         statFunc(src),
         statFunc(dest).catch((err) => {
@@ -1092,7 +1092,7 @@ var require_stat = __commonJS({
     }
     function getStatsSync(src, dest, opts) {
       let destStat;
-      const statFunc = opts.dereference ? (file2) => fs24.statSync(file2, { bigint: true }) : (file2) => fs24.lstatSync(file2, { bigint: true });
+      const statFunc = opts.dereference ? (file2) => fs25.statSync(file2, { bigint: true }) : (file2) => fs25.lstatSync(file2, { bigint: true });
       const srcStat = statFunc(src);
       try {
         destStat = statFunc(dest);
@@ -1154,7 +1154,7 @@ var require_stat = __commonJS({
       if (destParent === srcParent || destParent === path28.parse(destParent).root) return;
       let destStat;
       try {
-        destStat = await fs24.stat(destParent, { bigint: true });
+        destStat = await fs25.stat(destParent, { bigint: true });
       } catch (err) {
         if (err.code === "ENOENT") return;
         throw err;
@@ -1170,7 +1170,7 @@ var require_stat = __commonJS({
       if (destParent === srcParent || destParent === path28.parse(destParent).root) return;
       let destStat;
       try {
-        destStat = fs24.statSync(destParent, { bigint: true });
+        destStat = fs25.statSync(destParent, { bigint: true });
       } catch (err) {
         if (err.code === "ENOENT") return;
         throw err;
@@ -1237,7 +1237,7 @@ var require_async = __commonJS({
 var require_copy = __commonJS({
   "../../node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var path28 = require("path");
     var { mkdirs } = require_mkdirs();
     var { pathExists } = require_path_exists();
@@ -1273,7 +1273,7 @@ var require_copy = __commonJS({
       return opts.filter(src, dest);
     }
     async function getStatsAndPerformCopy(destStat, src, dest, opts) {
-      const statFn = opts.dereference ? fs24.stat : fs24.lstat;
+      const statFn = opts.dereference ? fs25.stat : fs25.lstat;
       const srcStat = await statFn(src);
       if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts);
       if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts);
@@ -1285,7 +1285,7 @@ var require_copy = __commonJS({
     async function onFile(srcStat, destStat, src, dest, opts) {
       if (!destStat) return copyFile(srcStat, src, dest, opts);
       if (opts.overwrite) {
-        await fs24.unlink(dest);
+        await fs25.unlink(dest);
         return copyFile(srcStat, src, dest, opts);
       }
       if (opts.errorOnExist) {
@@ -1293,27 +1293,27 @@ var require_copy = __commonJS({
       }
     }
     async function copyFile(srcStat, src, dest, opts) {
-      await fs24.copyFile(src, dest);
+      await fs25.copyFile(src, dest);
       if (opts.preserveTimestamps) {
         if (fileIsNotWritable(srcStat.mode)) {
           await makeFileWritable(dest, srcStat.mode);
         }
-        const updatedSrcStat = await fs24.stat(src);
+        const updatedSrcStat = await fs25.stat(src);
         await utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
       }
-      return fs24.chmod(dest, srcStat.mode);
+      return fs25.chmod(dest, srcStat.mode);
     }
     function fileIsNotWritable(srcMode) {
       return (srcMode & 128) === 0;
     }
     function makeFileWritable(dest, srcMode) {
-      return fs24.chmod(dest, srcMode | 128);
+      return fs25.chmod(dest, srcMode | 128);
     }
     async function onDir(srcStat, destStat, src, dest, opts) {
       if (!destStat) {
-        await fs24.mkdir(dest);
+        await fs25.mkdir(dest);
       }
-      await asyncIteratorConcurrentProcess(await fs24.opendir(src), async (item) => {
+      await asyncIteratorConcurrentProcess(await fs25.opendir(src), async (item) => {
         const srcItem = path28.join(src, item.name);
         const destItem = path28.join(dest, item.name);
         const include = await runFilter(srcItem, destItem, opts);
@@ -1323,22 +1323,22 @@ var require_copy = __commonJS({
         }
       });
       if (!destStat) {
-        await fs24.chmod(dest, srcStat.mode);
+        await fs25.chmod(dest, srcStat.mode);
       }
     }
     async function onLink(destStat, src, dest, opts) {
-      let resolvedSrc = await fs24.readlink(src);
+      let resolvedSrc = await fs25.readlink(src);
       if (opts.dereference) {
         resolvedSrc = path28.resolve(process.cwd(), resolvedSrc);
       }
       if (!destStat) {
-        return fs24.symlink(resolvedSrc, dest);
+        return fs25.symlink(resolvedSrc, dest);
       }
       let resolvedDest = null;
       try {
-        resolvedDest = await fs24.readlink(dest);
+        resolvedDest = await fs25.readlink(dest);
       } catch (e) {
-        if (e.code === "EINVAL" || e.code === "UNKNOWN") return fs24.symlink(resolvedSrc, dest);
+        if (e.code === "EINVAL" || e.code === "UNKNOWN") return fs25.symlink(resolvedSrc, dest);
         throw e;
       }
       if (opts.dereference) {
@@ -1352,8 +1352,8 @@ var require_copy = __commonJS({
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
       }
-      await fs24.unlink(dest);
-      return fs24.symlink(resolvedSrc, dest);
+      await fs25.unlink(dest);
+      return fs25.symlink(resolvedSrc, dest);
     }
     module2.exports = copy;
   }
@@ -1363,7 +1363,7 @@ var require_copy = __commonJS({
 var require_copy_sync = __commonJS({
   "../../node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_graceful_fs();
+    var fs25 = require_graceful_fs();
     var path28 = require("path");
     var mkdirsSync = require_mkdirs().mkdirsSync;
     var utimesMillisSync = require_utimes().utimesMillisSync;
@@ -1386,11 +1386,11 @@ var require_copy_sync = __commonJS({
       stat.checkParentPathsSync(src, srcStat, dest, "copy");
       if (opts.filter && !opts.filter(src, dest)) return;
       const destParent = path28.dirname(dest);
-      if (!fs24.existsSync(destParent)) mkdirsSync(destParent);
+      if (!fs25.existsSync(destParent)) mkdirsSync(destParent);
       return getStats2(destStat, src, dest, opts);
     }
     function getStats2(destStat, src, dest, opts) {
-      const statSync2 = opts.dereference ? fs24.statSync : fs24.lstatSync;
+      const statSync2 = opts.dereference ? fs25.statSync : fs25.lstatSync;
       const srcStat = statSync2(src);
       if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts);
       else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts);
@@ -1405,14 +1405,14 @@ var require_copy_sync = __commonJS({
     }
     function mayCopyFile(srcStat, src, dest, opts) {
       if (opts.overwrite) {
-        fs24.unlinkSync(dest);
+        fs25.unlinkSync(dest);
         return copyFile(srcStat, src, dest, opts);
       } else if (opts.errorOnExist) {
         throw new Error(`'${dest}' already exists`);
       }
     }
     function copyFile(srcStat, src, dest, opts) {
-      fs24.copyFileSync(src, dest);
+      fs25.copyFileSync(src, dest);
       if (opts.preserveTimestamps) handleTimestamps(srcStat.mode, src, dest);
       return setDestMode(dest, srcStat.mode);
     }
@@ -1427,10 +1427,10 @@ var require_copy_sync = __commonJS({
       return setDestMode(dest, srcMode | 128);
     }
     function setDestMode(dest, srcMode) {
-      return fs24.chmodSync(dest, srcMode);
+      return fs25.chmodSync(dest, srcMode);
     }
     function setDestTimestamps(src, dest) {
-      const updatedSrcStat = fs24.statSync(src);
+      const updatedSrcStat = fs25.statSync(src);
       return utimesMillisSync(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
     }
     function onDir(srcStat, destStat, src, dest, opts) {
@@ -1438,12 +1438,12 @@ var require_copy_sync = __commonJS({
       return copyDir(src, dest, opts);
     }
     function mkDirAndCopy(srcMode, src, dest, opts) {
-      fs24.mkdirSync(dest);
+      fs25.mkdirSync(dest);
       copyDir(src, dest, opts);
       return setDestMode(dest, srcMode);
     }
     function copyDir(src, dest, opts) {
-      const dir = fs24.opendirSync(src);
+      const dir = fs25.opendirSync(src);
       try {
         let dirent;
         while ((dirent = dir.readSync()) !== null) {
@@ -1461,18 +1461,18 @@ var require_copy_sync = __commonJS({
       return getStats2(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
-      let resolvedSrc = fs24.readlinkSync(src);
+      let resolvedSrc = fs25.readlinkSync(src);
       if (opts.dereference) {
         resolvedSrc = path28.resolve(process.cwd(), resolvedSrc);
       }
       if (!destStat) {
-        return fs24.symlinkSync(resolvedSrc, dest);
+        return fs25.symlinkSync(resolvedSrc, dest);
       } else {
         let resolvedDest;
         try {
-          resolvedDest = fs24.readlinkSync(dest);
+          resolvedDest = fs25.readlinkSync(dest);
         } catch (err) {
-          if (err.code === "EINVAL" || err.code === "UNKNOWN") return fs24.symlinkSync(resolvedSrc, dest);
+          if (err.code === "EINVAL" || err.code === "UNKNOWN") return fs25.symlinkSync(resolvedSrc, dest);
           throw err;
         }
         if (opts.dereference) {
@@ -1490,8 +1490,8 @@ var require_copy_sync = __commonJS({
       }
     }
     function copyLink(resolvedSrc, dest) {
-      fs24.unlinkSync(dest);
-      return fs24.symlinkSync(resolvedSrc, dest);
+      fs25.unlinkSync(dest);
+      return fs25.symlinkSync(resolvedSrc, dest);
     }
     module2.exports = copySync;
   }
@@ -1513,13 +1513,13 @@ var require_copy2 = __commonJS({
 var require_remove = __commonJS({
   "../../node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_graceful_fs();
+    var fs25 = require_graceful_fs();
     var u2 = require_universalify().fromCallback;
     function remove(path28, callback) {
-      fs24.rm(path28, { recursive: true, force: true }, callback);
+      fs25.rm(path28, { recursive: true, force: true }, callback);
     }
     function removeSync(path28) {
-      fs24.rmSync(path28, { recursive: true, force: true });
+      fs25.rmSync(path28, { recursive: true, force: true });
     }
     module2.exports = {
       remove: u2(remove),
@@ -1533,14 +1533,14 @@ var require_empty = __commonJS({
   "../../node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
     "use strict";
     var u2 = require_universalify().fromPromise;
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var path28 = require("path");
     var mkdir = require_mkdirs();
     var remove = require_remove();
     var emptyDir = u2(async function emptyDir2(dir) {
       let items;
       try {
-        items = await fs24.readdir(dir);
+        items = await fs25.readdir(dir);
       } catch {
         return mkdir.mkdirs(dir);
       }
@@ -1549,7 +1549,7 @@ var require_empty = __commonJS({
     function emptyDirSync(dir) {
       let items;
       try {
-        items = fs24.readdirSync(dir);
+        items = fs25.readdirSync(dir);
       } catch {
         return mkdir.mkdirsSync(dir);
       }
@@ -1573,51 +1573,51 @@ var require_file = __commonJS({
     "use strict";
     var u2 = require_universalify().fromPromise;
     var path28 = require("path");
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var mkdir = require_mkdirs();
     async function createFile(file2) {
       let stats;
       try {
-        stats = await fs24.stat(file2);
+        stats = await fs25.stat(file2);
       } catch {
       }
       if (stats && stats.isFile()) return;
       const dir = path28.dirname(file2);
       let dirStats = null;
       try {
-        dirStats = await fs24.stat(dir);
+        dirStats = await fs25.stat(dir);
       } catch (err) {
         if (err.code === "ENOENT") {
           await mkdir.mkdirs(dir);
-          await fs24.writeFile(file2, "");
+          await fs25.writeFile(file2, "");
           return;
         } else {
           throw err;
         }
       }
       if (dirStats.isDirectory()) {
-        await fs24.writeFile(file2, "");
+        await fs25.writeFile(file2, "");
       } else {
-        await fs24.readdir(dir);
+        await fs25.readdir(dir);
       }
     }
     function createFileSync(file2) {
       let stats;
       try {
-        stats = fs24.statSync(file2);
+        stats = fs25.statSync(file2);
       } catch {
       }
       if (stats && stats.isFile()) return;
       const dir = path28.dirname(file2);
       try {
-        if (!fs24.statSync(dir).isDirectory()) {
-          fs24.readdirSync(dir);
+        if (!fs25.statSync(dir).isDirectory()) {
+          fs25.readdirSync(dir);
         }
       } catch (err) {
         if (err && err.code === "ENOENT") mkdir.mkdirsSync(dir);
         else throw err;
       }
-      fs24.writeFileSync(file2, "");
+      fs25.writeFileSync(file2, "");
     }
     module2.exports = {
       createFile: u2(createFile),
@@ -1632,19 +1632,19 @@ var require_link = __commonJS({
     "use strict";
     var u2 = require_universalify().fromPromise;
     var path28 = require("path");
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var mkdir = require_mkdirs();
     var { pathExists } = require_path_exists();
     var { areIdentical } = require_stat();
     async function createLink(srcpath, dstpath) {
       let dstStat;
       try {
-        dstStat = await fs24.lstat(dstpath);
+        dstStat = await fs25.lstat(dstpath);
       } catch {
       }
       let srcStat;
       try {
-        srcStat = await fs24.lstat(srcpath);
+        srcStat = await fs25.lstat(srcpath);
       } catch (err) {
         err.message = err.message.replace("lstat", "ensureLink");
         throw err;
@@ -1655,26 +1655,26 @@ var require_link = __commonJS({
       if (!dirExists) {
         await mkdir.mkdirs(dir);
       }
-      await fs24.link(srcpath, dstpath);
+      await fs25.link(srcpath, dstpath);
     }
     function createLinkSync(srcpath, dstpath) {
       let dstStat;
       try {
-        dstStat = fs24.lstatSync(dstpath);
+        dstStat = fs25.lstatSync(dstpath);
       } catch {
       }
       try {
-        const srcStat = fs24.lstatSync(srcpath);
+        const srcStat = fs25.lstatSync(srcpath);
         if (dstStat && areIdentical(srcStat, dstStat)) return;
       } catch (err) {
         err.message = err.message.replace("lstat", "ensureLink");
         throw err;
       }
       const dir = path28.dirname(dstpath);
-      const dirExists = fs24.existsSync(dir);
-      if (dirExists) return fs24.linkSync(srcpath, dstpath);
+      const dirExists = fs25.existsSync(dir);
+      if (dirExists) return fs25.linkSync(srcpath, dstpath);
       mkdir.mkdirsSync(dir);
-      return fs24.linkSync(srcpath, dstpath);
+      return fs25.linkSync(srcpath, dstpath);
     }
     module2.exports = {
       createLink: u2(createLink),
@@ -1688,13 +1688,13 @@ var require_symlink_paths = __commonJS({
   "../../node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
     "use strict";
     var path28 = require("path");
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var { pathExists } = require_path_exists();
     var u2 = require_universalify().fromPromise;
     async function symlinkPaths(srcpath, dstpath) {
       if (path28.isAbsolute(srcpath)) {
         try {
-          await fs24.lstat(srcpath);
+          await fs25.lstat(srcpath);
         } catch (err) {
           err.message = err.message.replace("lstat", "ensureSymlink");
           throw err;
@@ -1714,7 +1714,7 @@ var require_symlink_paths = __commonJS({
         };
       }
       try {
-        await fs24.lstat(srcpath);
+        await fs25.lstat(srcpath);
       } catch (err) {
         err.message = err.message.replace("lstat", "ensureSymlink");
         throw err;
@@ -1726,7 +1726,7 @@ var require_symlink_paths = __commonJS({
     }
     function symlinkPathsSync(srcpath, dstpath) {
       if (path28.isAbsolute(srcpath)) {
-        const exists2 = fs24.existsSync(srcpath);
+        const exists2 = fs25.existsSync(srcpath);
         if (!exists2) throw new Error("absolute srcpath does not exist");
         return {
           toCwd: srcpath,
@@ -1735,14 +1735,14 @@ var require_symlink_paths = __commonJS({
       }
       const dstdir = path28.dirname(dstpath);
       const relativeToDst = path28.join(dstdir, srcpath);
-      const exists = fs24.existsSync(relativeToDst);
+      const exists = fs25.existsSync(relativeToDst);
       if (exists) {
         return {
           toCwd: relativeToDst,
           toDst: srcpath
         };
       }
-      const srcExists = fs24.existsSync(srcpath);
+      const srcExists = fs25.existsSync(srcpath);
       if (!srcExists) throw new Error("relative srcpath does not exist");
       return {
         toCwd: srcpath,
@@ -1760,13 +1760,13 @@ var require_symlink_paths = __commonJS({
 var require_symlink_type = __commonJS({
   "../../node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var u2 = require_universalify().fromPromise;
     async function symlinkType(srcpath, type) {
       if (type) return type;
       let stats;
       try {
-        stats = await fs24.lstat(srcpath);
+        stats = await fs25.lstat(srcpath);
       } catch {
         return "file";
       }
@@ -1776,7 +1776,7 @@ var require_symlink_type = __commonJS({
       if (type) return type;
       let stats;
       try {
-        stats = fs24.lstatSync(srcpath);
+        stats = fs25.lstatSync(srcpath);
       } catch {
         return "file";
       }
@@ -1795,7 +1795,7 @@ var require_symlink = __commonJS({
     "use strict";
     var u2 = require_universalify().fromPromise;
     var path28 = require("path");
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var { mkdirs, mkdirsSync } = require_mkdirs();
     var { symlinkPaths, symlinkPathsSync } = require_symlink_paths();
     var { symlinkType, symlinkTypeSync } = require_symlink_type();
@@ -1804,13 +1804,13 @@ var require_symlink = __commonJS({
     async function createSymlink(srcpath, dstpath, type) {
       let stats;
       try {
-        stats = await fs24.lstat(dstpath);
+        stats = await fs25.lstat(dstpath);
       } catch {
       }
       if (stats && stats.isSymbolicLink()) {
         const [srcStat, dstStat] = await Promise.all([
-          fs24.stat(srcpath),
-          fs24.stat(dstpath)
+          fs25.stat(srcpath),
+          fs25.stat(dstpath)
         ]);
         if (areIdentical(srcStat, dstStat)) return;
       }
@@ -1821,27 +1821,27 @@ var require_symlink = __commonJS({
       if (!await pathExists(dir)) {
         await mkdirs(dir);
       }
-      return fs24.symlink(srcpath, dstpath, toType);
+      return fs25.symlink(srcpath, dstpath, toType);
     }
     function createSymlinkSync(srcpath, dstpath, type) {
       let stats;
       try {
-        stats = fs24.lstatSync(dstpath);
+        stats = fs25.lstatSync(dstpath);
       } catch {
       }
       if (stats && stats.isSymbolicLink()) {
-        const srcStat = fs24.statSync(srcpath);
-        const dstStat = fs24.statSync(dstpath);
+        const srcStat = fs25.statSync(srcpath);
+        const dstStat = fs25.statSync(dstpath);
         if (areIdentical(srcStat, dstStat)) return;
       }
       const relative = symlinkPathsSync(srcpath, dstpath);
       srcpath = relative.toDst;
       type = symlinkTypeSync(relative.toCwd, type);
       const dir = path28.dirname(dstpath);
-      const exists = fs24.existsSync(dir);
-      if (exists) return fs24.symlinkSync(srcpath, dstpath, type);
+      const exists = fs25.existsSync(dir);
+      if (exists) return fs25.symlinkSync(srcpath, dstpath, type);
       mkdirsSync(dir);
-      return fs24.symlinkSync(srcpath, dstpath, type);
+      return fs25.symlinkSync(srcpath, dstpath, type);
     }
     module2.exports = {
       createSymlink: u2(createSymlink),
@@ -1910,9 +1910,9 @@ var require_jsonfile = __commonJS({
       if (typeof options === "string") {
         options = { encoding: options };
       }
-      const fs24 = options.fs || _fs;
+      const fs25 = options.fs || _fs;
       const shouldThrow = "throws" in options ? options.throws : true;
-      let data = await universalify.fromCallback(fs24.readFile)(file2, options);
+      let data = await universalify.fromCallback(fs25.readFile)(file2, options);
       data = stripBom(data);
       let obj;
       try {
@@ -1932,10 +1932,10 @@ var require_jsonfile = __commonJS({
       if (typeof options === "string") {
         options = { encoding: options };
       }
-      const fs24 = options.fs || _fs;
+      const fs25 = options.fs || _fs;
       const shouldThrow = "throws" in options ? options.throws : true;
       try {
-        let content = fs24.readFileSync(file2, options);
+        let content = fs25.readFileSync(file2, options);
         content = stripBom(content);
         return JSON.parse(content, options.reviver);
       } catch (err) {
@@ -1948,15 +1948,15 @@ var require_jsonfile = __commonJS({
       }
     }
     async function _writeFile(file2, obj, options = {}) {
-      const fs24 = options.fs || _fs;
+      const fs25 = options.fs || _fs;
       const str = stringify(obj, options);
-      await universalify.fromCallback(fs24.writeFile)(file2, str, options);
+      await universalify.fromCallback(fs25.writeFile)(file2, str, options);
     }
     var writeFile2 = universalify.fromPromise(_writeFile);
     function writeFileSync2(file2, obj, options = {}) {
-      const fs24 = options.fs || _fs;
+      const fs25 = options.fs || _fs;
       const str = stringify(obj, options);
-      return fs24.writeFileSync(file2, str, options);
+      return fs25.writeFileSync(file2, str, options);
     }
     module2.exports = {
       readFile,
@@ -1987,7 +1987,7 @@ var require_output_file = __commonJS({
   "../../node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
     "use strict";
     var u2 = require_universalify().fromPromise;
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var path28 = require("path");
     var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
@@ -1996,14 +1996,14 @@ var require_output_file = __commonJS({
       if (!await pathExists(dir)) {
         await mkdir.mkdirs(dir);
       }
-      return fs24.writeFile(file2, data, encoding);
+      return fs25.writeFile(file2, data, encoding);
     }
     function outputFileSync(file2, ...args2) {
       const dir = path28.dirname(file2);
-      if (!fs24.existsSync(dir)) {
+      if (!fs25.existsSync(dir)) {
         mkdir.mkdirsSync(dir);
       }
-      fs24.writeFileSync(file2, ...args2);
+      fs25.writeFileSync(file2, ...args2);
     }
     module2.exports = {
       outputFile: u2(outputFile),
@@ -2062,7 +2062,7 @@ var require_json = __commonJS({
 var require_move = __commonJS({
   "../../node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_fs();
+    var fs25 = require_fs();
     var path28 = require("path");
     var { copy } = require_copy2();
     var { remove } = require_remove();
@@ -2089,7 +2089,7 @@ var require_move = __commonJS({
         }
       }
       try {
-        await fs24.rename(src, dest);
+        await fs25.rename(src, dest);
       } catch (err) {
         if (err.code !== "EXDEV") {
           throw err;
@@ -2114,7 +2114,7 @@ var require_move = __commonJS({
 var require_move_sync = __commonJS({
   "../../node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
     "use strict";
-    var fs24 = require_graceful_fs();
+    var fs25 = require_graceful_fs();
     var path28 = require("path");
     var copySync = require_copy2().copySync;
     var removeSync = require_remove().removeSync;
@@ -2139,12 +2139,12 @@ var require_move_sync = __commonJS({
         removeSync(dest);
         return rename(src, dest, overwrite);
       }
-      if (fs24.existsSync(dest)) throw new Error("dest already exists.");
+      if (fs25.existsSync(dest)) throw new Error("dest already exists.");
       return rename(src, dest, overwrite);
     }
     function rename(src, dest, overwrite) {
       try {
-        fs24.renameSync(src, dest);
+        fs25.renameSync(src, dest);
       } catch (err) {
         if (err.code !== "EXDEV") throw err;
         return moveAcrossDevice(src, dest, overwrite);
@@ -4730,7 +4730,7 @@ var require_windows = __commonJS({
     "use strict";
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     function checkPathExt(path28, options) {
       var pathext = options.pathExt !== void 0 ? options.pathExt : process.env.PATHEXT;
       if (!pathext) {
@@ -4755,12 +4755,12 @@ var require_windows = __commonJS({
       return checkPathExt(path28, options);
     }
     function isexe(path28, options, cb) {
-      fs24.stat(path28, function(er, stat) {
+      fs25.stat(path28, function(er, stat) {
         cb(er, er ? false : checkStat(stat, path28, options));
       });
     }
     function sync(path28, options) {
-      return checkStat(fs24.statSync(path28), path28, options);
+      return checkStat(fs25.statSync(path28), path28, options);
     }
   }
 });
@@ -4771,14 +4771,14 @@ var require_mode = __commonJS({
     "use strict";
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     function isexe(path28, options, cb) {
-      fs24.stat(path28, function(er, stat) {
+      fs25.stat(path28, function(er, stat) {
         cb(er, er ? false : checkStat(stat, options));
       });
     }
     function sync(path28, options) {
-      return checkStat(fs24.statSync(path28), options);
+      return checkStat(fs25.statSync(path28), options);
     }
     function checkStat(stat, options) {
       return stat.isFile() && checkMode(stat, options);
@@ -4803,7 +4803,7 @@ var require_mode = __commonJS({
 var require_isexe = __commonJS({
   "../../node_modules/isexe/index.js"(exports2, module2) {
     "use strict";
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var core;
     if (process.platform === "win32" || global.TESTING_WINDOWS) {
       core = require_windows();
@@ -5068,16 +5068,16 @@ var require_shebang_command = __commonJS({
 var require_readShebang = __commonJS({
   "../../node_modules/cross-spawn/lib/util/readShebang.js"(exports2, module2) {
     "use strict";
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var shebangCommand = require_shebang_command();
     function readShebang(command2) {
       const size = 150;
       const buffer = Buffer.alloc(size);
       let fd;
       try {
-        fd = fs24.openSync(command2, "r");
-        fs24.readSync(fd, buffer, 0, size, 0);
-        fs24.closeSync(fd);
+        fd = fs25.openSync(command2, "r");
+        fs25.readSync(fd, buffer, 0, size, 0);
+        fs25.closeSync(fd);
       } catch (e) {
       }
       return shebangCommand(buffer.toString());
@@ -30752,7 +30752,7 @@ var require_view = __commonJS({
     "use strict";
     var debug = require_src()("express:view");
     var path28 = require("path");
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var dirname = path28.dirname;
     var basename = path28.basename;
     var extname = path28.extname;
@@ -30832,7 +30832,7 @@ var require_view = __commonJS({
     function tryStat(path29) {
       debug('stat "%s"', path29);
       try {
-        return fs24.statSync(path29);
+        return fs25.statSync(path29);
       } catch (e) {
         return void 0;
       }
@@ -42073,27 +42073,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module2.exports = Router21;
+    module2.exports = Router22;
     module2.exports.Route = Route;
-    function Router21(options) {
-      if (!(this instanceof Router21)) {
-        return new Router21(options);
+    function Router22(options) {
+      if (!(this instanceof Router22)) {
+        return new Router22(options);
       }
       const opts = options || {};
-      function router21(req, res, next) {
-        router21.handle(req, res, next);
+      function router22(req, res, next) {
+        router22.handle(req, res, next);
       }
-      Object.setPrototypeOf(router21, this);
-      router21.caseSensitive = opts.caseSensitive;
-      router21.mergeParams = opts.mergeParams;
-      router21.params = {};
-      router21.strict = opts.strict;
-      router21.stack = [];
-      return router21;
+      Object.setPrototypeOf(router22, this);
+      router22.caseSensitive = opts.caseSensitive;
+      router22.mergeParams = opts.mergeParams;
+      router22.params = {};
+      router22.strict = opts.strict;
+      router22.stack = [];
+      return router22;
     }
-    Router21.prototype = function() {
+    Router22.prototype = function() {
     };
-    Router21.prototype.param = function param(name, fn) {
+    Router22.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -42113,7 +42113,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router21.prototype.handle = function handle(req, res, callback) {
+    Router22.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -42240,7 +42240,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router21.prototype.use = function use(handler) {
+    Router22.prototype.use = function use(handler) {
       let offset = 0;
       let path28 = "/";
       if (typeof handler !== "function") {
@@ -42273,7 +42273,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router21.prototype.route = function route3(path28) {
+    Router22.prototype.route = function route3(path28) {
       const route4 = new Route(path28);
       const layer = new Layer(path28, {
         sensitive: this.caseSensitive,
@@ -42288,7 +42288,7 @@ var require_router = __commonJS({
       return route4;
     };
     methods.concat("all").forEach(function(method) {
-      Router21.prototype[method] = function(path28) {
+      Router22.prototype[method] = function(path28) {
         const route3 = this.route(path28);
         route3[method].apply(route3, slice.call(arguments, 1));
         return this;
@@ -42471,13 +42471,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils5().compileTrust;
     var resolve = require("path").resolve;
     var once9 = require_once();
-    var Router21 = require_router();
+    var Router22 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app3 = exports2 = module2.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app3.init = function init() {
-      var router21 = null;
+      var router22 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -42486,13 +42486,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router21 === null) {
-            router21 = new Router21({
+          if (router22 === null) {
+            router22 = new Router22({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router21;
+          return router22;
         }
       });
     };
@@ -42563,15 +42563,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router21 = this.router;
+      var router22 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router21.use(path28, fn2);
+          return router22.use(path28, fn2);
         }
         debug(".use app under %s", path28);
         fn2.mountpath = path28;
         fn2.parent = this;
-        router21.use(path28, function mounted_app(req, res, next) {
+        router22.use(path28, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -53479,7 +53479,7 @@ var require_send = __commonJS({
     var escapeHtml = require_escape_html();
     var etag = require_etag();
     var fresh = require_fresh();
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var mime = require_mime_types3();
     var ms = require_ms();
     var onFinished = require_on_finished();
@@ -53761,7 +53761,7 @@ var require_send = __commonJS({
       var i2 = 0;
       var self = this;
       debug('stat "%s"', path29);
-      fs24.stat(path29, function onstat(err, stat) {
+      fs25.stat(path29, function onstat(err, stat) {
         var pathEndsWithSep = path29[path29.length - 1] === sep;
         if (err && err.code === "ENOENT" && !extname(path29) && !pathEndsWithSep) {
           return next(err);
@@ -53778,7 +53778,7 @@ var require_send = __commonJS({
         }
         var p = path29 + "." + self._extensions[i2++];
         debug('stat "%s"', p);
-        fs24.stat(p, function(err2, stat) {
+        fs25.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -53796,7 +53796,7 @@ var require_send = __commonJS({
         }
         var p = join(path29, self._index[i2]);
         debug('stat "%s"', p);
-        fs24.stat(p, function(err2, stat) {
+        fs25.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -53808,7 +53808,7 @@ var require_send = __commonJS({
     SendStream.prototype.stream = function stream(path29, options) {
       var self = this;
       var res = this.res;
-      var stream2 = fs24.createReadStream(path29, options);
+      var stream2 = fs25.createReadStream(path29, options);
       this.emit("stream", stream2);
       stream2.pipe(res);
       function cleanup() {
@@ -54607,7 +54607,7 @@ var require_express = __commonJS({
     var EventEmitter2 = require("events").EventEmitter;
     var mixin2 = require_merge_descriptors();
     var proto = require_application();
-    var Router21 = require_router();
+    var Router22 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -54629,8 +54629,8 @@ var require_express = __commonJS({
     exports2.application = proto;
     exports2.request = req;
     exports2.response = res;
-    exports2.Route = Router21.Route;
-    exports2.Router = Router21;
+    exports2.Route = Router22.Route;
+    exports2.Router = Router22;
     exports2.json = bodyParser.json;
     exports2.raw = bodyParser.raw;
     exports2.static = require_serve_static();
@@ -79577,8 +79577,8 @@ var require_utils8 = __commonJS({
     exports2.array = array;
     var errno = require_errno();
     exports2.errno = errno;
-    var fs24 = require_fs2();
-    exports2.fs = fs24;
+    var fs25 = require_fs2();
+    exports2.fs = fs25;
     var path28 = require_path();
     exports2.path = path28;
     var pattern = require_pattern();
@@ -79762,12 +79762,12 @@ var require_fs3 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createFileSystemAdapter = exports2.FILE_SYSTEM_ADAPTER = void 0;
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     exports2.FILE_SYSTEM_ADAPTER = {
-      lstat: fs24.lstat,
-      stat: fs24.stat,
-      lstatSync: fs24.lstatSync,
-      statSync: fs24.statSync
+      lstat: fs25.lstat,
+      stat: fs25.stat,
+      lstatSync: fs25.lstatSync,
+      statSync: fs25.statSync
     };
     function createFileSystemAdapter(fsMethods) {
       if (fsMethods === void 0) {
@@ -79784,12 +79784,12 @@ var require_settings = __commonJS({
   "../../node_modules/@nodelib/fs.stat/out/settings.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    var fs24 = require_fs3();
+    var fs25 = require_fs3();
     var Settings = class {
       constructor(_options = {}) {
         this._options = _options;
         this.followSymbolicLink = this._getValue(this._options.followSymbolicLink, true);
-        this.fs = fs24.createFileSystemAdapter(this._options.fs);
+        this.fs = fs25.createFileSystemAdapter(this._options.fs);
         this.markSymbolicLink = this._getValue(this._options.markSymbolicLink, false);
         this.throwErrorOnBrokenSymbolicLink = this._getValue(this._options.throwErrorOnBrokenSymbolicLink, true);
       }
@@ -79946,8 +79946,8 @@ var require_utils9 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.fs = void 0;
-    var fs24 = require_fs4();
-    exports2.fs = fs24;
+    var fs25 = require_fs4();
+    exports2.fs = fs25;
   }
 });
 
@@ -80142,14 +80142,14 @@ var require_fs5 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createFileSystemAdapter = exports2.FILE_SYSTEM_ADAPTER = void 0;
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     exports2.FILE_SYSTEM_ADAPTER = {
-      lstat: fs24.lstat,
-      stat: fs24.stat,
-      lstatSync: fs24.lstatSync,
-      statSync: fs24.statSync,
-      readdir: fs24.readdir,
-      readdirSync: fs24.readdirSync
+      lstat: fs25.lstat,
+      stat: fs25.stat,
+      lstatSync: fs25.lstatSync,
+      statSync: fs25.statSync,
+      readdir: fs25.readdir,
+      readdirSync: fs25.readdirSync
     };
     function createFileSystemAdapter(fsMethods) {
       if (fsMethods === void 0) {
@@ -80168,12 +80168,12 @@ var require_settings2 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     var path28 = require("path");
     var fsStat = require_out();
-    var fs24 = require_fs5();
+    var fs25 = require_fs5();
     var Settings = class {
       constructor(_options = {}) {
         this._options = _options;
         this.followSymbolicLinks = this._getValue(this._options.followSymbolicLinks, false);
-        this.fs = fs24.createFileSystemAdapter(this._options.fs);
+        this.fs = fs25.createFileSystemAdapter(this._options.fs);
         this.pathSegmentSeparator = this._getValue(this._options.pathSegmentSeparator, path28.sep);
         this.stats = this._getValue(this._options.stats, false);
         this.throwErrorOnBrokenSymbolicLink = this._getValue(this._options.throwErrorOnBrokenSymbolicLink, true);
@@ -81554,16 +81554,16 @@ var require_settings4 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_FILE_SYSTEM_ADAPTER = void 0;
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var os3 = require("os");
     var CPU_COUNT = Math.max(os3.cpus().length, 1);
     exports2.DEFAULT_FILE_SYSTEM_ADAPTER = {
-      lstat: fs24.lstat,
-      lstatSync: fs24.lstatSync,
-      stat: fs24.stat,
-      statSync: fs24.statSync,
-      readdir: fs24.readdir,
-      readdirSync: fs24.readdirSync
+      lstat: fs25.lstat,
+      lstatSync: fs25.lstatSync,
+      stat: fs25.stat,
+      statSync: fs25.statSync,
+      readdir: fs25.readdir,
+      readdirSync: fs25.readdirSync
     };
     var Settings = class {
       constructor(_options = {}) {
@@ -81968,7 +81968,7 @@ var require_cpu = __commonJS({
   "../../node_modules/pidusage/lib/helpers/cpu.js"(exports2, module2) {
     "use strict";
     var os3 = require("os");
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var exec6 = require("child_process").exec;
     var parallel = require_parallel();
     function updateCpu(cpu, next) {
@@ -81995,7 +81995,7 @@ var require_cpu = __commonJS({
     }
     module2.exports = updateCpu;
     function getRealUptime(next) {
-      fs24.readFile("/proc/uptime", "utf8", function(err, uptime) {
+      fs25.readFile("/proc/uptime", "utf8", function(err, uptime) {
         if (err || uptime === void 0) {
           if (!process.env.PIDUSAGE_SILENT) {
             console.warn("[pidusage] We couldn't find uptime from /proc/uptime, using os.uptime() value");
@@ -82103,7 +82103,7 @@ var require_safe_buffer = __commonJS({
 var require_procfile = __commonJS({
   "../../node_modules/pidusage/lib/procfile.js"(exports2, module2) {
     "use strict";
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var path28 = require("path");
     var updateCpu = require_cpu();
     var parallel = require_parallel();
@@ -82117,11 +82117,11 @@ var require_procfile = __commonJS({
       if (history2.fd) {
         return cb(null, history2.fd);
       }
-      fs24.open(path29, "r", cb);
+      fs25.open(path29, "r", cb);
     }
     function close(history2) {
       if (history2.fd) {
-        fs24.close(history2.fd, noop3);
+        fs25.close(history2.fd, noop3);
       }
     }
     function readUntilEnd(fd, buf, cb) {
@@ -82131,7 +82131,7 @@ var require_procfile = __commonJS({
         buf = Buffer6.alloc(SIZE);
         firstRead = true;
       }
-      fs24.read(fd, buf, 0, SIZE, 0, function(err, bytesRead, buffer) {
+      fs25.read(fd, buf, 0, SIZE, 0, function(err, bytesRead, buffer) {
         if (err) {
           cb(err);
           return;
@@ -82414,7 +82414,7 @@ var require_gwmi = __commonJS({
 var require_stats = __commonJS({
   "../../node_modules/pidusage/lib/stats.js"(exports2, module2) {
     "use strict";
-    var fs24 = require("fs");
+    var fs25 = require("fs");
     var os3 = require("os");
     var spawn4 = require("child_process").spawn;
     var requireMap = {
@@ -82438,7 +82438,7 @@ var require_stats = __commonJS({
       win: "wmic"
     };
     var platform3 = os3.platform();
-    if (fs24.existsSync("/etc/alpine-release")) {
+    if (fs25.existsSync("/etc/alpine-release")) {
       platform3 = "alpine";
     }
     if (platform3.match(/^win/)) {
@@ -82764,7 +82764,7 @@ Examples:
 }
 
 // src/index.ts
-var import_express25 = __toESM(require_express2());
+var import_express26 = __toESM(require_express2());
 var import_cors = __toESM(require_lib4());
 var import_path21 = __toESM(require("path"));
 
@@ -82848,7 +82848,8 @@ var apiRoute = {
   /** Docker API */
   docker: "docker",
   availabletemplates: "availabletemplates",
-  setWorkspaceTemplate: "setworkspacetemplate"
+  setWorkspaceTemplate: "setworkspacetemplate",
+  deleteWorkspace: "deleteworkspace"
 };
 var api_default = apiRoute;
 
@@ -89860,17 +89861,11 @@ var dockerCompose5 = `services:
     networks:
       - cloud-net
 
-  s3-manager:
-    image: cloudlena/s3manager
+  s3-browser:
+    image: machines/filestash
     pull_policy: if_not_present
     ports:
-      - "4340:8080"
-    environment:
-      - ACCESS_KEY_ID=test
-      - SECRET_ACCESS_KEY=test
-      - REGION=us-east-1
-      - ENDPOINT=localstack:4566
-      - USE_SSL=false
+      - "4340:8334"
     depends_on:
       - localstack
     networks:
@@ -90101,7 +90096,7 @@ dynamodb.createTable(params, function(err, data) {
 var serverJs5 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { spawn, exec } = require('child_process');
+const { spawn, exec, execSync } = require('child_process');
 const deploy = require('./deploy');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
@@ -90109,6 +90104,56 @@ const DATA_DIR = path.join(__dirname, 'localstack-data');
 let currentPort = 3748;
 
 console.log("Starting AWS Local environment...");
+console.log("");
+
+// Check for required dependencies
+function checkDependencies() {
+    let hasErrors = false;
+    
+    // Check Docker
+    try {
+        execSync('docker --version', { stdio: 'pipe' });
+        console.log('\u2713 Docker is installed');
+    } catch (e) {
+        console.error('\u2717 ERROR: Docker is not installed!');
+        console.error('  LocalStack requires Docker to run.');
+        console.error('  Install Docker: https://docs.docker.com/get-docker/');
+        hasErrors = true;
+    }
+    
+    // Check Docker Compose
+    try {
+        execSync('docker compose version', { stdio: 'pipe' });
+        console.log('\u2713 Docker Compose is installed');
+    } catch (e) {
+        console.error('\u2717 ERROR: Docker Compose is not installed!');
+        console.error('  LocalStack requires Docker Compose to run.');
+        console.error('  Install Docker Compose: https://docs.docker.com/compose/install/');
+        hasErrors = true;
+    }
+    
+    // Check AWS CLI (optional but recommended)
+    try {
+        execSync('aws --version', { stdio: 'pipe' });
+        console.log('\u2713 AWS CLI is installed');
+    } catch (e) {
+        console.warn('\u26A0 WARNING: AWS CLI is not installed');
+        console.warn('  The CLI commands in this guide will not work without it.');
+        console.warn('  Install AWS CLI: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html');
+        console.warn('  (You can still use the web UIs without AWS CLI)');
+    }
+    
+    console.log("");
+    
+    if (hasErrors) {
+        console.error('==================================================');
+        console.error('\u274C Missing required dependencies. Please install them first.');
+        console.error('==================================================');
+        process.exit(1);
+    }
+}
+
+checkDependencies();
 
 // Pre-create data directory to ensure correct permissions
 if (!fs.existsSync(DATA_DIR)) {
@@ -90147,20 +90192,85 @@ function displayCredentials() {
 
         console.log('\\n==================================================');
         console.log('\u{1F680} AWS LocalStack is running!');
-        console.log('--------------------------------------------------');
-        console.log('\u{1F4CC} AWS Credentials:');
+        console.log('==================================================');
+        console.log('');
+        console.log('\u{1F4CC} AWS Credentials (use these everywhere):');
         console.log('   Access Key ID:     test');
         console.log('   Secret Access Key: test');
         console.log('   Region:            us-east-1');
+        console.log('   Endpoint:          http://localhost:4566');
+        console.log('');
         console.log('--------------------------------------------------');
         console.log('\u{1F310} Service URLs:');
-        console.log('   LocalStack:        http://localhost:4566');
-        console.log('   DynamoDB Admin:    http://localhost:8001');
-        console.log('   S3 Manager:        http://localhost:8002');
-        console.log(\`   Manager UI:        http://localhost:\${server.address().port}\`);
         console.log('--------------------------------------------------');
-        console.log('\u{1F4E6} Available Services:');
+        console.log('   LocalStack API:    http://localhost:4566 (API only)');
+        console.log('   DynamoDB Admin:    http://localhost:4330');
+        console.log('   S3 Browser:        http://localhost:4340');
+        console.log(\`   Manager UI:        http://localhost:\${server.address().port}\`);
+        console.log('');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4C1} S3 Browser Setup (Filestash):');
+        console.log('--------------------------------------------------');
+        console.log('   1. Go to http://localhost:4340');
+        console.log('   2. Set admin password (first time only)');
+        console.log('   3. Select "S3" tab and check "Advanced"');
+        console.log('   4. Fill in:');
+        console.log('      \u2022 Access Key ID:     test');
+        console.log('      \u2022 Secret Access Key: test');
+        console.log('      \u2022 Region:            us-east-1');
+        console.log('      \u2022 Endpoint:          http://localstack:4566');
+        console.log('   5. Click CONNECT');
+        console.log('');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F4E6} Quick Start - S3 Commands:');
+        console.log('--------------------------------------------------');
+        console.log('   # Create bucket:');
+        console.log('   aws --endpoint-url=http://localhost:4566 s3 mb s3://my-bucket');
+        console.log('');
+        console.log('   # List buckets:');
+        console.log('   aws --endpoint-url=http://localhost:4566 s3 ls');
+        console.log('');
+        console.log('   # Upload file:');
+        console.log('   aws --endpoint-url=http://localhost:4566 s3 cp file.txt s3://my-bucket/');
+        console.log('');
+        console.log('   # Sync folder:');
+        console.log('   aws --endpoint-url=http://localhost:4566 s3 sync ./folder s3://my-bucket/');
+        console.log('');
+        console.log('--------------------------------------------------');
+        console.log('\u26A1 Lambda Deployment:');
+        console.log('--------------------------------------------------');
+        console.log('   # 1. Create index.js with:');
+        console.log('   exports.handler = async (event) => {');
+        console.log('     return { statusCode: 200, body: "Hello from Lambda!" };');
+        console.log('   };');
+        console.log('');
+        console.log('   # 2. Zip and deploy:');
+        console.log('   zip function.zip index.js');
+        console.log('   aws --endpoint-url=http://localhost:4566 lambda create-function \\\\');
+        console.log('     --function-name myFunc --runtime nodejs18.x \\\\');
+        console.log('     --handler index.handler --zip-file fileb://function.zip \\\\');
+        console.log('     --role arn:aws:iam::000000000000:role/lambda-role');
+        console.log('');
+        console.log('   # 3. Invoke Lambda:');
+        console.log('   aws --endpoint-url=http://localhost:4566 lambda invoke \\\\');
+        console.log('     --function-name myFunc out.json && cat out.json');
+        console.log('');
+        console.log('--------------------------------------------------');
+        console.log('\u{1F5C4}\uFE0F  DynamoDB Commands:');
+        console.log('--------------------------------------------------');
+        console.log('   # Create table:');
+        console.log('   aws --endpoint-url=http://localhost:4566 dynamodb create-table \\\\');
+        console.log('     --table-name Users --billing-mode PAY_PER_REQUEST \\\\');
+        console.log('     --attribute-definitions AttributeName=id,AttributeType=S \\\\');
+        console.log('     --key-schema AttributeName=id,KeyType=HASH');
+        console.log('');
+        console.log('   Or use the DynamoDB Admin UI: http://localhost:4330');
+        console.log('');
+        console.log('--------------------------------------------------');
+        console.log('\uFFFD Available Services:');
         console.log('   S3, Lambda, DynamoDB, API Gateway, SQS, SNS, CloudWatch');
+        console.log('');
+        console.log('\u{1F4A1} Tip: Add --endpoint-url=http://localhost:4566 to all AWS CLI commands');
         console.log('==================================================\\n');
     });
 }
@@ -90224,9 +90334,9 @@ spawn('docker', ['compose', 'down'], { stdio: 'inherit' });`;
 
 // ../../packages/template/services/aws.ts
 var AWSTemplate = {
-  name: "Localstack (Experimental)",
-  description: "AWS LocalStack with Manager",
-  notes: "For local testing with LocalStack",
+  name: "Localstack",
+  description: "Local AWS EC2 and S3 environment",
+  notes: "For learning and local testing with LocalStack",
   type: "tool",
   category: "Service",
   icon: "fab fa-aws text-orange-400",
@@ -90284,11 +90394,6 @@ var AWSTemplate = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.dev=node server.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
       args: ["pkg", "set", "scripts.stop=node stop.js"]
     },
     {
@@ -90300,6 +90405,11 @@ var AWSTemplate = {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "description=AWS LocalStack Environment with Manager"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",
@@ -90484,9 +90594,9 @@ const stripe = new Stripe('sk_test_mock_123', {
 
 // ../../packages/template/services/stripe.ts
 var StripeTemplate = {
-  name: "Stripe Mock (Experimental)",
-  description: "Stripe API Mock Server",
-  notes: "Runs the official stripe-mock image.",
+  name: "Stripe Mock",
+  description: "Stripe API Server",
+  notes: "For learning and testing the official stripe-mock image.",
   type: "tool",
   category: "Service",
   icon: "fab fa-stripe text-orange-500",
@@ -90519,11 +90629,6 @@ var StripeTemplate = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "scripts.dev=node server.js"]
-    },
-    {
-      action: "command",
-      cmd: "npm",
       args: ["pkg", "set", "scripts.start=node server.js"]
     },
     {
@@ -90545,6 +90650,11 @@ var StripeTemplate = {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "description=Stripe Mock"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     },
     {
       action: "command",
@@ -90574,10 +90684,12 @@ services:
       - ./.headlamp_data:/home/headlamp/data
     environment:
       - HEADLAMP_CONFIG_CONF_MAX_CONNECTIONS=1000
+      - HEADLAMP_CONFIG_ENABLE_DYNAMIC_CLUSTERS=true
       - HOME=/home/headlamp
     command:
       - "-in-cluster=false"
       - "-kubeconfig=/home/headlamp/.kube/config"
+      - "-enable-dynamic-clusters"
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:4466/ || exit 1"]
       interval: 10s
@@ -90650,27 +90762,76 @@ const clusterRunning = () => {
 };
 
 async function main() {
-    console.log('\\\\x1b[36m\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\\\\x1b[0m');
-    console.log('\\\\x1b[36m\u2551\\\\x1b[0m       \u{1F680} K3d + Headlamp Learning Environment               \\\\x1b[36m\u2551\\\\x1b[0m');
-    console.log('\\\\x1b[36m\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D\\\\x1b[0m');
+    console.log('\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557');
+    console.log('\u2551       \u{1F680} K3d + Headlamp Learning Environment               \u2551');
+    console.log('\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D');
     console.log('');
 
-    // Check prerequisites
+    // Check all prerequisites
+    console.log('Checking dependencies...');
+    console.log('');
+    let hasErrors = false;
+
+    // Check Docker (required)
+    try {
+        execSync('docker --version', { stdio: 'pipe' });
+        console.log('\u2713 Docker is installed');
+    } catch (e) {
+        console.log('\u2717 ERROR: Docker is not installed!');
+        console.log('  K3d and Headlamp require Docker to run.');
+        console.log('  Install Docker: https://docs.docker.com/get-docker/');
+        hasErrors = true;
+    }
+
+    // Check Docker Compose (required for Headlamp)
+    try {
+        execSync('docker compose version', { stdio: 'pipe' });
+        console.log('\u2713 Docker Compose is installed');
+    } catch (e) {
+        console.log('\u2717 ERROR: Docker Compose is not installed!');
+        console.log('  Headlamp requires Docker Compose to run.');
+        console.log('  Install Docker Compose: https://docs.docker.com/compose/install/');
+        hasErrors = true;
+    }
+
+    // Check k3d (required)
     if (!checkK3d()) {
-        console.log('\\\\x1b[31m\u274C k3d is not installed!\\\\x1b[0m');
-        console.log('');
-        console.log('\\\\x1b[33mInstall k3d using one of these methods:\\\\x1b[0m');
+        console.log('\u2717 ERROR: k3d is not installed!');
+        console.log('  Install k3d using one of these methods:');
         console.log('  \u2022 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash');
         console.log('  \u2022 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash');
         console.log('  \u2022 brew install k3d (on macOS)');
-        console.log('');
+        hasErrors = true;
+    } else {
+        console.log('\u2713 k3d is installed');
+    }
+
+    // Check kubectl (optional but recommended)
+    try {
+        execSync('kubectl version --client', { stdio: 'pipe' });
+        console.log('\u2713 kubectl is installed');
+    } catch (e) {
+        console.log('\u26A0 WARNING: kubectl is not installed');
+        console.log('  The kubectl commands in this guide will not work without it.');
+        console.log('  Install kubectl: https://kubernetes.io/docs/tasks/tools/');
+        console.log('  (You can still use Headlamp UI without kubectl)');
+    }
+
+    console.log('');
+
+    if (hasErrors) {
+        console.log('\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550');
+        console.log('\u274C Missing required dependencies. Please install them first.');
+        console.log('\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550');
         process.exit(1);
     }
-    console.log('\\\\x1b[32m\u2713 k3d is installed\\\\x1b[0m');
+
+    console.log('\u2713 All required dependencies are installed');
+    console.log('');
 
     // Create or start cluster
     if (!clusterExists()) {
-        console.log(\`\\\\n\\\\x1b[33mCreating k3d cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+        console.log(\`\\\\nCreating k3d cluster "\${CLUSTER_NAME}"...\`);
         try {
             await runCommand('k3d', [
                 'cluster', 'create', CLUSTER_NAME,
@@ -90682,30 +90843,30 @@ async function main() {
                 '--tls-san', 'host.k3d.internal',
                 '--wait'
             ]);
-            console.log(\`\\\\x1b[32m\u2713 Cluster "\${CLUSTER_NAME}" created successfully\\\\x1b[0m\`);
+            console.log(\`\u2713 Cluster "\${CLUSTER_NAME}" created successfully\`);
         } catch (e) {
-            console.error('\\\\x1b[31m\u274C Failed to create cluster\\\\x1b[0m');
+            console.error('\u274C Failed to create cluster');
             process.exit(1);
         }
     } else if (!clusterRunning()) {
-        console.log(\`\\\\n\\\\x1b[33mStarting existing cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+        console.log(\`\\\\nStarting existing cluster "\${CLUSTER_NAME}"...\`);
         try {
             await runCommand('k3d', ['cluster', 'start', CLUSTER_NAME]);
-            console.log(\`\\\\x1b[32m\u2713 Cluster "\${CLUSTER_NAME}" started\\\\x1b[0m\`);
+            console.log(\`\u2713 Cluster "\${CLUSTER_NAME}" started\`);
         } catch (e) {
-            console.error('\\\\x1b[31m\u274C Failed to start cluster\\\\x1b[0m');
-            console.log('\\\\x1b[33mThis often happens if the cluster network was deleted or Docker was restarted.\\\\x1b[0m');
-            console.log('\\\\x1b[33mTry deleting and recreating the cluster:\\\\x1b[0m');
+            console.error('\u274C Failed to start cluster');
+            console.log('This often happens if the cluster network was deleted or Docker was restarted.');
+            console.log('Try deleting and recreating the cluster:');
             console.log(\`  k3d cluster delete \${CLUSTER_NAME}\`);
             console.log('  npm run start');
             process.exit(1);
         }
     } else {
-        console.log(\`\\\\x1b[32m\u2713 Cluster "\${CLUSTER_NAME}" is already running\\\\x1b[0m\`);
+        console.log(\`\u2713 Cluster "\${CLUSTER_NAME}" is already running\`);
     }
 
     // Update kubeconfig
-    console.log('\\\\n\\\\x1b[33mUpdating kubeconfig...\\\\x1b[0m');
+    console.log('\\\\nUpdating kubeconfig...');
     
     // 1. Try to export config to local file (REQUIRED for Headlamp)
     try {
@@ -90716,8 +90877,8 @@ async function main() {
         kubeconfig = kubeconfig.replace(/127\\.0\\.0\\.1/g, 'host.k3d.internal');
 
         // Fix TLS: Skip verification since host.k3d.internal is not in the default cert
-        // Replace certificate-authority-data with insecure-skip-tls-verify (preserves indentation)
-        kubeconfig = kubeconfig.replace(/certificate-authority-data:.*\\n/g, 'insecure-skip-tls-verify: true\\n    ');
+        // Replace certificate-authority-data line with insecure-skip-tls-verify (preserve indentation)
+        kubeconfig = kubeconfig.replace(/(\\s+)certificate-authority-data:.*\\n/g, '$1insecure-skip-tls-verify: true\\n');
 
         const kubeDir = path.join(__dirname, '.kube');
         if (!fs.existsSync(kubeDir)) {
@@ -90726,9 +90887,9 @@ async function main() {
         const kubePath = path.join(kubeDir, 'config');
         fs.writeFileSync(kubePath, kubeconfig);
         fs.chmodSync(kubePath, 0o644);
-        console.log('\\\\x1b[32m\u2713 Local kubeconfig updated (for container access)\\\\x1b[0m');
+        console.log('\u2713 Local kubeconfig updated (for container access)');
     } catch (e) {
-        console.error('\\\\x1b[31m\u274C Failed to create local kubeconfig!\\\\x1b[0m');
+        console.error('\u274C Failed to create local kubeconfig!');
         console.error(e.message);
         process.exit(1);
     }
@@ -90736,15 +90897,15 @@ async function main() {
     // 2. Try to merge into global config for user convenience (kubectl)
     try {
         execSync(\`k3d kubeconfig merge \${CLUSTER_NAME} --kubeconfig-merge-default\`, { stdio: 'pipe' });
-        console.log('\\\\x1b[32m\u2713 Global kubeconfig updated\\\\x1b[0m');
+        console.log('\u2713 Global kubeconfig updated');
     } catch (e) {
-        console.warn('\\\\x1b[33m\u26A0 Could not update global kubeconfig automatically\\\\x1b[0m');
-        console.log('\\\\x1b[90mHint: This is usually because /home/anghelo/.kube/config is a root-owned directory.\\\\x1b[0m');
-        console.log('\\\\x1b[90mFix it with: sudo rm -rf /home/anghelo/.kube/config\\\\x1b[0m');
+        console.warn('\u26A0 Could not update global kubeconfig automatically');
+        console.log('Hint: This is usually because /home/anghelo/.kube/config is a root-owned directory.');
+        console.log('Fix it with: sudo rm -rf /home/anghelo/.kube/config');
     }
 
     // Start Headlamp via Docker Compose
-    console.log('\\\\n\\\\x1b[33mStarting Headlamp UI...\\\\x1b[0m');
+    console.log('\\\\nStarting Headlamp UI...');
     const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit', cwd: __dirname });
 
     child.on('close', (code) => {
@@ -90759,7 +90920,7 @@ async function main() {
                 let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
                 const lower = cleanLine.toLowerCase();
                 if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                    process.stdout.write('\\\\x1b[31mError:\\\\x1b[0m ' + cleanLine + '\\\\n');
+                    process.stdout.write('Error: ' + cleanLine + '\\\\n');
                 }
             });
         };
@@ -90816,27 +90977,27 @@ async function main() {
                     }
 
                     console.log('');
-                    console.log('\\\\x1b[36m\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                    \u{1F389} Setup Complete!                       \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\\\\x1b[0m');
-                    console.log(\`\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F4CA} Headlamp UI:   http://localhost:\${headlampPort}                    \\\\x1b[36m\u2551\\\\x1b[0m\`);
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F527} Cluster:       k3d-' + CLUSTER_NAME + '                       \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                                                              \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F4DA} Quick Commands:                                         \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl get nodes                                        \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl get pods --all-namespaces                        \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl create deployment nginx --image=nginx            \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    kubectl expose deployment nginx --port=80 --type=NodePort\\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                                                              \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m  \u{1F517} Documentation:                                          \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    K3d:      https://k3d.io/                                 \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    Headlamp: https://headlamp.dev/                          \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m    K8s:      https://kubernetes.io/docs/                    \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u2551\\\\x1b[0m                                                              \\\\x1b[36m\u2551\\\\x1b[0m');
-                    console.log('\\\\x1b[36m\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D\\\\x1b[0m');
+                    console.log('\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557');
+                    console.log('\u2551                    \u{1F389} Setup Complete!                       \u2551');
+                    console.log('\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563');
+                    console.log(\`\u2551  \u{1F4CA} Headlamp UI:   http://localhost:\${headlampPort}                    \u2551\`);
+                    console.log('\u2551  \u{1F527} Cluster:       k3d-' + CLUSTER_NAME + '                       \u2551');
+                    console.log('\u2560\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2563');
+                    console.log('\u2551                                                              \u2551');
+                    console.log('\u2551  \u{1F4DA} Quick Commands:                                         \u2551');
+                    console.log('\u2551    kubectl get nodes                                        \u2551');
+                    console.log('\u2551    kubectl get pods --all-namespaces                        \u2551');
+                    console.log('\u2551    kubectl create deployment nginx --image=nginx            \u2551');
+                    console.log('\u2551    kubectl expose deployment nginx --port=80 --type=NodePort\u2551');
+                    console.log('\u2551                                                              \u2551');
+                    console.log('\u2551  \u{1F517} Documentation:                                          \u2551');
+                    console.log('\u2551    K3d:      https://k3d.io/                                 \u2551');
+                    console.log('\u2551    Headlamp: https://headlamp.dev/                          \u2551');
+                    console.log('\u2551    K8s:      https://kubernetes.io/docs/                    \u2551');
+                    console.log('\u2551                                                              \u2551');
+                    console.log('\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D');
                     console.log('');
-                    console.log('\\\\x1b[33mPress Ctrl+C to stop the services\\\\x1b[0m');
+                    console.log('Press Ctrl+C to stop the services');
                 });
             }).on('error', (e) => {
                 setTimeout(checkStatus, 2000);
@@ -90848,9 +91009,32 @@ async function main() {
 }
 
 const cleanup = () => {
-    console.log('\\\\n\\\\x1b[33mStopping services...\\\\x1b[0m');
-    exec('docker compose down', { cwd: __dirname }, (err, stdout, stderr) => {
-        console.log('\\\\x1b[32m\u2713 Headlamp stopped\\\\x1b[0m');
+    console.log('\\\\nStopping services...');
+    
+    // Read runtime file to get tracked container IDs
+    let runtimeData = { containerIds: [] };
+    try {
+        const content = fs.readFileSync(RUNTIME_FILE, 'utf8');
+        runtimeData = JSON.parse(content);
+    } catch (e) {
+        // Runtime file might not exist
+    }
+    
+    // Stop docker compose containers
+    exec('docker compose down --remove-orphans', { cwd: __dirname }, (err, stdout, stderr) => {
+        if (err) {
+            console.log('\u26A0 docker compose down failed, trying to stop containers directly...');
+            
+            // Fallback: stop containers by ID if we have them
+            if (runtimeData.containerIds && runtimeData.containerIds.length > 0) {
+                const ids = runtimeData.containerIds.join(' ');
+                exec(\`docker stop \${ids} 2>/dev/null; docker rm \${ids} 2>/dev/null\`, () => {
+                    console.log('\u2713 Containers stopped');
+                });
+            }
+        } else {
+            console.log('\u2713 Headlamp stopped');
+        }
 
         // Ask if user wants to stop the cluster too
         const readline = require('readline');
@@ -90859,18 +91043,18 @@ const cleanup = () => {
             output: process.stdout
         });
 
-        rl.question('\\\\x1b[33mDo you want to stop the k3d cluster as well? (y/N): \\\\x1b[0m', (answer) => {
+        rl.question('Do you want to stop the k3d cluster as well? (y/N): ', (answer) => {
             if (answer.toLowerCase() === 'y') {
-                console.log(\`\\\\x1b[33mStopping cluster "\${CLUSTER_NAME}"...\\\\x1b[0m\`);
+                console.log(\`Stopping cluster "\${CLUSTER_NAME}"...\`);
                 exec(\`k3d cluster stop \${CLUSTER_NAME}\`, () => {
-                    console.log('\\\\x1b[32m\u2713 Cluster stopped\\\\x1b[0m');
-                    console.log('\\\\x1b[90m(Run "npm run cluster:delete" to permanently delete the cluster)\\\\x1b[0m');
+                    console.log('\u2713 Cluster stopped');
+                    console.log('(Run "npm run cluster:delete" to permanently delete the cluster)');
                     try { fs.unlinkSync(RUNTIME_FILE); } catch (e) { }
                     rl.close();
                     process.exit(0);
                 });
             } else {
-                console.log('\\\\x1b[90m(Cluster is still running. Run "npm run cluster:stop" to stop it later)\\\\x1b[0m');
+                console.log('(Cluster is still running. Run "npm run cluster:stop" to stop it later)');
                 try { fs.unlinkSync(RUNTIME_FILE); } catch (e) { }
                 rl.close();
                 process.exit(0);
@@ -90884,6 +91068,65 @@ process.on('SIGTERM', cleanup);
 
 main().catch(console.error);`;
 
+// ../../packages/template/services/k3d-headlamp/stop.ts
+var stopJs2 = `const fs = require('fs');
+const { exec, execSync } = require('child_process');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+// Read runtime file
+let runtimeData = null;
+try {
+    const content = fs.readFileSync(RUNTIME_FILE, 'utf8');
+    runtimeData = JSON.parse(content);
+} catch (e) {
+    console.log('No runtime file found. Trying to clean up any remaining containers...');
+}
+
+// Try to call the running server's stop endpoint first
+if (runtimeData && runtimeData.port) {
+    console.log('Sending stop signal to running server...');
+    fetch(\`http://localhost:\${runtimeData.port}/stop\`)
+        .then(() => {
+            console.log('\u2713 Stop signal sent');
+            process.exit(0);
+        })
+        .catch(() => {
+            console.log('Server not responding. Cleaning up containers directly...');
+            cleanupContainers();
+        });
+} else {
+    cleanupContainers();
+}
+
+function cleanupContainers() {
+    // Stop docker compose containers
+    console.log('Stopping docker compose containers...');
+    exec('docker compose down --remove-orphans', { cwd: __dirname }, (err, stdout, stderr) => {
+        if (err) {
+            console.log('docker compose down failed. Trying to stop containers by ID...');
+            
+            // Try stopping by container IDs from runtime file
+            if (runtimeData && runtimeData.containerIds && runtimeData.containerIds.length > 0) {
+                const ids = runtimeData.containerIds.join(' ');
+                execSync(\`docker stop \${ids} 2>/dev/null || true\`, { stdio: 'inherit' });
+                execSync(\`docker rm \${ids} 2>/dev/null || true\`, { stdio: 'inherit' });
+            }
+        }
+        
+        console.log('\u2713 Headlamp containers stopped');
+        
+        // Clean up runtime file
+        try { fs.unlinkSync(RUNTIME_FILE); } catch (e) { }
+        
+        console.log('');
+        console.log('Note: The k3d cluster is still running.');
+        console.log('To stop it: npm run cluster:stop');
+        console.log('To delete it: npm run cluster:delete');
+    });
+}`;
+
 // ../../packages/template/services/k3d-headlamp/readme.ts
 var readmeContent = `# K3d + Headlamp Learning Environment
 
@@ -90891,9 +91134,9 @@ A local Kubernetes learning environment using k3d (k3s in Docker) and Headlamp (
 
 ## \u{1F680} Quick Start
 
-\\\`\\\`\\\`bash
+\`\`\`bash
 npm run start
-\\\`\\\`\\\`
+\`\`\`
 
 This will:
 1. Check if k3d is installed
@@ -90905,20 +91148,20 @@ This will:
 
 - **Docker**: Required for running k3d
 - **k3d**: Install using one of these methods:
-  - \\\`curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash\\\`
-  - \\\`brew install k3d\\\` (macOS)
-  - \\\`choco install k3d\\\` (Windows)
+  - \`curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash\`
+  - \`brew install k3d\` (macOS)
+  - \`choco install k3d\` (Windows)
 
 ## \u{1F527} Available Commands
 
 | Command | Description |
 |---------|-------------|
-| \\\`npm run start\\\` | Start the learning environment |
-| \\\`npm run stop\\\` | Stop Headlamp and optionally the cluster |
-| \\\`npm run cluster:start\\\` | Start the k3d cluster |
-| \\\`npm run cluster:stop\\\` | Stop the k3d cluster |
-| \\\`npm run cluster:delete\\\` | Delete the k3d cluster |
-| \\\`npm run cluster:info\\\` | Show cluster information |
+| \`npm run start\` | Start the learning environment |
+| \`npm run stop\` | Stop Headlamp and optionally the cluster |
+| \`npm run cluster:start\` | Start the k3d cluster |
+| \`npm run cluster:stop\` | Stop the k3d cluster |
+| \`npm run cluster:delete\` | Delete the k3d cluster |
+| \`npm run cluster:info\` | Show cluster information |
 
 ## \u{1F393} Learning Resources
 
@@ -90937,36 +91180,36 @@ This will:
 ## \u{1F4DA} Quick Examples
 
 ### Deploy Nginx
-\\\`\\\`\\\`bash
+\`\`\`bash
 kubectl create deployment nginx --image=nginx
 kubectl expose deployment nginx --port=80 --type=NodePort
 kubectl get services
-\\\`\\\`\\\`
+\`\`\`
 
 ### Deploy a Pod
-\\\`\\\`\\\`bash
+\`\`\`bash
 kubectl run my-pod --image=nginx --restart=Never
 kubectl get pods
 kubectl logs my-pod
-\\\`\\\`\\\`
+\`\`\`
 
 ### Create a Namespace
-\\\`\\\`\\\`bash
+\`\`\`bash
 kubectl create namespace dev
 kubectl get namespaces
-\\\`\\\`\\\`
+\`\`\`
 
 ### Scale Deployment
-\\\`\\\`\\\`bash
+\`\`\`bash
 kubectl scale deployment nginx --replicas=3
 kubectl get pods -w
-\\\`\\\`\\\`
+\`\`\`
 
 ### Apply YAML Configuration
-\\\`\\\`\\\`bash
+\`\`\`bash
 kubectl apply -f my-deployment.yaml
 kubectl get all
-\\\`\\\`\\\`
+\`\`\`
 
 ## \u{1F3D7}\uFE0F Cluster Architecture
 
@@ -90976,23 +91219,149 @@ The k3d cluster created has:
 - LoadBalancer exposed on ports 8080 (HTTP) and 8443 (HTTPS)
 - API server on port 6443
 
+## \u2795 Adding More Clusters to Headlamp
+
+Headlamp supports connecting to multiple Kubernetes clusters. Here are the different ways to add clusters:
+
+### Method 1: Via Headlamp UI (Recommended)
+
+Dynamic cluster management is enabled by default. To add a new cluster:
+
+1. Open Headlamp at **http://localhost:7000**
+2. Click **\u2699\uFE0F Settings** in the left sidebar
+3. Click **"Add Cluster"**
+4. Fill in the cluster details:
+   - **Name**: A friendly name for the cluster
+   - **Server URL**: The API server URL (e.g., \`https://my-cluster:6443\`)
+   - **Authentication**: Choose token, certificate, or other auth method
+5. Click **Save**
+
+The cluster will appear in the cluster selector dropdown.
+
+### Method 2: Edit kubeconfig File
+
+Add cluster entries directly to the \`.kube/config\` file:
+
+\`\`\`yaml
+apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    server: https://cluster1:6443
+    insecure-skip-tls-verify: true
+  name: cluster1
+- cluster:
+    server: https://cluster2:6443
+    insecure-skip-tls-verify: true
+  name: cluster2
+contexts:
+- context:
+    cluster: cluster1
+    user: admin@cluster1
+  name: cluster1
+- context:
+    cluster: cluster2
+    user: admin@cluster2
+  name: cluster2
+current-context: cluster1
+users:
+- name: admin@cluster1
+  user:
+    client-certificate-data: <base64-cert>
+    client-key-data: <base64-key>
+- name: admin@cluster2
+  user:
+    token: <bearer-token>
+\`\`\`
+
+After editing, restart Headlamp:
+\`\`\`bash
+docker compose restart headlamp
+\`\`\`
+
+### Method 3: Merge Multiple kubeconfigs
+
+Combine kubeconfigs from multiple clusters:
+
+\`\`\`bash
+# Export kubeconfig from another k3d cluster
+k3d kubeconfig get another-cluster > another-cluster.yaml
+
+# Merge with existing config
+KUBECONFIG=./.kube/config:another-cluster.yaml kubectl config view --merge --flatten > merged-config.yaml
+
+# Replace the config
+mv merged-config.yaml ./.kube/config
+
+# Restart Headlamp
+docker compose restart headlamp
+\`\`\`
+
+### Method 4: Create Additional k3d Clusters
+
+Create a new k3d cluster and add it to Headlamp:
+
+\`\`\`bash
+# Create a new cluster
+k3d cluster create dev-cluster --api-port 6444
+
+# Get and merge its kubeconfig
+k3d kubeconfig get dev-cluster >> ./.kube/config
+
+# Restart Headlamp
+docker compose restart headlamp
+\`\`\`
+
+### Switching Between Clusters
+
+In Headlamp UI:
+1. Click the cluster name in the top-left corner
+2. Select the cluster you want to view from the dropdown
+
+Using kubectl:
+\`\`\`bash
+# List all contexts
+kubectl config get-contexts
+
+# Switch context
+kubectl config use-context dev-cluster
+\`\`\`
+
 ## \u2753 Troubleshooting
 
 ### Cluster not accessible
-\\\`\\\`\\\`bash
+\`\`\`bash
 k3d kubeconfig merge learning-cluster --kubeconfig-merge-default
 kubectl cluster-info
-\\\`\\\`\\\`
+\`\`\`
 
 ### Reset kubeconfig
-\\\`\\\`\\\`bash
+\`\`\`bash
 k3d kubeconfig get learning-cluster > ~/.kube/config
-\\\`\\\`\\\`
+\`\`\`
 
 ### View cluster logs
-\\\`\\\`\\\`bash
+\`\`\`bash
 docker logs k3d-learning-cluster-server-0
-\\\`\\\`\\\`
+\`\`\`
+
+### Headlamp shows "No clusters found"
+\`\`\`bash
+# Verify kubeconfig exists and is valid
+cat ./.kube/config
+
+# Restart Headlamp
+docker compose restart headlamp
+
+# Check Headlamp logs
+docker logs k3d-headlamp-headlamp-1
+\`\`\`
+
+### YAML parsing error in kubeconfig
+Ensure proper indentation (2 spaces per level). Use a YAML validator:
+\`\`\`bash
+python3 -c "import yaml; yaml.safe_load(open('./.kube/config'))"
+\`\`\`
 `;
 
 // ../../packages/template/services/k3d-headlamp.ts
@@ -91035,9 +91404,14 @@ var K3dHeadlampTemplate = {
       args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
+      action: "file",
+      file: "stop.js",
+      filecontent: stopJs2
+    },
+    {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+      args: ["pkg", "set", "scripts.stop=node stop.js"]
     },
     {
       action: "command",
@@ -91068,6 +91442,11 @@ var K3dHeadlampTemplate = {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "fontawesomeIcon=fas fa-dharmachakra text-blue-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
     }
   ]
 };
@@ -92710,6 +93089,28 @@ router20.post("/", async (req, res) => {
 });
 var stopTerminalWorkspace_default = router20;
 
+// src/routes/deleteWorkspace.ts
+var import_express25 = __toESM(require_express2());
+var import_fs_extra14 = __toESM(require_lib());
+var router21 = (0, import_express25.Router)();
+router21.post("/", async (req, res) => {
+  try {
+    const { workspace } = req.body;
+    if (!workspace || !workspace.path) {
+      res.status(400).json({ error: "Invalid workspace path" });
+      return;
+    }
+    if (await import_fs_extra14.default.pathExists(workspace.path)) {
+      await import_fs_extra14.default.remove(workspace.path);
+    }
+    res.json({ success: true, message: "Workspace deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting workspace:", error);
+    res.status(500).json({ error: "Failed to delete workspace" });
+  }
+});
+var deleteWorkspace_default = router21;
+
 // src/index.ts
 var args = process.argv.slice(2);
 var command = args[0];
@@ -92729,7 +93130,7 @@ if (command === "init") {
     process.exit(1);
   });
 }
-var app2 = (0, import_express25.default)();
+var app2 = (0, import_express26.default)();
 var port2 = config_default.apiPort;
 var isDevelopment = process.env.NODE_ENV === "development";
 var actualPort = port2;
@@ -92755,8 +93156,8 @@ app2.use((0, import_cors.default)({
   },
   credentials: true
 }));
-app2.use(import_express25.default.static("public"));
-app2.use(import_express25.default.json());
+app2.use(import_express26.default.static("public"));
+app2.use(import_express26.default.json());
 app2.use("/", tester_default);
 app2.use("/" + api_default.scanWorkspace, scanworkspace_default);
 app2.use("/" + api_default.stopProcess, stopcmd_default);
@@ -92779,8 +93180,9 @@ app2.use("/" + api_default.processTree, processUsage_default);
 app2.use("/" + api_default.docker, apidocker_default);
 app2.use("/" + api_default.availabletemplates, availabletemplates_default);
 app2.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
+app2.use("/" + api_default.deleteWorkspace, deleteWorkspace_default);
 var frontendPath = import_path21.default.join(__dirname, "../public");
-app2.use(import_express25.default.static(frontendPath));
+app2.use(import_express26.default.static(frontendPath));
 app2.get(/(.*)/, (req, res) => {
   res.sendFile(import_path21.default.join(frontendPath, "index.html"));
 });
