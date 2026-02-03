@@ -1,14 +1,14 @@
 
 services:
   db:
-    image: percona:8
+    image: mariadb:latest
     restart: always
     user: "${UID:-1000}:${GID:-1000}"
     environment:
-      - MYSQL_ROOT_PASSWORD=admin
-      - MYSQL_DATABASE=db
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=admin
+      - MARIADB_ROOT_PASSWORD=admin
+      - MARIADB_DATABASE=db
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=admin
 
     ports:
       - "3306:3306"
@@ -28,3 +28,5 @@ services:
     restart: always
     ports:
       - "8081:8080"
+    depends_on:
+      - db

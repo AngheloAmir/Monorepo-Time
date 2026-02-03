@@ -2,8 +2,8 @@ import type { ProjectTemplate } from "../../types";
 
 export const MySQL: ProjectTemplate = {
   name: "MySQL",
-  description: "MySQL (Percona 8 + Adminer)",
-  notes: "Uses Percona MySQL 8 and Adminer for management.",
+  description: "MySQL (MariaDB + Adminer)",
+  notes: "Uses MariaDB (MySQL compatible) and Adminer for management.",
   type: "database",
   category: "Database",
   icon: "fas fa-database text-blue-500",
@@ -14,14 +14,14 @@ export const MySQL: ProjectTemplate = {
       filecontent: `
 services:
   db:
-    image: percona:8
+    image: mariadb:latest
     restart: always
     user: "\${UID:-1000}:\${GID:-1000}"
     environment:
-      - MYSQL_ROOT_PASSWORD=admin
-      - MYSQL_DATABASE=db
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=admin
+      - MARIADB_ROOT_PASSWORD=admin
+      - MARIADB_DATABASE=db
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=admin
 
     ports:
       - "3306:3306"
@@ -41,6 +41,8 @@ services:
     restart: always
     ports:
       - "8081:8080"
+    depends_on:
+      - db
 `
     },
     {
@@ -64,7 +66,7 @@ const path = require("path");
 const RUNTIME_FILE = path.join(__dirname, ".runtime.json");
 const DATA_DIR = path.join(__dirname, "mysql-data");
 
-console.log("Starting MySQL (Percona 8 + Adminer)...");
+console.log("Starting MySQL (MariaDB + Adminer)...");
 
 // 1. Ensure data directory exists so it's owned by you
 if (!fs.existsSync(DATA_DIR)) {
@@ -146,10 +148,14 @@ const checkStatus = () => {
       console.log("\\n==================================================");
       console.log("MySQL is running!");
       console.log("--------------------------------------------------");
-      console.log(\`Connection: mysql://admin:admin@localhost:\${port}/db\`);
-      console.log("Admin UI:   http://localhost:8081");
-      console.log("Username:   admin");
-      console.log("Password:   admin");
+      console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${port}/db\`);
+      console.log("--------------------------------------------------");
+      console.log("Adminer Login Details:");
+      console.log("  URL:      http://localhost:8081/?server=db&username=admin&db=db");
+      console.log("  Server:   db");
+      console.log("  Username: admin");
+      console.log("  Password: admin");
+      console.log("  Database: db");
       console.log("==================================================\\n");
     });
   });

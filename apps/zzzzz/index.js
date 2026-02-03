@@ -7,7 +7,7 @@ const path = require("path");
 const RUNTIME_FILE = path.join(__dirname, ".runtime.json");
 const DATA_DIR = path.join(__dirname, "mysql-data");
 
-console.log("Starting MySQL (Percona 8 + Adminer)...");
+console.log("Starting MySQL (MariaDB + Adminer)...");
 
 // 1. Ensure data directory exists so it's owned by you
 if (!fs.existsSync(DATA_DIR)) {
@@ -89,10 +89,14 @@ const checkStatus = () => {
       console.log("\n==================================================");
       console.log("MySQL is running!");
       console.log("--------------------------------------------------");
-      console.log(`Connection: mysql://admin:admin@localhost:${port}/db`);
-      console.log("Admin UI:   http://localhost:8081");
-      console.log("Username:   admin");
-      console.log("Password:   admin");
+      console.log(`Local Connection URI: mysql://admin:admin@localhost:${port}/db`);
+      console.log("--------------------------------------------------");
+      console.log("Adminer Login Details:");
+      console.log("  URL:      http://localhost:8081/?server=db&username=admin&db=db");
+      console.log("  Server:   db");
+      console.log("  Username: admin");
+      console.log("  Password: admin");
+      console.log("  Database: db");
       console.log("==================================================\n");
     });
   });
