@@ -76,7 +76,7 @@ function Button2(props: ButtonProps) {
                 {/* Text Content */}
                 <div className="relative z-10 flex flex-col min-w-0 text-left">
                     <span className={`
-                        font-bold text-md truncate transition-colors duration-300
+                        font-bold text-sm truncate transition-colors duration-300
                         ${props.disabled ? 'text-gray-500' : (props.bg ? 'text-white' : 'text-gray-300 group-hover:text-white')}
                     `}
                     >

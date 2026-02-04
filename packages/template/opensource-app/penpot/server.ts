@@ -17,12 +17,18 @@ child.on('close', (code) => {
     const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
     
     const printImportant = (data) => {
-        const lines = data.toString().split('\\n');
+        const lines = data.toString().split('\n');
         lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            let cleanLine = line.replace(/^[^|]+\||\s+/, '');
             const lower = cleanLine.toLowerCase();
+
+            // Filter out specific "expected" errors during startup
+            if (lower.includes('connect() failed') || lower.includes('connection refused')) {
+                return;
+            }
+
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+                process.stdout.write('\x1b[31mError:\x1b[0m ' + cleanLine + '\n');
             }
         });
     };
@@ -61,8 +67,15 @@ const checkStatus = () => {
             return;
         }
 
-        // Verify Penpot is actually responding to HTTP
-        http.get(\`http://localhost:\${penpotPort}/\`, (res) => {
+        // Verify Penpot Backend is actually responding
+        // We check an API endpoint because the frontend might be up while backend is initializing (returning 502)
+        http.get(\`http://localhost:\${penpotPort}/api/main/methods/get-profile\`, (res) => {
+            if (res.statusCode >= 500) {
+                // Backend likely down (502 Bad Gateway)
+                setTimeout(checkStatus, 2000);
+                return;
+            }
+
              // Capture Container IDs
             exec('docker compose ps -q', (err2, stdout2) => {
                 const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];

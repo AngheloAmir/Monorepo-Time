@@ -4,8 +4,10 @@ import { MauticLocal } from "./opensource-app/mautic";
 import { EzBookkeepingLocal } from "./opensource-app/ezbookkeeping";
 import { PeppermintLocal } from "./opensource-app/peppermint";
 import { PenpotLocal } from "./opensource-app/penpot";
+import { DrawDBTool } from "./opensource-app/drawdb";
 
 const OpenSourceTemplates =  [
+    DrawDBTool,
     PenpotLocal,
     MattermostLocal,
     NextcloudLocal,

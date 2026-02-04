@@ -4,7 +4,6 @@ import { RedisCommanderTool } from "./tools/rediscommander";
 import { YaadeTool } from "./tools/yaade";
 import { MailpitTool } from "./tools/mailpit";
 import { CloudbeaverTool } from "./tools/cloudbeaver";
-import { DrawDBTool } from "./tools/drawdb";
 
 const tools: ProjectTemplate[] = [
     CloudbeaverTool,
@@ -12,6 +11,5 @@ const tools: ProjectTemplate[] = [
     RedisCommanderTool,
     YaadeTool,
     MailpitTool,
-    DrawDBTool
 ];
 export default tools;

@@ -87067,7 +87067,7 @@ process.on('SIGTERM', cleanup);`;
 
 // ../../packages/template/opensource-app/mattermost.ts
 var MattermostLocal = {
-  name: "Mattermost Local",
+  name: "Mattermost",
   description: "Mattermost Team",
   notes: "Open source version of Discord",
   type: "opensource-app",
@@ -87288,7 +87288,7 @@ process.on('SIGTERM', cleanup);`;
 
 // ../../packages/template/opensource-app/nextcloud.ts
 var NextcloudLocal = {
-  name: "Nextcloud Local",
+  name: "Nextcloud",
   description: "Nextcloud Office & Storage",
   notes: "Can be used with N8N that acts like GDrive",
   type: "opensource-app",
@@ -87514,7 +87514,7 @@ process.on('SIGTERM', cleanup);`;
 
 // ../../packages/template/opensource-app/mautic.ts
 var MauticLocal = {
-  name: "Mautic Local",
+  name: "Mautic",
   description: "Marketing Automation Platform",
   notes: "Local Mautic instance for testing workflows",
   type: "opensource-app",
@@ -87967,8 +87967,627 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
+// ../../packages/template/opensource-app/penpot/dockerCompose.ts
+var dockerCompose4 = `## Common flags:
+# demo-users
+# email-verification
+# log-emails
+# log-invitation-tokens
+# login-with-github
+# login-with-gitlab
+# login-with-google
+# login-with-ldap
+# login-with-oidc
+# login-with-password
+# prepl-server
+# registration
+# secure-session-cookies
+# smtp
+# smtp-debug
+# telemetry
+# webhooks
+##
+## You can read more about all available flags and other
+## environment variables here:
+## https://help.penpot.app/technical-guide/configuration/#penpot-configuration
+#
+# WARNING: if you're exposing Penpot to the internet, you should remove the flags
+# 'disable-secure-session-cookies' and 'disable-email-verification'
+x-flags: &penpot-flags
+  PENPOT_FLAGS: disable-email-verification enable-smtp enable-prepl-server disable-secure-session-cookies
+
+x-uri: &penpot-public-uri
+  PENPOT_PUBLIC_URI: http://localhost:9001
+
+x-body-size: &penpot-http-body-size
+  # Max body size (30MiB); Used for plain requests, should never be
+  # greater than multi-part size
+  PENPOT_HTTP_SERVER_MAX_BODY_SIZE: 31457280
+
+  # Max multipart body size (350MiB)
+  PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE: 367001600
+
+## Penpot SECRET KEY. It serves as a master key from which other keys for subsystems
+## (eg http sessions, or invitations) are derived.
+##
+## We recommend to use a trully randomly generated
+## 512 bits base64 encoded string here. You can generate one with:
+##
+## python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+x-secret-key: &penpot-secret-key
+  PENPOT_SECRET_KEY: change-this-insecure-key
+
+networks:
+  penpot:
+
+volumes:
+  penpot_postgres_v15:
+  penpot_assets:
+  # penpot_traefik:
+
+services:
+  ## Traefik service declaration example. Consider using it if you are going to expose
+  ## penpot to the internet, or a different host than \`localhost\`.
+
+  # traefik:
+  #   image: traefik:v3.3
+  #   networks:
+  #     - penpot
+  #   command:
+  #     - "--api.insecure=true"
+  #     - "--entryPoints.web.address=:80"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entryPoints.websecure.address=:443"
+  #     - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+  #     - "--certificatesresolvers.letsencrypt.acme.email=<EMAIL_ADDRESS>"
+  #     - "--certificatesresolvers.letsencrypt.acme.storage=/traefik/acme.json"
+  #   volumes:
+  #     - "penpot_traefik:/traefik"
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+
+  penpot-frontend:
+    image: "penpotapp/frontend:\${PENPOT_VERSION:-latest}"
+    restart: always
+    ports:
+      - 9001:8080
+
+    volumes:
+      - penpot_assets:/opt/data/assets
+
+    depends_on:
+      - penpot-backend
+      - penpot-exporter
+
+    networks:
+      - penpot
+
+    # labels:
+      # - "traefik.enable=true"
+
+      # ## HTTPS: example of labels for the case where penpot will be exposed to the
+      # ## internet with HTTPS using traefik.
+
+      # - "traefik.http.routers.penpot-https.rule=Host(\`<DOMAIN_NAME>\`)"
+      # - "traefik.http.routers.penpot-https.entrypoints=websecure"
+      # - "traefik.http.routers.penpot-https.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.penpot-https.tls=true"
+
+    environment:
+      << : [*penpot-flags, *penpot-http-body-size]
+
+  penpot-backend:
+    image: "penpotapp/backend:\${PENPOT_VERSION:-latest}"
+    restart: always
+
+    volumes:
+      - penpot_assets:/opt/data/assets
+
+    depends_on:
+      penpot-postgres:
+        condition: service_healthy
+      penpot-valkey:
+        condition: service_healthy
+
+    networks:
+      - penpot
+
+    ## Configuration envronment variables for the backend container.
+
+    environment:
+      << : [*penpot-flags, *penpot-public-uri, *penpot-http-body-size, *penpot-secret-key]
+
+      ## Database connection parameters. Don't touch them unless you are using custom
+      ## postgresql connection parameters.
+
+      PENPOT_DATABASE_URI: postgresql://penpot-postgres/penpot
+      PENPOT_DATABASE_USERNAME: penpot
+      PENPOT_DATABASE_PASSWORD: penpot
+
+      ## Valkey (or previously redis) is used for the websockets notifications. Don't touch
+      ## unless the valkey container has different parameters or different name.
+
+      PENPOT_REDIS_URI: redis://penpot-valkey/0
+
+      ## Default configuration for assets storage: using filesystem based with all files
+      ## stored in a docker volume.
+
+      PENPOT_OBJECTS_STORAGE_BACKEND: fs
+      PENPOT_OBJECTS_STORAGE_FS_DIRECTORY: /opt/data/assets
+
+      ## Also can be configured to to use a S3 compatible storage.
+
+      # AWS_ACCESS_KEY_ID: <KEY_ID>
+      # AWS_SECRET_ACCESS_KEY: <ACCESS_KEY>
+      # PENPOT_OBJECTS_STORAGE_BACKEND: s3
+      # PENPOT_OBJECTS_STORAGE_S3_ENDPOINT: <ENDPOINT>
+      # PENPOT_OBJECTS_STORAGE_S3_BUCKET: <BUKET_NAME>
+
+      ## Telemetry. When enabled, a periodical process will send anonymous data about this
+      ## instance. Telemetry data will enable us to learn how the application is used,
+      ## based on real scenarios. If you want to help us, please leave it enabled. You can
+      ## audit what data we send with the code available on github.
+
+      PENPOT_TELEMETRY_ENABLED: true
+      PENPOT_TELEMETRY_REFERER: compose
+
+      ## Example SMTP/Email configuration. By default, emails are sent to the mailcatch
+      ## service, but for production usage it is recommended to setup a real SMTP
+      ## provider. Emails are used to confirm user registrations & invitations. Look below
+      ## how the mailcatch service is configured.
+
+      PENPOT_SMTP_DEFAULT_FROM: no-reply@example.com
+      PENPOT_SMTP_DEFAULT_REPLY_TO: no-reply@example.com
+      PENPOT_SMTP_HOST: penpot-mailcatch
+      PENPOT_SMTP_PORT: 1025
+      PENPOT_SMTP_USERNAME:
+      PENPOT_SMTP_PASSWORD:
+      PENPOT_SMTP_TLS: false
+      PENPOT_SMTP_SSL: false
+
+  penpot-exporter:
+    image: "penpotapp/exporter:\${PENPOT_VERSION:-latest}"
+    restart: always
+
+    depends_on:
+      penpot-valkey:
+        condition: service_healthy
+
+    networks:
+      - penpot
+
+    environment:
+      << : [*penpot-secret-key]
+      # Don't touch it; this uses an internal docker network to
+      # communicate with the frontend.
+      PENPOT_PUBLIC_URI: http://penpot-frontend:8080
+
+      ## Valkey (or previously Redis) is used for the websockets notifications.
+      PENPOT_REDIS_URI: redis://penpot-valkey/0
+
+  penpot-postgres:
+    image: "postgres:15"
+    restart: always
+    stop_signal: SIGINT
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U penpot"]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+      start_period: 2s
+
+    volumes:
+      - penpot_postgres_v15:/var/lib/postgresql/data
+
+    networks:
+      - penpot
+
+    environment:
+      - POSTGRES_INITDB_ARGS=--data-checksums
+      - POSTGRES_DB=penpot
+      - POSTGRES_USER=penpot
+      - POSTGRES_PASSWORD=penpot
+
+  penpot-valkey:
+    image: valkey/valkey:8.1
+    restart: always
+
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+
+    networks:
+      - penpot
+
+    environment:
+      # You can increase the max memory size if you have sufficient resources,
+      # although this should not be necessary.
+      - VALKEY_EXTRA_FLAGS=--maxmemory 128mb --maxmemory-policy volatile-lfu
+
+  ## A mailcatch service, used as temporal SMTP server. You can access via HTTP to the
+  ## port 1080 for read all emails the penpot platform has sent. Should be only used as a
+  ## temporal solution while no real SMTP provider is configured.
+
+  penpot-mailcatch:
+    image: sj26/mailcatcher:latest
+    restart: always
+    expose:
+      - '1025'
+    ports:
+      - "1080:1080"
+    networks:
+      - penpot
+`;
+
+// ../../packages/template/opensource-app/penpot/gitignore.ts
+var gitignoreContent4 = `# Runtime file
+.runtime.json
+`;
+
+// ../../packages/template/opensource-app/penpot/server.ts
+var serverJs4 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting Penpot Design Tool...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('
+');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+||s+/, '');
+            const lower = cleanLine.toLowerCase();
+
+            // Filter out specific "expected" errors during startup
+            if (lower.includes('connect() failed') || lower.includes('connection refused')) {
+                return;
+            }
+
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\x1B[31mError:\x1B[0m ' + cleanLine + '
+');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    const port = server.address().port;
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port penpot-frontend 8080', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const penpotPort = stdout.trim().split(':')[1];
+        if (!penpotPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify Penpot Backend is actually responding
+        // We check an API endpoint because the frontend might be up while backend is initializing (returning 502)
+        http.get(\`http://localhost:\${penpotPort}/api/main/methods/get-profile\`, (res) => {
+            if (res.statusCode >= 500) {
+                // Backend likely down (502 Bad Gateway)
+                setTimeout(checkStatus, 2000);
+                return;
+            }
+
+             // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('\u{1F3A8} Penpot - Open Source Design & Prototyping');
+                console.log('==================================================');
+                console.log(\`Web UI:            http://localhost:\${penpotPort}\`);
+                console.log(\`MailCatcher:       http://localhost:9002\`);
+                console.log('--------------------------------------------------');
+                console.log('\u{1F464} Setup Account:');
+                console.log('   Open the Web UI and create a new account.');
+                console.log('   Verify email using MailCatcher (port 9002).');
+                console.log('--------------------------------------------------');
+                console.log('\u{1F4DA} Resources:');
+                console.log('   Docs: https://help.penpot.app/');
+                console.log('   GitHub: https://github.com/penpot/penpot');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            // Connection failed (ECONNREFUSED usually), retry
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 5000);
+
+const cleanup = () => {
+    console.log('Stopping Penpot...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/penpot.ts
+var PenpotLocal = {
+  name: "Penpot",
+  description: "Open Source Design & Prototyping Platform",
+  notes: "Self-hosted alternative to Figma. Requires Docker.",
+  type: "opensource-app",
+  category: "Open Source",
+  icon: "fas fa-pen-nib text-green-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose4
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent4
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs4
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Penpot Design Tool (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-pen-nib text-purple-500"]
+    }
+  ]
+};
+
+// ../../packages/template/opensource-app/drawdb.ts
+var DrawDBTool = {
+  name: "DrawDB",
+  description: "Free, simple, and intuitive database design tool and SQL generator.",
+  notes: "Requires Docker. Runs locally. Github: https://github.com/drawdb-io/drawdb",
+  type: "tool",
+  category: "Tool",
+  icon: "fas fa-project-diagram text-blue-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `services:
+  drawdb:
+    image: ghcr.io/drawdb-io/drawdb:latest
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "8543:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting DrawDB...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port drawdb 80', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const port = stdout.trim().split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify drawdb is responding
+        http.get(\`http://localhost:\${port}\`, (res) => {
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+
+                process.stdout.write('\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('DrawDB is running!');
+                console.log('--------------------------------------------------');
+                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log('--------------------------------------------------');
+                console.log('Free, simple, and intuitive database design tool.');
+                console.log('Github: https://github.com/drawdb-io/drawdb');
+                console.log('==================================================\\n');
+            });
+        }).on('error', () => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping DrawDB...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=DrawDB - Database Design Tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-project-diagram text-blue-500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    }
+  ]
+};
+
 // ../../packages/template/opensource.ts
 var OpenSourceTemplates = [
+  DrawDBTool,
+  PenpotLocal,
   MattermostLocal,
   NextcloudLocal,
   MauticLocal,
@@ -89510,7 +90129,7 @@ var templates3 = [
 var projecttemplate_default = templates3;
 
 // ../../packages/template/services/n8n/dockerCompose.ts
-var dockerCompose4 = `services:
+var dockerCompose5 = `services:
   n8n:
     image: n8nio/n8n:2.7.1
     pull_policy: if_not_present
@@ -89538,12 +90157,12 @@ volumes:
   n8n_data:`;
 
 // ../../packages/template/services/n8n/gitignore.ts
-var gitignoreContent4 = `# Runtime file
+var gitignoreContent5 = `# Runtime file
 .runtime.json
 `;
 
 // ../../packages/template/services/n8n/server.ts
-var serverJs4 = `const http = require('http');
+var serverJs5 = `const http = require('http');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -89665,17 +90284,17 @@ var N8NLocal = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose4
+      filecontent: dockerCompose5
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent4
+      filecontent: gitignoreContent5
     },
     {
       action: "file",
       file: "index.js",
-      filecontent: serverJs4
+      filecontent: serverJs5
     },
     {
       action: "command",
@@ -90040,7 +90659,7 @@ module.exports = {
 };`;
 
 // ../../packages/template/services/aws/dockerCompose.ts
-var dockerCompose5 = `services:
+var dockerCompose6 = `services:
   localstack:
     image: localstack/localstack:4.0
     pull_policy: if_not_present
@@ -90089,7 +90708,7 @@ networks:
     driver: bridge`;
 
 // ../../packages/template/services/aws/gitignore.ts
-var gitignoreContent5 = `# LocalStack data folder
+var gitignoreContent6 = `# LocalStack data folder
 localstack-data/
 
 # Runtime file
@@ -90306,7 +90925,7 @@ dynamodb.createTable(params, function(err, data) {
 </html>`;
 
 // ../../packages/template/services/aws/server.ts
-var serverJs5 = `const http = require('http');
+var serverJs6 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec, execSync } = require('child_process');
@@ -90558,12 +91177,12 @@ var AWSTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose5
+      filecontent: dockerCompose6
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent5
+      filecontent: gitignoreContent6
     },
     {
       action: "file",
@@ -90573,7 +91192,7 @@ var AWSTemplate = {
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs5
+      filecontent: serverJs6
     },
     {
       action: "file",
@@ -90634,7 +91253,7 @@ var AWSTemplate = {
 };
 
 // ../../packages/template/services/stripe/dockerCompose.ts
-var dockerCompose6 = `services:
+var dockerCompose7 = `services:
   stripe-mock:
     image: stripe/stripe-mock:0.197.0
     pull_policy: if_not_present
@@ -90650,12 +91269,12 @@ var dockerCompose6 = `services:
 `;
 
 // ../../packages/template/services/stripe/gitignore.ts
-var gitignoreContent6 = `# Runtime file
+var gitignoreContent7 = `# Runtime file
 .runtime.json
 `;
 
 // ../../packages/template/services/stripe/server.ts
-var serverJs6 = `const http = require('http');
+var serverJs7 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -90819,17 +91438,17 @@ var StripeTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose6
+      filecontent: dockerCompose7
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent6
+      filecontent: gitignoreContent7
     },
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs6
+      filecontent: serverJs7
     },
     {
       action: "file",
@@ -90880,7 +91499,7 @@ var StripeTemplate = {
 };
 
 // ../../packages/template/services/k3d-headlamp/dockerCompose.ts
-var dockerCompose7 = `# K3d + Headlamp Docker Compose Configuration
+var dockerCompose8 = `# K3d + Headlamp Docker Compose Configuration
 # This file sets up Headlamp to connect to a k3d cluster
 # Note: k3d cluster is managed separately via k3d CLI
 
@@ -90915,14 +91534,14 @@ volumes:
   headlamp_data:`;
 
 // ../../packages/template/services/k3d-headlamp/gitignore.ts
-var gitignoreContent7 = `.runtime.json
+var gitignoreContent8 = `.runtime.json
 node_modules/
 .env.local
 .kube/
 *.log`;
 
 // ../../packages/template/services/k3d-headlamp/server.ts
-var serverJs7 = `const http = require('http');
+var serverJs8 = `const http = require('http');
 const { spawn, exec, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -91599,17 +92218,17 @@ var K3dHeadlampTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose7
+      filecontent: dockerCompose8
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent7
+      filecontent: gitignoreContent8
     },
     {
       action: "file",
       file: "index.js",
-      filecontent: serverJs7
+      filecontent: serverJs8
     },
     {
       action: "file",

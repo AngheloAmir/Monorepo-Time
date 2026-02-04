@@ -13,10 +13,10 @@ interface NetworkProps {
 }
 
 export default function NetworkUtility(props: NetworkProps) {
-    const terminalRef                         = useRef<InteractiveTerminalRef>(null);
-    const rootDir                             = useAppState.use.rootDir();
-    const [isRunning, setIsRunning]           = useState(false);
-    const showModal                           = useModal.use.showModal();
+    const terminalRef = useRef<InteractiveTerminalRef>(null);
+    const rootDir = useAppState.use.rootDir();
+    const [isRunning, setIsRunning] = useState(false);
+    const showModal = useModal.use.showModal();
 
     useEffect(() => {
         if (config.useDemo) {
@@ -62,8 +62,8 @@ export default function NetworkUtility(props: NetworkProps) {
                 command.label,
                 command.confirmMessage ?? "",
                 "warning",
-                (value :any) => {
-                    if(value) {
+                (value: any) => {
+                    if (value) {
                         const cleanInput = value.trim();
                         if (!cleanInput && !command.cmd.includes("docker stats")) {
                             if (!command.inputPlaceholder?.includes("Optional")) {
@@ -111,30 +111,30 @@ export default function NetworkUtility(props: NetworkProps) {
                     </div>
                 </div>
 
-                {/* Right Panel - Terminal */}
-                <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden border border-white/[0.08] shadow-[0_0_100px_-20px_rgba(6,182,212,0.15)] bg-[#0c0c0c]">
+                <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden border border-white/[0.08] shadow-[0_0_100px_-20px_rgba(168,85,247,0.3)]">
                     <TerminalHeader
-                        title="Output Terminal"
+                        title="Terminal Output"
                         description="Real-time command execution results"
                         icon="fas fa-terminal"
                         handleStop={handleStop}
                         isRunning={isRunning}
                     >
                         <div className="flex items-center gap-2 text-xs text-gray-400">
-                            <i className="fas fa-info-circle"></i>
                             <span>Results will appear here automatically</span>
                         </div>
                     </TerminalHeader>
 
-                    {/* Terminal Body */}
-                    <div className="w-full flex-1 min-h-0 p-1 bg-black/40">
+                    <div className="w-full flex-1 min-h-0 p-2 bg-black/20">
                         <InteractiveTerminal
                             ref={terminalRef}
-                            isInteractive={true}
                             className="h-full w-full"
                             socketUrl={config.serverPath}
-                            onExit={() => setIsRunning(false)}
-                            onCrash={() => setIsRunning(false)}
+                            onExit={() => {
+                                setIsRunning(false);
+                            }}
+                            onCrash={() => {
+                                setIsRunning(false);
+                            }}
                         />
                     </div>
                 </div>
