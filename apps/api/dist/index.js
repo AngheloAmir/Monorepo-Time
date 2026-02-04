@@ -85219,6 +85219,7 @@ node_modules/
       file: "index.js",
       filecontent: `
 const http = require("http");
+const os = require("os");
 const { spawn, exec, execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -85357,13 +85358,43 @@ async function main() {
             console.log("CloudBeaver Setup Instructions:");
             console.log("1. Open CloudBeaver");
             console.log("2. Create a new connection -> MariaDB");
-            console.log("3. Host: localhost");
+
+            // Detect IP for Docker/CloudBeaver usage
+            let cloudBeaverHost = "localhost";
+            if (process.platform === "win32" || process.platform === "darwin") {
+                cloudBeaverHost = "host.docker.internal";
+            } else {
+                try {
+                    const nets = os.networkInterfaces();
+                    for (const name of Object.keys(nets)) {
+                        for (const net of nets[name]) {
+                            // Find IPv4 that is not internal 
+                            if (net.family === "IPv4" && !net.internal) {
+                                cloudBeaverHost = net.address;
+                                break; // Take the first valid one (LAN or Docker Bridge)
+                            }
+                        }
+                        if (cloudBeaverHost !== "localhost") break;
+                    }
+                } catch(e) {}
+            }
+
+            process.stdout.write("\\x1Bc"); 
+            console.log("\\n==================================================");
+            console.log("MySQL is running!");
+            console.log("--------------------------------------------------");
+            console.log(\`Local Application URI: mysql://admin:admin@localhost:\${DB_PORT}/db\`);
+            console.log("--------------------------------------------------");
+            console.log("CloudBeaver (Docker) Setup Instructions:");
+            console.log("1. Open CloudBeaver");
+            console.log("2. Create a new connection -> MariaDB");
+            console.log(\`3. Host: \${cloudBeaverHost}\`);
             console.log(\`4. Port: \${DB_PORT}\`);
             console.log("5. Database: db");
             console.log("6. Username: admin");
             console.log("7. Password: admin");
             console.log("==================================================\\n");
-            console.log("Note: It takes a minute for the database to fully initialize");
+            console.log("Note: Database instantiation may take up to a minute.");
           });
         });
     };

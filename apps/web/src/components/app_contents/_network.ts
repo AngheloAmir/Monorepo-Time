@@ -100,12 +100,12 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 color: 'cyanBlue'
             },
             {
-                label: 'All Containers',
-                displayCmd: 'docker ps -a',
-                cmd: 'docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"',
-                cmdWindow: 'docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"',
-                cmdMac: 'docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"',
-                icon: 'fa-boxes',
+                label: 'Gateway IPs',
+                displayCmd: 'docker network gateways',
+                cmd: 'docker network inspect $(docker network ls -q) --format \'{{printf "%-25s" .Name}} {{range .IPAM.Config}}{{.Gateway}}{{end}}\'',
+                cmdWindow: 'docker network inspect $(docker network ls -q) --format "{{printf \\"%-25s\\" .Name}} {{range .IPAM.Config}}{{.Gateway}}{{end}}"',
+                cmdMac: 'docker network inspect $(docker network ls -q) --format \'{{printf "%-25s" .Name}} {{range .IPAM.Config}}{{.Gateway}}{{end}}\'',
+                icon: 'fa-network-wired',
                 color: 'gray'
             },
             {
