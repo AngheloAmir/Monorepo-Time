@@ -87,6 +87,7 @@ const checkStatus = () => {
                 console.log('--------------------------------------------------');
                 console.log('📝 First Time Setup:');
                 console.log('   Create admin account on first visit');
+                console.log('   If it takes too much time to load, refresh the page');
                 console.log('--------------------------------------------------');
                 console.log('🔗 n8n Integration:');
                 console.log('   n8n has a native Nextcloud node!');

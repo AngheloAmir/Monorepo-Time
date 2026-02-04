@@ -1,7 +1,7 @@
 {
   "name": "z-db-checker",
   "version": "1.0.0",
-  "description": "",
+  "description": "Database checker if they run properly",
   "fontawesomeIcon": "fa fa-cube text-blue-500",
   "scripts": {
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"

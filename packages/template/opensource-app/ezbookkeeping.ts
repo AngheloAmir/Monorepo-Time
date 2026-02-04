@@ -135,6 +135,7 @@ const checkStatus = () => {
              console.log('--------------------------------------------------');
              console.log('📝 First Time Setup:');
              console.log('   Create account on first visit');
+             console.log('Note: If it takes too much time to load or error, refresh the page');
              console.log('--------------------------------------------------');
              console.log('🔗 n8n Integration:');
              console.log('   Use HTTP Request node with the API');

@@ -92,6 +92,7 @@ const checkStatus = () => {
                 console.log('   n8n has a native Mautic node!');
                 console.log(\`   API URL: http://localhost:\${mauticPort}/api\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mautic/');
+                console.log('Note: If it takes too much time to load, refresh the page');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {
