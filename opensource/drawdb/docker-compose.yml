@@ -1,0 +1,12 @@
+services:
+  drawdb:
+    image: ghcr.io/drawdb-io/drawdb:latest
+    pull_policy: if_not_present
+    restart: unless-stopped
+    ports:
+      - "8543:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
