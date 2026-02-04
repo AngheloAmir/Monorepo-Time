@@ -1,6 +1,7 @@
 import type { ProjectTemplate } from "../types";
 import { ViteReact } from "./projects/vite-react";
 import { NextJS } from "./projects/nextjs";
+import { ExpoReactNative } from "./projects/expo-react-native";
 import { ExpressTS } from "./projects/express";
 import { ServerlessExpressTS } from "./projects/serverless-express";
 import { PHP } from "./projects/php";
@@ -12,6 +13,7 @@ import { StrapiLocal } from "./projects/strapi";
 const templates: ProjectTemplate[] = [
     ViteReact,
     NextJS,
+    ExpoReactNative,
     StrapiLocal,
     ExpressTS,
     ServerlessExpressTS,
