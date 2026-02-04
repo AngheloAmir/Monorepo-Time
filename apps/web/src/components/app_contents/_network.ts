@@ -128,6 +128,19 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 description: 'Remove unused data (force)'
             },
             {
+                label: 'Delete Image',
+                displayCmd: 'docker rmi',
+                cmd: 'docker rmi {{input}}',
+                cmdWindow: 'docker rmi {{input}}',
+                cmdMac: 'docker rmi {{input}}',
+                icon: 'fa-trash-alt',
+                color: 'red',
+                requiresInput: true,
+                inputLabel: 'Image ID or Name',
+                inputPlaceholder: 'e.g. my-image:latest',
+                confirmMessage: 'Are you sure you want to delete this image?'
+            },
+            {
                 label: 'Prune Networks',
                 displayCmd: 'docker network prune',
                 cmd: 'docker network prune -f',
