@@ -2,7 +2,7 @@
 interface TransparentCardProps {
     title: string;
     description: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
     contentClassName?: string;
 }
 
@@ -16,9 +16,11 @@ export default function TransparentCard(props: TransparentCardProps) {
                 </span>
                 <span className="ml-auto text-gray-600 text-xs">{props.description}</span>
             </div>
-            <div className={props.contentClassName ?? "p-2 grid grid-cols-2 gap-2"}>
-                {props.children}
-            </div>
+            { props.children ? (
+                <div className={props.contentClassName ?? "p-2 grid grid-cols-2 gap-2"}>
+                    {props.children}
+                </div>
+            ) : null}
         </div>
     )
 }

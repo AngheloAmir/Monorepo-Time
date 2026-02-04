@@ -94,8 +94,8 @@ export default function NetworkUtility(props: NetworkProps) {
                 <div className="w-[360px] lg:w-[440px] xl:w-[480px] flex-none h-full flex flex-col overflow-hidden">
                     <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                         {commandGroups.map((group) => (
-                            <TransparentCard key={group.title} title={group.title} description={`${group.commands.length} commands`}>
-                                {group.commands.map((c) => (
+                            <TransparentCard key={group.title} title={group.title} description={""}>
+                                {group.commands.length > 0 && group.commands.map((c) => (
                                     <Button2
                                         key={c.label}
                                         onClick={() => handleCommandClick(c)}
