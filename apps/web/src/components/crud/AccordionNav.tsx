@@ -39,12 +39,12 @@ export default function AccordionNav() {
     };
 
     return (
-        <div className="w-full flex flex-col gap-3 pb-10">
+        <div className="w-full flex flex-col pb-10">
             {crudData.map((category, catIndex) => (
                 <div key={catIndex} className="flex flex-col">
                     <button 
                         onClick={() => toggleCategory(catIndex)}
-                        className="flex items-center justify-between p-2 hover:bg-white/5 rounded-lg transition-colors group mb-1"
+                        className="flex items-center justify-between py-1 px-2 hover:bg-white/5 rounded-lg transition-colors group mb-1"
                     >
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-white transition-colors">
                             {category.category}
@@ -65,7 +65,7 @@ export default function AccordionNav() {
                     </button>
 
                     {openCategories[catIndex] && (
-                        <div className="flex flex-col gap-1 pl-2">
+                        <div className="flex flex-col pl-2">
                             {category.items.map((item, itemIndex) => {
                                 const isActive = catIndex === currentCategoryIndex && itemIndex === currentCrudIndex;
                                 return (
