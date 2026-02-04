@@ -299,6 +299,31 @@
                     "suggested": []
                 }
             ]
+        },
+        {
+            "category": "Database Check",
+            "devurl": "http://localhost:3500",
+            "produrl": "",
+            "items": [
+                {
+                    "label": "Postgres",
+                    "route": "/postgres",
+                    "methods": "POST",
+                    "description": "",
+                    "sampleInput": "{\n \"connectionString\": \"postgres://admin:admin@localhost:5432/db\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "MariaDB",
+                    "route": "/mariadb",
+                    "methods": "POST",
+                    "description": "",
+                    "sampleInput": "{\n \"connectionString\": \"mysql://admin:admin@localhost:3306/db\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                }
+            ]
         }
     ]
 }
