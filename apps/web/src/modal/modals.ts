@@ -12,9 +12,10 @@ interface modalContext {
     title:  string;
     message: string;
     data: any;
+    placeholder: string;
     callback: (result: any) => void | null;
     banner: ModalBanner;
-    showModal: (modal: ModalType, title: string, message: string, banner?: ModalBanner, callback?: (result: any) => void, data?: any) => void   ;
+    showModal: (modal: ModalType, title: string, message: string, banner?: ModalBanner, callback?: (result: any) => void, data?: any, placeholder?: string) => void   ;
     hideModal: () => void;
 }
 
@@ -29,12 +30,31 @@ const modalstate = create<modalContext>()((set) => ({
     message: "",
     banner: null,
     data: null,
+    placeholder: "",
     callback: () => {},
-    showModal: (modal: ModalType, title: string, message: string, banner?: ModalBanner, callback?: (result: any) => void, data?: any) => {
-        set({ modal, title, message, banner, callback, data, text: "" });
+    showModal: (modal: ModalType, title: string, message: string, banner?: ModalBanner, callback?: (result: any) => void, data?: any, placeholder?: string) => {
+        set({ 
+            modal, 
+            title, 
+            message, 
+            banner, 
+            callback, 
+            data, 
+            text: "", 
+            placeholder: placeholder || "" 
+        });
     },
     hideModal: () => {
-        set({ modal: null, title: "", message: "", banner: null, callback: () => {}, data: null, text: "" });
+        set({ 
+            modal: null, 
+            title: "", 
+            message: "", 
+            banner: null, 
+            callback: () => {}, 
+            data: null, 
+            text: "", 
+            placeholder: "" 
+        });
     }
 }));
 

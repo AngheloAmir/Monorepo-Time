@@ -96,7 +96,7 @@ export default function App() {
                         },
                         { 
                             name: 'network',
-                            label: 'Network',
+                            label: 'Network & Docker',
                             icon: 'fa fa-solid fa-network-wired',
                             isSelected: currentPage === 'network',
                             onClick: () => navAction.setCurrentPage('network') 

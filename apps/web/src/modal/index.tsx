@@ -11,6 +11,7 @@ export default function Modal() {
     const hideModal = useModal.use.hideModal();
     const banner = useModal.use.banner();
     const data = useModal.use.data();
+    const placeholder = useModal.use.placeholder();
 
     // Type Styling
     let iconClass = 'fa fa-info-circle text-blue-500';
@@ -113,7 +114,7 @@ export default function Modal() {
 
                             {currentModal === 'prompt' && (
                                 <div className="flex flex-col gap-4 justify-end mt-4">
-                                    <input value={text} onChange={(e) => setText(e.target.value)} type="text" className="w-full p-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold" />
+                                    <input value={text} placeholder={placeholder} onChange={(e) => setText(e.target.value)} type="text" className="w-full p-2 rounded-xl text-white bg-gray-600 hover:bg-gray-500 font-bold" />
                                     <div className="flex gap-4 justify-end mt-4">
                                         <button
                                             onClick={() => {
