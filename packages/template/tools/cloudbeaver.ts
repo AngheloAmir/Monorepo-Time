@@ -137,14 +137,14 @@ const checkStatus = () => {
                 console.log('  3. Use host.docker.internal for local DBs');
                 console.log('--------------------------------------------------');
                 console.log('Example connecting to PostgreSQL (if using Docker based template):');
-                console.log('  Host: host.docker.internal');
+                console.log('  Host: <look at PostgreSQL section in the terminal>');
                 console.log('  Port: 5432');
                 console.log('  User: admin');
                 console.log('  Password: admin');
                 console.log('  Database: db');
                 console.log('--------------------------------------------------');
                 console.log('Example connecting to MariaDB (if using Docker based template):');
-                console.log('  Host: host.docker.internal');
+                console.log('  Host: <look at MariaDB section in the terminal>');
                 console.log('  Port: 3306');
                 console.log('  User: admin');
                 console.log('  Password: admin');

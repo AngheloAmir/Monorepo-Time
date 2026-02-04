@@ -85490,6 +85490,7 @@ postgres-data/
       action: "file",
       file: "index.js",
       filecontent: `const http = require('http');
+const os = require('os');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -85521,6 +85522,12 @@ child.on('close', (code) => {
             const lower = cleanLine.toLowerCase();
             if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !lower.includes('database system is starting up')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+                
+                if (lower.includes('database "db" does not exist')) {
+                    console.log('\\n\\x1b[33mPossible Fix:\\x1b[0m It looks like you have an existing data volume.');
+                    console.log('              To fix this, delete the \\x1b[1m./postgres-data\\x1b[0m folder and restart.');
+                    console.log('              Command: \\x1b[1mrm -rf postgres-data\\x1b[0m\\n');
+                }
             }
         });
     };
@@ -85577,11 +85584,35 @@ const checkStatus = () => {
              console.log('\\n==================================================');
              console.log('PostgreSQL is running!');
              console.log('--------------------------------------------------');
-             console.log(\`Connection String: postgres://admin:admin@localhost:\${port}/db\`);
-             console.log('Username:          admin');
-             console.log('Password:          admin');
-             console.log('Database:          db');
-             console.log(\`Port:              \${port}\`);
+             console.log(\`Local Connection: postgres://admin:admin@localhost:\${port}/db\`);
+             console.log('--------------------------------------------------');
+
+             // Detect IP for Docker/CloudBeaver usage
+            let hostIp = "localhost";
+            if (process.platform === "win32" || process.platform === "darwin") {
+                hostIp = "host.docker.internal";
+            } else {
+                try {
+                    const nets = os.networkInterfaces();
+                    for (const name of Object.keys(nets)) {
+                        for (const net of nets[name]) {
+                            // Find IPv4 that is not internal 
+                            if (net.family === "IPv4" && !net.internal) {
+                                hostIp = net.address;
+                                break; // Take the first valid one (LAN or Docker Bridge)
+                            }
+                        }
+                        if (hostIp !== "localhost") break;
+                    }
+                } catch(e) {}
+            }
+
+             console.log('Docker/CloudBeaver Connection Info:');
+             console.log(\`  Host:            \${hostIp}\`);
+             console.log(\`  Port:            \${port}\`);
+             console.log('  Username:        admin');
+             console.log('  Password:        admin');
+             console.log('  Database:        db');
              console.log('--------------------------------------------------');
              console.log('To update to the latest version:');
              console.log('  docker pull postgres:16.2');
@@ -93248,14 +93279,14 @@ const checkStatus = () => {
                 console.log('  3. Use host.docker.internal for local DBs');
                 console.log('--------------------------------------------------');
                 console.log('Example connecting to PostgreSQL (if using Docker based template):');
-                console.log('  Host: host.docker.internal');
+                console.log('  Host: <look at PostgreSQL section in the terminal>');
                 console.log('  Port: 5432');
                 console.log('  User: admin');
                 console.log('  Password: admin');
                 console.log('  Database: db');
                 console.log('--------------------------------------------------');
                 console.log('Example connecting to MariaDB (if using Docker based template):');
-                console.log('  Host: host.docker.internal');
+                console.log('  Host: <look at MariaDB section in the terminal>');
                 console.log('  Port: 3306');
                 console.log('  User: admin');
                 console.log('  Password: admin');
