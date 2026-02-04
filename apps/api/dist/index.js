@@ -85182,7 +85182,7 @@ var MySQL = {
       filecontent: `
 services:
   db:
-    image: mariadb:latest
+    image: mariadb:12.1.2
     restart: always
     user: "\${UID:-1000}:\${GID:-1000}"
     environment:

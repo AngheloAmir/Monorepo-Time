@@ -322,6 +322,15 @@
                     "sampleInput": "{\n \"connectionString\": \"mysql://admin:admin@localhost:3306/db\"\n}",
                     "expectedOutcome": "",
                     "suggested": []
+                },
+                {
+                    "label": "Redis",
+                    "route": "/redis",
+                    "methods": "POST",
+                    "description": "",
+                    "sampleInput": "{\n \"connectionString\": \"redis://localhost:6379\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
                 }
             ]
         }

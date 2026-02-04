@@ -4,6 +4,7 @@ import cors from "cors";
 import helloRouter from "./routes/hello";
 import postgresRouter from "./routes/postgres";
 import mariadbRouter from "./routes/mariadb";
+import redisRouter from "./routes/redis";
 
 const app  = express();
 const port = process.env.PORT || 3500;
@@ -18,6 +19,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/hello", helloRouter);
 app.use("/postgres", postgresRouter);
 app.use("/mariadb", mariadbRouter);
+app.use("/redis", redisRouter);
 
 app.listen(port, () => {
     console.log("Server running at http://localhost:" + port);
