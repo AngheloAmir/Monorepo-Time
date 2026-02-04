@@ -88,6 +88,15 @@ export default function App() {
                             onClick: () => navAction.setCurrentPage('turborepo') 
                         },
                         { 
+                            name: 'crud',
+                            label: 'CRUD Tester',
+                            icon: 'fa fa-microscope',
+                            isSelected: currentPage === 'crud',
+                            onClick: () => navAction.setCurrentPage('crud') 
+                        },
+                    ]}
+                    extraNavs={[
+                        { 
                             name: 'cloudflare',
                             label: 'Cloudflare Tunnel',
                             icon: 'fa fa-solid fa-cloud',
@@ -101,23 +110,7 @@ export default function App() {
                             isSelected: currentPage === 'network',
                             onClick: () => navAction.setCurrentPage('network') 
                         },
-                        { 
-                            name: 'crud',
-                            label: 'CRUD Tester',
-                            icon: 'fa fa-microscope',
-                            isSelected: currentPage === 'crud',
-                            onClick: () => navAction.setCurrentPage('crud') 
-                        },
                     ]}
-                    // extraNavs={[
-                    //     {
-                    //         name: 'project-template',
-                    //         label: 'Project Template',
-                    //         icon: 'fas fa-file-code',
-                    //         isSelected: currentPage === 'project-template',
-                    //         onClick: () => navAction.setCurrentPage('project-template') 
-                    //     }
-                    // ]}
                 />
 
                 <main className="flex-1 relative overflow-hidden">

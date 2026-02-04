@@ -54,7 +54,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 inputPlaceholder: 'e.g., 8080',
                 confirmMessage: 'Are you sure you want to kill the process on this port?'
             },
-             {
+            {
                 label: 'Test TCP Port',
                 displayCmd: 'nc -zv',
                 cmd: 'nc -zv {{input}}',
@@ -127,6 +127,16 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 color: 'red',
                 description: 'Remove unused data (force)'
             },
+            {
+                label: 'Prune Networks',
+                displayCmd: 'docker network prune',
+                cmd: 'docker network prune -f',
+                cmdWindow: 'docker network prune -f',
+                cmdMac: 'docker network prune -f',
+                icon: 'fa-trash-alt',
+                color: 'yellowOrange',
+                confirmMessage: 'Remove all unused local networks? This fixes many "network not found" errors.'
+            },
         ]
     },
 
@@ -148,9 +158,9 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
             {
                 label: 'Docker Events',
                 displayCmd: 'docker events',
-                cmd: 'docker events --since 10m',
+                cmd: `docker events --since 10m --format '{{.Time}}|{{.Type}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}NO_NAME{{end}}|{{.Action}}|{{range $k, $v := .Actor.Attributes}}{{$k}}={{$v}} {{end}}' | while IFS='|' read -r t type name action attrs; do printf "%-10s %-12s %-30s %-20s %s\\n" "$(date -d @$t '+%H:%M:%S')" "$type" "$name" "$action" "$attrs"; done`,
                 cmdWindow: 'docker events --since 10m',
-                cmdMac: 'docker events --since 10m',
+                cmdMac: `docker events --since 10m --format '{{.Time}}|{{.Type}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}NO_NAME{{end}}|{{.Action}}|{{range $k, $v := .Actor.Attributes}}{{$k}}={{$v}} {{end}}' | while IFS='|' read -r t type name action attrs; do printf "%-10s %-12s %-30s %-20s %s\\n" "$(date -r $t '+%H:%M:%S')" "$type" "$name" "$action" "$attrs"; done`,
                 icon: 'fa-history',
                 color: 'blueIndigo'
             },
@@ -221,6 +231,25 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 color: 'red',
                 description: 'Restart Network Manager'
             },
+            {
+                label: 'Flush DNS',
+                displayCmd: 'resolvectl/ipconfig',
+                cmd: 'sudo resolvectl flush-caches || sudo systemd-resolve --flush-caches',
+                cmdWindow: 'ipconfig /flushdns',
+                cmdMac: 'sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder',
+                icon: 'fa-eraser',
+                color: 'blueIndigo'
+            },
+            {
+                label: 'Release/Renew IP',
+                displayCmd: 'dhclient -r',
+                cmd: 'sudo dhclient -r && sudo dhclient',
+                cmdWindow: 'ipconfig /release && ipconfig /renew',
+                cmdMac: 'sudo ipconfig set en0 DHCP',
+                icon: 'fa-sync-alt',
+                color: 'emeraldTeal',
+                confirmMessage: 'This will briefly disconnect your internet connection. Continue?'
+            },
         ]
     },
 
@@ -245,27 +274,27 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 icon: 'fa-fire-alt',
                 color: 'yellowOrange'
             },
-            { 
-                label: 'Dig (DNS)', 
+            {
+                label: 'Dig (DNS)',
                 displayCmd: 'dig +short',
-                cmd: 'dig {{input}} +short', 
+                cmd: 'dig {{input}} +short',
                 cmdWindow: 'nslookup {{input}}',
                 cmdMac: 'dig {{input}} +short',
-                icon: 'fa-search', 
+                icon: 'fa-search',
                 color: 'yellowOrange',
-                requiresInput: true, 
+                requiresInput: true,
                 inputLabel: 'Domain',
                 inputPlaceholder: 'example.com'
             },
-            { 
-                label: 'Container DNS Config', 
+            {
+                label: 'Container DNS Config',
                 displayCmd: 'cat /etc/resolv.conf',
-                cmd: 'docker exec {{input}} cat /etc/resolv.conf', 
+                cmd: 'docker exec {{input}} cat /etc/resolv.conf',
                 cmdWindow: 'docker exec {{input}} cat /etc/resolv.conf',
                 cmdMac: 'docker exec {{input}} cat /etc/resolv.conf',
-                icon: 'fa-file-alt', 
+                icon: 'fa-file-alt',
                 color: 'emeraldTeal',
-                requiresInput: true, 
+                requiresInput: true,
                 inputLabel: 'Container Name/ID',
                 inputPlaceholder: 'container_name'
             },
