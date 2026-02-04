@@ -29,6 +29,8 @@ export const dockerCompose = `services:
       - MAUTIC_RUN_CRON_JOBS=true
       - MAUTIC_ADMIN_EMAIL=admin@admin.com
       - MAUTIC_ADMIN_PASSWORD=admin
+      - PHP_MAX_EXECUTION_TIME=600
+      - PHP_MEMORY_LIMIT=1G
     ports:
       - "4310:80"
     volumes:

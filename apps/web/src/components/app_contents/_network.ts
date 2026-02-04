@@ -61,7 +61,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'powershell -Command "Test-NetConnection -ComputerName ({{input}} -replace \' .*$\', \'\') -Port ({{input}} -replace \'^.* \', \'\')"',
                 cmdMac: 'nc -zv {{input}}',
                 icon: 'fa-network-wired',
-                color: 'emeraldTeal',
+                color: 'blueIndigo',
                 requiresInput: true,
                 confirmMessage: 'Enter hostname and port (e.g., google.com 80)',
                 inputLabel: 'Host Port',
@@ -106,7 +106,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'docker network inspect $(docker network ls -q) --format "{{printf \\"%-25s\\" .Name}} {{range .IPAM.Config}}{{.Gateway}}{{end}}"',
                 cmdMac: 'docker network inspect $(docker network ls -q) --format \'{{printf "%-25s" .Name}} {{range .IPAM.Config}}{{.Gateway}}{{end}}\'',
                 icon: 'fa-network-wired',
-                color: 'gray'
+                color: 'emeraldTeal'
             },
             {
                 label: 'Images',
@@ -115,7 +115,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'docker images',
                 cmdMac: 'docker images',
                 icon: 'fa-compact-disc',
-                color: 'blueIndigo'
+                color: 'indigoFuchsia'
             },
             {
                 label: 'Prune',
@@ -153,7 +153,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
         ]
     },
 
-    { //docker network inspect mariadb_default
+    {
         title: 'Docker Debugging',
         commands: [
             {
@@ -175,7 +175,19 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'docker network ls',
                 cmdMac: 'docker network ls',
                 icon: 'fa-sitemap',
-                color: 'blueIndigo'
+                color: 'emeraldTeal'
+            },
+             {
+                label: 'Log Container',
+                displayCmd: 'docker logs',
+                cmd: 'docker logs {{input}} --tail 50',
+                cmdWindow: 'docker logs {{input}} --tail 50', 
+                cmdMac: 'docker logs {{input}} --tail 50',
+                icon: 'fa-globe',
+                color: 'cyanBlue',
+                requiresInput: true,
+                inputLabel: 'Container Name/ID',
+                inputPlaceholder: 'container_name'
             },
             {
                 label: 'Docker Events',
@@ -184,7 +196,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'docker events --since 10m',
                 cmdMac: `docker events --since 10m --format '{{.Time}}|{{.Type}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}NO_NAME{{end}}|{{.Action}}|{{range $k, $v := .Actor.Attributes}}{{$k}}={{$v}} {{end}}' | while IFS='|' read -r t type name action attrs; do printf "%-10s %-12s %-30s %-20s %s\\n" "$(date -r $t '+%H:%M:%S')" "$type" "$name" "$action" "$attrs"; done`,
                 icon: 'fa-history',
-                color: 'blueIndigo'
+                color: 'gray'
             },
             {
                 label: 'Inspect',
@@ -193,7 +205,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'docker network inspect {{input}}',
                 cmdMac: 'docker network inspect {{input}}',
                 icon: 'fa-globe',
-                color: 'cyanBlue',
+                color: 'indigoFuchsia',
                 requiresInput: true,
                 inputLabel: 'Container Name/ID',
                 inputPlaceholder: 'container_name'
@@ -217,7 +229,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'docker inspect -f "{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}" {{input}}', // Windows uses double quotes often
                 cmdMac: 'docker inspect -f \'{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}\' {{input}}',
                 icon: 'fa-fingerprint',
-                color: 'cyanBlue',
+                color: 'skyBlue',
                 requiresInput: true,
                 inputLabel: 'Container Name/ID',
                 inputPlaceholder: 'container_name'
@@ -263,7 +275,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'ipconfig /flushdns',
                 cmdMac: 'sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder',
                 icon: 'fa-eraser',
-                color: 'blueIndigo'
+                color: 'red'
             },
             {
                 label: 'Release/Renew IP',
@@ -272,7 +284,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'ipconfig /release && ipconfig /renew',
                 cmdMac: 'sudo ipconfig set en0 DHCP',
                 icon: 'fa-sync-alt',
-                color: 'emeraldTeal',
+                color: 'red',
                 confirmMessage: 'This will briefly disconnect your internet connection. Continue?'
             },
         ]
@@ -288,7 +300,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'netsh advfirewall show allprofiles',
                 cmdMac: 'sudo pfctl -s rules',
                 icon: 'fa-shield-alt',
-                color: 'red'
+                color: 'blueIndigo'
             },
             {
                 label: 'UFW Status',
@@ -297,7 +309,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'netsh advfirewall show allprofiles', // Fallback
                 cmdMac: 'sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate',
                 icon: 'fa-fire-alt',
-                color: 'yellowOrange'
+                color: 'emeraldTeal'
             },
             {
                 label: 'Dig (DNS)',
@@ -306,7 +318,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'nslookup {{input}}',
                 cmdMac: 'dig {{input}} +short',
                 icon: 'fa-search',
-                color: 'yellowOrange',
+                color: 'blueIndigo',
                 requiresInput: true,
                 inputLabel: 'Domain',
                 inputPlaceholder: 'example.com'
@@ -318,7 +330,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'docker exec {{input}} cat /etc/resolv.conf',
                 cmdMac: 'docker exec {{input}} cat /etc/resolv.conf',
                 icon: 'fa-file-alt',
-                color: 'emeraldTeal',
+                color: 'blueIndigo',
                 requiresInput: true,
                 inputLabel: 'Container Name/ID',
                 inputPlaceholder: 'container_name'
@@ -330,7 +342,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'netstat -ano | findstr :{{input}}',
                 cmdMac: 'lsof -i :{{input}}',
                 icon: 'fa-user-secret',
-                color: 'gray',
+                color: 'indigoFuchsia',
                 requiresInput: true,
                 inputLabel: 'Port Number',
                 inputPlaceholder: '8080'
@@ -342,7 +354,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'netstat -an | findstr ESTABLISHED',
                 cmdMac: 'netstat -an | grep ESTABLISHED',
                 icon: 'fa-project-diagram',
-                color: 'emeraldTeal'
+                color: 'indigoFuchsia'
             },
             {
                 label: 'ARP Table',
@@ -351,7 +363,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'arp -a',
                 cmdMac: 'arp -a',
                 icon: 'fa-table',
-                color: 'gray'
+                color: 'yellowOrange'
             },
             {
                 label: 'Network Errors',
@@ -360,7 +372,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'netstat -e',
                 cmdMac: 'netstat -i',
                 icon: 'fa-exclamation-triangle',
-                color: 'red'
+                color: 'yellowOrange'
             },
             {
                 label: 'Dropped Packets',
@@ -369,7 +381,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdWindow: 'netstat -e',
                 cmdMac: 'netstat -ib',
                 icon: 'fa-times-circle',
-                color: 'yellowOrange'
+                color: 'skyBlue'
             },
             {
                 label: 'MTU Values',

@@ -87321,6 +87321,7 @@ const checkStatus = () => {
                 console.log('--------------------------------------------------');
                 console.log('\u{1F4DD} First Time Setup:');
                 console.log('   Create admin account on first visit');
+                console.log('   If it takes too much time to load, refresh the page');
                 console.log('--------------------------------------------------');
                 console.log('\u{1F517} n8n Integration:');
                 console.log('   n8n has a native Nextcloud node!');
@@ -87432,6 +87433,8 @@ var dockerCompose3 = `services:
       - MAUTIC_RUN_CRON_JOBS=true
       - MAUTIC_ADMIN_EMAIL=admin@admin.com
       - MAUTIC_ADMIN_PASSWORD=admin
+      - PHP_MAX_EXECUTION_TIME=600
+      - PHP_MEMORY_LIMIT=1G
     ports:
       - "4310:80"
     volumes:
@@ -87552,6 +87555,7 @@ const checkStatus = () => {
                 console.log('   n8n has a native Mautic node!');
                 console.log(\`   API URL: http://localhost:\${mauticPort}/api\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mautic/');
+                console.log('Note: If it takes too much time to load, refresh the page');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {
@@ -87762,6 +87766,7 @@ const checkStatus = () => {
              console.log('--------------------------------------------------');
              console.log('\u{1F4DD} First Time Setup:');
              console.log('   Create account on first visit');
+             console.log('Note: If it takes too much time to load or error, refresh the page');
              console.log('--------------------------------------------------');
              console.log('\u{1F517} n8n Integration:');
              console.log('   Use HTTP Request node with the API');
@@ -87966,7 +87971,7 @@ const checkStatus = () => {
                     console.error('Failed to write runtime file:', e);
                 }
 
-                process.stdout.write('\\\\x1Bc');
+                process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('\u{1F33F} Peppermint Ticketing System');
                 console.log('==================================================');
