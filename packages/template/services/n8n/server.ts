@@ -23,7 +23,7 @@ child.on('close', (code) => {
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+\|\s+/, '');
             const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+            if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !lower.includes('starting migration') && !lower.includes('finished migration')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
                 
                 if (lower.includes('sqlite_error') || lower.includes('queryfailederror')) {
