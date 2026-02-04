@@ -6,6 +6,7 @@ import postgresRouter from "./routes/postgres";
 import mariadbRouter from "./routes/mariadb";
 import redisRouter from "./routes/redis";
 import mongodbRouter from "./routes/mongodb";
+import meilisearchRouter from "./routes/meilisearch";
 
 const app  = express();
 const port = process.env.PORT || 3500;
@@ -22,6 +23,7 @@ app.use("/postgres", postgresRouter);
 app.use("/mariadb", mariadbRouter);
 app.use("/redis", redisRouter);
 app.use("/mongodb", mongodbRouter);
+app.use("/meilisearch", meilisearchRouter);
 
 app.listen(port, () => {
     console.log("Server running at http://localhost:" + port);

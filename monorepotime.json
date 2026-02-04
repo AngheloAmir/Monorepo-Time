@@ -340,6 +340,15 @@
                     "sampleInput": "{\n \"connectionString\": \"mongodb://admin:admin@localhost:27017/db?authSource=admin\"\n}",
                     "expectedOutcome": "",
                     "suggested": []
+                },
+                {
+                    "label": "Meilisearch",
+                    "route": "/meilisearch",
+                    "methods": "POST",
+                    "description": "",
+                    "sampleInput": "{\n \"connectionString\": \"http://localhost:7700\",\n \"apiKey\": \"admin\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
                 }
             ]
         }
