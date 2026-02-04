@@ -104,21 +104,6 @@ export default function WorkspaceOptionModal() {
                     />
                 </div>
 
-                <InputField
-                    key="description"
-                    label="Description"
-                    icon="fas fa-info"
-                    placeholder="(optional) Description"
-                    value={workspaceCopy?.description || ''}
-                    onChange={(e) => {
-                        if (!workspaceCopy) return;
-                        setWorkspaceCopy({
-                            ...workspaceCopy,
-                            description: e.target.value
-                        })
-                    }}
-                />
-
                 <h4 className="my-4 w-full font-semibold text-gray-500 uppercase tracking-wider flex items-center">
                     <p className="flex-1 text-sm">
                         <i className="fas fa-terminal mr-2"></i>
