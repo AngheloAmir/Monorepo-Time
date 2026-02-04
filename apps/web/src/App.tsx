@@ -17,6 +17,7 @@ import CRUDTester from './components/app_contents/CrudTester';
 import AboutModal from './components/AboutModal';
 import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
+import Network from './components/app_contents/Network';
 
 declare global {
     interface Window {
@@ -94,12 +95,19 @@ export default function App() {
                             onClick: () => navAction.setCurrentPage('cloudflare') 
                         },
                         { 
+                            name: 'network',
+                            label: 'Network',
+                            icon: 'fa fa-solid fa-network-wired',
+                            isSelected: currentPage === 'network',
+                            onClick: () => navAction.setCurrentPage('network') 
+                        },
+                        { 
                             name: 'crud',
                             label: 'CRUD Tester',
                             icon: 'fa fa-microscope',
                             isSelected: currentPage === 'crud',
                             onClick: () => navAction.setCurrentPage('crud') 
-                        }
+                        },
                     ]}
                     // extraNavs={[
                     //     {
@@ -123,8 +131,8 @@ export default function App() {
                         <Workspace  isVisible={currentPage === "workspace"} />
                         <Turborepo  isVisible={currentPage === "turborepo"} />
                         <Cloudflare isVisible={currentPage === "cloudflare"} />
+                        <Network    isVisible={currentPage === "network"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
-                        {/* <ProjectTemplate isVisible={currentPage === "project-template"} /> */}
                     </div>
                 </main>
             </div>
