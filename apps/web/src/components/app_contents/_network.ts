@@ -79,6 +79,18 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 inputLabel: 'URL',
                 inputPlaceholder: 'google.com'
             },
+            {
+                label: 'Who Owns Port',
+                displayCmd: 'fuser/lsof',
+                cmd: 'fuser -n tcp {{input}} -v',
+                cmdWindow: 'netstat -ano | findstr :{{input}}',
+                cmdMac: 'lsof -i :{{input}}',
+                icon: 'fa-user-secret',
+                color: 'indigoFuchsia',
+                requiresInput: true,
+                inputLabel: 'Port Number',
+                inputPlaceholder: '8080'
+            },
         ]
     },
 
@@ -177,11 +189,11 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 icon: 'fa-sitemap',
                 color: 'emeraldTeal'
             },
-             {
+            {
                 label: 'Log Container',
                 displayCmd: 'docker logs',
                 cmd: 'docker logs {{input}} --tail 50',
-                cmdWindow: 'docker logs {{input}} --tail 50', 
+                cmdWindow: 'docker logs {{input}} --tail 50',
                 cmdMac: 'docker logs {{input}} --tail 50',
                 icon: 'fa-globe',
                 color: 'cyanBlue',
@@ -192,9 +204,9 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
             {
                 label: 'Docker Events',
                 displayCmd: 'docker events',
-                cmd: `docker events --since 10m --format '{{.Time}}|{{.Type}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}NO_NAME{{end}}|{{.Action}}|{{range $k, $v := .Actor.Attributes}}{{$k}}={{$v}} {{end}}' | while IFS='|' read -r t type name action attrs; do printf "%-10s %-12s %-30s %-20s %s\\n" "$(date -d @$t '+%H:%M:%S')" "$type" "$name" "$action" "$attrs"; done`,
-                cmdWindow: 'docker events --since 10m',
-                cmdMac: `docker events --since 10m --format '{{.Time}}|{{.Type}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}NO_NAME{{end}}|{{.Action}}|{{range $k, $v := .Actor.Attributes}}{{$k}}={{$v}} {{end}}' | while IFS='|' read -r t type name action attrs; do printf "%-10s %-12s %-30s %-20s %s\\n" "$(date -r $t '+%H:%M:%S')" "$type" "$name" "$action" "$attrs"; done`,
+                cmd: `docker events --since 10m --filter 'event!=exec_create' --filter 'event!=exec_start' --filter 'event!=exec_die' --filter 'event!=top' --format '{{.Time}}|{{.Type}}|{{.Action}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}{{.Actor.ID}}{{end}}|{{.Actor.Attributes.exitCode}}' | while IFS='|' read -r t type action name exitCode; do printf "%-10s %-10s %-25s %-15s %s\\n" "$(date -d @$t '+%H:%M:%S')" "$type" "$name" "$action" "\${exitCode:+Exit:$exitCode}"; done`,
+                cmdWindow: 'docker events --since 10m --filter "event!=exec_create" --filter "event!=exec_start" --filter "event!=exec_die" --filter "event!=top" --format "table {{.Time}}\t{{.Type}}\t{{.Action}}\t{{.Actor.Attributes.name}}\t{{.Actor.Attributes.exitCode}}"',
+                cmdMac: `docker events --since 10m --filter 'event!=exec_create' --filter 'event!=exec_start' --filter 'event!=exec_die' --filter 'event!=top' --format '{{.Time}}|{{.Type}}|{{.Action}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}{{.Actor.ID}}{{end}}|{{.Actor.Attributes.exitCode}}' | while IFS='|' read -r t type action name exitCode; do printf "%-10s %-10s %-25s %-15s %s\\n" "$(date -r $t '+%H:%M:%S')" "$type" "$name" "$action" "\${exitCode:+Exit:$exitCode}"; done`,
                 icon: 'fa-history',
                 color: 'gray'
             },
@@ -334,18 +346,6 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 requiresInput: true,
                 inputLabel: 'Container Name/ID',
                 inputPlaceholder: 'container_name'
-            },
-            {
-                label: 'Who Owns Port',
-                displayCmd: 'fuser/lsof',
-                cmd: 'fuser -n tcp {{input}} -v',
-                cmdWindow: 'netstat -ano | findstr :{{input}}',
-                cmdMac: 'lsof -i :{{input}}',
-                icon: 'fa-user-secret',
-                color: 'indigoFuchsia',
-                requiresInput: true,
-                inputLabel: 'Port Number',
-                inputPlaceholder: '8080'
             },
             {
                 label: 'Live Connections',

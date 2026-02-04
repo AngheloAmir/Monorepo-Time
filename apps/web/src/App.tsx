@@ -97,18 +97,18 @@ export default function App() {
                     ]}
                     extraNavs={[
                         { 
-                            name: 'cloudflare',
-                            label: 'Cloudflare Tunnel',
-                            icon: 'fa fa-solid fa-cloud',
-                            isSelected: currentPage === 'cloudflare',
-                            onClick: () => navAction.setCurrentPage('cloudflare') 
-                        },
-                        { 
                             name: 'network',
                             label: 'Network & Docker',
                             icon: 'fa fa-solid fa-network-wired',
                             isSelected: currentPage === 'network',
                             onClick: () => navAction.setCurrentPage('network') 
+                        },
+                        { 
+                            name: 'cloudflare',
+                            label: 'Cloudflare Tunnel',
+                            icon: 'fa fa-solid fa-cloud',
+                            isSelected: currentPage === 'cloudflare',
+                            onClick: () => navAction.setCurrentPage('cloudflare') 
                         },
                     ]}
                 />
