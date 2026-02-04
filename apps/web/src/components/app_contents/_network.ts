@@ -1,3 +1,5 @@
+import type { BorderColorVariant } from "../ui/_color";
+
 export interface Command {
     label: string;
     displayCmd: string;
@@ -17,15 +19,13 @@ export interface Command {
      */
     cmdMac: string;
     icon: string;
-    color: string;
+    color: BorderColorVariant;
     description?: string;
     requiresInput?: boolean;
     inputLabel?: string;
     inputPlaceholder?: string;
     confirmMessage?: string;
 }
-
-
 
 export const commandGroups: { title: string; commands: Command[] }[] = [
     {
@@ -153,7 +153,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
         ]
     },
 
-    {
+    { //docker network inspect mariadb_default
         title: 'Docker Debugging',
         commands: [
             {
@@ -169,6 +169,15 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 inputPlaceholder: 'container_name'
             },
             {
+                label: 'Networks',
+                displayCmd: 'docker network ls',
+                cmd: 'docker network ls',
+                cmdWindow: 'docker network ls',
+                cmdMac: 'docker network ls',
+                icon: 'fa-sitemap',
+                color: 'blueIndigo'
+            },
+            {
                 label: 'Docker Events',
                 displayCmd: 'docker events',
                 cmd: `docker events --since 10m --format '{{.Time}}|{{.Type}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}NO_NAME{{end}}|{{.Action}}|{{range $k, $v := .Actor.Attributes}}{{$k}}={{$v}} {{end}}' | while IFS='|' read -r t type name action attrs; do printf "%-10s %-12s %-30s %-20s %s\\n" "$(date -d @$t '+%H:%M:%S')" "$type" "$name" "$action" "$attrs"; done`,
@@ -176,6 +185,18 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 cmdMac: `docker events --since 10m --format '{{.Time}}|{{.Type}}|{{if .Actor.Attributes.name}}{{.Actor.Attributes.name}}{{else}}NO_NAME{{end}}|{{.Action}}|{{range $k, $v := .Actor.Attributes}}{{$k}}={{$v}} {{end}}' | while IFS='|' read -r t type name action attrs; do printf "%-10s %-12s %-30s %-20s %s\\n" "$(date -r $t '+%H:%M:%S')" "$type" "$name" "$action" "$attrs"; done`,
                 icon: 'fa-history',
                 color: 'blueIndigo'
+            },
+            {
+                label: 'Inspect',
+                displayCmd: 'docker network inspect',
+                cmd: 'docker network inspect {{input}}',
+                cmdWindow: 'docker network inspect {{input}}',
+                cmdMac: 'docker network inspect {{input}}',
+                icon: 'fa-globe',
+                color: 'cyanBlue',
+                requiresInput: true,
+                inputLabel: 'Container Name/ID',
+                inputPlaceholder: 'container_name'
             },
             {
                 label: 'Health Check',
@@ -188,15 +209,6 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 requiresInput: true,
                 inputLabel: 'Container Name/ID',
                 inputPlaceholder: 'container_name'
-            },
-            {
-                label: 'List Networks',
-                displayCmd: 'docker network ls',
-                cmd: 'docker network ls',
-                cmdWindow: 'docker network ls',
-                cmdMac: 'docker network ls',
-                icon: 'fa-sitemap',
-                color: 'blueIndigo'
             },
             {
                 label: 'Container IP',
