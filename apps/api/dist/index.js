@@ -90249,7 +90249,7 @@ child.on('close', (code) => {
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+|s+/, '');
             const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+            if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !lower.includes('starting migration') && !lower.includes('finished migration')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
                 
                 if (lower.includes('sqlite_error') || lower.includes('queryfailederror')) {
@@ -91317,7 +91317,7 @@ var AWSTemplate = {
 // ../../packages/template/services/stripe/dockerCompose.ts
 var dockerCompose7 = `services:
   stripe-mock:
-    image: stripe/stripe-mock:0.197.0
+    image: stripe/stripe-mock:latest
     pull_policy: if_not_present
     container_name: stripe-mock
     ports:
