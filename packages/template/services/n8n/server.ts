@@ -87,6 +87,7 @@ const checkStatus = () => {
 
                 process.stdout.write('\\x1Bc');
                 console.log('N8N is running at http://localhost:' + n8nPort);
+                console.log('Official docker image: https://hub.docker.com/r/n8nio/n8n');
             });
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry

@@ -5,10 +5,12 @@ import { EzBookkeepingLocal } from "./opensource-app/ezbookkeeping";
 import { PeppermintLocal } from "./opensource-app/peppermint";
 import { PenpotLocal } from "./opensource-app/penpot";
 import { DrawDBTool } from "./opensource-app/drawdb";
+import { N8nMcpTool } from "./opensource-app/n8n-mcp";
 
 const OpenSourceTemplates =  [
     DrawDBTool,
     PenpotLocal,
+    N8nMcpTool,
     MattermostLocal,
     NextcloudLocal,
     MauticLocal,
