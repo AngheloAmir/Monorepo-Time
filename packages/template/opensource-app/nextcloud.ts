@@ -4,7 +4,7 @@ import { gitignoreContent } from "./nextcloud/gitignore";
 import { serverJs } from "./nextcloud/server";
 
 export const NextcloudLocal: ProjectTemplate = {
-    name: "Nextcloud Local",
+    name: "Nextcloud",
     description: "Nextcloud Office & Storage",
     notes: "Can be used with N8N that acts like GDrive",
     type: "opensource-app",

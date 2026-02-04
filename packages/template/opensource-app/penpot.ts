@@ -1,15 +1,15 @@
 import type { ProjectTemplate } from "../../types";
-import { dockerCompose } from "./mattermost/dockerCompose";
-import { gitignoreContent } from "./mattermost/gitignore";
-import { serverJs } from "./mattermost/server";
+import { dockerCompose } from "./penpot/dockerCompose";
+import { gitignoreContent } from "./penpot/gitignore";
+import { serverJs } from "./penpot/server";
 
-export const MattermostLocal: ProjectTemplate = {
-    name: "Mattermost",
-    description: "Mattermost Team",
-    notes: "Open source version of Discord",
+export const PenpotLocal: ProjectTemplate = {
+    name: "Penpot",
+    description: "Open Source Design & Prototyping Platform",
+    notes: "Self-hosted alternative to Figma. Requires Docker.",
     type: "opensource-app",
     category: "Open Source",
-    icon: "fas fa-comments text-green-500",
+    icon: "fas fa-pen-nib text-green-500",
     templating: [
         {
             action: 'file',
@@ -39,7 +39,7 @@ export const MattermostLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=Mattermost Messaging (Docker)']
+            args: ['pkg', 'set', 'description=Penpot Design Tool (Docker)']
         },
         {
             action: 'command',
@@ -49,7 +49,7 @@ export const MattermostLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-comments text-blue-500']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-pen-nib text-purple-500']
         }
     ]
 };

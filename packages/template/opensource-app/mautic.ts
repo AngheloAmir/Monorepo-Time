@@ -4,7 +4,7 @@ import { gitignoreContent } from "./mautic/gitignore";
 import { serverJs } from "./mautic/server";
 
 export const MauticLocal: ProjectTemplate = {
-    name: "Mautic Local",
+    name: "Mautic",
     description: "Marketing Automation Platform",
     notes: "Local Mautic instance for testing workflows",
     type: "opensource-app",
