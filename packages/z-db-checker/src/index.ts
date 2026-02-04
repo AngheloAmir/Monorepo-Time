@@ -5,6 +5,7 @@ import helloRouter from "./routes/hello";
 import postgresRouter from "./routes/postgres";
 import mariadbRouter from "./routes/mariadb";
 import redisRouter from "./routes/redis";
+import mongodbRouter from "./routes/mongodb";
 
 const app  = express();
 const port = process.env.PORT || 3500;
@@ -20,6 +21,7 @@ app.use("/hello", helloRouter);
 app.use("/postgres", postgresRouter);
 app.use("/mariadb", mariadbRouter);
 app.use("/redis", redisRouter);
+app.use("/mongodb", mongodbRouter);
 
 app.listen(port, () => {
     console.log("Server running at http://localhost:" + port);

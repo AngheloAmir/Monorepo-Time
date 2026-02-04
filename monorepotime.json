@@ -331,6 +331,15 @@
                     "sampleInput": "{\n \"connectionString\": \"redis://localhost:6379\"\n}",
                     "expectedOutcome": "",
                     "suggested": []
+                },
+                {
+                    "label": "MongoDB",
+                    "route": "/mongodb",
+                    "methods": "POST",
+                    "description": "",
+                    "sampleInput": "{\n \"connectionString\": \"mongodb://admin:admin@localhost:27017/db?authSource=admin\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
                 }
             ]
         }
