@@ -1,6 +1,6 @@
 export const dockerCompose = `services:
   postgres:
-    image: postgres:13-alpine
+    image: postgres:15-alpine
     pull_policy: if_not_present
     restart: unless-stopped
     security_opt:

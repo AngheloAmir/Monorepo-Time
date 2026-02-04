@@ -86938,7 +86938,7 @@ var demo_default = templates2;
 // ../../packages/template/opensource-app/mattermost/dockerCompose.ts
 var dockerCompose = `services:
   postgres:
-    image: postgres:13-alpine
+    image: postgres:15-alpine
     pull_policy: if_not_present
     restart: unless-stopped
     security_opt:
@@ -88313,8 +88313,7 @@ child.on('close', (code) => {
     const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
     
     const printImportant = (data) => {
-        const lines = data.toString().split('
-');
+        const lines = data.toString().split('\\n');
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+||s+/, '');
             const lower = cleanLine.toLowerCase();
@@ -88325,8 +88324,7 @@ child.on('close', (code) => {
             }
 
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\x1B[31mError:\x1B[0m ' + cleanLine + '
-');
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
         });
     };
