@@ -98,7 +98,7 @@ const onRunning = (containerInfo) => {
     console.log('n8n MCP Server Image is Ready!');
     console.log('--------------------------------------------------');
     console.log('This MCP server runs in STDIO mode (not HTTP).');
-    console.log('To use it, add this to your Claude Desktop config:');
+    console.log('To use it, add this to your MCP Client config (e.g., Claude Desktop, Cursor):');
     console.log('');
     console.log(JSON.stringify({
       "mcpServers": {

@@ -88748,7 +88748,7 @@ const onRunning = (containerInfo) => {
     console.log('n8n MCP Server Image is Ready!');
     console.log('--------------------------------------------------');
     console.log('This MCP server runs in STDIO mode (not HTTP).');
-    console.log('To use it, add this to your CAUDE DESKTOP config:');
+    console.log('To use it, add this to your MCP Client config (e.g., Claude Desktop, Cursor):');
     console.log('');
     console.log(JSON.stringify({
       "mcpServers": {
@@ -88770,7 +88770,15 @@ const onRunning = (containerInfo) => {
     console.log('  macOS: ~/Library/Application Support/Claude/claude_desktop_config.json');
     console.log('  Linux: ~/.config/Claude/claude_desktop_config.json');
     console.log('--------------------------------------------------');
-    console.log('The service is just a placeholder to keep this active.');
+    console.log('Usage Instructions:');
+    console.log('1. Ask Claude to "Help me build an n8n workflow for..."');
+    console.log('2. Claude can search nodes, get documentation, and generate workflow JSON.');
+    console.log('3. You can paste the generated JSON directly into n8n.');
+    console.log('4. Claude can also help debug workflows if you provide error logs.');
+    console.log('');
+    console.log('Note: This server provides knowledge about n8n nodes and templates.');
+    console.log('--------------------------------------------------');
+    console.log('GitHub: https://github.com/czlonkowski/n8n-mcp');
     console.log('==================================================\\n');
 };
 
