@@ -83635,14 +83635,6 @@ async function isRunnableProject(dir) {
   }
   return false;
 }
-async function resolveWorkspaceDirs(workspaces) {
-  return (0, import_fast_glob.default)(workspaces.map((w) => w.replace(/\/$/, "") + "/"), {
-    cwd: ROOT,
-    onlyDirectories: true,
-    absolute: true,
-    ignore: IGNORE
-  });
-}
 async function scanWorkspaces(rootPkg) {
   var _a2;
   let patterns = [];
@@ -83652,14 +83644,25 @@ async function scanWorkspaces(rootPkg) {
     patterns = rootPkg.workspaces.packages;
   }
   if (!patterns.length) return [];
-  const dirs = await resolveWorkspaceDirs(patterns);
-  const results = /* @__PURE__ */ new Set();
-  for (const dir of dirs) {
-    if (await isRunnableProject(dir)) {
-      results.add(import_path3.default.resolve(dir));
+  const results = [];
+  for (const pattern of patterns) {
+    const workspaceName = pattern.replace(/\/\*$/, "").replace(/\/$/, "");
+    const dirs = await (0, import_fast_glob.default)(pattern.replace(/\/$/, "") + "/", {
+      cwd: ROOT,
+      onlyDirectories: true,
+      absolute: true,
+      ignore: IGNORE
+    });
+    for (const dir of dirs) {
+      if (await isRunnableProject(dir)) {
+        results.push({
+          path: import_path3.default.resolve(dir),
+          workspace: workspaceName
+        });
+      }
     }
   }
-  return [...results];
+  return results;
 }
 async function scanRecursively() {
   const pkgFiles = await (0, import_fast_glob.default)("**/package.json", {
@@ -83667,14 +83670,19 @@ async function scanRecursively() {
     absolute: true,
     ignore: IGNORE
   });
-  const results = /* @__PURE__ */ new Set();
+  const results = [];
   for (const pkgFile of pkgFiles) {
     const dir = import_path3.default.dirname(pkgFile);
     if (await isRunnableProject(dir)) {
-      results.add(import_path3.default.resolve(dir));
+      const relative = import_path3.default.relative(ROOT, dir);
+      const workspaceName = relative.split(import_path3.default.sep)[0] || "root";
+      results.push({
+        path: import_path3.default.resolve(dir),
+        workspace: workspaceName
+      });
     }
   }
-  return [...results];
+  return results;
 }
 route.get("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -83689,23 +83697,29 @@ route.get("/", async (req, res) => {
     }
     const opensourceFolder = import_path3.default.join(ROOT, "opensource");
     if (await import_fs_extra2.default.pathExists(opensourceFolder)) {
-      const opensourceDirs = await resolveWorkspaceDirs(["opensource/*"]);
+      const opensourceDirs = await (0, import_fast_glob.default)(["opensource/*/"], {
+        cwd: ROOT,
+        onlyDirectories: true,
+        absolute: true,
+        ignore: IGNORE
+      });
       for (const dir of opensourceDirs) {
         if (await isRunnableProject(dir)) {
           const absoluteDir = import_path3.default.resolve(dir);
-          if (!projects.includes(absoluteDir)) {
-            projects.push(absoluteDir);
+          if (!projects.find((p) => p.path === absoluteDir)) {
+            projects.push({ path: absoluteDir, workspace: "opensource" });
           }
         }
       }
     }
     const projectInfos = (await Promise.all(projects.map(async (p) => {
-      const pkgPath = import_path3.default.join(p, "package.json");
+      const pkgPath = import_path3.default.join(p.path, "package.json");
       const pkg = await readJSON(pkgPath);
       if (!pkg) return null;
       return {
-        name: pkg.name || import_path3.default.basename(p),
-        path: p,
+        name: pkg.name || import_path3.default.basename(p.path),
+        path: p.path,
+        workspace: p.workspace,
         fontawesomeIcon: pkg.fontawesomeIcon != "object" ? pkg.fontawesomeIcon : null,
         description: pkg.description != "object" ? pkg.description : null,
         devCommand: pkg.scripts.dev != "object" ? pkg.scripts.dev : null,
@@ -83718,9 +83732,11 @@ route.get("/", async (req, res) => {
         appType: pkg.appType != "object" ? pkg.appType : null
       };
     }))).filter(Boolean);
+    const workspaces = [...new Set(projectInfos.map((p) => p.workspace).filter(Boolean))];
     res.json({
       root: ROOT,
       count: projectInfos.length,
+      workspaces,
       workspace: projectInfos
     });
   } catch (err) {
@@ -83926,7 +83942,8 @@ async function checkNameExists(name, excludePath) {
   } else {
     projects = await scanRecursively();
   }
-  for (const projectPath of projects) {
+  for (const project of projects) {
+    const projectPath = project.path;
     if (excludePath && import_path5.default.resolve(projectPath) === import_path5.default.resolve(excludePath)) {
       continue;
     }

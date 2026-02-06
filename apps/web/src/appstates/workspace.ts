@@ -25,55 +25,60 @@ export interface WorkspaceTemplate {
     }
 }
 
+/**
+ * @interface WorkspaceItem
+ * @description Interface for a workspace item
+ * @property {string | null} isRunningAs - The running status of the workspace
+ * @property {WorkspaceInfo} info - The base information of the workspace
+ */
 export interface WorkspaceItem {
     isRunningAs: 'dev' | 'start' | 'crashed' | null;
     info: WorkspaceInfo;
 }
 
+/**
+ * @interface workspaceContext
+ * @description Interface for the workspace context
+ * @property {boolean} workspaceLoading - Whether the workspace is loading
+ * @property {WorkspaceItem[]} workspace - The list of workspaces
+ * @property {string} activeTerminal - The active terminal
+ * @property {WorkspaceInfo | null} activeWorkspaceOptionModal - The active workspace option modal
+ * @property {string | null} loadingWorkspace - The name of the workspace that is still loading
+ * @property {boolean} loading - Whether the workspace is loading
+ * @property {boolean} showWorkspaceNew - Whether the workspace new modal is shown
+ * @property {WorkspaceInfo | null} showNewTerminalWindow - The workspace that is shown in the new terminal window
+ * @property {string} loadMessage - The message to be displayed when the workspace is loading
+ * @property {() => Promise<void>} loadWorkspace - Function to load the workspace
+ * @property {(terminal: string) => void} setActiveTerminal - Function to set the active terminal
+ * @property {(workspace: WorkspaceInfo | null) => void} setActiveWorkspaceOptionModal - Function to set the active workspace option modal
+ * @property {(workspaceName: string, runas: 'dev' | 'start' | 'crashed' | null) => void} setWorkSpaceRunningAs - Function to set the workspace running as
+ * @property {(show: boolean) => void} setShowWorkspaceNew - Function to set the workspace new modal
+ * @property {(workspace: WorkspaceInfo | null) => void} setShowNewTerminalWindow - Function to set the new terminal window
+ * @property {(loading: boolean) => void} setWorkspaceLoading - Function to set the workspace loading
+ * @property {(workspaceName: string) => Promise<void>} stopProcess - Function to stop the process
+ * @property {(workspaceName: string, skips?: boolean) => Promise<void>} stopInteractiveTerminal - Function to stop the interactive terminal
+ * @property {(workspaceName: string, skips?: boolean) => Promise<void>} stopWorkspaceTerminal - Function to stop the workspace terminal
+ * @property {(workspaceName: WorkspaceInfo) => Promise<boolean>} createNewWorkspace - Function to create a new workspace
+ * @property {(workspace: WorkspaceInfo) => Promise<boolean>} updateWorkspace - Function to update the workspace
+ * @property {(workspace: WorkspaceInfo, template: string) => Promise<void>} setWorkspaceTemplate - Function to set the workspace template
+ * @property {(currentWorkspace: WorkspaceInfo) => Promise<string>} deleteWorkspace - Function to delete the workspace
+ */
 interface workspaceContext {
-    /** loading workspace which the workspace itself */
     workspaceLoading: boolean;
-
-    /** Base information of workspace */
     workspace: WorkspaceItem[];
-
-    /** show the workspace console */
     activeTerminal: string;
-
-    /** show the workspace option modal */
     activeWorkspaceOptionModal: WorkspaceInfo | null;
-
-    /** name of the workspace that is still loading */
     loadingWorkspace: string | null;
-
-    /** show workspace new modal */
     showWorkspaceNew: boolean;
-
-    /** load/refresh the content of workspaces */
     loadWorkspace: () => Promise<void>;
-
-    /** set active terminal */
     setActiveTerminal: (terminal: string) => void;
-
-    /** set active workspace option modal */
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => void;
-
-    /** set workspace running as */
     setWorkSpaceRunningAs: (workspaceName: string, runas: 'dev' | 'start' | 'crashed' | null) => void;
 
-    /** loading */
     loading: boolean;
-
-    /** show workspace new modal */
     setShowWorkspaceNew: (show: boolean) => void;
-
-    /** It has content of workspace to show new terminal window */
     showNewTerminalWindow: WorkspaceInfo | null;
-
-    /** Close or show a terminal window for the particular workspace */
     setShowNewTerminalWindow: (workspace: WorkspaceInfo | null) => void;
-
-    /** set workspace loading */
     setWorkspaceLoading: (loading: boolean) => void;
 
     ///API calls
@@ -81,17 +86,9 @@ interface workspaceContext {
     stopProcess: (workspaceName: string) => Promise<void>;
     stopInteractiveTerminal: (workspaceName: string, skips?: boolean) => Promise<void>;
     stopWorkspaceTerminal:   (workspaceName: string, skips?: boolean) => Promise<void>;
-
-    /** list workspace folders*/
     listWorkspace: () => Promise<any>;
-
-    /** create new workspace */
     createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
-
-    /** update workspace */
     updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
-
-    /** delete workspace */
     deleteWorkspace: (workspaceName: WorkspaceInfo) => Promise<string>;
 
     loadMessage: string;
