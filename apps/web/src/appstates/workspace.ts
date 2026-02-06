@@ -1,9 +1,15 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { WorkspaceInfo } from 'types';
-import apiRoute from 'apiroute';
-import config from 'config';
-import defaultWorkspace from './demo/defaultWorkspace';
+import loadWorkspace from './workspaces/loadWorkspace';
+import stopProcess from './workspaces/stopProcess';
+import stopInteractiveTerminal from './workspaces/stopInteractiveTerminal';
+import stopWorkspaceTerminal from './workspaces/stopWorkspaceTerminal';
+import listWorkspace from './workspaces/listWorkspace';
+import createNewWorkspace from './workspaces/createNewWorkspace';
+import updateWorkspace from './workspaces/updateWorkspace';
+import setWorkspaceTemplate from './workspaces/setWorkspaceTemplate';
+import deleteWorkspace from './workspaces/deleteWorkspace';
 
 declare global {
     interface Window {
@@ -75,9 +81,17 @@ interface workspaceContext {
     stopProcess: (workspaceName: string) => Promise<void>;
     stopInteractiveTerminal: (workspaceName: string, skips?: boolean) => Promise<void>;
     stopWorkspaceTerminal:   (workspaceName: string, skips?: boolean) => Promise<void>;
+
+    /** list workspace folders*/
     listWorkspace: () => Promise<any>;
+
+    /** create new workspace */
     createNewWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
+
+    /** update workspace */
     updateWorkspace: (workspaceName: WorkspaceInfo) => Promise<boolean>;
+
+    /** delete workspace */
     deleteWorkspace: (workspaceName: WorkspaceInfo) => Promise<string>;
 
     loadMessage: string;
@@ -94,6 +108,23 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
     showWorkspaceNew: false,
     showNewTerminalWindow: null,
     loadMessage: '',
+
+    setWorkSpaceRunningAs: (workspaceName, runas) => {
+        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
+        if (workspace) {
+            set({
+                workspace: get().workspace.map((item) => {
+                    if (item.info.name === workspaceName) {
+                        return {
+                            ...item,
+                            isRunningAs: runas
+                        }
+                    }
+                    return item;
+                })
+            });
+        }
+    },
 
     setWorkspaceLoading: (loading: boolean) => {
         set({ workspaceLoading: loading });
@@ -115,332 +146,37 @@ const workspaceState = create<workspaceContext>()((set, get) => ({
         set({ showWorkspaceNew: show });
     },
 
-    setWorkSpaceRunningAs: (workspaceName, runas) => {
-        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
-        if (workspace) {
-            set({
-                workspace: get().workspace.map((item) => {
-                    if (item.info.name === workspaceName) {
-                        return {
-                            ...item,
-                            isRunningAs: runas
-                        }
-                    }
-                    return item;
-                })
-            });
-        }
-    },
+    listWorkspace: async () => 
+        listWorkspace(),
 
-    loadWorkspace: async () => {
-        if (config.useDemo) {
-            set({ workspace: defaultWorkspace });
-            return;
-        }
+    loadWorkspace: () => 
+        loadWorkspace(set, get),
 
-        const isLoading = get().loading;
-        if (isLoading) return;
-        set({ loading: true });
+    stopProcess: (workspaceName: string) => 
+        stopProcess(set, get, workspaceName),
 
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.scanWorkspace}`);
-            let workspaceResponse: {
-                root: string;
-                count: number;
-                workspace: WorkspaceInfo[];
-            } = await response.json() as any
-            if (!response.ok) {
-                throw new Error('Failed to fetch workspace');
-            }
+    stopInteractiveTerminal: async (workspaceName: string, skips?: boolean) => 
+        stopInteractiveTerminal(set, get, workspaceName, skips),
 
-            const newWorkspace: WorkspaceItem[] = [];
-            const currentWorkspace = get().workspace;
-            workspaceResponse.workspace.forEach((item: WorkspaceInfo) => {
-                //if already exist in workspace dont add to make sure data is not cleared
-                //but refresh only the information
-                if (currentWorkspace.find((i) => i.info.name === item.name)) {
-                    newWorkspace.push({
-                        isRunningAs: currentWorkspace.find((i) => i.info.name === item.name)?.isRunningAs ?? null,
-                        info: item
-                    })
-                } else {
-                    newWorkspace.push({
-                        isRunningAs: null,
-                        info: item
-                    })
-                }
-            })
-
-            //sort workspace alphabetically
-            const alphabeticalWorkspace = newWorkspace.sort((a, b) => {
-                if (a.info.name < b.info.name) return -1;
-                if (a.info.name > b.info.name) return 1;
-                return 0;
-            });
-
-            set({ workspace: alphabeticalWorkspace });
-        } catch (error) {
-            console.error('Error fetching workspace:', error);
-        }
-        set({ loading: false });
-    },
-
-    //==========================================================================
-    // API calls
-    //==========================================================================
-    stopProcess: async (workspaceName: string) => {
-        if (config.useDemo) return;
-
-        const isLoading = get().loadingWorkspace;
-        if (isLoading == workspaceName) return;
-        set({ loadingWorkspace: workspaceName });
-
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.stopProcess}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ workspace: { name: workspaceName } })
-            });
-            if (!response.ok) {
-                throw new Error('Failed to stop process');
-            }
-        } catch (error) {
-            console.error('Error stopping process:', error);
-        }
-
-        set({ loadingWorkspace: null });
-    },
-
-    stopInteractiveTerminal: async (workspaceName: string, skips?: boolean) => {
-        if (config.useDemo) return;
-
-        const isLoading = get().loadingWorkspace;
-        if (isLoading == workspaceName) return;
-        set({ loadingWorkspace: workspaceName });
-
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.stopInteractiveTerminal}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ workspace: { name: workspaceName } })
-            });
-            if (!response.ok) {
-                throw new Error('Failed to stop interactive terminal');
-            }
-
-            if (!skips)
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-        } catch (error) {
-            console.error('Error stopping interactive terminal:', error);
-        }
-
-        set({ loadingWorkspace: null });
-    },
-
-    stopWorkspaceTerminal: async (workspaceName: string, skips?: boolean) => {
-        if (config.useDemo) return;
-        const isLoading = get().loadingWorkspace;
-        if (isLoading == workspaceName) return;
-        set({ loadingWorkspace: workspaceName });
-
-        const workspace = get().workspace.find((item) => item.info.name === workspaceName);
-        const workspacePath = workspace?.info.path;
-        
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.stopTerminalWorkspace}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    workspace: { 
-                        name: workspaceName,
-                        path: workspacePath
-                    } 
-                })
-            });
-            if (!response.ok) {
-                let errMsg = 'Failed to stop interactive terminal';
-                try {
-                    const errText = await response.text();
-                    try {
-                        const errBody = JSON.parse(errText);
-                        errMsg = errBody.message || errBody.error || errMsg;
-                    } catch {
-                        if (errText) errMsg = errText;
-                    }
-                } catch (e) {
-                    // Body might be empty or unreadable
-                }
-                console.error('[Frontend] Backend error:', errMsg);
-                throw new Error(errMsg);
-            }
-
-            if (!skips)
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-        } catch (error) {
-            console.error('Error stopping interactive terminal:', error);
-        }
-        set({ loadingWorkspace: null });
-    },
-
-
-    listWorkspace: async () => {
-        if (config.useDemo) return [];
-
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.listWorkspacesDir}`);
-            if (!response.ok) {
-                throw new Error('Failed to list workspace');
-            }
-            return await response.json();
-        } catch (error) {
-            console.error('Error listing workspace:', error);
-            return [];
-        }
-    },
+    stopWorkspaceTerminal: async (workspaceName: string, skips?: boolean) => 
+        stopWorkspaceTerminal(set, get, workspaceName, skips),
 
     createNewWorkspace: async (workspaceName: WorkspaceInfo) => {
-        if (config.useDemo) return true;
- 
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.newWorkspace}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(workspaceName),
-            });
-            await response.json();
-            return true;
-        } catch (error) {
-            return false;
-        }
+        return await createNewWorkspace(workspaceName);
     },
 
     updateWorkspace: async (workspace: WorkspaceInfo) => {
-        if (config.useDemo) return true;
-
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.updateWorkspace}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(workspace),
-            });
-            await response.json();
-            return true;
-        } catch (error) {
-            return false;
-        }
+        return await updateWorkspace(workspace);
     },
 
     setWorkspaceTemplate: async (workspace: WorkspaceInfo, template: string) => {
-        if (config.useDemo) return;
-        window.isLoadingCancelled = false;
-
-        // Import socket.io-client dynamically to avoid SSR issues
-        const { io } = await import('socket.io-client');
-        
-        return new Promise<void>((resolve, reject) => {
-            const socket = io(config.serverPath, {
-                transports: ['websocket'],
-                forceNew: true,
-                reconnection: false
-            });
-
-            // Set initial loading message
-            set({ loadMessage: `Connecting...` });
-
-            socket.on('connect', () => {
-                set({ loadMessage: `Starting template '${template}'...` });
-                socket.emit('template:start', { workspace, templatename: template });
-
-                if(window.isLoadingCancelled) {
-                    socket.disconnect();
-                    reject(new Error('Loading cancelled'));
-                }
-            });
-
-            socket.on('template:progress', (data: { message: string }) => {
-                set({ loadMessage: data.message });
-                console.log('[Template Progress]', data.message);
-
-                if(window.isLoadingCancelled) {
-                    socket.disconnect();
-                    reject(new Error('Loading cancelled'));
-                }
-            });
-
-            socket.on('template:success', (data: { message: string }) => {
-                set({ loadMessage: data.message });
-                console.log('[Template Success]', data.message);
-                socket.disconnect();
-                resolve();
-            });
-
-            socket.on('template:error', (data: { error: string }) => {
-                set({ loadMessage: `Error: ${data.error}` });
-                console.error('[Template Error]', data.error);
-
-                alert(data.error);
-                socket.disconnect();
-                reject(new Error(data.error));
-            });
-
-            socket.on('connect_error', (err) => {
-                set({ loadMessage: `Connection error: ${err.message}` });
-                console.error('[Template Connect Error]', err);
-                
-                alert(err.message);
-                socket.disconnect();
-                reject(err);
-            });
-
-            // Timeout after 5 minutes
-            setTimeout(() => {
-                if (socket.connected) {
-                    socket.disconnect();
-                    set({ loadMessage: 'Template setup timed out' });
-                    reject(new Error('Template setup timed out'));
-                }
-            }, 5 * 60 * 1000);
-        });
+        return await setWorkspaceTemplate(set, workspace, template);
     },
 
     deleteWorkspace: async (currentWorkspace: WorkspaceInfo) => {
-        const isLoading = get().loading;
-        if (isLoading) return;
-        set({ loading: true });
-
-        try {
-            const response = await fetch(`${config.serverPath}${apiRoute.deleteWorkspace}`, {
-                method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ workspace: currentWorkspace }),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to delete workspace');
-            }
-            const data = await response.json();
-            set({ loading: false });
-            return data.message;
-        } catch (error) {
-            console.error('Error deleting workspace:', error);
-            set({ loading: false });
-            return 'Error deleting workspace';
-        }
+        return await deleteWorkspace(set, get, currentWorkspace);
     },
-
 }));
-
 
 const useWorkspaceState = createSelectors(workspaceState);
 export default useWorkspaceState;
