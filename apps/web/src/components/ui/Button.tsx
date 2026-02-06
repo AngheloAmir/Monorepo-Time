@@ -56,15 +56,15 @@ function ButtonSkeleton(props: ButtonProps) {
             {/* Background Layer for Border (Hover - Colored) */}
             {!props.disabled && !props.bg && (
                 <>
-                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-40 blur-md transition-opacity duration-500`} />
                     <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 </>
             )}
 
             {props.bg && (
                 <>
-                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-50 blur-lg`} />
-                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-50`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-60 blur-md`} />
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-70`} />
                 </>
             )}
 

@@ -45,8 +45,8 @@ function Button2(props: ButtonProps) {
             {/* Background Layer for Border (Hover - Colored) */}
             {!props.disabled && (
                 <>
-                    {/* Outer Glow */}
-                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
+                    {/* Outer Glow - Adjusted for Firefox visibility */}
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-40 blur-md transition-opacity duration-500`} />
                     {/* Sharp Border Gradient */}
                     <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 </>

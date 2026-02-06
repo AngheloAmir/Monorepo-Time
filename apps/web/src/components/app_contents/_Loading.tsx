@@ -7,8 +7,8 @@ export default function Loading() {
             <div className="flex flex-1 overflow-hidden ">
                 <main className="flex-1 relative overflow-hidden bg-gray-900">
                     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"></div>
-                        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl"></div>
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(59,130,246,0.1),transparent_50%)]"></div>
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_100%,rgba(168,85,247,0.1),transparent_50%)]"></div>
                     </div>
                 </main>
             </div>

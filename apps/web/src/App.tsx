@@ -115,9 +115,10 @@ export default function App() {
 
                 <main className="flex-1 relative overflow-hidden">
                     <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                        <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[128px]"></div>
-                        <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[128px]"></div>
-                        <div className="absolute -bottom-[25%] -right-[10%] w-[50%] h-[50%] bg-fuchsia-600/20 rounded-full blur-[128px]"></div>
+                        {/* More consistent glows using radial gradients instead of heavy blurs */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(37,99,235,0.12),transparent_45%)]"></div>
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_35%,rgba(147,51,234,0.12),transparent_40%)]"></div>
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_95%_95%,rgba(192,38,211,0.12),transparent_45%)]"></div>
                     </div>
                     <div id="app-content" className="w-full max-w-[2100px] mx-auto h-full relative z-10">
                         <Home       isVisible={currentPage === "dashboard"} />
