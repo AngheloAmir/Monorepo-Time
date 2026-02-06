@@ -17,16 +17,19 @@ const loadWorkspace = async ( set: any, get: any, ) => {
     try {
         const response = await fetch(`${config.serverPath}${apiRoute.scanWorkspace}`);
         let workspaceResponse: {
-            root: string;
-            count: number;
-            workspace: WorkspaceInfo[];
+            root:          string;
+            count:         number;
+            workspaceDirs: string[];
+            workspace:     WorkspaceInfo[];
         } = await response.json() as any
         if (!response.ok) {
             throw new Error('Failed to fetch workspace');
         }
 
+        set({ workspaceDirs: workspaceResponse.workspaceDirs ?? [] });
+
         const newWorkspace: WorkspaceItem[] = [];
-        const currentWorkspace = get().workspace as WorkspaceItem[];
+        const currentWorkspace              = get().workspace as WorkspaceItem[];
         workspaceResponse.workspace.forEach((item: WorkspaceInfo) => {
             //if already exist in workspace dont add to make sure data is not cleared
             //but refresh only the information

@@ -65,11 +65,13 @@ export interface WorkspaceItem {
  */
 interface workspaceContext {
     workspaceLoading: boolean;
-    workspace: WorkspaceItem[];
+    workspace:      WorkspaceItem[];
+    workspaceDirs:  string[];
     activeTerminal: string;
     activeWorkspaceOptionModal: WorkspaceInfo | null;
     loadingWorkspace: string | null;
     showWorkspaceNew: boolean;
+
     loadWorkspace: () => Promise<void>;
     setActiveTerminal: (terminal: string) => void;
     setActiveWorkspaceOptionModal: (workspace: WorkspaceInfo | null) => void;
@@ -98,6 +100,7 @@ interface workspaceContext {
 const workspaceState = create<workspaceContext>()((set, get) => ({
     workspace: [],
     workspaceLoading: false,
+    workspaceDirs: ['apps', 'packages'], //this is usually the workspace dirs
     activeTerminal: '',
     activeWorkspaceOptionModal: null,
     loadingWorkspace: null,

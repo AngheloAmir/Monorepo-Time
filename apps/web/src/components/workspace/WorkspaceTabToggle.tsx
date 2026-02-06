@@ -1,4 +1,14 @@
-export function WorkspaceTabToggle({whichShow, setWhichShow}: {whichShow: string, setWhichShow: (whichShow: string) => void}) {
+import useWorkspaceState from "../../appstates/workspace";
+
+interface WorkspaceTabToggleProps {
+    whichShow: string;
+    setWhichShow: (whichShow: string) => void;
+}
+
+export function WorkspaceTabToggle(props: WorkspaceTabToggleProps) {
+    const { whichShow, setWhichShow } = props;
+    const workspaceDirs = useWorkspaceState.use.workspaceDirs();
+
     return (
         <div className="absolute top-2 left-2 z-10 bg-gradient-to-b from-[#050505] to-[#101010] px-2 rounded-lg">
             <button
@@ -7,18 +17,14 @@ export function WorkspaceTabToggle({whichShow, setWhichShow}: {whichShow: string
             >
                 Show All Apps
             </button>
-            <button
-                onClick={() => setWhichShow("apps")}
-                className={`${whichShow === "apps" ? "bg-blue-800/80" : ""} px-4 py-1 text-[10px] font-bold uppercase rounded-lg transition-all text-white/50`}
-            >
-                Apps Only
-            </button>
-            <button
-                onClick={() => setWhichShow("tools")}
-                className={`${whichShow === "tools" ? "bg-blue-800/80" : ""} px-4 py-1 text-[10px] font-bold uppercase rounded-lg transition-all text-white/50`}
-            >
-                Tools Only
-            </button>
+            {workspaceDirs.map((dir) => (
+                <button
+                    onClick={() => setWhichShow(dir)}
+                    className={`${whichShow === dir ? "bg-blue-800/80" : ""} px-4 py-1 text-[10px] font-bold uppercase rounded-lg transition-all text-white/50`}
+                >
+                    {dir}
+                </button>
+            ))}
         </div>
     );
 }

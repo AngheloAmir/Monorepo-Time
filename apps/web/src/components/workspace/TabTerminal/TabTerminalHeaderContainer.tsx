@@ -9,12 +9,8 @@ export default function TabTerminalHeaderContainer({ whichShow }: { whichShow: s
             {workspace.map((item) => {
                 if (item.isRunningAs != null &&
                     (
-                        //show all==============================
                         (whichShow === "all") ||
-                        //show apps and databases===============
-                        (whichShow === "apps" && (item.info.appType === undefined || item.info.appType === "database")) ||
-                        //show tools only======================
-                        (whichShow === "tools" && item.info.appType === "tool")
+                        (whichShow === item.info.workspace)
                     ))
                     return <HeaderItem key={item.info.name} workspace={item} />
             })}

@@ -5,10 +5,10 @@ import { Request, Response, Router } from "express";
 import { WorkspaceInfo } from "types";
 
 export interface ScanWorkspaceResponse {
-  root:       string;
-  count:      number;
-  workspaces: string[];
-  workspace:  WorkspaceInfo[];
+  root:          string;
+  count:         number;
+  workspaceDirs: string[];
+  workspace:     WorkspaceInfo[];
 }
 
 const START_DIR = process.cwd();
@@ -195,7 +195,7 @@ route.get("/", async (req: Request, res: Response) => {
 
     const projectInfos = (await Promise.all(projects.map(async (p) => {
       const pkgPath = path.join(p.path, "package.json");
-      const pkg = await readJSON(pkgPath);
+      const pkg     = await readJSON(pkgPath);
       if (!pkg) return null;
 
       return {
@@ -220,7 +220,7 @@ route.get("/", async (req: Request, res: Response) => {
     res.json({
       root:          ROOT,
       count:         projectInfos.length,
-      workspaces:    workspaces,
+      workspaceDirs: workspaces,
       workspace:     projectInfos,
     } as ScanWorkspaceResponse);
   } catch (err: any) {

@@ -4,7 +4,7 @@ import TabTerminalHeaderContainer from "./TabTerminal/TabTerminalHeaderContainer
 import { useState } from "react";
 
 export default function TabTerminal({ whichShow }: { whichShow: string }) {
-    const workspace = useWorkspaceState.use.workspace();
+    const workspace      = useWorkspaceState.use.workspace();
     const activeTerminal = useWorkspaceState.use.activeTerminal();
     const [viewMode, setViewMode] = useState<'normal' | 'maximized'>('normal');
     const toggleMaximize = () => {
@@ -45,9 +45,11 @@ export default function TabTerminal({ whichShow }: { whichShow: string }) {
                         key={item.info.name}
                         workspace={item}
                         visible={   
-                            (whichShow === "all"    && activeTerminal == item.info.name && item.isRunningAs != null) ||
-                            (whichShow === "apps"   && activeTerminal == item.info.name && item.isRunningAs != null && (item.info.appType === "database" || item.info.appType === undefined)) ||
-                            (whichShow === "tools"  && activeTerminal == item.info.name && item.isRunningAs != null && item.info.appType === "tool")
+                            (whichShow === "all" && activeTerminal == item.info.name && item.isRunningAs != null) ||
+                            (whichShow === item.info.workspace   && 
+                                activeTerminal == item.info.name && 
+                                item.isRunningAs != null
+                            )
                         }
                     />
                 ))}
