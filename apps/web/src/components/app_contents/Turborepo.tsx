@@ -159,13 +159,13 @@ export default function Turborepo(props: TurborepoProps) {
                 {/* Tutorial Button - Top Card */}
                 <button
                     onClick={() => setShowTutorial(true)}
-                    className="mb-4 w-full p-3 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 
-                               hover:border-blue-500/40 hover:from-blue-500/20 hover:to-purple-500/20
+                    className="mb-4 w-full p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 
+                               hover:border-blue-500/40 hover:bg-blue-500/10
                                transition-all duration-300 group"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center 
-                                      group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-blue-500/30 transition-all duration-300">
+                        <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center 
+                                      group-hover:scale-110 transition-all duration-300">
                             <i className="fas fa-book-reader text-white text-lg"></i>
                         </div>
                         <div className="flex flex-col text-left">
@@ -197,7 +197,7 @@ export default function Turborepo(props: TurborepoProps) {
             </div>
 
             {/* Right Panel - Terminal */}
-            <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden border border-white/[0.08] shadow-[0_0_100px_-20px_rgba(168,85,247,0.3)]">
+            <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden border border-white/[0.08]">
                 <TerminalHeader
                     title="Terminal Output"
                     description="Execute commands"

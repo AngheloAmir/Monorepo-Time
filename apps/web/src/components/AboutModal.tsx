@@ -14,7 +14,7 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                 <div className="p-8 flex flex-col items-center text-center">
                     
                     {/* App Logo/Icon */}
-                    <div className="w-20 h-20 mb-6 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 p-[1px] shadow-lg shadow-purple-500/20">
+                    <div className="w-20 h-20 mb-6 rounded-2xl bg-blue-600 p-[1px] shadow-lg shadow-blue-500/20">
                         <div className="w-full h-full bg-black rounded-2xl flex items-center justify-center overflow-hidden">
                              <Logo className="w-12 h-12" />
                         </div>
@@ -23,7 +23,7 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                     {/* Title & Version */}
                     <h2 className="text-3xl font-bold text-white mb-2">
                         Monorepo 
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"> Time</span>
+                        <span className="text-blue-400"> Time</span>
                     </h2>
 
                     {/* Description */}
@@ -39,7 +39,6 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                         rel="noopener noreferrer" 
                         className="group relative inline-flex items-center gap-2 px-6 py-3 bg-[#FFDD00] text-black font-bold rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,221,0,0.4)] hover:bg-[#ffe233]"
                     >
-                        <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                         <i className="fas fa-coffee text-xl transition-transform duration-300 group-hover:rotate-12"></i> 
                         <span className="relative">Buy me a coffee</span>
                     </a>

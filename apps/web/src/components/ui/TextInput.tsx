@@ -15,11 +15,7 @@ export default function TextInput({label, placeholder, value, onChange, rows = 4
 
             <div className="relative group rounded-lg transition-all duration-300">
                 {/* Border Wrapper */}
-                <div className={`relative p-[1px] rounded-lg bg-gradient-to-r 
-                    from-gray-700/40 to-gray-800/40 
-                    group-focus-within:from-blue-500/40 
-                    group-focus-within:to-purple-600/40
-                    transition-colors duration-300`}>
+                <div className="relative p-[1px] rounded-lg bg-gray-800 group-focus-within:bg-blue-600 transition-colors duration-300">
                     <div className="relative bg-gray/[0.1] rounded flex items-center overflow-hidden">
                         <textarea
                             className="pl-3 pr-4 py-2.5 text-sm w-full text-white placeholder-gray-600 focus:outline-none resize-none"
