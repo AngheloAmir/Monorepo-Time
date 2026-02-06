@@ -36,27 +36,3 @@
 button {
   cursor: pointer;
 }
-
-/* 
-  Global Color Calibration 
-  Firefox (Gecko) renders gradients more muted and 'blacker'. 
-  Chrome (Blink) tends to over-saturate purples/indigos, causing a pinkish shift.
-*/
-body {
-  background-color: #000;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Target Chrome/Webkit to match Firefox's more muted/professional profile */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  #app-content {
-    filter: saturate(0.88) contrast(1.02);
-  }
-}
-
-/* Ensure consistent subpixel rendering across engines */
-* {
-  text-rendering: optimizeLegibility;
-  -webkit-tap-highlight-color: transparent;
-}

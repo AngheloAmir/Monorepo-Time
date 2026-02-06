@@ -45,27 +45,29 @@ function Button2(props: ButtonProps) {
             {/* Background Layer for Border (Hover - Colored) */}
             {!props.disabled && (
                 <>
-                    {/* Sharp Border Solid */}
-                    <div className={`absolute inset-0 rounded ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    {/* Outer Glow */}
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-50 blur-lg transition-opacity duration-500`} />
+                    {/* Sharp Border Gradient */}
+                    <div className={`absolute inset-0 rounded bg-gradient-to-r ${borderColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 </>
             )}
 
             {/* Inner Content Container */}
             <div className={`
-                relative h-full w-full rounded bg-[#0A0A0A] p-2 flex items-center gap-3 overflow-hidden
+                relative h-full w-full rounded bg-[#0A0A0A]/80 p-2 flex items-center gap-3 overflow-hidden
                 transition-colors duration-300
-                ${!props.disabled && !props.bg ? 'group-hover:bg-[#111]' : ''}
+                ${!props.disabled && !props.bg ? 'group-hover:bg-[#212121]/70' : ''}
             `}>
                 {/* Active Low-Opacity Background Overlay */}
                 {props.bg && (
-                    <div className={`absolute inset-0 ${borderColor} opacity-20`} />
+                    <div className={`absolute inset-0 bg-gradient-to-r ${borderColor} opacity-20`} />
                 )}
 
                 {/* Icon Container */}
                 <div className={`
                     relative z-10
                     w-9 h-9 rounded-lg flex items-center justify-center shrink-0
-                    ${borderColor} text-white shadow-lg
+                    bg-gradient-to-br ${borderColor} text-white shadow-lg
                     opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300
                 `}>
                     <i className={`fas ${props.icon || 'fa-circle'} text-sm`}></i>

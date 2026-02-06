@@ -9,7 +9,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
 
     return (
         <GradientBody className="rounded-lg overflow-hidden">
-            <header className="p-3 flex items-start gap-4 bg-white/5">
+            <header className="p-3 flex items-start gap-4 bg-gradient-to-b from-white/5 to-transparent">
                 <div className="w-10 h-10 rounded flex items-center justify-center border border-white/10">
                     <i className={`text-xl ${props.info.fontawesomeIcon ?? 'text-gray-400 fa fa-cube'}`}></i>
                 </div>

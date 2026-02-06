@@ -37,17 +37,17 @@ export default function Flash({ onComplete }: FlashProps) {
             <div className="bg-[#111111] border border-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col relative animate-fade-in-up my-auto">
                 
                 {/* Header Decoration */}
-                <div className="h-1 w-full bg-blue-600 shrink-0"></div>
+                <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 shrink-0"></div>
 
                 <div className="p-6 md:p-12 flex-1">
                     {step === 'intro' && (
                         <div className="space-y-8 text-center">
                             <div className="space-y-4">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4">
+                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 mb-4">
                                     <i className="fas fa-cubes text-3xl text-blue-400"></i>
                                 </div>
                                 <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">
-                                    Welcome to <span className="text-blue-400 block sm:inline">Monorepo TIME</span>
+                                    Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 block sm:inline">Monorepo TIME</span>
                                 </h1>
                                 <p className="text-base md:text-lg text-gray-400 max-w-lg mx-auto leading-relaxed">
                                     Your modern dashboard for managing monorepos with speed, elegance, and precision.

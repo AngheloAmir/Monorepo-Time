@@ -22,7 +22,7 @@ export default function CICDTutorial({ onClose }: CICDTutorialProps) {
                     {/* Introduction */}
                     <section id="intro" className="space-y-4">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                                 <i className="fas fa-infinity text-2xl text-white"></i>
                             </div>
                             <div>
@@ -72,13 +72,13 @@ export default function CICDTutorial({ onClose }: CICDTutorialProps) {
                         <div className="flex items-center gap-8 justify-center py-8">
                             <div className="text-center">
                                 <div className="w-16 h-16 mx-auto rounded-full bg-[#1e1e1e] flex items-center justify-center border border-white/20 mb-3">
-                                    <i className="fas fa-cube text-3xl text-red-500"></i>
+                                    <i className="fas fa-cube text-3xl text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500"></i>
                                 </div>
                                 <span className="font-bold text-white">Turborepo</span>
                             </div>
                             <div className="flex flex-col items-center gap-1">
                                 <span className="text-xs text-green-400 font-bold">CACHE HIT!</span>
-                                <div className="h-[2px] w-24 bg-blue-500/20"></div>
+                                <div className="h-[2px] w-24 bg-gradient-to-r from-red-500 to-white"></div>
                                 <i className="fas fa-arrow-right text-white"></i>
                             </div>
                             <div className="text-center">
@@ -143,7 +143,7 @@ export default function CICDTutorial({ onClose }: CICDTutorialProps) {
                         </div>
 
                         {/* Turbo Build Button Note */}
-                        <div className="mt-8 p-5 bg-white/5 rounded-xl border border-purple-500/30">
+                        <div className="mt-8 p-5 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-xl border border-purple-500/30">
                             <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                                 <i className="fas fa-magic text-purple-400"></i>
                                 Pro Tip: The "Turbo Build" Button

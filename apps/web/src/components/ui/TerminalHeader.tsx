@@ -14,16 +14,15 @@ export default function TerminalHeader(props: TerminalHeaderProps) {
             <div className="flex items-center gap-4">
                 {/* Icon with animated ring */}
                 <div className="relative">
-                    {/* Consistent icon glow using solid color */}
-                    <div className={`absolute inset-0 rounded-xl bg-red-500/20 blur-[8px]`}></div>
-                    <div className="relative w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/30">
+                    <div className={`absolute inset-0 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 blur-md opacity-50`}></div>
+                    <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
                         <i className={props.icon}></i>
                     </div>
                 </div>
 
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-blue-400">
+                        <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
                             {props.title}
                         </span>
 

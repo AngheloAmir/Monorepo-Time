@@ -83736,7 +83736,7 @@ route.get("/", async (req, res) => {
     res.json({
       root: ROOT,
       count: projectInfos.length,
-      workspaceDirs: workspaces,
+      workspaces,
       workspace: projectInfos
     });
   } catch (err) {

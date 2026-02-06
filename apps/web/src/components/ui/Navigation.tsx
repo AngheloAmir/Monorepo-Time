@@ -49,7 +49,7 @@ export default function Navigation(props :NavigationProps) {
 
 function NavButton(props: NavButton) {
     const activeClass = props.isSelected
-        ? 'bg-blue-600/80 text-white ring-1 ring-white/20'
+        ? 'bg-gradient-to-br from-blue-600/50 to-indigo-400/50 text-white shadow-[0_0_20px_-5px_rgba(124,58,237,0.5)] ring-1 ring-white/20'
         : 'text-gray-400 hover:bg-white/5 hover:text-white';
 
     return (
