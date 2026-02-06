@@ -13,7 +13,7 @@ export async function checkNameExists(name: string, excludePath?: string): Promi
     const rootPkgPath = path.join(ROOT, "package.json");
     const rootPkg = await readJSON(rootPkgPath);
 
-    let projects: string[] = [];
+    let projects: { path: string; workspace: string }[] = [];
 
     if (rootPkg?.workspaces) {
       projects = await scanWorkspaces(rootPkg);
@@ -21,7 +21,8 @@ export async function checkNameExists(name: string, excludePath?: string): Promi
       projects = await scanRecursively();
     }
 
-    for (const projectPath of projects) {
+    for (const project of projects) {
+        const projectPath = project.path;
         // Skip the excluded workspace if provided
         if (excludePath && path.resolve(projectPath) === path.resolve(excludePath)) {
             continue;

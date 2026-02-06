@@ -38,8 +38,9 @@ export interface DockerProcessInfo {
     name: string;
     path: string;
 
-    //These are found inside of the package the json of the project
+    workspace?:   string;
     fontawesomeIcon?: string;
+    appType?:     string;
     description?: string;
     
     devCommand?: string;
@@ -50,12 +51,13 @@ export interface DockerProcessInfo {
     lintCommand?: string;
     testCommand?: string;
 }
+}
  */
 export interface WorkspaceInfo {
     name: string;
     path: string;
 
-    //These are found inside of the package the json of the project
+    workspace?:   string;
     fontawesomeIcon?: string;
     appType?:     string;
     description?: string;

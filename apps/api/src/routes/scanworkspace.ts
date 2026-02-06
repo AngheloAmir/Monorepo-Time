@@ -4,6 +4,13 @@ import fg from "fast-glob";
 import { Request, Response, Router } from "express";
 import { WorkspaceInfo } from "types";
 
+export interface ScanWorkspaceResponse {
+  root:       string;
+  count:      number;
+  workspaces: string[];
+  workspace:  WorkspaceInfo[];
+}
+
 const START_DIR = process.cwd();
 
 function findMonorepoRoot(startDir: string): string {
@@ -97,16 +104,28 @@ export async function scanWorkspaces(rootPkg: any) {
 
   if (!patterns.length) return [];
 
-  const dirs = await resolveWorkspaceDirs(patterns);
-  const results = new Set<string>();
+  const results: { path: string, workspace: string }[] = [];
 
-  for (const dir of dirs) {
-    if (await isRunnableProject(dir)) {
-      results.add(path.resolve(dir));
+  for (const pattern of patterns) {
+    const workspaceName = pattern.replace(/\/\*$/, "").replace(/\/$/, "");
+    const dirs = await fg(pattern.replace(/\/$/, "") + "/", {
+      cwd: ROOT,
+      onlyDirectories: true,
+      absolute: true,
+      ignore: IGNORE,
+    });
+
+    for (const dir of dirs) {
+      if (await isRunnableProject(dir)) {
+        results.push({
+          path: path.resolve(dir),
+          workspace: workspaceName,
+        });
+      }
     }
   }
 
-  return [...results];
+  return results;
 }
 
 /**
@@ -119,16 +138,21 @@ export async function scanRecursively() {
     ignore: IGNORE,
   });
 
-  const results = new Set<string>();
+  const results: { path: string, workspace: string }[] = [];
 
   for (const pkgFile of pkgFiles) {
     const dir = path.dirname(pkgFile);
     if (await isRunnableProject(dir)) {
-      results.add(path.resolve(dir));
+      const relative = path.relative(ROOT, dir);
+      const workspaceName = relative.split(path.sep)[0] || "root";
+      results.push({
+        path: path.resolve(dir),
+        workspace: workspaceName,
+      });
     }
   }
 
-  return [...results];
+  return results;
 }
 
 /**
@@ -141,7 +165,7 @@ route.get("/", async (req: Request, res: Response) => {
     const rootPkgPath = path.join(ROOT, "package.json");
     const rootPkg = await readJSON(rootPkgPath);
 
-    let projects: string[] = [];
+    let projects: { path: string; workspace: string }[] = [];
 
     if (rootPkg?.workspaces) {
       projects = await scanWorkspaces(rootPkg);
@@ -152,25 +176,32 @@ route.get("/", async (req: Request, res: Response) => {
     // Explicitly scan 'root/opensource' directory if it exists
     const opensourceFolder = path.join(ROOT, "opensource");
     if (await fs.pathExists(opensourceFolder)) {
-      const opensourceDirs = await resolveWorkspaceDirs(["opensource/*"]);
+      const opensourceDirs = await fg(["opensource/*/"], {
+        cwd: ROOT,
+        onlyDirectories: true,
+        absolute: true,
+        ignore: IGNORE,
+      });
+
       for (const dir of opensourceDirs) {
         if (await isRunnableProject(dir)) {
           const absoluteDir = path.resolve(dir);
-          if (!projects.includes(absoluteDir)) {
-            projects.push(absoluteDir);
+          if (!projects.find(p => p.path === absoluteDir)) {
+            projects.push({ path: absoluteDir, workspace: "opensource" });
           }
         }
       }
     }
 
     const projectInfos = (await Promise.all(projects.map(async (p) => {
-      const pkgPath = path.join(p, "package.json");
+      const pkgPath = path.join(p.path, "package.json");
       const pkg = await readJSON(pkgPath);
       if (!pkg) return null;
 
       return {
-        name: pkg.name || path.basename(p),
-        path: p,
+        name: pkg.name || path.basename(p.path),
+        path: p.path,
+        workspace: p.workspace,
         fontawesomeIcon: (pkg.fontawesomeIcon != typeof null)  ? pkg.fontawesomeIcon : null,
         description:     (pkg.description != typeof null)      ? pkg.description : null,
         devCommand:      (pkg.scripts.dev != typeof null)      ? pkg.scripts.dev : null,
@@ -182,13 +213,16 @@ route.get("/", async (req: Request, res: Response) => {
         testCommand:     (pkg.scripts.test != typeof null)     ? pkg.scripts.test : null,
         appType:         (pkg.appType != typeof null)          ? pkg.appType : null,
       } as WorkspaceInfo;
-    }))).filter(Boolean); // Filter out any failed reads
+    }))).filter(Boolean) as WorkspaceInfo[]; // Filter out any failed reads
+
+    const workspaces = [...new Set(projectInfos.map(p => p.workspace).filter(Boolean))];
 
     res.json({
-      root:      ROOT,
-      count:     projectInfos.length,
-      workspace: projectInfos,
-    });
+      root:          ROOT,
+      count:         projectInfos.length,
+      workspaces:    workspaces,
+      workspace:     projectInfos,
+    } as ScanWorkspaceResponse);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
