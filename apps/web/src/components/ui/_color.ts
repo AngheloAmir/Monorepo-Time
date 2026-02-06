@@ -1,5 +1,6 @@
 export const borderColorVariants = {
-    blueIndigo:     'from-blue-500 to-indigo-600',
+    //blueIndigo:     'from-blue-500 to-indigo-600',
+    blueIndigo:     'from-blue-400 to-blue-500',
     emeraldTeal:    'from-emerald-500 to-teal-600',
     yellowOrange:   'from-yellow-500 to-orange-600',
     pinkRose:       'from-pink-500 to-rose-600',
