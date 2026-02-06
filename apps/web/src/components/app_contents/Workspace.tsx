@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import useWorkspaceState, { type WorkspaceItem } from "../../appstates/workspace"
 import TabTerminal from "../workspace/TabTerminal";
 import WorkspaceCard from "../workspace/WorkSpaceCard";
@@ -34,6 +34,21 @@ export default function Workspace(props: WorkspaceProps) {
         }
     }, [whichShow, workspace]);
 
+    const groupedWorkspaces = useMemo(() => {
+        if (!currentWorkspace) return [];
+        const groups: Record<string, WorkspaceItem[]> = {};
+        currentWorkspace.forEach(item => {
+            const dir = item.info.workspace || 'other';
+            if (!groups[dir]) groups[dir] = [];
+            groups[dir].push(item);
+        });
+        const sortedDirs = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+        return sortedDirs.map(dir => ({
+            dir,
+            items: groups[dir].sort((a, b) => a.info.name.localeCompare(b.info.name))
+        }));
+    }, [currentWorkspace]);
+
     return (
         <>
             { props.isVisible && <WorkspaceTabToggle whichShow={whichShow} setWhichShow={setWhichShow} /> }
@@ -42,9 +57,20 @@ export default function Workspace(props: WorkspaceProps) {
                 <div className="grid grid-rows-5 h-full min-h-0 gap-2">
                     <div className="row-span-3 min-h-0 grid grid-cols-4 gap-2 overflow-hidden p-2">
                         <div className="pt-9 col-span-3 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 p-2 relative">
-                            {currentWorkspace?.map((item) => (
-                                <div key={item.info.name}>
-                                    <WorkspaceCard {...item} />
+                            {groupedWorkspaces.map((group) => (
+                                <div key={group.dir} className="contents">
+                                    {whichShow === "all" && (
+                                        <div className="col-span-1 md:col-span-2 xl:col-span-3 first:mt-0">
+                                            <h2 className="text-xs font-bold uppercase tracking-widest text-white/30">
+                                                {group.dir}
+                                            </h2>
+                                        </div>
+                                    )}
+                                    {group.items.map((item) => (
+                                        <div key={item.info.name}>
+                                            <WorkspaceCard {...item} />
+                                        </div>
+                                    ))}
                                 </div>
                             ))}
                         </div>
