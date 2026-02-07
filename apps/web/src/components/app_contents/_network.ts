@@ -44,9 +44,9 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
             {
                 label: 'Close Port',
                 displayCmd: 'kill process',
-                cmd: 'kill $(lsof -t -i:{{input}})',
-                cmdWindow: 'netstat -ano | findstr :{{input}}',
-                cmdMac: 'kill $(lsof -t -i:{{input}})',
+                cmd: 'npx -y kill-port {{input}}',
+                cmdWindow: 'npx -y kill-port {{input}}',
+                cmdMac: 'npx -y kill-port {{input}}',
                 icon: 'fa-skull',
                 color: 'red',
                 requiresInput: true,

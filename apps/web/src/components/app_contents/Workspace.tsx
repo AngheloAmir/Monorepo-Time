@@ -68,7 +68,7 @@ export default function Workspace(props: WorkspaceProps) {
                 <div className="flex flex-col h-full min-h-0">
 
                     <div className={`flex-1 min-h-0 ${isGitControlVisible ? "grid grid-cols-4 gap-2" : "flex"} overflow-hidden p-2 transition-all duration-500 ${isTerminalMaximized ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}>
-                        <div className={`pr-4 ${isGitControlVisible ? 'col-span-3 xl:grid-cols-3' : 'flex-1 xl:grid-cols-4'} pt-8 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 content-start gap-2 relative transition-all duration-300`}>
+                        <div className={`pr-4 ${isGitControlVisible ? 'col-span-3 xl:grid-cols-3' : 'flex-1 xl:grid-cols-4'} pt-9 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 content-start gap-4 relative transition-all duration-300`}>
                             {groupedWorkspaces.map((group) => (
                                 <div key={group.dir} className="contents">
                                     {whichShow === "all" && (
