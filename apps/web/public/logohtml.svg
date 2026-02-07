@@ -1,4 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB" /> <!-- blue-600 -->
+      <stop offset="100%" stop-color="#60A5FA" /> <!-- blue-400 -->
+    </linearGradient>
+  </defs>
+
+  <!-- Background Rounded Rect -->
+  <rect width="200" height="200" rx="40" fill="url(#bgGradient)" />
+
   <!-- Hexagon Background -->
   <path d="M100 20 L170 60 V140 L100 180 L30 140 V60 Z" 
         fill="white" 
