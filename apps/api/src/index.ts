@@ -64,6 +64,8 @@ import availableTemplates from './routes/availabletemplates';
 import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/setworkspace';
 import stopTerminalWorkspace from './routes/stopTerminalWorkspace';
 import deleteWorkspace from './routes/deleteWorkspace';
+import opencodeHelper from './routes/opencodeHelper';
+import opencodeTerminal, { opencodeTerminalSocket } from './routes/opencodeTerminal';
 
 const app = express();
 const port = config.apiPort;
@@ -121,6 +123,8 @@ app.use("/" + apiRoute.docker, apiDocker);
 app.use("/" + apiRoute.availabletemplates, availableTemplates);
 app.use("/" + apiRoute.setWorkspaceTemplate, setWorkspaceTemplate);
 app.use("/" + apiRoute.deleteWorkspace, deleteWorkspace);
+app.use("/" + apiRoute.opencodeHelper, opencodeHelper);
+app.use("/" + apiRoute.opencodeTerminal, opencodeTerminal);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');
@@ -157,6 +161,7 @@ const io = new Server(httpServer, {
 runCmdDevSocket(io);
 interactiveTerminalSocket(io);
 setWorkspaceTemplateSocket(io);
+opencodeTerminalSocket(io);
 
 //=============================================================================
 // Helper to find an available port

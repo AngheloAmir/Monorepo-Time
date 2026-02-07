@@ -24,6 +24,10 @@ interface appContext {
     scaffoldRepo: () => Promise<{ success: boolean; error?: string }>;
     hideShowFileFolder: (filesShow: boolean, pathInclude: string[]) => Promise<{ isHidden: boolean }>;
     getTemplates: () => Promise<AvailbleTemplates>;
+
+    isOpenCodeInstalled: boolean;
+    checkIfInstalled: () => Promise<void>;
+    installOpenCode: () => Promise<void>;
 }
 
 const appstate = create<appContext>()((set, get) => ({
@@ -138,6 +142,20 @@ const appstate = create<appContext>()((set, get) => ({
         const response = await fetch(`${config.serverPath}${apiRoute.availabletemplates}`);
         const data = await response.json();
         return data;
+    },
+
+    isOpenCodeInstalled: false,
+    checkIfInstalled: async () => {
+        if(config.useDemo) return;
+        const response = await fetch(`${config.serverPath}${apiRoute.opencodeHelper}/check`);
+        const data     = await response.json();
+        set({ isOpenCodeInstalled: data.status === "local" });
+    },
+
+    installOpenCode: async () => {
+        if(config.useDemo) return;
+        await fetch(`${config.serverPath}${apiRoute.opencodeHelper}/install`);
+        await get().checkIfInstalled();
     },
 }));
 

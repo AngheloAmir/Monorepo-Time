@@ -5,78 +5,33 @@ import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
 import "xterm/css/xterm.css";
 
-export interface InteractiveTerminalRef {
-    /** Writes data directly to the xterm instance */
-    write: (data: string) => void;
-    /** Sends input data to the connected socket terminal process */
-    input: (data: string) => void;
-    /** Registers a callback to receive data events from the terminal */
-    onData: (callback: (data: string) => void) => void;
-    /** Registers a callback to be called when the terminal process closes */
-    onClose: (callback: () => void) => void;
-    /** Registers a callback to be called when the terminal process crashes (exit code != 0) */
-    onCrash: (callback: (code: number) => void) => void;
-    /** Triggers the fit addon to resize the terminal to its container */
-    fit: () => void;
-    /** Clears the terminal buffer */
-    clear: () => void;
+export interface OpenCodeTerminalRef {
     /** Focuses the terminal input */
     focus: () => void;
     /** Manually initiates a connection to a terminal process */
-    connect: (path: string, command?: string, workspaceName?: string) => void;
+    connect: (path: string, command: string) => void;
     /** Manually disconnects the socket connection */
     disconnect: () => void;
+    /** Fits the terminal to the container */
+    fit: () => void;
+    /** Clears the terminal buffer */
+    clear: () => void;
 }
 
-interface InteractiveTerminalProps {
+// ... (props interface unchanged) ...
+interface OpenCodeTerminalProps {
     /** CSS class names for the container */
     className?: string;
-    /** Initial text to display in the terminal before connection */
-    startingText?: string;
     /** Custom socket.io URL (default: http://localhost:3000) */
     socketUrl?: string;
-    /** Whether the terminal accepts user input (default: true) */
-    isInteractive?: boolean;
     /** Callback function called when the process exits */
     onExit?: () => void;
     /** Callback function called when the process crashes (non-zero exit) */
     onCrash?: (code: number) => void;
 }
 
-/** An interactive terminal
- * 
- * @example
- * ```tsx
- * import InteractiveTerminal, { type InteractiveTerminalRef } from "./InteractiveTerminal";
- *
- * export default function MyTerminal() {
- *     const terminalRef = useRef<InteractiveTerminalRef>(null);
- *     useEffect(() => {
- *         if (terminalRef.current) {
- *             setTimeout(() => {
- *                 terminalRef.current?.connect(rootDir);
- *                 terminalRef.current?.focus();
- *             }, 50);
- *             return () => {
- *                 if(terminalRef.current) {
- *                     terminalRef.current.disconnect();
- *                 }
- *             }
- *         }
- *     }, []);
- *
- *     return (
- *         <InteractiveTerminal 
- *             ref={terminalRef}
- *             isInteractive={true}
- *             className="h-full"
- *             onExit={() => console.log("Terminal exited")}
- *         />
- *     )
- * }
- * ```
- */
-const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTerminalProps>((props, ref) => {
+/** An interactive terminal optimized for Opencode */
+const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>((props, ref) => {
     // We hold the Terminal instance here to control it directly
     const terminalRef = useRef<Terminal | null>(null);
     // Reference to the Console component (mainly for fit())
@@ -84,11 +39,6 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     
     const socketRef = useRef<Socket | null>(null);
     
-    // Callbacks exposed to parent via the Ref interface
-    const onDataCallbackRef = useRef<((data: string) => void) | null>(null);
-    const onCloseCallbackRef = useRef<(() => void) | null>(null);
-    const onCrashCallbackRef = useRef<((code: number) => void) | null>(null);
-
     // Helper to disconnect socket
     const disconnectSocket = () => {
         if (socketRef.current) {
@@ -99,7 +49,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     };
 
     // Helper to connect socket
-    const connectSocket = async (path: string, command: string = 'bash', workspaceName?: string) => {
+    const connectSocket = async (path: string, command: string) => {
         disconnectSocket();
         const { io } = await import("socket.io-client");
 
@@ -107,7 +57,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         const socket   = io(url, {
             transports: ['websocket'],
             forceNew: true, // Important for connection stability
-            reconnection: false // We manage lifecycle manually, so disable auto-reconnect to avoid race conditions
+            reconnection: false // We manage lifecycle manually
         });
 
         socketRef.current = socket;
@@ -119,7 +69,7 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
                 terminalRef.current?.write(`\x1b[34m${path}\x1b[0m: ${command}\r\n`);
             }
 
-            socket.emit('terminal:start', { path, command, workspaceName });
+            socket.emit('opencode:start', { path, command });
             terminalRef.current?.focus();
             
             // Try fitting again after connection
@@ -128,29 +78,23 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
             }, 100);
         });
 
-        socket.on('terminal:log', (data: string) => {
+        socket.on('opencode:log', (data: string) => {
             terminalRef.current?.write(data);
         });
 
-        socket.on('terminal:error', (data: string) => {
+        socket.on('opencode:error', (data: string) => {
             terminalRef.current?.write(`\x1b[31m${data}\x1b[0m`);
         });
 
-        socket.on('terminal:exit', (code: number) => {
+        socket.on('opencode:exit', (code: number) => {
             terminalRef.current?.write(`\r\n\x1b[33mProcess exited with code ${code}\x1b[0m\r\n`);
             
             if (code !== 0) {
-                if (onCrashCallbackRef.current) {
-                    onCrashCallbackRef.current(code);
-                }
                 if (props.onCrash) {
                     props.onCrash(code);
                 }
             }
 
-            if (onCloseCallbackRef.current) {
-                onCloseCallbackRef.current();
-            }
             if (props.onExit) {
                 props.onExit();
             }
@@ -158,55 +102,24 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     };
 
     useImperativeHandle(ref, () => ({
-        write: (data: string) => {
-            terminalRef.current?.write(data);
-        },
-        input: (data: string) => {
-             // If socket is active, send to socket
-             if (socketRef.current && socketRef.current.connected) {
-                 // Programmatic input usually implies a command execution, so we ensure a newline if strictly just a command
-                 const commandToSend = data.endsWith('\r') ? data : data + '\r';
-                 socketRef.current.emit('terminal:input', commandToSend);
-             } else {
-                 // Simulate user input by sending data/command to the registered onData handler local callback
-                 // This effectively loops it back to the terminal if someone's listening
-                 if (onDataCallbackRef.current) {
-                     onDataCallbackRef.current(data + '\r');
-                 }
-             }
-        },
-        onData: (callback: (data: string) => void) => {
-            onDataCallbackRef.current = callback;
-        },
-        onClose: (callback: () => void) => {
-            onCloseCallbackRef.current = callback;
-        },
-        onCrash: (callback: (code: number) => void) => {
-            onCrashCallbackRef.current = callback;
-        },
-        fit: () => {
-            consoleComponentRef.current?.fit();
-        },
-        clear: () => {
-            terminalRef.current?.clear();
-        },
         focus: () => {
             terminalRef.current?.focus();
         },
-        connect: (path: string, command: string = 'bash', workspaceName?: string) => {
-            connectSocket(path, command, workspaceName);
+        connect: (path: string, command: string) => {
+            connectSocket(path, command);
         },
         disconnect: () => {
             disconnectSocket();
+        },
+        fit: () => {
+             consoleComponentRef.current?.fit();
+        },
+        clear: () => {
+             terminalRef.current?.clear();
         }
     }));
-
-    // Handle initial text
-    useEffect(() => {
-        if (props.startingText && terminalRef.current) {
-            terminalRef.current.write(props.startingText);
-        }
-    }, [props.startingText]);
+    
+    // ... (rest of component unchanged) ...
 
     // Cleanup on unmount
     useEffect(() => {
@@ -215,45 +128,16 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
         };
     }, []);
 
-    // Handle interactivity changes
-    useEffect(() => {
-        const term = terminalRef.current;
-        if (!term) return;
-        
-        const interactive = props.isInteractive ?? true;
-        
-        term.options.disableStdin = !interactive;
-        term.options.cursorBlink = interactive;
-        term.options.cursorStyle = interactive ? 'block' : 'underline';
-        
-        if (!interactive) {
-            term.options.theme = {
-                ...term.options.theme,
-                cursor: 'transparent'
-            };
-        } else {
-            term.options.theme = {
-                ...term.options.theme,
-                cursor: '#ffffff'
-            };
-        }
-
-    }, [props.isInteractive]);
-
     const handleData = (data: string) => {
         // Forward input to socket if connected
         if (socketRef.current && socketRef.current.connected) {
-            socketRef.current.emit('terminal:input', data);
-        }
-        // Also trigger local callback (for parents listening to raw input)
-        if (onDataCallbackRef.current) {
-            onDataCallbackRef.current(data);
+            socketRef.current.emit('opencode:input', data);
         }
     };
 
     const handleResize = (cols: number, rows: number) => {
         if (socketRef.current && socketRef.current.connected) {
-            socketRef.current.emit('terminal:resize', { cols, rows });
+            socketRef.current.emit('opencode:resize', { cols, rows });
         }
     };
 
@@ -269,8 +153,8 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
     );
 });
 
-InteractiveTerminal.displayName = "InteractiveTerminal";
-export default InteractiveTerminal;
+OpenCodeTerminal.displayName = "OpenCodeTerminal";
+export default OpenCodeTerminal;
 
 interface ConsoleProps {
     className?: string;
@@ -337,6 +221,22 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
         term.loadAddon(fitAddon);
         term.loadAddon(webLinksAddon);
 
+        term.attachCustomKeyEventHandler((event) => {
+             // Capture Ctrl+<Key> combinations to prevent browser defaults (like Ctrl+P, Ctrl+S)
+             // and ensure they are sent to the terminal.
+             if (event.type === 'keydown' && event.ctrlKey) {
+                 // Allow Copy (Ctrl+C) / Paste (Ctrl+V) if needed, but for now we prioritize terminal input
+                 // If the user has a selection, xterm usually handles copy internally or via extension
+                 
+                 // We specifically requested support for keys like Ctrl+X
+                 // Preventing default ensures the browser doesn't try to handle it (e.g. Cut)
+                 // returning true tells xterm to process the event (emit data)
+                 event.preventDefault();
+                 return true;
+             }
+             return true;
+        });
+
         // Delay opening to ensure DOM is ready and visible
         // This fixes the "can't access property dimensions" error when opening inside a modal
         const initTimeout = setTimeout(() => {
@@ -348,7 +248,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
                         onResizeRef.current(term.cols, term.rows);
                     }
                 } catch (e) {
-                    console.warn("Fit failed on init:", e);
+                    // ignore
                 }
             }
         }, 0);

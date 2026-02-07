@@ -101,6 +101,8 @@ const apiRoute = {
     setWorkspaceTemplate: 'setworkspacetemplate',
 
     deleteWorkspace: 'deleteworkspace',
+    opencodeHelper: 'opencode',
+    opencodeTerminal: 'opencodeterminal',
 }
 
 export default apiRoute;
