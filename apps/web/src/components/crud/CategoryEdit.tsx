@@ -4,6 +4,7 @@ import type { CrudCategory } from "types";
 import ModalHeader from "../ui/ModalHeader";
 import ModalBody from "../ui/ModalBody";
 import InputField from "../ui/InputField";
+import Button3 from "../ui/Button3";
 
 interface CategoryEditProps {
     isOpen: boolean;
@@ -120,12 +121,12 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
                 </div>
 
                 <footer className="mt-4 flex justify-between px-4">
-                    { categoryIndex !== -1 ? <button
+                    {categoryIndex !== -1 ? <button
                         onClick={handleDelete}
                         className="group relative px-6 py-2 rounded-lg font-medium text-sm text-red-400 hover:text-red-600 transition-colors overflow-hidden" >
                         Delete
                         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    </button> : <div></div> 
+                    </button> : <div></div>
                     }
 
                     <div className="flex gap-6">
@@ -136,16 +137,11 @@ export default function CategoryEdit({ isOpen, onClose, categoryIndex }: Categor
                             <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </button>
 
-                        <button
+                        <Button3
                             onClick={handleSave}
-                            className="group relative px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
-                            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
-                            <span className="relative z-10 flex items-center gap-2">
-                                <i className="fas fa-save"></i>
-                                Save
-                            </span>
-                        </button>
+                            text="Save"
+                            icon="fas fa-save"
+                        />
                     </div>
                 </footer>
             </div>

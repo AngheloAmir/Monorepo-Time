@@ -13,12 +13,10 @@ import Flash from './components/app_contents/Flash';
 import Loading from './components/app_contents/_Loading';
 import Turborepo from './components/app_contents/Turborepo';
 import CRUDTester from './components/app_contents/CrudTester';
-//import ProjectTemplate from './components/app_contents/ProjectTemplate';
 import AboutModal from './components/AboutModal';
 import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
-import ColorPallette from './components/app_contents/ColorPallette';
 
 declare global {
     interface Window {
@@ -96,13 +94,14 @@ export default function App() {
                             onClick: () => navAction.setCurrentPage('crud') 
                         },
 
-                        { 
-                            name: 'color-pallette',
-                            label: 'Color Pallette',
-                            icon: 'fa fa-solid fa-palette',
-                            isSelected: currentPage === 'color-pallette',
-                            onClick: () => navAction.setCurrentPage('color-pallette') 
-                        },
+
+                        // { 
+                        //     name: 'color-pallette',
+                        //     label: 'Color Pallette',
+                        //     icon: 'fa fa-solid fa-palette',
+                        //     isSelected: currentPage === 'color-pallette',
+                        //     onClick: () => navAction.setCurrentPage('color-pallette') 
+                        // },
                     ]}
                     extraNavs={[
                         { 
@@ -136,7 +135,7 @@ export default function App() {
                         <Network    isVisible={currentPage === "network"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
 
-                        <ColorPallette isVisible={currentPage === "color-pallette"} />
+                        {/* <ColorPallette isVisible={currentPage === "color-pallette"} /> */}
                     </div>
                 </main>
             </div>

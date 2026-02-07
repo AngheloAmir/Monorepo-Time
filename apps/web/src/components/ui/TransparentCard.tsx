@@ -9,9 +9,9 @@ interface TransparentCardProps {
 export default function TransparentCard(props: TransparentCardProps) {
     return (
 
-        <div className="rounded bg-gray-800/40 border border-white/[0.1] overflow-hidden">
+        <div className="rounded bg-gray-800/30 overflow-hidden">
             <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center gap-3">
-                <span className="text-gray-300 font-medium text-sm">
+                <span className="text-white font-medium text-sm">
                     {props.title}
                 </span>
                 <span className="ml-auto text-gray-600 text-xs">{props.description}</span>

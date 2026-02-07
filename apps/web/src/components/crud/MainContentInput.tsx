@@ -62,7 +62,7 @@ export default function MainContentInput() {
                     className="group relative px-6 py-2 rounded-xl font-bold text-xs tracking-wide text-white overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-600/20 flex-none h-10 flex items-center gap-2"
                     onClick={sendRequest}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400"></div>
                     <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <span className="relative z-10">
                         SEND REQUEST
@@ -114,7 +114,7 @@ export default function MainContentInput() {
                 <div className={`p-[1px] rounded-lg bg-gradient-to-r 
                     from-gray-700/40 to-gray-800/40 
                     group-focus-within:from-blue-500/40 
-                    group-focus-within:to-purple-600/40
+                    group-focus-within:to-blue-400/40
                     transition-colors duration-300`}>
                     <div className="bg-gray/[0.1] rounded flex items-center overflow-hidden">
                         <div className="pl-3 flex items-center pointer-events-none">

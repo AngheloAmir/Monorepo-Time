@@ -8,64 +8,11 @@ import CICDTutorial from "../CICDTutorial";
 import config from 'config';
 import TransparentCard from "../ui/TransparentCard";
 import TerminalHeader from "../ui/TerminalHeader";
+import commandGroups from "./_turborepo";
 
 interface TurborepoProps {
     isVisible: boolean
 }
-
-// Grouped commands for better organization
-const commandGroups = [
-    {
-        title: 'Build & Run',
-        commands: [
-            { label: 'Install', cmd: 'npm install', icon: 'fa-download', color: 'blueIndigo' },
-            { label: 'Build', cmd: 'turbo build', icon: 'fa-hammer', color: 'emeraldTeal' },
-            { label: 'Force', cmd: 'turbo run build --force', icon: 'fa-sync-alt', color: 'yellowOrange' },
-        ]
-    },
-    {
-        title: 'Code Quality',
-        commands: [
-            { label: 'Lint', cmd: 'turbo lint', icon: 'fa-check-double', color: 'yellowOrange' },
-            { label: 'Test', cmd: 'turbo test', icon: 'fa-vial', color: 'pinkRose' },
-        ]
-    },
-    {
-        title: 'Optimization',
-        commands: [
-            { label: 'Prune', cmd: 'turbo prune', icon: 'fa-scissors', color: 'red' },
-            { label: 'Docker', cmd: 'turbo prune --docker', icon: 'fa-docker', color: 'skyBlue' },
-            { label: 'Summary', cmd: 'turbo run build --dry-run', icon: 'fa-list-alt' },
-            { label: 'Generate', cmd: 'turbo gen', icon: 'fa-plus-circle', color: 'pinkRose' },
-        ]
-    },
-    {
-        title: 'Diagnostics',
-        commands: [
-            { label: 'Graph', cmd: 'turbo run build --graph', icon: 'fa-project-diagram', color: 'cyanBlue' },
-            { label: 'Info', cmd: 'turbo info', icon: 'fa-info-circle', color: 'blueIndigo' },
-            { label: 'Daemon', cmd: 'turbo daemon status', icon: 'fa-server', color: 'gray' },
-        ]
-    },
-    {
-        title: 'Remote Cache',
-        commands: [
-            { label: 'Link', cmd: 'npx turbo link', icon: 'fa-cloud', color: 'cyanBlue' },
-            { label: 'Login', cmd: 'turbo login', icon: 'fa-sign-in-alt', color: 'emeraldTeal' },
-            { label: 'Unlink', cmd: 'turbo unlink', icon: 'fa-unlink', color: 'red' },
-        ]
-    },
-    {
-        title: 'Maintenance',
-        commands: [
-            { label: 'Clean', cmd: 'turbo clean', icon: 'fa-broom', color: 'gray' },
-            { label: 'Cache', cmd: 'rm -rf node_modules/.cache/turbo .turbo', icon: 'fa-trash-alt', color: 'darkRed' },
-        ]
-    },
-];
-
-// Flat commands list for export compatibility
-export const commands = commandGroups.flatMap(group => group.commands);
 
 export default function Turborepo(props: TurborepoProps) {
     const terminalRef = useRef<InteractiveTerminalRef>(null);
@@ -159,15 +106,11 @@ export default function Turborepo(props: TurborepoProps) {
                 {/* Tutorial Button - Top Card */}
                 <button
                     onClick={() => setShowTutorial(true)}
-                    className="mb-4 w-full p-3 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 
+                    className="mb-4 w-full p-3 rounded-lg border border-blue-500/20 
                                hover:border-blue-500/40 hover:from-blue-500/20 hover:to-purple-500/20
                                transition-all duration-300 group"
                 >
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center 
-                                      group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-blue-500/30 transition-all duration-300">
-                            <i className="fas fa-book-reader text-white text-lg"></i>
-                        </div>
                         <div className="flex flex-col text-left">
                             <span className="text-white font-semibold text-sm">CI/CD Tutorial</span>
                             <span className="text-gray-400 text-xs">Learn deployment with Vercel</span>
@@ -197,7 +140,7 @@ export default function Turborepo(props: TurborepoProps) {
             </div>
 
             {/* Right Panel - Terminal */}
-            <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden border border-white/[0.08] shadow-[0_0_100px_-20px_rgba(168,85,247,0.3)]">
+            <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden border border-white/[0.08]">
                 <TerminalHeader
                     title="Terminal Output"
                     description="Execute commands"

@@ -39,12 +39,12 @@ export default function AccordionNav() {
     };
 
     return (
-        <div className="w-full flex flex-col pb-10">
+        <div className="w-full flex flex-col pb-12">
             {crudData.map((category, catIndex) => (
                 <div key={catIndex} className="flex flex-col">
                     <button 
                         onClick={() => toggleCategory(catIndex)}
-                        className="flex items-center justify-between py-1 px-2 hover:bg-white/5 rounded-lg transition-colors group mb-1"
+                        className="px-3 flex items-center justify-between py-1 bg-gradient-to-br hover:from-blue-600 hover:to-blue-400 from-blue-600/5 to-blue-400/5 rounded-lg transition-colors group mb-1"
                     >
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-white transition-colors">
                             {category.category}
@@ -56,7 +56,7 @@ export default function AccordionNav() {
                                     e.stopPropagation();
                                     setCategoryEditModal({ isOpen: true, categoryIndex: catIndex });
                                 }}
-                                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all text-gray-500 hover:text-white"
+                                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all text-white"
                             >
                                 <i className="fas fa-pen text-[10px]"></i>
                             </div>
@@ -73,8 +73,8 @@ export default function AccordionNav() {
                                         key={itemIndex}
                                         className={`group relative flex items-center justify-between px-2 rounded-lg cursor-pointer transition-all border border-transparent
                                             ${isActive 
-                                                ? 'bg-blue-500/10 border-blue-500/20' 
-                                                : 'hover:bg-white/5 hover:border-white/5'
+                                                ? 'bg-gradient-to-br from-blue-600/50 to-blue-400/50' 
+                                                : 'bg-gradient-to-br hover:from-blue-600/30 hover:to-blue-400/30'
                                             }`}
                                         onClick={() => handleItemClick(catIndex, itemIndex, item)}
                                     >
@@ -88,7 +88,7 @@ export default function AccordionNav() {
                                             }`}>
                                                 {item.methods}
                                             </span>
-                                            <span className={`text-sm font-medium truncate transition-colors ${isActive ? 'text-blue-400' : 'text-gray-300 group-hover:text-white'}`}>
+                                            <span className={`text-sm font-medium truncate transition-colors ${isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'}`}>
                                                 {item.label}
                                             </span>
                                         </div>
@@ -98,7 +98,7 @@ export default function AccordionNav() {
                                                 e.stopPropagation();
                                                 setEditModal({ isOpen: true, categoryIndex: catIndex, itemIndex });
                                             }}
-                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-white/10 text-gray-500 hover:text-white transition-all"
+                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-md hover:bg-white/10 text-white hover:text-white transition-all"
                                             title="Edit Item"
                                         >
                                             <i className="fas fa-pen text-xs"></i>
