@@ -17,6 +17,7 @@ import AboutModal from './components/AboutModal';
 import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
+import OpenCode from './components/app_contents/OpenCode';
 
 declare global {
     interface Window {
@@ -80,6 +81,13 @@ export default function App() {
                             onClick: () => navAction.setCurrentPage('workspace') 
                         },
                         { 
+                            name: 'open-code',
+                            label: 'OpenCode',
+                            icon: 'fa fa-solid fa-terminal',
+                            isSelected: currentPage === 'open-code',
+                            onClick: () => navAction.setCurrentPage('open-code') 
+                        },
+                        { 
                             name: 'turborepo',
                             label: 'Turborepo',
                             icon: 'fa fa-solid fa-truck-fast',
@@ -94,7 +102,6 @@ export default function App() {
                             onClick: () => navAction.setCurrentPage('crud') 
                         },
 
-
                         // { 
                         //     name: 'color-pallette',
                         //     label: 'Color Pallette',
@@ -102,6 +109,7 @@ export default function App() {
                         //     isSelected: currentPage === 'color-pallette',
                         //     onClick: () => navAction.setCurrentPage('color-pallette') 
                         // },
+                        
                     ]}
                     extraNavs={[
                         { 
@@ -130,11 +138,12 @@ export default function App() {
                     <div id="app-content" className="w-full max-w-[2100px] mx-auto h-full relative z-10">
                         <Home       isVisible={currentPage === "dashboard"} />
                         <Workspace  isVisible={currentPage === "workspace"} />
+                        <OpenCode   isVisible={currentPage === "open-code"} />
                         <Turborepo  isVisible={currentPage === "turborepo"} />
                         <Cloudflare isVisible={currentPage === "cloudflare"} />
                         <Network    isVisible={currentPage === "network"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
-
+                        
                         {/* <ColorPallette isVisible={currentPage === "color-pallette"} /> */}
                     </div>
                 </main>
