@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "@radix-ui/themes": "^3.2.1",
     "ace-builds": "^1.43.5",
     "ansi_up": "^6.0.6",
