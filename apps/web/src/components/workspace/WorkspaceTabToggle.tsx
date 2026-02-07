@@ -19,6 +19,7 @@ export function WorkspaceTabToggle(props: WorkspaceTabToggleProps) {
             </button>
             {workspaceDirs.map((dir) => (
                 <button
+                    key={dir}
                     onClick={() => setWhichShow(dir)}
                     className={`${whichShow === dir ? "bg-gradient-to-br from-blue-600 to-blue-400" : ""} px-4 py-1 text-[10px] font-bold uppercase rounded-lg transition-all text-white`}
                 >

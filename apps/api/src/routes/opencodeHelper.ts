@@ -12,8 +12,15 @@ router.get("/check", async (req, res) => {
         if (await fs.pathExists(packageJsonPath)) {
             const packageJson = await fs.readJson(packageJsonPath);
             const devDeps     = packageJson.devDependencies || {};
+            const deps        = packageJson.dependencies || {};
 
-            if ( devDeps["opencode-ai"] ) {
+            let isGlobal = false;
+            try {
+                await execa('opencode', ['--version']);
+                isGlobal = true;
+            } catch (error) {}
+
+            if ( devDeps["opencode-ai"] || deps["opencode-ai"] || isGlobal ) {
                 res.json({ status: "local" });
                 return;
             }
@@ -28,19 +35,7 @@ router.get("/check", async (req, res) => {
 
 router.get("/install", async (req, res) => {
     try {
-        // 1. Install opencode-ai
-        await execa('npm', ['install', '-D', 'opencode-ai'], { cwd: ROOT });
-
-        // 2. Add script to package.json
-        const packageJsonPath = path.join(ROOT, "package.json");
-        if (await fs.pathExists(packageJsonPath)) {
-            const packageJson = await fs.readJson(packageJsonPath);
-            packageJson.scripts = packageJson.scripts || {};
-            packageJson.scripts.opencode = "opencode";
-            
-            await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
-        }
-
+        await execa('npm', ['install', '-g', 'opencode-ai']);
         res.json({ success: true });
 
     } catch (error: any) {

@@ -10,8 +10,7 @@
     "build": "cd apps/web && npm run build && cd ../api && npm run build",
     "start": "node index.js",
     "dep": "npm run build -w monorepotime && rm -rf \"/home/anghelo/Desktop/Link to Projects/monotime/test/node_modules/monorepotime/dist\" && cp -r \"/home/anghelo/Desktop/Link to Projects/monotime/MonoTime/apps/api/dist\" \"/home/anghelo/Desktop/Link to Projects/monotime/test/node_modules/monorepotime/dist\"",
-    "stop": "node -e 'const fs=require(\"fs\"); try{const p=JSON.parse(fs.readFileSync(\".runtime.json\")).port; fetch(\"http://localhost:\"+p+\"/stop\").catch(e=>{})}catch(e){}'",
-    "opencode": "opencode"
+    "stop": "node -e 'const fs=require(\"fs\"); try{const p=JSON.parse(fs.readFileSync(\".runtime.json\")).port; fetch(\"http://localhost:\"+p+\"/stop\").catch(e=>{})}catch(e){}'"
   },
   "keywords": [],
   "workspaces": [

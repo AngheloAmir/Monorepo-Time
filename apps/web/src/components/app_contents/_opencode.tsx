@@ -23,12 +23,22 @@ export function OpenCodeContent( {isVisible, onInstall}: {isVisible: boolean, on
                     onClick={onInstall}
                     className="group relative inline-flex items-center justify-center px-8 py-3 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900"
                 >
-                    <i className="fas fa-download mr-2 group-hover:animate-bounce"></i>
-                    Install OpenCode as DevDependency
+                    <div className="flex flex-col">
+                        <h2 className="text-lg">Install OpenCode Globally</h2>
+                        <p className="text-xs">
+                            npm i -g opencode-ai
+                        </p>
+                    </div>
                 </button>
 
                 <p className="mt-4 text-xs text-neutral-500">
-                    This will add opencode-ai to your devDependencies and configure the necessary scripts.
+                    Disclaimer: This is not sponsored by opencode.ai,
+                    it happens that they provide free access to their tool.
+                </p>
+
+                <p className="mt-4 text-xs text-neutral-500">
+                    * My version of this tool is not full-supported,
+                    but it is a good starting point. Ideally you should use the terminal version.
                 </p>
             </div>
         </div>
@@ -51,6 +61,14 @@ export function StartOpenCode({ isVisible, onStart }: { isVisible: boolean, onSt
                     <i className="fas fa-terminal mr-2 group-hover:-translate-y-1 transition-transform duration-200"></i>
                     Launch Terminal
                 </button>
+
+                <p className="mt-4 text-xs text-neutral-500">
+                    Not all features are support in this app, please use
+                    <a href="https://opencode.ai/" target="_blank" rel="noopener noreferrer" className="mx-1 text-blue-400 hover:text-blue-300 transition-colors duration-200 pr-2">
+                        the terminal, web or desktop version
+                    </a>
+                    for the full experience.
+                </p>
             </div>
         </div>
     )

@@ -33,7 +33,11 @@ export default function OpenCode(props: CloudflareProps) {
         return (
             <OpenCodeContent
                 isVisible={props.isVisible}
-                onInstall={() => useAppState.getState().installOpenCode()}
+                onInstall={() => {
+                    useAppState.getState().installOpenCode();
+                    checkIfInstalled();
+                    loadRootDir();
+                }}
             />
         )
 
@@ -41,7 +45,7 @@ export default function OpenCode(props: CloudflareProps) {
         <>
             <div className={`h-[92%] w-full p-4 gap-6 ${props.isVisible && isRunning ? 'flex' : 'hidden'}`}>
                 <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded overflow-hidden border border-white/[0.08]">
-                    <div className="w-full flex-1 min-h-0 p-2 bg-black/20">
+                    <div className="w-full flex-1 min-h-0 bg-black/20">
                         <OpenCodeTerminal
                             ref={terminalRef}
                             className="h-full w-full"
@@ -63,7 +67,7 @@ export default function OpenCode(props: CloudflareProps) {
                     if (terminalRef.current) {
                         setIsRunning(true);
                         terminalRef.current?.fit();
-                        terminalRef.current?.connect(rootDir, 'npm run opencode');
+                        terminalRef.current?.connect(rootDir, 'opencode');
                         terminalRef.current?.focus();
                     }
                 }}

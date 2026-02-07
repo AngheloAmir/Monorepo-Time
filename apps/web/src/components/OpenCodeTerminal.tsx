@@ -287,6 +287,6 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
     }, []);
 
     return (
-        <div className="h-full w-full overflow-hidden bg-transparent p-1" ref={divRef} />
+        <div className="h-full w-full overflow-hidden bg-transparent" ref={divRef} />
     );
 });
