@@ -1,5 +1,5 @@
-import Logo from "./Logo";
 import useAppState from "../appstates/app";
+import Logo from "./Logo";
 
 export default function Header() {
     const setShowAboutModal = useAppState.use.setShowAboutModal();
@@ -8,7 +8,7 @@ export default function Header() {
         <header className="h-12 w-full px-6 py-2 sticky top-0 bg-white/4">
             <div className="flex items-center justify-between gap-4 h-full">
                 <div className="flex items-center gap-4">
-                    <Logo className="w-8 h-8" />
+                    <Logo />
                     <div>
                         <h1 className="text-xl font-space tracking-tight text-white font-medium">
                             Monorepo
@@ -19,7 +19,7 @@ export default function Header() {
                     </div>
                 </div>
 
-                <button 
+                <button
                     onClick={() => setShowAboutModal(true)}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all group"
                 >
