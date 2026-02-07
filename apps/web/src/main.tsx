@@ -5,12 +5,11 @@ import './index.css'
 import App from './App.tsx'
 
 // Browser detection for color correction
+//For some reason, chrome can produce different colors than other browsers
 const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 if (isChrome) {
-    document.documentElement.classList.add('is-chrome');
-} else {
-    document.documentElement.classList.add('is-not-chrome');
-}
+  document.documentElement.classList.add('is-chrome');
+} 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

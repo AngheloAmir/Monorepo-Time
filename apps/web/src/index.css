@@ -13,34 +13,20 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  /* Default Blue (Firefox/Standard) - Hue ~260 */
-  --color-blue-50:  oklch(0.97 0.014 260);
-  --color-blue-100: oklch(0.93 0.032 260);
-  --color-blue-200: oklch(0.88 0.062 260);
-  --color-blue-300: oklch(0.80 0.115 260);
-  --color-blue-400: oklch(0.70 0.165 260);
-  --color-blue-500: oklch(0.60 0.200 260);
-  --color-blue-600: oklch(0.50 0.180 260);
-  --color-blue-700: oklch(0.40 0.150 260);
-  --color-blue-800: oklch(0.30 0.120 260);
-  --color-blue-900: oklch(0.20 0.090 260);
-  --color-blue-950: oklch(0.15 0.060 260);
 }
 
 .is-chrome {
-  /* Chrome Fix (Lighter/Cyan Shift) - Hue 250 */
-  --color-blue-50:  oklch(0.97 0.014 250);
-  --color-blue-100: oklch(0.93 0.032 250);
-  --color-blue-200: oklch(0.88 0.062 250);
-  --color-blue-300: oklch(0.80 0.115 250);
-  --color-blue-400: oklch(0.70 0.165 250);
-  --color-blue-500: oklch(0.60 0.200 250); /* The hero color */
-  --color-blue-600: oklch(0.50 0.180 250);
-  --color-blue-700: oklch(0.40 0.150 250);
-  --color-blue-800: oklch(0.30 0.120 250);
-  --color-blue-900: oklch(0.20 0.090 250);
-  --color-blue-950: oklch(0.15 0.060 250);
+  --color-blue-50: oklch(0.97 0.014 240);
+  --color-blue-100: oklch(0.93 0.032 240);
+  --color-blue-200: oklch(0.88 0.062 240);
+  --color-blue-300: oklch(0.80 0.115 240);
+  --color-blue-400: oklch(0.70 0.165 240);
+  --color-blue-500: oklch(0.60 0.200 240);
+  --color-blue-600: oklch(0.50 0.180 240);
+  --color-blue-700: oklch(0.40 0.150 240);
+  --color-blue-800: oklch(0.30 0.120 240);
+  --color-blue-900: oklch(0.20 0.090 240);
+  --color-blue-950: oklch(0.15 0.060 240);
 }
 
 ::-webkit-scrollbar {
