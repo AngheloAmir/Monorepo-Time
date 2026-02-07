@@ -18,8 +18,8 @@ export default function InputField(props: InputFieldProps) {
                 {/* Border Wrapper */}
                 <div className={`relative p-[1px] rounded-lg bg-gradient-to-r 
                     from-gray-700/40 to-gray-800/40 
-                    group-focus-within:from-blue-500/40 
-                    group-focus-within:to-purple-600/40
+                    group-focus-within:from-blue-600/20 
+                    group-focus-within:to-blue-400/20
                     transition-colors duration-300
                     ${props.disabled ? 'bg-transparent cursor-not-allowed' : ''}
                     `}>

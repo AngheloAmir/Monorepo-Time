@@ -24,10 +24,10 @@ export default function SelectField({ label, icon, value, onChange, options, pla
 
             <div className="relative group rounded-lg transition-all duration-300">
                 {/* Glow Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg opacity-0 group-focus-within:opacity-100 blur transition-opacity duration-300 -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg opacity-0 group-focus-within:opacity-100 blur transition-opacity duration-300 -z-10"></div>
                 
                 {/* Border Wrapper */}
-                <div className="relative p-[1px] rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 group-focus-within:from-blue-500 group-focus-within:to-purple-600 transition-colors duration-300">
+                <div className="relative p-[1px] rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 group-focus-within:from-blue-600 group-focus-within:to-blue-400 transition-colors duration-300">
                     <div className="relative bg-[#0A0A0A] rounded-[7px] flex items-center overflow-hidden">
                         <div className="pl-3 flex items-center pointer-events-none">
                             <i className={`${icon} text-gray-500 group-focus-within:text-blue-400 transition-colors text-sm`}></i>

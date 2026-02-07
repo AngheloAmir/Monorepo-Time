@@ -5,6 +5,7 @@ import ModalBody from "../../ui/ModalBody";
 import ModalHeader from "../../ui/ModalHeader";
 import { useEffect, useState } from "react";
 import useWorkspaceState from "../../../appstates/workspace";
+import Button3 from "../../ui/Button3";
 
 const clearInfo: WorkspaceInfo = {
     name: '',
@@ -130,8 +131,7 @@ export default function TemplateWindow( props: Props) {
                         onClick={() => props.setShowTemplateSelector(true)}
                         className="group relative h-10 mt-6  px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
-                        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg"></div>
                         <span className="relative z-10 flex items-center gap-2">
                             Select
                         </span>
@@ -149,17 +149,11 @@ export default function TemplateWindow( props: Props) {
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </button>
 
-                <button
+                <Button3
                     onClick={props.createWorkspace}
-                    className="group relative px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
-                >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
-                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
-                    <span className="relative z-10 flex items-center gap-2">
-                        <i className="fas fa-plus"></i>
-                        Create New App
-                    </span>
-                </button>
+                    text="Create New App"
+                    icon="fas fa-plus"
+                />
             </footer>
 
             

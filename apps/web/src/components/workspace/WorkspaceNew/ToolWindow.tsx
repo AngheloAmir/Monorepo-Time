@@ -1,3 +1,4 @@
+import Button3 from "../../ui/Button3";
 import InputField from "../../ui/InputField"
 import ModalBody from "../../ui/ModalBody"
 import ModalHeader from "../../ui/ModalHeader"
@@ -11,8 +12,8 @@ export default function ToolWindow(props: {
 }) {
     return (
         <ModalBody>
-            <ModalHeader 
-                close={props.close} 
+            <ModalHeader
+                close={props.close}
                 title="Add Open Source App"
                 description="Bundle it with your monorepo to allow developer to use the same tool as you do" />
             <div className="p-3 flex-1 overflow-y-auto text-md">
@@ -27,12 +28,12 @@ export default function ToolWindow(props: {
                         }}
                         disabled={true}
                     />
+
                     <button
                         onClick={() => props.setShowTemplateSelector(true)}
                         className="group relative h-10 mt-6  px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
-                        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg"></div>
                         <span className="relative z-10 flex items-center gap-2">
                             Select
                         </span>
@@ -54,17 +55,11 @@ export default function ToolWindow(props: {
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </button>
 
-                <button
+                <Button3
                     onClick={props.createWorkspace}
-                    className="group relative px-6 py-2 rounded-lg font-bold text-sm text-white transition-all hover:shadow-[0_0_20px_-5px_rgba(59,130,246,0.5)]"
-                >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg"></div>
-                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"></div>
-                    <span className="relative z-10 flex items-center gap-2">
-                        <i className="fas fa-plus"></i>
-                        Add New Tool
-                    </span>
-                </button>
+                    text="Add New Tool"
+                    icon="fas fa-plus"
+                />
             </footer>
         </ModalBody>
     )

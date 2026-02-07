@@ -1,6 +1,7 @@
 
 const colorVariants = {
-    default:        "from-blue-600/50 to-purple-600/50",
+    default:        "from-blue-600/50 to-blue-400/50",
+    neon:           "from-blue-600/50 to-purple-600/50",
     blueIndigo:     'from-blue-500 to-indigo-600',
     emeraldTeal:    'from-emerald-500 to-teal-600',
     yellowOrange:   'from-yellow-500 to-orange-600',
@@ -77,7 +78,7 @@ export default function ButtonFloating(props: ButtonFloatingProps) {
         >
                 <div className={`relative flex items-center ${dir.contentFlex} p-[1px] rounded-xl bg-gradient-to-r ${color} transition-transform duration-300 group-hover:scale-105`}>
                      <div className={`relative flex items-center ${dir.contentFlex} bg-[#0A0A0A] rounded-xl px-4 py-3 transition-colors duration-300 group-hover:bg-[#0A0A0A]/80`}>
-                        <i className= { props.icon + " w-6 h-6 text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"}></i>
+                        <i className= { props.icon + " w-6 h-6 text-xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400"}></i>
                          <span className={`font-bold overflow-hidden transition-all duration-300 whitespace-nowrap text-white ${dir.textAnim}`}>
                             { props.text }
                         </span>

@@ -5,7 +5,7 @@ export default function Header() {
     const setShowAboutModal = useAppState.use.setShowAboutModal();
 
     return (
-        <header className="h-12 w-full px-6 py-2 sticky top-0 bg-white/6">
+        <header className="h-12 w-full px-6 py-2 sticky top-0 bg-white/4">
             <div className="flex items-center justify-between gap-4 h-full">
                 <div className="flex items-center gap-4">
                     <Logo className="w-8 h-8" />

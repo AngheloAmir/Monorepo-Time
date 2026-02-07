@@ -24,7 +24,7 @@ export default function ModalBody( props: ModalBodyProps ) {
                     style={{ width: modalWidth }}
                 >
                     {/* Gradient Border Background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 via-purple-500/40 to-pink-500/40 pointer-events-none"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/50 to-blue-400/50 pointer-events-none"></div>
                     <div className="absolute inset-[2px] bg-[#0A0A0A] rounded-[15px] pointer-events-none"></div>
                     
                     {/* Content Container */}

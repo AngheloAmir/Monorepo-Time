@@ -98,7 +98,7 @@ function TabItem({ name, icon, activeTab, setActiveTab }: { name: string, icon: 
             onClick={() => setActiveTab(name)}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 w-full text-left
                     ${activeTab === name
-                    ? 'bg-blue-600/10 text-blue-400'
+                    ? 'bg-gradient-to-br from-blue-600 to-blue-400'
                     : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
                 }`}
         >
@@ -118,14 +118,14 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
                 <button
                     key={index}
                     onClick={() => onClick(project.name, project.type)}
-                    className="flex items-center p-2 hover:bg-gray-800 text-left w-full"
+                    className="rounded-lg flex items-center p-2 hover:bg-gradient-to-br hover:from-blue-600/50 hover:to-blue-400/50 text-left w-full"
                 >
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                             <i className={`${project.icon} text-xl`}></i> 
-                            <span className="font-bold text-gray-200 group-hover:text-white text-base truncate">{project.name}</span>
+                            <span className="font-bold text-gray-200 group-hover:text-blue-400 text-base truncate">{project.name}</span>
                         </div>
-                        <div className="text-xs text-gray-500 group-hover:text-gray-400 mt-1 leading-relaxed">
+                        <div className="text-xs text-white mt-1 leading-relaxed">
                             {project.description}
                         </div>
                         {project.notes && (

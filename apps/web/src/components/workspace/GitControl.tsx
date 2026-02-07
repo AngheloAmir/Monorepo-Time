@@ -5,7 +5,7 @@ import GitHeader from "./GitControl/GitHeader";
 import GitInput from "./GitControl/GitInput";
 import RevertModal from "./GitControl/RevertModal";
 
-export default function GitControl() {
+export default function GitControl( {onMinimize}: {onMinimize: () => void} ) {
     const fetchData      = useGitControlContext.use.fetchData();
     const selectedCommit = useGitControlContext.use.selectedCommit();
 
@@ -17,7 +17,7 @@ export default function GitControl() {
         <>
             <div className="w-full h-full">
                 <div className="flex flex-col w-full h-full overflow-hidden">
-                    <GitHeader />
+                    <GitHeader onMinimize={onMinimize} />
                     <GitHistory />
                     <GitInput />
                 </div>
