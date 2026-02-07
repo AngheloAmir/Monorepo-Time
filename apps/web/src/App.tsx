@@ -18,6 +18,7 @@ import AboutModal from './components/AboutModal';
 import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
+import ColorPallette from './components/app_contents/ColorPallette';
 
 declare global {
     interface Window {
@@ -94,6 +95,14 @@ export default function App() {
                             isSelected: currentPage === 'crud',
                             onClick: () => navAction.setCurrentPage('crud') 
                         },
+
+                        { 
+                            name: 'color-pallette',
+                            label: 'Color Pallette',
+                            icon: 'fa fa-solid fa-palette',
+                            isSelected: currentPage === 'color-pallette',
+                            onClick: () => navAction.setCurrentPage('color-pallette') 
+                        },
                     ]}
                     extraNavs={[
                         { 
@@ -126,6 +135,8 @@ export default function App() {
                         <Cloudflare isVisible={currentPage === "cloudflare"} />
                         <Network    isVisible={currentPage === "network"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
+
+                        <ColorPallette isVisible={currentPage === "color-pallette"} />
                     </div>
                 </main>
             </div>
