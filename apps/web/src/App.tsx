@@ -61,7 +61,7 @@ export default function App() {
         return <Flash onComplete={() => setIsFlashVisible(false)} />
 
     return (
-        <div className='w-screen h-screen overflow-hidden bg-black relative'>
+        <div className='w-screen h-screen overflow-hidden bg-[#090909] relative'>
             <Header />
 
             <div className="flex flex-1 overflow-hidden h-full w-full ">
@@ -123,11 +123,11 @@ export default function App() {
                 />
 
                 <main className="flex-1 relative overflow-hidden">
-                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                        <div className="absolute -top-[25%] -left-[10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[128px]"></div>
-                        <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-purple-600/20 rounded-full blur-[128px]"></div>
-                        <div className="absolute -bottom-[25%] -right-[10%] w-[50%] h-[50%] bg-fuchsia-600/20 rounded-full blur-[128px]"></div>
-                    </div>
+                    {/* <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                        <div className="absolute -top-[20%]    -left-[10%]  w-[50%] h-[50%] bg-blue-500/20 rounded-full blur-[160px]"></div>
+                        <div className="absolute -bottom-[10%] -right-[10%] w-[70%] h-[50%] bg-blue-400/10 rounded-full blur-[160px]"></div>
+                    </div> */}
+
                     <div id="app-content" className="w-full max-w-[2100px] mx-auto h-full relative z-10">
                         <Home       isVisible={currentPage === "dashboard"} />
                         <Workspace  isVisible={currentPage === "workspace"} />

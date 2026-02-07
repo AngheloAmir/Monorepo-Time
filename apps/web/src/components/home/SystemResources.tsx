@@ -33,7 +33,7 @@ export default function SystemResources() {
                 </div>
                 <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-700/30">
                     <div className="text-gray-400 text-[10px] uppercase">Peak RAM</div>
-                    <div className="text-xl font-bold text-pink-400 font-mono">
+                    <div className="text-xl font-bold text-blue-400 font-mono">
                         { peakRam } MB
                     </div>
                 </div>

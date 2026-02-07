@@ -7,6 +7,9 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+        fontFamily: {
+          space: ['"Space Grotesk"', 'sans-serif'],
+        },
         gray: {
           50:  'oklch(0.985 0.002 265)',
           100: 'oklch(0.96 0.005 265)',

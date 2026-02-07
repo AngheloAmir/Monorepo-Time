@@ -19,8 +19,8 @@ export default function GitHistory() {
                         onClick={() => setSelectedCommit(item)}
                         className={`
                             w-full text-left group flex flex-col gap-1 p-2
-                            rounded border border-white/5 opacity-70
-                            hover:opacity-100 bg-gradient-to-r hover:from-blue-500/50 hover:to-indigo-600/50
+                            rounded border border-white/7
+                            bg-gradient-to-r hover:from-blue-500/50 hover:to-indigo-500/50
                             transition-all duration-200
                         `}
                     >
@@ -28,7 +28,7 @@ export default function GitHistory() {
                             <span className="text-sm text-white font-medium ">
                                 {item.message}
                             </span>
-                            <span className="text-[12px] font-mono text-white px-1.5 py-0.5 border border-white/5">
+                            <span className="text-[12px] font-mono text-white px-1.5 py-0.5 border border-white/7">
                                 {item.hash}
                             </span>
                         </div>

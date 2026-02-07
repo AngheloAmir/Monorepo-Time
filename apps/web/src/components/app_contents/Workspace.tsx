@@ -72,7 +72,7 @@ export default function Workspace(props: WorkspaceProps) {
                                 <div key={group.dir} className="contents">
                                     {whichShow === "all" && (
                                         <div className="col-span-1 md:col-span-2 xl:col-span-3">
-                                            <h2 className="text-xs font-bold uppercase tracking-widest text-white/30">
+                                            <h2 className="text-xs font-bold uppercase tracking-widest text-white/80">
                                                 {group.dir}
                                             </h2>
                                         </div>

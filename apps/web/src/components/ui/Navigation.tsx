@@ -13,7 +13,7 @@ interface NavButton {
 
 export default function Navigation(props :NavigationProps) {
     return (
-        <nav className="w-16 h-full flex flex-col items-center py-4">
+        <nav className="w-16 h-full flex flex-col items-center py-4 bg-white/6">
             <div className="flex flex-col gap-2 w-full px-2">
                 {props.navs.map((item) => {
                     return (
@@ -49,7 +49,7 @@ export default function Navigation(props :NavigationProps) {
 
 function NavButton(props: NavButton) {
     const activeClass = props.isSelected
-        ? 'bg-gradient-to-br from-blue-600/50 to-indigo-400/50 text-white shadow-[0_0_20px_-5px_rgba(124,58,237,0.5)] ring-1 ring-white/20'
+        ? 'bg-gradient-to-br from-blue-600 to-blue-400 text-white'
         : 'text-gray-400 hover:bg-white/5 hover:text-white';
 
     return (

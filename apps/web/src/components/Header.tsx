@@ -5,14 +5,14 @@ export default function Header() {
     const setShowAboutModal = useAppState.use.setShowAboutModal();
 
     return (
-        <header className="h-12 w-full px-6 py-2 sticky top-0">
+        <header className="h-12 w-full px-6 py-2 sticky top-0 bg-white/6">
             <div className="flex items-center justify-between gap-4 h-full">
                 <div className="flex items-center gap-4">
                     <Logo className="w-8 h-8" />
                     <div>
-                        <h1 className="font-bold text-lg tracking-wide text-white">
+                        <h1 className="text-xl font-space tracking-tight text-white font-medium">
                             Monorepo
-                            <span className="pl-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                            <span className="font-bold pl-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
                                 Time
                             </span>
                         </h1>
