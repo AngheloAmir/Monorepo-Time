@@ -20,7 +20,7 @@ export default function OpenCode(props: CloudflareProps) {
     const loadRootDir = useAppState.use.loadRootDir();
     const loadProjectTree = useProjectState.use.loadProjectTree();
     const [isRunning, setIsRunning] = useState(false);
-    const [sidebarWidth, setSidebarWidth] = useState(265);
+    const [sidebarWidth, setSidebarWidth] = useState(285);
     const [isResizing, setIsResizing] = useState(false);
     const [projectTreeInterval, setProjectTreeInterval] = useState<any>(null);
 

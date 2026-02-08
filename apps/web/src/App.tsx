@@ -32,7 +32,6 @@ export default function App() {
     const checkIfFirstTime = useAppState.use.checkIfFirstTime();
     const showAboutModal = useAppState.use.showAboutModal();
     const setShowAboutModal    = useAppState.use.setShowAboutModal();
-    const loadTerminalFontSize = useAppState.use.loadTerminalFontSize();
     const [isFlashVisible, setIsFlashVisible] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -50,7 +49,6 @@ export default function App() {
             const isFirstTime = await checkIfFirstTime();
             if (isFirstTime) setIsFlashVisible(true);
             await loadRootDir();
-            loadTerminalFontSize();
         }, 0);
     }, []);
 

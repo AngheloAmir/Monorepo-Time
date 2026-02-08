@@ -1,3 +1,4 @@
+import useAppState from "../../appstates/app";
 import useProjectState, { type ProjectTree, type Folder as FolderType, type File as FileType } from "../../appstates/project";
 
 const FileIcon = ({ name }: { name: string }) => {
@@ -38,10 +39,11 @@ const FileIcon = ({ name }: { name: string }) => {
 };
 
 export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level?: number }) {
-    const isFolder = 'folder' in item;
-    const path = isFolder ? (item as FolderType).path : (item as FileType).path;
-    const isOpen = useProjectState(state => state.openFolders[path] || false);
-    const toggleFolder = useProjectState.use.toggleFolder();
+    const projectTreeFontSize = useAppState.use.projectTreeFontSize();
+    const isFolder         = 'folder' in item;
+    const path             = isFolder ? (item as FolderType).path : (item as FileType).path;
+    const isOpen           = useProjectState(state => state.openFolders[path] || false);
+    const toggleFolder     = useProjectState.use.toggleFolder();
     
     const paddingLeft = level * 12 + 4;
     const name = isFolder ? (item as FolderType).folder : (item as FileType).file;
@@ -65,9 +67,9 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                         e.dataTransfer.effectAllowed = "copy";
                     }}
                 >
-                    <i className={`fa-solid fa-chevron-right text-[10px] text-white/30 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
-                    <i className={`fa-solid ${isOpen ? 'fa-folder-open' : 'fa-folder'} text-blue-400/80 mr-2 text-xs`} />
-                    <span className={`text-xs truncate ${textColor} group-hover:text-white`}>{name}</span>
+                    <i className={`fa-solid fa-chevron-right text-[${projectTreeFontSize}px] text-white/30 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+                    <i className={`fa-solid ${isOpen ? 'fa-folder-open' : 'fa-folder'} text-blue-400/80 mr-2 text-[${projectTreeFontSize}px]`} />
+                    <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
                     {color !== 'none' && <div className={`ml-auto w-1.5 h-1.5 rounded-full ${color === 'yellow' ? 'bg-yellow-400' : 'bg-green-400'}`}></div>}
                 </div>
                 {isOpen && (
@@ -91,10 +93,10 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     e.dataTransfer.effectAllowed = "copy";
                 }}
             >
-                <div className="w-4" /> {/* Spacer for chevron */}
-                <span className="mr-2 text-sm"><FileIcon name={name} /></span>
-                <span className={`text-xs truncate ${textColor} group-hover:text-white`}>{name}</span>
-                {color !== 'none' && <div className={`ml-auto text-[10px] font-bold ${color === 'blue' ? 'text-blue-400' : color === 'orange' ? 'text-orange-400' : 'text-green-400'}`}>
+                <div className="w-4" />
+                <span className={`mr-2 text-[${projectTreeFontSize}px]`}><FileIcon name={name} /></span>
+                <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
+                {color !== 'none' && <div className={`ml-auto text-[${projectTreeFontSize}px] font-bold ${color === 'blue' ? 'text-blue-400' : color === 'orange' ? 'text-orange-400' : 'text-green-400'}`}>
                     {color === 'orange' ? 'M' : color === 'green' ? 'U' : ''}
                 </div>}
             </div>

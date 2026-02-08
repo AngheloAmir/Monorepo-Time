@@ -17,13 +17,13 @@ export default function CommitInput() {
             }}
             className="flex flex-col gap-2"
         >
-            <div className="text-[10px] text-white/40 uppercase font-bold tracking-wider">
+            <div className="text-sm text-white/40 uppercase font-bold tracking-wider">
                 GIT ADD THEN PUSH
             </div>
             <div className="flex gap-2">
                 <input
                     type="text"
-                    className="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
+                    className="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1 text-sm text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
                     placeholder="Git commit message"
                     value={commitMessage}
                     onChange={(e) => setCommitMessage(e.target.value)}

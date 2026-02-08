@@ -33,6 +33,10 @@ interface appContext {
     terminalFontSize: number;
     loadTerminalFontSize: () => void;
     setTerminalFontSize: (size: number) => void;
+
+    projectTreeFontSize: number;
+    loadProjectTreeFontSize: () => void;
+    setProjectTreeFontSize: (size: number) => void;
 }
 
 const appstate = create<appContext>()((set, get) => ({
@@ -51,6 +55,18 @@ const appstate = create<appContext>()((set, get) => ({
         const fontSize = localStorage.getItem('terminalFontSize');
         if (fontSize) {
             set({ terminalFontSize: parseInt(fontSize) });
+        }
+    },
+
+    projectTreeFontSize: 15,
+    setProjectTreeFontSize: (size: number) => {
+        localStorage.setItem('projectTreeFontSize', size.toString());
+        set({ projectTreeFontSize: size });
+    },
+    loadProjectTreeFontSize() {
+        const fontSize = localStorage.getItem('projectTreeFontSize');
+        if (fontSize) {
+            set({ projectTreeFontSize: parseInt(fontSize) });
         }
     },
 

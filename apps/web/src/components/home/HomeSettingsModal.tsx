@@ -10,8 +10,12 @@ interface HomeSettingsModalProps {
 }
 
 export default function HomeSettingsModal({ isOpen, onClose }: HomeSettingsModalProps) {
-    const terminalFontSize = useAppState.use.terminalFontSize();
-    const setTerminalFontSize = useAppState.use.setTerminalFontSize();
+    const loadTerminalFontSize    = useAppState.use.loadTerminalFontSize();
+    const loadProjectTreeFontSize = useAppState.use.loadProjectTreeFontSize();
+    const terminalFontSize        = useAppState.use.terminalFontSize();
+    const setTerminalFontSize     = useAppState.use.setTerminalFontSize();
+    const projectTreeFontSize     = useAppState.use.projectTreeFontSize();
+    const setProjectTreeFontSize  = useAppState.use.setProjectTreeFontSize();
 
     // Close on Escape key
     useEffect(() => {
@@ -22,9 +26,12 @@ export default function HomeSettingsModal({ isOpen, onClose }: HomeSettingsModal
         return () => window.removeEventListener('keydown', handleEsc);
     }, [isOpen, onClose]);
 
+    useEffect(() => {
+        loadTerminalFontSize();
+        loadProjectTreeFontSize();
+    }, []);
+
     if (!isOpen) return null;
-
-
     return (
         <ModalBody width="420px">
             <ModalHeader
@@ -66,6 +73,38 @@ export default function HomeSettingsModal({ isOpen, onClose }: HomeSettingsModal
                     </div>
                 </div>
 
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+                            <i className="fa-solid fa-folder-tree"></i>
+                        </div>
+                        <div>
+                            <p className="font-medium text-white text-sm">Project Tree Font Size</p>
+                            <p className="text-xs text-gray-500">Adjust tree readability</p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-black/20 rounded-lg p-1 border border-white/5">
+                        <button
+                            onClick={() => setProjectTreeFontSize(Math.max(10, projectTreeFontSize - 1))}
+                            className="w-8 h-8 flex items-center justify-center rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all active:scale-95"
+                        >
+                            <i className="fa-solid fa-minus text-xs"></i>
+                        </button>
+
+                        <span className="w-10 text-center font-mono text-sm font-bold text-blue-400">
+                            {projectTreeFontSize}
+                        </span>
+
+                        <button
+                            onClick={() => setProjectTreeFontSize(Math.min(32, projectTreeFontSize + 1))}
+                            className="w-8 h-8 flex items-center justify-center rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all active:scale-95"
+                        >
+                            <i className="fa-solid fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                
                 <div className="flex justify-end">
                     <Button3
                         onClick={onClose}
