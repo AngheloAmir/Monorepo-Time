@@ -66,6 +66,7 @@ import stopTerminalWorkspace from './routes/stopTerminalWorkspace';
 import deleteWorkspace from './routes/deleteWorkspace';
 import opencodeHelper from './routes/opencodeHelper';
 import opencodeTerminal, { opencodeTerminalSocket } from './routes/opencodeTerminal';
+import scanProject from './routes/scanProject';
 
 const app = express();
 const port = config.apiPort;
@@ -125,6 +126,7 @@ app.use("/" + apiRoute.setWorkspaceTemplate, setWorkspaceTemplate);
 app.use("/" + apiRoute.deleteWorkspace, deleteWorkspace);
 app.use("/" + apiRoute.opencodeHelper, opencodeHelper);
 app.use("/" + apiRoute.opencodeTerminal, opencodeTerminal);
+app.use("/" + apiRoute.scanProject, scanProject);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');

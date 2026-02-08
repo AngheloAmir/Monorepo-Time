@@ -56,6 +56,15 @@
                     "suggested": []
                 },
                 {
+                    "label": "scanproject",
+                    "route": "/scanproject",
+                    "methods": "GET",
+                    "description": "",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
                     "label": "List Workspace Dirs",
                     "route": "/listworkspacedirs",
                     "methods": "GET",

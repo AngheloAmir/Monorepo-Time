@@ -94477,7 +94477,14 @@ router22.get("/check", async (req, res) => {
     if (await import_fs_extra15.default.pathExists(packageJsonPath2)) {
       const packageJson2 = await import_fs_extra15.default.readJson(packageJsonPath2);
       const devDeps = packageJson2.devDependencies || {};
-      if (devDeps["opencode-ai"]) {
+      const deps = packageJson2.dependencies || {};
+      let isGlobal = false;
+      try {
+        await execa("opencode", ["--version"]);
+        isGlobal = true;
+      } catch (error) {
+      }
+      if (devDeps["opencode-ai"] || deps["opencode-ai"] || isGlobal) {
         res.json({ status: "local" });
         return;
       }
@@ -94490,14 +94497,7 @@ router22.get("/check", async (req, res) => {
 });
 router22.get("/install", async (req, res) => {
   try {
-    await execa("npm", ["install", "-D", "opencode-ai"], { cwd: ROOT3 });
-    const packageJsonPath2 = import_path21.default.join(ROOT3, "package.json");
-    if (await import_fs_extra15.default.pathExists(packageJsonPath2)) {
-      const packageJson2 = await import_fs_extra15.default.readJson(packageJsonPath2);
-      packageJson2.scripts = packageJson2.scripts || {};
-      packageJson2.scripts.opencode = "opencode";
-      await import_fs_extra15.default.writeJson(packageJsonPath2, packageJson2, { spaces: 2 });
-    }
+    await execa("npm", ["install", "-g", "opencode-ai"]);
     res.json({ success: true });
   } catch (error) {
     console.error("Error installing opencode:", error);

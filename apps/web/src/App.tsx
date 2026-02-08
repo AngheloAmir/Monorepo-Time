@@ -33,11 +33,11 @@ export default function App() {
     const showAboutModal = useAppState.use.showAboutModal();
     const setShowAboutModal = useAppState.use.setShowAboutModal();
     const [isFlashVisible, setIsFlashVisible] = useState(false);
-    const [loading, setLoading]               = useState(true);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setLoading(false);
-        if(config.useDemo && !window.loaded) {
+        if (config.useDemo && !window.loaded) {
             window.loaded = true;
             setTimeout(() => {
                 alert("You are viewing a demo version. This application should be running on a local server. visit https://www.npmjs.com/package/monorepotime to know more.");
@@ -49,7 +49,7 @@ export default function App() {
             const isFirstTime = await checkIfFirstTime();
             if (isFirstTime) setIsFlashVisible(true);
             await loadRootDir();
-            
+
         }, 0);
     }, []);
 
@@ -66,40 +66,40 @@ export default function App() {
             <div className="flex flex-1 overflow-hidden h-full w-full ">
                 <Navigation
                     navs={[
-                        { 
+                        {
                             name: 'dashboard',
                             label: 'Dashboard',
                             icon: 'fa fa-solid fa-house',
                             isSelected: currentPage === 'dashboard',
-                            onClick: () => navAction.setCurrentPage('dashboard') 
+                            onClick: () => navAction.setCurrentPage('dashboard')
                         },
-                        { 
+                        {
                             name: 'workspace',
                             label: 'Workspace',
                             icon: 'fa fa-cube',
                             isSelected: currentPage === 'workspace',
-                            onClick: () => navAction.setCurrentPage('workspace') 
+                            onClick: () => navAction.setCurrentPage('workspace')
                         },
-                        { 
+                        {
                             name: 'open-code',
                             label: 'OpenCode',
                             icon: 'fa fa-solid fa-terminal',
                             isSelected: currentPage === 'open-code',
-                            onClick: () => navAction.setCurrentPage('open-code') 
+                            onClick: () => navAction.setCurrentPage('open-code')
                         },
-                        { 
+                        {
                             name: 'turborepo',
                             label: 'Turborepo',
                             icon: 'fa fa-solid fa-truck-fast',
                             isSelected: currentPage === 'turborepo',
-                            onClick: () => navAction.setCurrentPage('turborepo') 
+                            onClick: () => navAction.setCurrentPage('turborepo')
                         },
-                        { 
+                        {
                             name: 'crud',
                             label: 'CRUD Tester',
                             icon: 'fa fa-microscope',
                             isSelected: currentPage === 'crud',
-                            onClick: () => navAction.setCurrentPage('crud') 
+                            onClick: () => navAction.setCurrentPage('crud')
                         },
 
                         // { 
@@ -109,22 +109,29 @@ export default function App() {
                         //     isSelected: currentPage === 'color-pallette',
                         //     onClick: () => navAction.setCurrentPage('color-pallette') 
                         // },
-                        
+
                     ]}
                     extraNavs={[
-                        { 
+                        {
+                            name: 'folder-tree',
+                            label: 'Folder Tree',
+                            icon: 'fa-solid fa-folder-tree',
+                            isSelected: currentPage === 'folder-tree',
+                            onClick: () => navAction.setCurrentPage('folder-tree')
+                        },
+                        {
                             name: 'network',
                             label: 'Network & Docker',
                             icon: 'fa fa-solid fa-network-wired',
                             isSelected: currentPage === 'network',
-                            onClick: () => navAction.setCurrentPage('network') 
+                            onClick: () => navAction.setCurrentPage('network')
                         },
-                        { 
+                        {
                             name: 'cloudflare',
                             label: 'Cloudflare Tunnel',
                             icon: 'fa fa-solid fa-cloud',
                             isSelected: currentPage === 'cloudflare',
-                            onClick: () => navAction.setCurrentPage('cloudflare') 
+                            onClick: () => navAction.setCurrentPage('cloudflare')
                         },
                     ]}
                 />
@@ -136,14 +143,14 @@ export default function App() {
                     </div>
 
                     <div id="app-content" className="w-full max-w-[2100px] mx-auto h-full relative z-10">
-                        <Home       isVisible={currentPage === "dashboard"} />
-                        <Workspace  isVisible={currentPage === "workspace"} />
-                        <OpenCode   isVisible={currentPage === "open-code"} />
-                        <Turborepo  isVisible={currentPage === "turborepo"} />
+                        <Home isVisible={currentPage === "dashboard"} />
+                        <Workspace isVisible={currentPage === "workspace"} />
+                        <OpenCode isVisible={currentPage === "open-code"} />
+                        <Turborepo isVisible={currentPage === "turborepo"} />
                         <Cloudflare isVisible={currentPage === "cloudflare"} />
-                        <Network    isVisible={currentPage === "network"} />
+                        <Network isVisible={currentPage === "network"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
-                        
+
                         {/* <ColorPallette isVisible={currentPage === "color-pallette"} /> */}
                     </div>
                 </main>

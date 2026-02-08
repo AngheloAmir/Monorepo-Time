@@ -286,6 +286,35 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
         };
     }, []);
 
+    useEffect(() => {
+        const div = divRef.current;
+        if (!div) return;
+
+        const handleDragOver = (e: DragEvent) => {
+            e.preventDefault();
+            if (e.dataTransfer) {
+                e.dataTransfer.dropEffect = 'copy';
+            }
+        };
+
+        const handleDrop = (e: DragEvent) => {
+            e.preventDefault();
+            const data = e.dataTransfer?.getData('text/plain');
+            if (data && onDataRef.current) {
+                onDataRef.current(data);
+                xtermRef.current?.focus();
+            }
+        };
+
+        div.addEventListener('dragover', handleDragOver as unknown as EventListener);
+        div.addEventListener('drop', handleDrop as unknown as EventListener);
+
+        return () => {
+            div.removeEventListener('dragover', handleDragOver as unknown as EventListener);
+            div.removeEventListener('drop', handleDrop as unknown as EventListener);
+        };
+    }, []);
+
     return (
         <div className="h-full w-full overflow-hidden bg-transparent" ref={divRef} />
     );

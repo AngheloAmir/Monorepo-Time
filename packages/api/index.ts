@@ -103,6 +103,7 @@ const apiRoute = {
     deleteWorkspace: 'deleteworkspace',
     opencodeHelper: 'opencode',
     opencodeTerminal: 'opencodeterminal',
+    scanProject: 'scanproject',
 }
 
 export default apiRoute;
