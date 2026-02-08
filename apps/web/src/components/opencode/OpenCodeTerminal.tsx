@@ -142,7 +142,7 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
     };
 
     return (
-        <div className={`h-full w-full ${props.className || ''}`}>
+        <div className={`h-full w-full box-border overflow-hidden ${props.className || ''}`}>
             <Console 
                 ref={consoleComponentRef}
                 terminalRef={terminalRef}
@@ -225,14 +225,30 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
              // Capture Ctrl+<Key> combinations to prevent browser defaults (like Ctrl+P, Ctrl+S)
              // and ensure they are sent to the terminal.
              if (event.type === 'keydown' && event.ctrlKey) {
-                 if (event.code === 'KeyZ' || event.code === 'KeyC' || event.code === 'KeyV') {
+                 if (event.code === 'KeyZ') {
                      event.preventDefault();
                      return false;
+                 }
+                 if (event.code === 'KeyC') {
+                     const selection = term.getSelection();
+                     if (selection) {
+                         navigator.clipboard.writeText(selection);
+                         // Prevent default browser copy (though we did it manually)
+                         // Return false to prevent xterm from processing it (sending ^C)
+                         event.preventDefault();
+                         return false;
+                     }
                  }
                  if (event.code === 'KeyT') {
                     event.preventDefault();
                     return true;
                  }
+                 // Allow Copy (Ctrl+C) / Paste (Ctrl+V) if needed, but for now we prioritize terminal input
+                 // If the user has a selection, xterm usually handles copy internally or via extension
+                 
+                 // We specifically requested support for keys like Ctrl+X
+                 // Preventing default ensures the browser doesn't try to handle it (e.g. Cut)
+                 // returning true tells xterm to process the event (emit data)
                  event.preventDefault();
                  return true;
              }
@@ -318,6 +334,6 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
     }, []);
 
     return (
-        <div className="h-full w-full overflow-hidden bg-transparent" ref={divRef} />
+        <div className="h-full w-full overflow-hidden bg-transparent box-border [&_.xterm-viewport::-webkit-scrollbar]:hidden" ref={divRef} />
     );
 });

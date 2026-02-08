@@ -94804,7 +94804,7 @@ router24.get("/", async (req, res) => {
       const status = gitStatusMap[filePath];
       if (!status) return "none";
       if (status.includes("?") || status.includes("A")) return "green";
-      if (status.includes("M")) return "orange";
+      if (status.includes("M")) return "yellow";
       return "none";
     };
     const root = [];
@@ -94836,17 +94836,17 @@ router24.get("/", async (req, res) => {
       addFileToTree(file2.split("/"), root, "");
     });
     const bubbleStatus = (items) => {
-      let hasOrange = false;
+      let hasYellow = false;
       let hasGreen = false;
       items.forEach((item) => {
         if (item.folder && item.content) {
           const childColor = bubbleStatus(item.content);
           item.color = childColor;
         }
-        if (item.color === "orange") hasOrange = true;
+        if (item.color === "yellow") hasYellow = true;
         if (item.color === "green") hasGreen = true;
       });
-      if (hasOrange) return "orange";
+      if (hasYellow) return "yellow";
       if (hasGreen) return "green";
       return "none";
     };
