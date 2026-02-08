@@ -62,9 +62,7 @@ export default function OpenCode(props: CloudflareProps) {
         loadProjectTree();
 
         return () => {
-            if (projectTreeInterval) {
-                clearInterval(projectTreeInterval);
-            }
+            clearInterval(projectTreeInterval);
         }
     }, []);
 
