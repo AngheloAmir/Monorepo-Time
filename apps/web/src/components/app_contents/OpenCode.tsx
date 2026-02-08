@@ -22,6 +22,7 @@ export default function OpenCode(props: CloudflareProps) {
     const [isRunning, setIsRunning] = useState(false);
     const [sidebarWidth, setSidebarWidth] = useState(265);
     const [isResizing, setIsResizing] = useState(false);
+    const [projectTreeInterval, setProjectTreeInterval] = useState<any>(null);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -59,6 +60,12 @@ export default function OpenCode(props: CloudflareProps) {
         checkIfInstalled();
         loadRootDir();
         loadProjectTree();
+
+        return () => {
+            if (projectTreeInterval) {
+                clearInterval(projectTreeInterval);
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -66,7 +73,16 @@ export default function OpenCode(props: CloudflareProps) {
             setTimeout(() => {
                 terminalRef.current?.fit();
             }, 50);
+
+            const intervalId = setInterval(() => {
+                loadProjectTree();
+            }, 5000);
+            setProjectTreeInterval(intervalId);
         }
+
+        //remove interval when component unmounts
+        else
+            clearInterval(projectTreeInterval);
     }, [props.isVisible]);
 
     return (
