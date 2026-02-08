@@ -89,7 +89,7 @@ export default function OpenCode(props: CloudflareProps) {
                     onMouseDown={() => setIsResizing(true)}
                 />
 
-                <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded overflow-hidden border border-white/[0.08]">
+                <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded overflow-hidden">
                     <div className="w-full flex-1 min-h-0 bg-black/20">
                         <OpenCodeTerminal
                             ref={terminalRef}

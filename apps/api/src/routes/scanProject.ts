@@ -120,28 +120,34 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
 
         const root: any[] = [];
         
-        const addFileToTree = (pathParts: string[], currentLevel: any[], fullPath: string) => {
+        const addFileToTree = (pathParts: string[], currentLevel: any[], currentPrefix: string) => {
              const part = pathParts[0];
+             const currentPath = currentPrefix ? `${currentPrefix}/${part}` : part;
              const isFile = pathParts.length === 1;
              
              if (isFile) {
                  currentLevel.push({
                      file: part,
-                     path: '@' + fullPath,
-                     color: getFileColor(fullPath)
+                     path: '@' + currentPath,
+                     color: getFileColor(currentPath)
                  });
              } else {
                  let folder = currentLevel.find((item: any) => item.folder === part);
                  if (!folder) {
-                     folder = { folder: part, content: [], color: "none" };
+                     folder = { 
+                         folder: part, 
+                         content: [], 
+                         color: "none",
+                         path: '@' + currentPath 
+                     };
                      currentLevel.push(folder);
                  }
-                 addFileToTree(pathParts.slice(1), folder.content, fullPath);
+                 addFileToTree(pathParts.slice(1), folder.content, currentPath);
              }
         };
         
         files.forEach(file => {
-             addFileToTree(file.split('/'), root, file);
+             addFileToTree(file.split('/'), root, '');
         });
 
         const bubbleStatus = (items: any[]) => {
@@ -185,7 +191,14 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
         
         sortTree(root);
 
-        res.json({ root });
+        const changes = Object.keys(gitStatusMap).length;
+
+        // Return the structured response
+        res.json({ 
+            root: MONOREPO_ROOT, 
+            content: root, 
+            changes 
+        });
     } catch (error) {
         console.error("Error scanning project:", error);
         res.status(500).json({ error: 'Failed to scan project' });

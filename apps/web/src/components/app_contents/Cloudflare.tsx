@@ -127,7 +127,7 @@ export default function Cloudflare(props: CloudflareProps) {
                 </div>
             </div>
 
-            <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden border border-white/[0.08]">
+            <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded-xl overflow-hidden">
                 <TerminalHeader
                     title="Terminal Output"
                     description="Execute commands"
