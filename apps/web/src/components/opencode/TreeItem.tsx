@@ -92,7 +92,7 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                 }}
             >
                 <div className="w-4" /> {/* Spacer for chevron */}
-                <span className="mr-2 text-xs"><FileIcon name={name} /></span>
+                <span className="mr-2 text-sm"><FileIcon name={name} /></span>
                 <span className={`text-xs truncate ${textColor} group-hover:text-white`}>{name}</span>
                 {color !== 'none' && <div className={`ml-auto text-[10px] font-bold ${color === 'blue' ? 'text-blue-400' : color === 'orange' ? 'text-orange-400' : 'text-green-400'}`}>
                     {color === 'orange' ? 'M' : color === 'green' ? 'U' : ''}

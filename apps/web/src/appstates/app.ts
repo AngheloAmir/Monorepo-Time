@@ -29,6 +29,10 @@ interface appContext {
     loadingIfOpenCodeInstalled: boolean;
     checkIfInstalled: () => Promise<void>;
     installOpenCode: () => Promise<void>;
+
+    terminalFontSize: number;
+    loadTerminalFontSize: () => void;
+    setTerminalFontSize: (size: number) => void;
 }
 
 const appstate = create<appContext>()((set, get) => ({
@@ -37,6 +41,18 @@ const appstate = create<appContext>()((set, get) => ({
     rootDir: '',
     showAboutModal: false,
     setShowAboutModal: (show: boolean) => set({ showAboutModal: show }),
+
+    terminalFontSize: 16,
+    setTerminalFontSize: (size: number) => {
+        localStorage.setItem('terminalFontSize', size.toString());
+        set({ terminalFontSize: size });
+    },
+    loadTerminalFontSize() {
+        const fontSize = localStorage.getItem('terminalFontSize');
+        if (fontSize) {
+            set({ terminalFontSize: parseInt(fontSize) });
+        }
+    },
 
     loadRootDir: async () => {
         if(config.useDemo) return;

@@ -4,6 +4,7 @@ import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
 import "xterm/css/xterm.css";
+import useAppState from "../../appstates/app";
 
 export interface OpenCodeTerminalRef {
     /** Focuses the terminal input */
@@ -168,6 +169,7 @@ export interface ConsoleRef {
 }
 
 const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
+    const terminalFontSize = useAppState.use.terminalFontSize();
     const divRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
     const fitAddonRef = useRef<FitAddon | null>(null);
@@ -205,7 +207,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
             cursorBlink: true,
             allowTransparency: true,
             fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-            fontSize: 15,
+            fontSize: terminalFontSize,
             theme: {
                 background: '#00000000', // transparent
                 foreground: '#f3f4f6',
