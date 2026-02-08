@@ -47,7 +47,9 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
     const name = isFolder ? (item as FolderType).folder : (item as FileType).file;
     const color = item.color;
 
-    const textColor = color === 'orange' ? 'text-orange-400' : color === 'green' ? 'text-green-400' : 'text-white/70';
+    const textColor = color === 'yellow' ? 
+        'text-yellow-400' : color === 'green' ? 
+            'text-green-400' : 'text-white/70';
 
     if (isFolder) {
         const folder = item as FolderType;
@@ -66,7 +68,7 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     <i className={`fa-solid fa-chevron-right text-[10px] text-white/30 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
                     <i className={`fa-solid ${isOpen ? 'fa-folder-open' : 'fa-folder'} text-blue-400/80 mr-2 text-xs`} />
                     <span className={`text-xs truncate ${textColor} group-hover:text-white`}>{name}</span>
-                    {color !== 'none' && <div className={`ml-auto w-1.5 h-1.5 rounded-full ${color === 'orange' ? 'bg-orange-400' : 'bg-green-400'}`}></div>}
+                    {color !== 'none' && <div className={`ml-auto w-1.5 h-1.5 rounded-full ${color === 'yellow' ? 'bg-yellow-400' : 'bg-green-400'}`}></div>}
                 </div>
                 {isOpen && (
                     <div>

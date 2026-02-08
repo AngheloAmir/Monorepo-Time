@@ -114,7 +114,7 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
             const status = gitStatusMap[filePath];
             if (!status) return "none";
             if (status.includes('?') || status.includes('A')) return "green";
-            if (status.includes('M')) return "orange";
+            if (status.includes('M')) return "yellow";
             return "none";
         };
 
@@ -151,8 +151,8 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
         });
 
         const bubbleStatus = (items: any[]) => {
-            let hasOrange = false;
-            let hasGreen = false;
+            let hasYellow = false;
+            let hasGreen  = false;
 
             items.forEach(item => {
                 if (item.folder && item.content) {
@@ -160,11 +160,11 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
                     item.color = childColor;
                 }
                 
-                if (item.color === 'orange') hasOrange = true;
+                if (item.color === 'yellow') hasYellow = true;
                 if (item.color === 'green') hasGreen = true;
             });
 
-            if (hasOrange) return 'orange';
+            if (hasYellow) return 'yellow';
             if (hasGreen) return 'green';
             return 'none';
         };

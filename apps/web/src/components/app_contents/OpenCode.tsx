@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import OpenCodeTerminal, { type OpenCodeTerminalRef } from "../OpenCodeTerminal";
+import OpenCodeTerminal, { type OpenCodeTerminalRef } from "../opencode/OpenCodeTerminal";
 import config from 'config';
 import useAppState from "../../appstates/app";
 import { OpenCodeContent, OpenCodeInit } from "../opencode/OpenCodeInit";
@@ -76,7 +76,7 @@ export default function OpenCode(props: CloudflareProps) {
                 <div className="w-full flex-1 min-h-0 bg-black/20">
                     <OpenCodeTerminal
                         ref={terminalRef}
-                        className={isRunning ? 'h-full w-full' : 'hidden'}
+                        className={isRunning ? '': 'hidden'}
                         socketUrl={config.serverPath}
                         onExit={() => {
                             setIsRunning(false);

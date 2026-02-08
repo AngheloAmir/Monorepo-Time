@@ -225,12 +225,14 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
              // Capture Ctrl+<Key> combinations to prevent browser defaults (like Ctrl+P, Ctrl+S)
              // and ensure they are sent to the terminal.
              if (event.type === 'keydown' && event.ctrlKey) {
-                 // Allow Copy (Ctrl+C) / Paste (Ctrl+V) if needed, but for now we prioritize terminal input
-                 // If the user has a selection, xterm usually handles copy internally or via extension
-                 
-                 // We specifically requested support for keys like Ctrl+X
-                 // Preventing default ensures the browser doesn't try to handle it (e.g. Cut)
-                 // returning true tells xterm to process the event (emit data)
+                 if (event.code === 'KeyZ' || event.code === 'KeyC' || event.code === 'KeyV') {
+                     event.preventDefault();
+                     return false;
+                 }
+                 if (event.code === 'KeyT') {
+                    event.preventDefault();
+                    return true;
+                 }
                  event.preventDefault();
                  return true;
              }
