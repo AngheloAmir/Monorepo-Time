@@ -5,6 +5,7 @@ import useAppState from "../../appstates/app";
 import { OpenCodeContent, OpenCodeInit } from "../opencode/OpenCodeInit";
 
 import ProjectBrowser from "../opencode/ProjectBrowser";
+import useProjectState from "../../appstates/project";
 
 interface CloudflareProps {
     isVisible: boolean
@@ -17,6 +18,7 @@ export default function OpenCode(props: CloudflareProps) {
     const checkIfInstalled = useAppState.use.checkIfInstalled();
     const rootDir = useAppState.use.rootDir();
     const loadRootDir = useAppState.use.loadRootDir();
+    const loadProjectTree = useProjectState.use.loadProjectTree();
     const [isRunning, setIsRunning] = useState(false);
     const [sidebarWidth, setSidebarWidth] = useState(265);
     const [isResizing, setIsResizing] = useState(false);
@@ -49,12 +51,14 @@ export default function OpenCode(props: CloudflareProps) {
         if (props.isVisible) {
             checkIfInstalled();
             loadRootDir();
+            loadProjectTree();
         }
     }, [props.isVisible]);
 
     useEffect(() => {
         checkIfInstalled();
         loadRootDir();
+        loadProjectTree();
     }, []);
 
     useEffect(() => {

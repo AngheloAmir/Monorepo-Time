@@ -1,7 +1,6 @@
 import config from 'config';
 import TreeItem from "./TreeItem";
 import useProjectState from "../../appstates/project";
-import { useEffect } from "react";
 import CommitInput from "./CommitInput";
 
 interface ProjectBrowserProps {
@@ -12,10 +11,6 @@ export default function ProjectBrowser(props: ProjectBrowserProps) {
     const changesCount    = useProjectState.use.changes();
     const projectTree     = useProjectState.use.projectTree();
     const loadProjectTree = useProjectState.use.loadProjectTree();
-
-    useEffect(() => {
-        loadProjectTree();
-    }, []);
 
     return (
         <div className={`flex flex-col h-full min-h-0 bg-gray-800/20 rounded ${props.className}`}>
