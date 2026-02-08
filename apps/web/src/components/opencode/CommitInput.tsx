@@ -1,16 +1,19 @@
 import useGitControlContext from "../../appstates/gitcontrol";
+import useProjectState from "../../appstates/project";
 
 export default function CommitInput() {
     const handleCommit = useGitControlContext.use.handleCommit();
     const commitMessage = useGitControlContext.use.commitMessage();
     const setCommitMessage = useGitControlContext.use.setCommitMessage();
     const commitLoading = useGitControlContext.use.commitLoading();
+    const loadProjectTree = useProjectState.use.loadProjectTree();
 
     return (
         <form
-            onSubmit={(e) => {
+            onSubmit={ async (e) => {
                 e.preventDefault();
-                handleCommit(e);
+                await handleCommit(e);
+                await loadProjectTree();
             }}
             className="flex flex-col gap-2"
         >

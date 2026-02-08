@@ -26,6 +26,7 @@ interface appContext {
     getTemplates: () => Promise<AvailbleTemplates>;
 
     isOpenCodeInstalled: boolean;
+    loadingIfOpenCodeInstalled: boolean;
     checkIfInstalled: () => Promise<void>;
     installOpenCode: () => Promise<void>;
 }
@@ -145,11 +146,12 @@ const appstate = create<appContext>()((set, get) => ({
     },
 
     isOpenCodeInstalled: false,
+    loadingIfOpenCodeInstalled: true,
     checkIfInstalled: async () => {
         if(config.useDemo) return;
         const response = await fetch(`${config.serverPath}${apiRoute.opencodeHelper}/check`);
         const data     = await response.json();
-        set({ isOpenCodeInstalled: data.status === "local" });
+        set({ isOpenCodeInstalled: data.status === "local", loadingIfOpenCodeInstalled: false });
     },
 
     installOpenCode: async () => {

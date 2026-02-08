@@ -101,24 +101,8 @@ export default function App() {
                             isSelected: currentPage === 'crud',
                             onClick: () => navAction.setCurrentPage('crud')
                         },
-
-                        // { 
-                        //     name: 'color-pallette',
-                        //     label: 'Color Pallette',
-                        //     icon: 'fa fa-solid fa-palette',
-                        //     isSelected: currentPage === 'color-pallette',
-                        //     onClick: () => navAction.setCurrentPage('color-pallette') 
-                        // },
-
                     ]}
                     extraNavs={[
-                        {
-                            name: 'folder-tree',
-                            label: 'Folder Tree',
-                            icon: 'fa-solid fa-folder-tree',
-                            isSelected: currentPage === 'folder-tree',
-                            onClick: () => navAction.setCurrentPage('folder-tree')
-                        },
                         {
                             name: 'network',
                             label: 'Network & Docker',
