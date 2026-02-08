@@ -386,7 +386,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
             resizeObserver.disconnect();
             term.dispose();
         };
-    }, []);
+    }, [terminalFontSize]);
 
     return (
         <div className="h-full w-full overflow-hidden bg-transparent p-1" ref={divRef} />

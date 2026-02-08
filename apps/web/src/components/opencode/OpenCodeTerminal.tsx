@@ -304,7 +304,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
             resizeObserver.disconnect();
             term.dispose();
         };
-    }, []);
+    }, [terminalFontSize]);
 
     useEffect(() => {
         const div = divRef.current;
