@@ -1,4 +1,5 @@
 import type { ProjectTemplate } from "../../types";
+import { N8NAgent } from "./n8n/n8nAgent";
 
 export const N8NNative: ProjectTemplate = {
     name: "N8N Native (Node 20)",
@@ -146,6 +147,11 @@ child.on('close', (code) => {
             action: 'command',
             cmd: 'npm',
             args: ['pkg', 'set', 'scripts.start=node runner.js start']
+        },
+        {
+            action: 'root-command',
+            cmd: 'node',
+            args: ['-e', `require('fs').writeFileSync('n8nAgent.ts', 'export const N8NAgent = ' + JSON.stringify(${JSON.stringify(N8NAgent)}) + ';')`]
         },
         {
             action: 'command',

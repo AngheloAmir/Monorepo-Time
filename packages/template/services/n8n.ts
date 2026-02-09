@@ -1,6 +1,7 @@
 import type { ProjectTemplate } from "../../types";
 import { dockerCompose } from "./n8n/dockerCompose";
 import { gitignoreContent } from "./n8n/gitignore";
+import { N8NAgent } from "./n8n/n8nAgent";
 import { serverJs } from "./n8n/server";
 
 export const N8NLocal: ProjectTemplate = {
@@ -32,9 +33,9 @@ export const N8NLocal: ProjectTemplate = {
             args: ['pkg', 'set', 'scripts.start=node index.js']
         },
         {
-            action: 'command',
-            cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.stop=node -e \'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}\'']
+            action: 'root-command',
+            cmd: 'node',
+            args: ['-e', `require('fs').writeFileSync('n8nAgent.ts', 'export const N8NAgent = ' + JSON.stringify(${JSON.stringify(N8NAgent)}) + ';')`]
         },
         {
             action: 'command',
