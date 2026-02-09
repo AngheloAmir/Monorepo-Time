@@ -37,6 +37,10 @@ interface projectContext {
     isEditable: (path: string) => boolean;
     loadFile: (path: string) => Promise<string | any>;
     saveFile: (path: string, content: string) => Promise<any>;
+
+    //current active path
+    selectedPath: string;
+    setSelectedPath: (path: string) => void;
 }
 
 const projectState = create<projectContext>()((set) => ({
@@ -60,6 +64,9 @@ const projectState = create<projectContext>()((set) => ({
             [path]: !state.openFolders[path]
         }
     })),
+
+    selectedPath: "",
+    setSelectedPath: (path: string) => set({ selectedPath: path }),
 
     isFileEditorOpen: false,
     currentFile: "",

@@ -40,12 +40,15 @@ const FileIcon = ({ name }: { name: string }) => {
 
 export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level?: number }) {
     const projectTreeFontSize = useAppState.use.projectTreeFontSize();
-    const isFolder            = 'folder' in item;
-    const path                = isFolder ? (item as FolderType).path : (item as FileType).path;
-    const isOpen              = useProjectState(state => state.openFolders[path] || false);
-    const toggleFolder        = useProjectState.use.toggleFolder();
-    const openFileEditor      = useProjectState.use.openFileEditor();
-    const isEditable          = useProjectState.use.isEditable();
+    const isFolder = 'folder' in item;
+    const path = isFolder ? (item as FolderType).path : (item as FileType).path;
+    const isOpen = useProjectState(state => state.openFolders[path] || false);
+    const toggleFolder = useProjectState.use.toggleFolder();
+    const openFileEditor = useProjectState.use.openFileEditor();
+    const isEditable = useProjectState.use.isEditable();
+
+    const setSelectedPath = useProjectState.use.setSelectedPath();
+    const selectedPath = useProjectState(state => state.selectedPath);
 
     const paddingLeft = level * 12 + 4;
     const name = isFolder ? (item as FolderType).folder : (item as FileType).file;
@@ -60,19 +63,37 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
         return (
             <div>
                 <div
-                    className="flex items-center py-0.5 px-2 hover:bg-white/[0.05] cursor-pointer select-none group"
+                    className={`
+                        flex  py-0.5 px-2 hover:bg-white/[0.05] cursor-pointer select-none group
+                        ${selectedPath === path ? 'bg-blue-400/8' : ''}
+                    `}
                     style={{ paddingLeft: `${paddingLeft}px` }}
-                    onClick={() => toggleFolder(path)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFolder(path);
+                        setSelectedPath(path);
+                    }}
                     draggable
                     onDragStart={(e) => {
                         e.dataTransfer.setData("text/plain", folder.path);
                         e.dataTransfer.effectAllowed = "copy";
                     }}
                 >
-                    <i className={`fa-solid fa-chevron-right text-[${projectTreeFontSize}px] text-white/30 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+                    {/* <i className={`fa-solid fa-chevron-right text-[${projectTreeFontSize}px] text-white/30 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} /> */}
                     <i className={`fa-solid ${isOpen ? 'fa-folder-open' : 'fa-folder'} text-blue-400/80 mr-2 text-[${projectTreeFontSize}px]`} />
                     <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
-                    {color !== 'none' && <div className={`ml-auto w-1.5 h-1.5 rounded-full ${color === 'yellow' ? 'bg-yellow-400' : 'bg-green-400'}`}></div>}
+                    
+                    { selectedPath === path && <div className="flex-end ml-auto">
+                        <button
+                            onClick={() => { }}
+                            className={`w-5 h-5 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                            title="Edit"
+                        >
+                            <i className="fas fa-pencil-alt text-xs"></i>
+                        </button>
+                    </div>
+                }
+
                 </div>
                 {isOpen && (
                     <div>
@@ -87,12 +108,19 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
         const file = item as FileType;
         return (
             <div
-                className="flex items-center py-0.5 px-2 hover:bg-white/[0.05] cursor-pointer select-none group"
+                className={`
+                    flex items-center py-0.5 px-2 hover:bg-white/[0.05] cursor-pointer select-none group
+                    ${selectedPath === file.path ? 'bg-blue-400/8' : ''}
+                `}
                 style={{ paddingLeft: `${paddingLeft}px` }}
                 draggable
                 onDragStart={(e) => {
                     e.dataTransfer.setData("text/plain", file.path);
                     e.dataTransfer.effectAllowed = "copy";
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPath(file.path);
                 }}
                 onDoubleClick={(e) => {
                     e.preventDefault();
@@ -109,6 +137,17 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                 {color !== 'none' && <div className={`ml-auto text-[${projectTreeFontSize}px] font-bold ${color === 'blue' ? 'text-blue-400' : color === 'orange' ? 'text-orange-400' : 'text-green-400'}`}>
                     {color === 'orange' ? 'M' : color === 'green' ? 'U' : ''}
                 </div>}
+
+                { selectedPath === path && <div className="flex-end ml-auto">
+                        <button
+                            onClick={() => { }}
+                            className={`w-5 h-5 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                            title="Edit"
+                        >
+                            <i className="fas fa-pencil-alt text-xs"></i>
+                        </button>
+                    </div>
+                }
             </div>
         );
     }

@@ -2,34 +2,28 @@ import config from 'config';
 import TreeItem from "./TreeItem";
 import useProjectState from "../../appstates/project";
 import CommitInput from "./CommitInput";
+import ProjectEdit from './ProjectEdit';
 
 interface ProjectBrowserProps {
     className?: string;
 }
 
 export default function ProjectBrowser(props: ProjectBrowserProps) {
-    const changesCount    = useProjectState.use.changes();
-    const projectTree     = useProjectState.use.projectTree();
-    const loadProjectTree = useProjectState.use.loadProjectTree();
+    const projectTree = useProjectState.use.projectTree();
+    const setSelectedPath = useProjectState.use.setSelectedPath();
 
     return (
         <div className={`flex flex-col h-full min-h-0 bg-gray-800/20 rounded ${props.className}`}>
-            <div className="flex items-center justify-between p-2">
-                <div className="text-xs font-medium text-white/40 uppercase tracking-wider pl-1">
-                    Changes: { changesCount } file{ changesCount > 1 ? "s" : "" }
-                </div>
-                <div 
-                    className="w-5 h-5 flex items-center justify-center rounded hover:bg-white/10 cursor-pointer text-white/40 hover:text-white transition-colors"
-                    onClick={() => loadProjectTree()}
-                    title="Refresh"
-                >
-                    <i className="fa-solid fa-arrows-rotate text-xs"></i>
-                </div>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 py-1">
+            <ProjectEdit />
+
+            <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 py-1"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPath("");
+                }}
+            >
                 {projectTree && projectTree.length > 0 ? (
-                     projectTree.map((item, i) => (
+                    projectTree.map((item, i) => (
                         <TreeItem key={i} item={item} />
                     ))
                 ) : (
@@ -40,7 +34,7 @@ export default function ProjectBrowser(props: ProjectBrowserProps) {
             </div>
 
             <div className="p-2">
-               <CommitInput />
+                <CommitInput />
             </div>
         </div>
     );

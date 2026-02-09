@@ -13,7 +13,7 @@ interface NavButton {
 
 export default function Navigation(props :NavigationProps) {
     return (
-        <nav className="w-16 h-full flex flex-col items-center py-4 bg-white/4">
+        <nav className="w-16 h-full flex flex-col items-center py-4">
             <div className="flex flex-col gap-2 w-full px-2">
                 {props.navs.map((item) => {
                     return (

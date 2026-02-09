@@ -46,7 +46,7 @@ const appstate = create<appContext>()((set, get) => ({
     showAboutModal: false,
     setShowAboutModal: (show: boolean) => set({ showAboutModal: show }),
 
-    terminalFontSize: 16,
+    terminalFontSize: 15,
     setTerminalFontSize: (size: number) => {
         localStorage.setItem('terminalFontSize', size.toString());
         set({ terminalFontSize: size });
@@ -58,7 +58,7 @@ const appstate = create<appContext>()((set, get) => ({
         }
     },
 
-    projectTreeFontSize: 15,
+    projectTreeFontSize: 14,
     setProjectTreeFontSize: (size: number) => {
         localStorage.setItem('projectTreeFontSize', size.toString());
         set({ projectTreeFontSize: size });
