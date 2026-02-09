@@ -43,12 +43,15 @@ export const PeppermintLocal: ProjectTemplate = {
       - POSTGRES_PASSWORD=peppermint123
       - POSTGRES_DB=peppermint
     volumes:
-      - ./peppermint-data:/var/lib/postgresql/data
+      - peppermint-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U peppermint"]
       interval: 5s
       timeout: 5s
-      retries: 10`
+      retries: 10
+
+volumes:
+  peppermint-data:`
         },
         {
             action: 'file',
