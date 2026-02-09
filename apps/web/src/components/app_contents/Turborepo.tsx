@@ -68,7 +68,7 @@ export default function Turborepo(props: TurborepoProps) {
             return;
         }
 
-        if (cmd === 'turbo prune' || cmd === 'turbo prune --docker') {
+        if (cmd === 'npx turbo prune' || cmd === 'npx turbo prune --docker') {
             showModal(
                 'selection',
                 'Select Workspace',
@@ -77,7 +77,7 @@ export default function Turborepo(props: TurborepoProps) {
                 (selectedItem: any) => {
                     if (selectedItem) {
                         const isDocker = cmd.includes('--docker');
-                        const newCmd = `turbo prune ${selectedItem.info.name}${isDocker ? ' --docker' : ''}`;
+                        const newCmd = `npx turbo prune ${selectedItem.info.name}${isDocker ? ' --docker' : ''}`;
                         execute(newCmd);
                     }
                 },

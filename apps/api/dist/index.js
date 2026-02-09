@@ -94826,54 +94826,87 @@ router24.get("/", async (req, res) => {
       cwd: MONOREPO_ROOT,
       ignore: ignorePatterns,
       dot: true,
-      onlyFiles: true
+      onlyFiles: false,
+      // Include directories too
+      markDirectories: true,
+      // Directories end with /
+      suppressErrors: true
+      // Skip directories with permission errors (e.g., Docker volumes)
     });
     let gitStatusMap = {};
+    let untrackedDirs = /* @__PURE__ */ new Set();
     try {
-      const { stdout } = await execa("git", ["status", "--porcelain"], { cwd: MONOREPO_ROOT });
+      const { stdout } = await execa("git", ["status", "--porcelain", "-uall"], { cwd: MONOREPO_ROOT });
       stdout.split("\n").forEach((line) => {
         if (!line) return;
         const status = line.substring(0, 2);
         const file2 = line.substring(3).trim();
         gitStatusMap[file2] = status;
+        if (status.includes("?")) {
+          const parts = file2.split("/");
+          let dirPath = "";
+          for (let i2 = 0; i2 < parts.length - 1; i2++) {
+            dirPath = dirPath ? `${dirPath}/${parts[i2]}` : parts[i2];
+            untrackedDirs.add(dirPath);
+          }
+        }
       });
     } catch (e) {
       console.warn("Failed to get git status:", e);
     }
-    const getFileColor = (filePath) => {
+    const getFileColor = (filePath, isDirectory = false) => {
       const status = gitStatusMap[filePath];
-      if (!status) return "none";
-      if (status.includes("?") || status.includes("A")) return "green";
-      if (status.includes("M")) return "yellow";
+      if (status) {
+        if (status.includes("?") || status.includes("A")) return "green";
+        if (status.includes("M")) return "yellow";
+      }
+      if (isDirectory && untrackedDirs.has(filePath)) {
+        return "green";
+      }
       return "none";
     };
     const root = [];
-    const addFileToTree = (pathParts, currentLevel, currentPrefix) => {
+    const addFileToTree = (pathParts, currentLevel, currentPrefix, isDirectory) => {
       const part = pathParts[0];
       const currentPath = currentPrefix ? `${currentPrefix}/${part}` : part;
-      const isFile = pathParts.length === 1;
-      if (isFile) {
-        currentLevel.push({
-          file: part,
-          path: currentPath,
-          color: getFileColor(currentPath)
-        });
+      const isLastPart = pathParts.length === 1;
+      if (isLastPart) {
+        if (isDirectory) {
+          let folder = currentLevel.find((item) => item.folder === part);
+          if (!folder) {
+            folder = {
+              folder: part,
+              content: [],
+              color: getFileColor(currentPath, true),
+              path: currentPath
+            };
+            currentLevel.push(folder);
+          }
+        } else {
+          currentLevel.push({
+            file: part,
+            path: currentPath,
+            color: getFileColor(currentPath)
+          });
+        }
       } else {
         let folder = currentLevel.find((item) => item.folder === part);
         if (!folder) {
           folder = {
             folder: part,
             content: [],
-            color: "none",
+            color: getFileColor(currentPath, true),
             path: currentPath
           };
           currentLevel.push(folder);
         }
-        addFileToTree(pathParts.slice(1), folder.content, currentPath);
+        addFileToTree(pathParts.slice(1), folder.content, currentPath, isDirectory);
       }
     };
     files.forEach((file2) => {
-      addFileToTree(file2.split("/"), root, "");
+      const isDirectory = file2.endsWith("/");
+      const cleanPath = isDirectory ? file2.slice(0, -1) : file2;
+      addFileToTree(cleanPath.split("/"), root, "", isDirectory);
     });
     const bubbleStatus = (items) => {
       let hasYellow = false;
@@ -94991,6 +95024,12 @@ router25.post("/edit", async (req, res) => {
     if (!await import_fs_extra17.default.pathExists(itemPath)) {
       res.status(404).json({ error: "Path not found" });
       return;
+    }
+    const originalName = import_path23.default.basename(itemPath);
+    const originalExt = import_path23.default.extname(originalName);
+    const isFile = originalExt !== "";
+    if (isFile && !newname.includes(".")) {
+      newname = newname + originalExt;
     }
     const dir = import_path23.default.dirname(itemPath);
     const newPath = import_path23.default.join(dir, newname);

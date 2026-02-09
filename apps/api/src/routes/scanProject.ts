@@ -94,7 +94,8 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
             ignore: ignorePatterns,
             dot: true, 
             onlyFiles: false,  // Include directories too
-            markDirectories: true  // Directories end with /
+            markDirectories: true,  // Directories end with /
+            suppressErrors: true  // Skip directories with permission errors (e.g., Docker volumes)
         });
 
         // Get Git Status (include untracked directories with -uall)
