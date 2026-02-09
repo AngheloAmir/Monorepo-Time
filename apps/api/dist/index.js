@@ -82699,9 +82699,14 @@ async function initCommand() {
     if (!packageJson2.scripts) {
       packageJson2.scripts = {};
     }
-    if (!packageJson2.scripts.monorepotime) {
+    let scriptName = "dev";
+    if (!packageJson2.scripts.dev) {
+      packageJson2.scripts.dev = "monorepotime";
+      console.log(import_chalk.default.green(`Added "dev" to package.json scripts`));
+    } else {
       packageJson2.scripts.monorepotime = "monorepotime";
       console.log(import_chalk.default.green(`Added "monorepotime" to package.json scripts`));
+      scriptName = "monorepotime";
     }
     if (!packageJson2.packageManager) {
       try {
@@ -82717,7 +82722,7 @@ async function initCommand() {
     await import_fs_extra.default.writeJson(packageJsonPath2, packageJson2, { spaces: 2 });
     console.log(import_chalk.default.green("\u2705 Successfully initialized monorepotime!"));
     console.log(import_chalk.default.cyan("\nYou can now run:"));
-    console.log(import_chalk.default.white(`  ${pm} run monorepotime`));
+    console.log(import_chalk.default.white(`  ${pm} run ${scriptName}`));
     console.log();
   } catch (error) {
     console.error(import_chalk.default.red("\u274C Error updating package.json:"), error.message);
