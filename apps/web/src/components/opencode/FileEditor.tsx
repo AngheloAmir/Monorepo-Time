@@ -6,6 +6,11 @@ import ButtonDefault from "../ui/ButtonDefault";
 import ModalBody from "../ui/ModalBody";
 import ModalHeader from "../ui/ModalHeader";
 
+interface DiffMarkers {
+    added: number[];
+    modified: number[];
+}
+
 export default function FileEditor() {
     const isFileEditorOpen = useProjectState.use.isFileEditorOpen();
     const currentFile      = useProjectState.use.currentFile();
@@ -15,18 +20,36 @@ export default function FileEditor() {
     const closeFileEditor  = useProjectState.use.closeFileEditor();
     const loadFile         = useProjectState.use.loadFile();
     const saveFile         = useProjectState.use.saveFile();
+    const getFileDiff      = useProjectState.use.getFileDiff();
     const [textContent, setTextContent] = useState('');
+    const [diffMarkers, setDiffMarkers] = useState<DiffMarkers | undefined>(undefined);
 
     useEffect(() => {
         if(isFileEditorOpen && currentFilePath) {
+            // Load file content
             loadFile(currentFilePath).then((content) => {
                 setTextContent(typeof content === 'string' ? content : "");
             });
+            
+            // Load git diff markers
+            getFileDiff(currentFilePath).then((diff) => {
+                if (diff && (diff.added?.length > 0 || diff.modified?.length > 0)) {
+                    setDiffMarkers({
+                        added: diff.added || [],
+                        modified: diff.modified || []
+                    });
+                } else {
+                    setDiffMarkers(undefined);
+                }
+            });
+        } else {
+            // Reset when editor closes
+            setDiffMarkers(undefined);
         }
     }, [isFileEditorOpen, currentFilePath]);
 
     if (isFileEditorOpen) return (
-        <ModalBody width="900px">
+        <ModalBody width="1200px">
             <ModalHeader
                 title={currentFile}
                 description={currentFilePath}
@@ -42,11 +65,12 @@ export default function FileEditor() {
                         curentFileType === 'ts' || curentFileType === 'tsx' ? 'typescript' : 
                         'json'
                     }
-                    height="50vh"
+                    height="60vh"
                     width="100%"
                     onChange={(value) => {
                         setTextContent(value);
                     }}
+                    diffMarkers={diffMarkers}
                 />
             </div>
 

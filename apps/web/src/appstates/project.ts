@@ -50,6 +50,8 @@ interface projectContext {
 
     delete: (path: string) => Promise<any>;
     rename: (path: string, newname: string) => Promise<any>;
+
+    getFileDiff: (path: string) => Promise<any>;
 }
 
 const projectState = create<projectContext>()((set, get) => ({
@@ -229,6 +231,21 @@ const projectState = create<projectContext>()((set, get) => ({
         } catch (e) {
             console.error(e);
             return { error: "Failed to rename" };
+        }
+    },
+
+    getFileDiff: async (path: string) => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/diff`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path }),
+            });
+            if (!response.ok) return { added: [], modified: [] };
+            return await response.json();
+        } catch (e) {
+            console.error(e);
+            return { added: [], modified: [] };
         }
     }
 }));

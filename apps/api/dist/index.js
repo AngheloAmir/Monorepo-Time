@@ -95071,7 +95071,7 @@ router25.post("/delete", async (req, res) => {
     res.status(500).json({ error: "Failed to delete", details: error.message });
   }
 });
-router25.post("/new", async (req, res) => {
+router25.post("/newfile", async (req, res) => {
   try {
     let { path: itemPath } = req.body;
     if (!itemPath) {
@@ -95082,25 +95082,39 @@ router25.post("/new", async (req, res) => {
     itemPath = resolvePath(itemPath);
     if (await import_fs_extra17.default.pathExists(itemPath)) {
       console.log("Path already exists");
-      res.status(400).json({ error: "A file or folder with that path already exists" });
+      res.status(400).json({ error: "A file with that path already exists" });
       return;
     }
-    const name = import_path23.default.basename(itemPath);
-    const isFile = name.includes(".");
-    if (isFile) {
-      console.log("Creating file", itemPath);
-      await import_fs_extra17.default.outputFile(itemPath, "");
-      res.json({ success: true, message: "File created successfully", type: "file" });
-    } else {
-      console.log("Creating folder", itemPath);
-      await import_fs_extra17.default.ensureDir(itemPath);
-      const exists = await import_fs_extra17.default.pathExists(itemPath);
-      console.log("Folder created, exists:", exists);
-      res.json({ success: true, message: "Folder created successfully", type: "folder", path: itemPath, verified: exists });
-    }
+    console.log("Creating file", itemPath);
+    await import_fs_extra17.default.outputFile(itemPath, "");
+    res.json({ success: true, message: "File created successfully", type: "file" });
   } catch (error) {
-    console.error("Error creating:", error);
-    res.status(500).json({ error: "Failed to create", details: error.message });
+    console.error("Error creating file:", error);
+    res.status(500).json({ error: "Failed to create file", details: error.message });
+  }
+});
+router25.post("/newfolder", async (req, res) => {
+  try {
+    let { path: itemPath } = req.body;
+    if (!itemPath) {
+      console.log("Path is required");
+      res.status(400).json({ error: "Path is required" });
+      return;
+    }
+    itemPath = resolvePath(itemPath);
+    if (await import_fs_extra17.default.pathExists(itemPath)) {
+      console.log("Path already exists");
+      res.status(400).json({ error: "A folder with that path already exists" });
+      return;
+    }
+    console.log("Creating folder", itemPath);
+    await import_fs_extra17.default.ensureDir(itemPath);
+    const exists = await import_fs_extra17.default.pathExists(itemPath);
+    console.log("Folder created, exists:", exists);
+    res.json({ success: true, message: "Folder created successfully", type: "folder", path: itemPath, verified: exists });
+  } catch (error) {
+    console.error("Error creating folder:", error);
+    res.status(500).json({ error: "Failed to create folder", details: error.message });
   }
 });
 var textEditor_default = router25;
