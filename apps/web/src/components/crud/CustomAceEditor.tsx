@@ -1,5 +1,9 @@
 import { useState } from "react";
 import AceEditor from "react-ace";
+import ace from "ace-builds";
+
+// Configure ace basePath for Vite - must be done before importing modes/themes
+ace.config.set("basePath", "https://cdn.jsdelivr.net/npm/ace-builds@1.32.6/src-noconflict/");
 
 // Import necessary ace-builds
 import "ace-builds/src-noconflict/mode-json";
@@ -75,6 +79,7 @@ export default function CustomAceEditor({
                     enableLiveAutocompletion: true,
                     enableSnippets: true,
                     showLineNumbers: true,
+                    showPrintMargin: false,
                     tabSize: 2,
                     useWorker: false,
                     fontFamily: "monospace",

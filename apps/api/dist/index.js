@@ -90849,6 +90849,40 @@ var gitignoreContent5 = `# Runtime file
 .runtime.json
 `;
 
+// ../../packages/template/services/n8n/n8nAgent.ts
+var N8NAgent = `
+# Agent Task: n8n Workflow Assistant
+
+**Goal:** Iteratively gather credentials, fetch the specific workflow, and analyze it before taking action.
+
+**Strict Interaction Protocol:**
+Follow these steps **sequentially**. Do not ask for everything at once.
+
+### 1. Step 1: Get Credentials
+- **Action:** ASK the user for their **n8n API Key**.
+- **Helper:** Guide the user to find this by going to **Settings > Personal API Keys > Create API Key** in their n8n dashboard.
+- **Constraint:** Do NOT ask for the workflow URL yet.
+- **Wait:** STOP and wait for the user's response.
+
+### 2. Step 2: Get Target
+- **Action:** Once you have the API Key, ASK the user for the **Workflow URL** or **Workflow ID** they are currently editing.
+- **Helper:** Explain that the Workflow ID can be found in the URL bar of their browser (e.g., in http://localhost:5678/workflow/15, the ID is 15).
+- **Wait:** STOP and wait for the user's response.
+- *Note: If the user provides a URL (e.g., http://localhost:5678/workflow/15), extract the ID (e.g., 15).*
+
+### 3. Step 3: Fetch & Analyze (Read-Only)
+- **Action:** EXECUTE a curl GET request to fetch the workflow JSON.
+  \`\`\`bash
+  curl -X GET http://localhost:5678/api/v1/workflows/<WORKFLOW_ID>     -H "X-N8N-API-KEY: <API_KEY>"
+  \`\`\`
+- **Action:** Read the JSON output carefully to understand the nodes and connections.
+- **Output:** PRESENT a brief summary of what the workflow does (e.g., "I see this workflow triggers on a Webhook, processes JSON data, and saves to Postgres.").
+- **Constraint:** **DO NOT** suggest changes or write code yet. just show the analysis.
+
+### 4. Step 4: Await Instruction
+- **Action:** ASK the user: *"I have analyzed the workflow. What specific task or modification would you like me to perform?"*
+`;
+
 // ../../packages/template/services/n8n/server.ts
 var serverJs5 = `const http = require('http');
 const { spawn, exec } = require('child_process');
@@ -90991,9 +91025,9 @@ var N8NLocal = {
       args: ["pkg", "set", "scripts.start=node index.js"]
     },
     {
-      action: "command",
-      cmd: "npm",
-      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+      action: "root-command",
+      cmd: "node",
+      args: ["-e", `require('fs').writeFileSync('n8nAgent.ts', 'export const N8NAgent = ' + JSON.stringify(${JSON.stringify(N8NAgent)}) + ';')`]
     },
     {
       action: "command",
@@ -91155,6 +91189,11 @@ child.on('close', (code) => {
       action: "command",
       cmd: "npm",
       args: ["pkg", "set", "scripts.start=node runner.js start"]
+    },
+    {
+      action: "root-command",
+      cmd: "node",
+      args: ["-e", `require('fs').writeFileSync('n8nAgent.ts', 'export const N8NAgent = ' + JSON.stringify(${JSON.stringify(N8NAgent)}) + ';')`]
     },
     {
       action: "command",

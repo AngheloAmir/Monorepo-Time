@@ -6,6 +6,7 @@ import { OpenCodeContent, OpenCodeInit } from "../opencode/OpenCodeInit";
 
 import ProjectBrowser from "../opencode/ProjectBrowser";
 import useProjectState from "../../appstates/project";
+import FileEditor from "../opencode/FileEditor";
 
 interface CloudflareProps {
     isVisible: boolean
@@ -102,6 +103,10 @@ export default function OpenCode(props: CloudflareProps) {
                         onCrash={() => {
                             setIsRunning(false);
                         }}
+                    />
+
+                    <FileEditor
+                    
                     />
 
                     <OpenCodeInit

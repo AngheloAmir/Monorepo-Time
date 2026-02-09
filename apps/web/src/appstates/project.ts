@@ -25,6 +25,18 @@ interface projectContext {
     openFolders: Record<string, boolean>;
     loadProjectTree: () => Promise<void>;
     toggleFolder: (path: string) => void;
+
+    //current file open
+    isFileEditorOpen: boolean;
+    currentFile: string;
+    currentFilePath: string;
+    curentFileType: string;
+    openFileEditor: (path: string) => void;
+    closeFileEditor: () => void;
+
+    isEditable: (path: string) => boolean;
+    loadFile: (path: string) => Promise<string | any>;
+    saveFile: (path: string, content: string) => Promise<any>;
 }
 
 const projectState = create<projectContext>()((set) => ({
@@ -33,13 +45,13 @@ const projectState = create<projectContext>()((set) => ({
     changes: 0,
     openFolders: {},
     loadProjectTree: async () => {
-        if(config.useDemo) return;
+        if (config.useDemo) return;
         const response = await fetch(`${config.serverPath}${apiRoute.scanProject}`);
         const data = await response.json();
-        set({ 
+        set({
             projectTree: data.content,
             root: data.root,
-            changes: data.changes 
+            changes: data.changes
         });
     },
     toggleFolder: (path: string) => set((state) => ({
@@ -48,6 +60,71 @@ const projectState = create<projectContext>()((set) => ({
             [path]: !state.openFolders[path]
         }
     })),
+
+    isFileEditorOpen: false,
+    currentFile: "",
+    currentFilePath: "",
+    curentFileType: "",
+    openFileEditor: (path: string) => set({
+        isFileEditorOpen: true,
+        currentFilePath: path,
+        currentFile: path.split("/").pop() || "",
+        curentFileType: path.split(".").pop() || ""
+    }),
+    closeFileEditor: () => set({
+        isFileEditorOpen: false,
+        currentFile: "",
+        currentFilePath: "",
+        curentFileType: ""
+    }),
+
+    isEditable: (path: string) => {
+        const nonEditableExtensions = [
+            'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'ico', 'svg', 'tiff', 'tif', 'avif',
+            'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', '3gp',
+            'mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'wma',
+            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+            'ttf', 'otf', 'woff', 'woff2', 'eot',
+            'exe', 'dll', 'so', 'dylib', 'bin', 'dat', 'db', 'sqlite'
+        ];
+
+        const ext = path.split('.').pop()?.toLowerCase();
+        return !nonEditableExtensions.includes(ext || '');
+    },
+
+    loadFile: async (path: string) => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/get`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path }),
+            });
+            if (!response.ok) return "";
+            const data = await response.json();
+            return data.content;
+        } catch (e) {
+            console.error(e);
+            return "";
+        }
+    },
+    saveFile: async (path: string, content: string) => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/set`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path, content }),
+            });
+            return await response.json();
+        } catch (e) {
+            console.error(e);
+            return { error: "Failed to save" };
+        }
+    }
 }));
 
 const useProjectState = createSelectors(projectState);

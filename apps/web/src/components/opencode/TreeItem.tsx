@@ -4,8 +4,8 @@ import useProjectState, { type ProjectTree, type Folder as FolderType, type File
 const FileIcon = ({ name }: { name: string }) => {
     const ext = name.split('.').pop()?.toLowerCase();
     let iconClass = "fa-solid fa-file text-white/40";
-    
-    switch(ext) {
+
+    switch (ext) {
         case 'ts':
         case 'tsx':
             iconClass = "fa-solid fa-file-code text-blue-400";
@@ -34,30 +34,32 @@ const FileIcon = ({ name }: { name: string }) => {
             iconClass = "fa-solid fa-image text-purple-400";
             break;
     }
-    
+
     return <i className={`${iconClass} w-4 text-center`} />;
 };
 
 export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level?: number }) {
     const projectTreeFontSize = useAppState.use.projectTreeFontSize();
-    const isFolder         = 'folder' in item;
-    const path             = isFolder ? (item as FolderType).path : (item as FileType).path;
-    const isOpen           = useProjectState(state => state.openFolders[path] || false);
-    const toggleFolder     = useProjectState.use.toggleFolder();
-    
+    const isFolder            = 'folder' in item;
+    const path                = isFolder ? (item as FolderType).path : (item as FileType).path;
+    const isOpen              = useProjectState(state => state.openFolders[path] || false);
+    const toggleFolder        = useProjectState.use.toggleFolder();
+    const openFileEditor      = useProjectState.use.openFileEditor();
+    const isEditable          = useProjectState.use.isEditable();
+
     const paddingLeft = level * 12 + 4;
     const name = isFolder ? (item as FolderType).folder : (item as FileType).file;
     const color = item.color;
 
-    const textColor = color === 'yellow' ? 
-        'text-yellow-400' : color === 'green' ? 
+    const textColor = color === 'yellow' ?
+        'text-yellow-400' : color === 'green' ?
             'text-green-400' : 'text-white/70';
 
     if (isFolder) {
         const folder = item as FolderType;
         return (
             <div>
-                <div 
+                <div
                     className="flex items-center py-0.5 px-2 hover:bg-white/[0.05] cursor-pointer select-none group"
                     style={{ paddingLeft: `${paddingLeft}px` }}
                     onClick={() => toggleFolder(path)}
@@ -84,7 +86,7 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
     } else {
         const file = item as FileType;
         return (
-            <div 
+            <div
                 className="flex items-center py-0.5 px-2 hover:bg-white/[0.05] cursor-pointer select-none group"
                 style={{ paddingLeft: `${paddingLeft}px` }}
                 draggable
@@ -92,9 +94,17 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     e.dataTransfer.setData("text/plain", file.path);
                     e.dataTransfer.effectAllowed = "copy";
                 }}
+                onDoubleClick={(e) => {
+                    e.preventDefault();
+                    const filePath = file.path.replace('@', '');
+                    if (!isEditable(filePath)) return;
+                    openFileEditor(filePath);
+                }}
             >
                 <div className="w-4" />
-                <span className={`mr-2 text-[${projectTreeFontSize}px]`}><FileIcon name={name} /></span>
+                <span className={`mr-2 text-[${projectTreeFontSize}px]`}>
+                    <FileIcon name={name} />
+                </span>
                 <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
                 {color !== 'none' && <div className={`ml-auto text-[${projectTreeFontSize}px] font-bold ${color === 'blue' ? 'text-blue-400' : color === 'orange' ? 'text-orange-400' : 'text-green-400'}`}>
                     {color === 'orange' ? 'M' : color === 'green' ? 'U' : ''}

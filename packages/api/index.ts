@@ -104,6 +104,7 @@ const apiRoute = {
     opencodeHelper: 'opencode',
     opencodeTerminal: 'opencodeterminal',
     scanProject: 'scanproject',
+    textEditor: 'texteditor',
 }
 
 export default apiRoute;
