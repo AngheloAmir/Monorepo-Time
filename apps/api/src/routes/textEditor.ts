@@ -99,6 +99,16 @@ router.post('/edit', async (req: Request, res: Response) => {
             return;
         }
 
+        // Get the original file info
+        const originalName = path.basename(itemPath);
+        const originalExt = path.extname(originalName);
+        const isFile = originalExt !== '';
+
+        // Preserve extension if the new name doesn't have one but the original file did
+        if (isFile && !newname.includes('.')) {
+            newname = newname + originalExt;
+        }
+
         // Get the directory and create new path
         const dir = path.dirname(itemPath);
         const newPath = path.join(dir, newname);

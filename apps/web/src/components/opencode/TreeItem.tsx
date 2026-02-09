@@ -1,9 +1,12 @@
+import { useState } from "react";
 import useAppState from "../../appstates/app";
 import useProjectState, { type ProjectTree, type Folder as FolderType, type File as FileType } from "../../appstates/project";
 import FileIcon from "./_fileIcon";
+import EditDropdown from "./EditDropdown";
 
 export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level?: number }) {
     const projectTreeFontSize = useAppState.use.projectTreeFontSize();
+    const [showDropdown, setShowDropdown] = useState(false);
     const isFolder = 'folder' in item;
     const path = isFolder ? (item as FolderType).path : (item as FileType).path;
     const isOpen = useProjectState(state => state.openFolders[path] || false);
@@ -46,16 +49,24 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     <i className={`fa-solid ${isOpen ? 'fa-folder-open' : 'fa-folder'} text-blue-400/80 mr-2 text-[${projectTreeFontSize}px]`} />
                     <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
                     
-                    { selectedPath === path && <div className="flex-end ml-auto">
+                    { selectedPath === path && <div className="flex-end ml-auto relative">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
+                                setShowDropdown(!showDropdown);
                             }}
                             className={`w-5 h-5 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                             title="Edit"
                         >
                             <i className="fas fa-pencil-alt text-xs"></i>
                         </button>
+                        {showDropdown && (
+                            <EditDropdown 
+                                path={path} 
+                                name={name} 
+                                onClose={() => setShowDropdown(false)} 
+                            />
+                        )}
                     </div>
                 }
 
@@ -99,16 +110,24 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     <FileIcon name={name} />
                 </span>
                 <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
-                { selectedPath === path && <div className="flex-end ml-auto">
+                { selectedPath === path && <div className="flex-end ml-auto relative">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
+                                setShowDropdown(!showDropdown);
                             }}
                             className={`w-5 h-5 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                             title="Edit"
                         >
                             <i className="fas fa-pencil-alt text-xs"></i>
                         </button>
+                        {showDropdown && (
+                            <EditDropdown 
+                                path={path} 
+                                name={name} 
+                                onClose={() => setShowDropdown(false)} 
+                            />
+                        )}
                     </div>
                 }
             </div>

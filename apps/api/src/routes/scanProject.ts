@@ -97,25 +97,41 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
             markDirectories: true  // Directories end with /
         });
 
-        // Get Git Status
+        // Get Git Status (include untracked directories with -uall)
         let gitStatusMap: Record<string, string> = {};
+        let untrackedDirs: Set<string> = new Set();
         try {
-            const { stdout } = await execa('git', ['status', '--porcelain'], { cwd: MONOREPO_ROOT });
+            const { stdout } = await execa('git', ['status', '--porcelain', '-uall'], { cwd: MONOREPO_ROOT });
             stdout.split('\n').forEach(line => {
                 if (!line) return;
                 const status = line.substring(0, 2);
                 const file = line.substring(3).trim();
                 gitStatusMap[file] = status;
+                
+                // Track parent directories of untracked files
+                if (status.includes('?')) {
+                    const parts = file.split('/');
+                    let dirPath = '';
+                    for (let i = 0; i < parts.length - 1; i++) {
+                        dirPath = dirPath ? `${dirPath}/${parts[i]}` : parts[i];
+                        untrackedDirs.add(dirPath);
+                    }
+                }
             });
         } catch (e) {
             console.warn("Failed to get git status:", e);
         }
 
-        const getFileColor = (filePath: string) => {
+        const getFileColor = (filePath: string, isDirectory: boolean = false) => {
             const status = gitStatusMap[filePath];
-            if (!status) return "none";
-            if (status.includes('?') || status.includes('A')) return "green";
-            if (status.includes('M')) return "yellow";
+            if (status) {
+                if (status.includes('?') || status.includes('A')) return "green";
+                if (status.includes('M')) return "yellow";
+            }
+            // Check if this directory contains untracked content
+            if (isDirectory && untrackedDirs.has(filePath)) {
+                return "green";
+            }
             return "none";
         };
 
@@ -134,7 +150,7 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
                          folder = { 
                              folder: part, 
                              content: [], 
-                             color: "none",
+                             color: getFileColor(currentPath, true),
                              path: currentPath 
                          };
                          currentLevel.push(folder);
@@ -153,7 +169,7 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
                      folder = { 
                          folder: part, 
                          content: [], 
-                         color: "none",
+                         color: getFileColor(currentPath, true),
                          path: currentPath 
                      };
                      currentLevel.push(folder);
