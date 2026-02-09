@@ -81969,7 +81969,7 @@ var require_cpu = __commonJS({
     "use strict";
     var os3 = require("os");
     var fs28 = require("fs");
-    var exec6 = require("child_process").exec;
+    var exec7 = require("child_process").exec;
     var parallel = require_parallel();
     function updateCpu(cpu, next) {
       if (cpu !== null) {
@@ -82023,7 +82023,7 @@ var require_cpu = __commonJS({
         next = options;
         options = { default: "" };
       }
-      exec6("getconf " + keyword, function(error, stdout, stderr) {
+      exec7("getconf " + keyword, function(error, stdout, stderr) {
         if (error !== null) {
           if (!process.env.PIDUSAGE_SILENT) {
             console.error('Error while calling "getconf ' + keyword + '"', error);
@@ -82539,7 +82539,7 @@ var require_tree_kill = __commonJS({
     "use strict";
     var childProcess4 = require("child_process");
     var spawn5 = childProcess4.spawn;
-    var exec6 = childProcess4.exec;
+    var exec7 = childProcess4.exec;
     module2.exports = function(pid, signal, callback) {
       if (typeof signal === "function" && callback === void 0) {
         callback = signal;
@@ -82559,7 +82559,7 @@ var require_tree_kill = __commonJS({
       pidsToProcess[pid] = 1;
       switch (process.platform) {
         case "win32":
-          exec6("taskkill /pid " + pid + " /T /F", callback);
+          exec7("taskkill /pid " + pid + " /T /F", callback);
           break;
         case "darwin":
           buildProcessTree(pid, tree, pidsToProcess, function(parentPid) {
@@ -94966,6 +94966,9 @@ var scanProject_default = router24;
 var import_express29 = __toESM(require_express2());
 var import_fs_extra17 = __toESM(require_lib());
 var import_path23 = __toESM(require("path"));
+var import_child_process9 = require("child_process");
+var import_util2 = require("util");
+var execAsync2 = (0, import_util2.promisify)(import_child_process9.exec);
 var router25 = (0, import_express29.Router)();
 function resolvePath(itemPath) {
   if (itemPath.startsWith(ROOT3)) {
@@ -95115,6 +95118,71 @@ router25.post("/newfolder", async (req, res) => {
   } catch (error) {
     console.error("Error creating folder:", error);
     res.status(500).json({ error: "Failed to create folder", details: error.message });
+  }
+});
+router25.post("/diff", async (req, res) => {
+  try {
+    let { path: filePath } = req.body;
+    if (!filePath) {
+      res.status(400).json({ error: "File path is required" });
+      return;
+    }
+    filePath = resolvePath(filePath);
+    if (!await import_fs_extra17.default.pathExists(filePath)) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+    const relativePath = import_path23.default.relative(ROOT3, filePath);
+    const added = [];
+    const modified = [];
+    try {
+      const { stdout: trackedCheck } = await execAsync2(
+        `git ls-files --error-unmatch "${relativePath}" 2>/dev/null || echo "untracked"`,
+        { cwd: ROOT3 }
+      );
+      if (trackedCheck.trim() === "untracked") {
+        const content = await import_fs_extra17.default.readFile(filePath, "utf-8");
+        const lineCount = content.split("\n").length;
+        for (let i2 = 1; i2 <= lineCount; i2++) {
+          added.push(i2);
+        }
+        res.json({ added, modified, isUntracked: true });
+        return;
+      }
+      const { stdout: diffOutput } = await execAsync2(
+        `git diff -U0 HEAD -- "${relativePath}"`,
+        { cwd: ROOT3 }
+      );
+      if (!diffOutput.trim()) {
+        res.json({ added, modified, isUntracked: false });
+        return;
+      }
+      const hunkRegex = /@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/g;
+      let match;
+      while ((match = hunkRegex.exec(diffOutput)) !== null) {
+        const oldStart = parseInt(match[1], 10);
+        const oldCount = match[2] ? parseInt(match[2], 10) : 1;
+        const newStart = parseInt(match[3], 10);
+        const newCount = match[4] ? parseInt(match[4], 10) : 1;
+        if (oldCount === 0) {
+          for (let i2 = 0; i2 < newCount; i2++) {
+            added.push(newStart + i2);
+          }
+        } else if (newCount === 0) {
+        } else {
+          for (let i2 = 0; i2 < newCount; i2++) {
+            modified.push(newStart + i2);
+          }
+        }
+      }
+      res.json({ added, modified, isUntracked: false });
+    } catch (gitError) {
+      console.error("Git error:", gitError.message);
+      res.json({ added: [], modified: [], error: "Not a git repository or git error" });
+    }
+  } catch (error) {
+    console.error("Error getting diff:", error);
+    res.status(500).json({ error: "Failed to get diff", details: error.message });
   }
 });
 var textEditor_default = router25;
