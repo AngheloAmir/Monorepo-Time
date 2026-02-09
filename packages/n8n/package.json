@@ -1,7 +1,7 @@
 {
   "name": "n8n",
   "version": "1.0.0",
-  "description": "N8N Workflow Automation (Docker)",
+  "description": "N8N Automation",
   "fontawesomeIcon": "fas fa-project-diagram text-red-500",
   "scripts": {
     "dev": "",

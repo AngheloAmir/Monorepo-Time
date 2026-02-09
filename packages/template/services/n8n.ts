@@ -40,7 +40,7 @@ export const N8NLocal: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=N8N Workflow Automation (Docker)']
+            args: ['pkg', 'set', 'description=N8N Automation']
         },
         {
             action: 'command',

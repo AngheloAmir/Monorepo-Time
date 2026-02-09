@@ -39,11 +39,18 @@ interface projectContext {
     saveFile: (path: string, content: string) => Promise<any>;
 
     //current active path
-    selectedPath: string;
+    selectedPath:   string;
+    selectedFolder: string;
     setSelectedPath: (path: string) => void;
+    getParentPath: () => string;
+
+    //api call
+    createNew: (path: string) => Promise<any>;
+    delete: (path: string) => Promise<any>;
+    rename: (path: string, newname: string) => Promise<any>;
 }
 
-const projectState = create<projectContext>()((set) => ({
+const projectState = create<projectContext>()((set, get) => ({
     projectTree: [],
     root: "",
     changes: 0,
@@ -66,7 +73,33 @@ const projectState = create<projectContext>()((set) => ({
     })),
 
     selectedPath: "",
-    setSelectedPath: (path: string) => set({ selectedPath: path }),
+    selectedFolder: "",
+    setSelectedPath: (path: string) => set(() => {
+        const segments = path.split("/").filter(s => s !== "");
+        const lastSegment = segments[segments.length - 1] || "";
+        const isFile = lastSegment.includes(".");
+        let folder: string;
+        if (isFile) {
+            segments.pop();
+            folder = segments.pop() || "/";
+        } else {
+            folder = segments.pop() || "/";
+        }
+        return {
+            selectedPath: path,
+            selectedFolder: folder
+        }
+    }),
+    getParentPath: () => {
+        const { selectedPath, root } = get();
+        if (!selectedPath) return root;
+        const segments = selectedPath.split("/").filter(s => s !== "");
+        const lastSegment = segments[segments.length - 1] || "";
+        const isFile = lastSegment.includes(".");
+        if (isFile) segments.pop();
+        const relativePath = segments.join("/");
+        return relativePath ? `${root}/${relativePath}` : root;
+    },
 
     isFileEditorOpen: false,
     currentFile: "",
@@ -130,6 +163,47 @@ const projectState = create<projectContext>()((set) => ({
         } catch (e) {
             console.error(e);
             return { error: "Failed to save" };
+        }
+    },
+
+    //api call
+    createNew: async (path: string) => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/new`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path }),
+            });
+            return await response.json();
+        } catch (e) {
+            console.error(e);
+            return { error: "Failed to create" };
+        }
+    },
+    delete: async (path: string) => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path }),
+            });
+            return await response.json();
+        } catch (e) {
+            console.error(e);
+            return { error: "Failed to delete" };
+        }
+    },
+    rename: async (path: string, newname: string) => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/edit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path, newname }),
+            });
+            return await response.json();
+        } catch (e) {
+            console.error(e);
+            return { error: "Failed to rename" };
         }
     }
 }));

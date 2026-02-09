@@ -91033,7 +91033,7 @@ var N8NLocal = {
     {
       action: "command",
       cmd: "npm",
-      args: ["pkg", "set", "description=N8N Workflow Automation (Docker)"]
+      args: ["pkg", "set", "description=N8N Automation"]
     },
     {
       action: "command",
@@ -94855,7 +94855,7 @@ router24.get("/", async (req, res) => {
       if (isFile) {
         currentLevel.push({
           file: part,
-          path: "@" + currentPath,
+          path: currentPath,
           color: getFileColor(currentPath)
         });
       } else {
@@ -94865,7 +94865,7 @@ router24.get("/", async (req, res) => {
             folder: part,
             content: [],
             color: "none",
-            path: "@" + currentPath
+            path: currentPath
           };
           currentLevel.push(folder);
         }
@@ -94926,6 +94926,13 @@ var import_express29 = __toESM(require_express2());
 var import_fs_extra17 = __toESM(require_lib());
 var import_path23 = __toESM(require("path"));
 var router25 = (0, import_express29.Router)();
+function resolvePath(itemPath) {
+  if (itemPath.startsWith(ROOT3)) {
+    return itemPath;
+  }
+  const relativePath = itemPath.replace(/^\/+/, "");
+  return import_path23.default.join(ROOT3, relativePath);
+}
 router25.post("/get", async (req, res) => {
   try {
     let { path: filePath } = req.body;
@@ -94933,9 +94940,7 @@ router25.post("/get", async (req, res) => {
       res.status(400).json({ error: "File path is required" });
       return;
     }
-    if (!import_path23.default.isAbsolute(filePath)) {
-      filePath = import_path23.default.join(ROOT3, filePath);
-    }
+    filePath = resolvePath(filePath);
     if (!await import_fs_extra17.default.pathExists(filePath)) {
       res.status(404).json({ error: "File not found" });
       return;
@@ -94959,9 +94964,7 @@ router25.post("/set", async (req, res) => {
       res.status(400).json({ error: "File path is required" });
       return;
     }
-    if (!import_path23.default.isAbsolute(filePath)) {
-      filePath = import_path23.default.join(ROOT3, filePath);
-    }
+    filePath = resolvePath(filePath);
     if (content === void 0 || content === null) {
       res.status(400).json({ error: "Content is required" });
       return;
@@ -94971,6 +94974,86 @@ router25.post("/set", async (req, res) => {
   } catch (error) {
     console.error("Error writing file:", error);
     res.status(500).json({ error: "Failed to write file", details: error.message });
+  }
+});
+router25.post("/edit", async (req, res) => {
+  try {
+    let { path: itemPath, newname } = req.body;
+    if (!itemPath) {
+      res.status(400).json({ error: "Path is required" });
+      return;
+    }
+    if (!newname) {
+      res.status(400).json({ error: "New name is required" });
+      return;
+    }
+    itemPath = resolvePath(itemPath);
+    if (!await import_fs_extra17.default.pathExists(itemPath)) {
+      res.status(404).json({ error: "Path not found" });
+      return;
+    }
+    const dir = import_path23.default.dirname(itemPath);
+    const newPath = import_path23.default.join(dir, newname);
+    if (await import_fs_extra17.default.pathExists(newPath)) {
+      res.status(400).json({ error: "A file or folder with that name already exists" });
+      return;
+    }
+    await import_fs_extra17.default.rename(itemPath, newPath);
+    res.json({ success: true, message: "Renamed successfully", newPath });
+  } catch (error) {
+    console.error("Error renaming:", error);
+    res.status(500).json({ error: "Failed to rename", details: error.message });
+  }
+});
+router25.post("/delete", async (req, res) => {
+  try {
+    let { path: itemPath } = req.body;
+    if (!itemPath) {
+      res.status(400).json({ error: "Path is required" });
+      return;
+    }
+    itemPath = resolvePath(itemPath);
+    if (!await import_fs_extra17.default.pathExists(itemPath)) {
+      res.status(404).json({ error: "Path not found" });
+      return;
+    }
+    await import_fs_extra17.default.remove(itemPath);
+    res.json({ success: true, message: "Deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting:", error);
+    res.status(500).json({ error: "Failed to delete", details: error.message });
+  }
+});
+router25.post("/new", async (req, res) => {
+  try {
+    let { path: itemPath } = req.body;
+    if (!itemPath) {
+      console.log("Path is required");
+      res.status(400).json({ error: "Path is required" });
+      return;
+    }
+    itemPath = resolvePath(itemPath);
+    if (await import_fs_extra17.default.pathExists(itemPath)) {
+      console.log("Path already exists");
+      res.status(400).json({ error: "A file or folder with that path already exists" });
+      return;
+    }
+    const name = import_path23.default.basename(itemPath);
+    const isFile = name.includes(".");
+    if (isFile) {
+      console.log("Creating file", itemPath);
+      await import_fs_extra17.default.outputFile(itemPath, "");
+      res.json({ success: true, message: "File created successfully", type: "file" });
+    } else {
+      console.log("Creating folder", itemPath);
+      await import_fs_extra17.default.ensureDir(itemPath);
+      const exists = await import_fs_extra17.default.pathExists(itemPath);
+      console.log("Folder created, exists:", exists);
+      res.json({ success: true, message: "Folder created successfully", type: "folder", path: itemPath, verified: exists });
+    }
+  } catch (error) {
+    console.error("Error creating:", error);
+    res.status(500).json({ error: "Failed to create", details: error.message });
   }
 });
 var textEditor_default = router25;

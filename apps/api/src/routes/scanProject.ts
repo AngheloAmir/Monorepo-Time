@@ -93,7 +93,8 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
             cwd: MONOREPO_ROOT, 
             ignore: ignorePatterns,
             dot: true, 
-            onlyFiles: true
+            onlyFiles: false,  // Include directories too
+            markDirectories: true  // Directories end with /
         });
 
         // Get Git Status
@@ -120,17 +121,32 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
 
         const root: any[] = [];
         
-        const addFileToTree = (pathParts: string[], currentLevel: any[], currentPrefix: string) => {
+        const addFileToTree = (pathParts: string[], currentLevel: any[], currentPrefix: string, isDirectory: boolean) => {
              const part = pathParts[0];
              const currentPath = currentPrefix ? `${currentPrefix}/${part}` : part;
-             const isFile = pathParts.length === 1;
+             const isLastPart = pathParts.length === 1;
              
-             if (isFile) {
-                 currentLevel.push({
-                     file: part,
-                     path: '@' + currentPath,
-                     color: getFileColor(currentPath)
-                 });
+             if (isLastPart) {
+                 if (isDirectory) {
+                     // It's a directory (possibly empty)
+                     let folder = currentLevel.find((item: any) => item.folder === part);
+                     if (!folder) {
+                         folder = { 
+                             folder: part, 
+                             content: [], 
+                             color: "none",
+                             path: currentPath 
+                         };
+                         currentLevel.push(folder);
+                     }
+                 } else {
+                     // It's a file
+                     currentLevel.push({
+                         file: part,
+                         path: currentPath,
+                         color: getFileColor(currentPath)
+                     });
+                 }
              } else {
                  let folder = currentLevel.find((item: any) => item.folder === part);
                  if (!folder) {
@@ -138,16 +154,18 @@ router.get("/", async (req: Request, res: Response): Promise<any> => {
                          folder: part, 
                          content: [], 
                          color: "none",
-                         path: '@' + currentPath 
+                         path: currentPath 
                      };
                      currentLevel.push(folder);
                  }
-                 addFileToTree(pathParts.slice(1), folder.content, currentPath);
+                 addFileToTree(pathParts.slice(1), folder.content, currentPath, isDirectory);
              }
         };
         
         files.forEach(file => {
-             addFileToTree(file.split('/'), root, '');
+             const isDirectory = file.endsWith('/');
+             const cleanPath = isDirectory ? file.slice(0, -1) : file;
+             addFileToTree(cleanPath.split('/'), root, '', isDirectory);
         });
 
         const bubbleStatus = (items: any[]) => {
