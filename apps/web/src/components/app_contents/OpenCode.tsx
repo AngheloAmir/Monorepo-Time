@@ -105,9 +105,7 @@ export default function OpenCode(props: CloudflareProps) {
                         }}
                     />
 
-                    <FileEditor
-                    
-                    />
+                    <FileEditor/>
 
                     <OpenCodeInit
                         isVisible={props.isVisible && !isRunning && isOpenCodeInstalled && !loadingIfOpenCodeInstalled}

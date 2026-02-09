@@ -11,6 +11,7 @@ export default function FileEditor() {
     const currentFile      = useProjectState.use.currentFile();
     const currentFilePath  = useProjectState.use.currentFilePath();
     const curentFileType   = useProjectState.use.curentFileType();
+    const loadProjectTree = useProjectState.use.loadProjectTree();
     const closeFileEditor  = useProjectState.use.closeFileEditor();
     const loadFile         = useProjectState.use.loadFile();
     const saveFile         = useProjectState.use.saveFile();
@@ -57,6 +58,7 @@ export default function FileEditor() {
                         if (!currentFilePath) return;
                         saveFile(currentFilePath, textContent);
                         closeFileEditor();
+                        loadProjectTree();
                     }}
                     text="Save"
                     icon="fa-solid fa-floppy-disk"
