@@ -45,7 +45,9 @@ interface projectContext {
     getParentPath: () => string;
 
     //api call
-    createNew: (path: string) => Promise<any>;
+    createNewFile: (path: string) => Promise<any>;
+    createNewFolder: (path: string) => Promise<any>;
+
     delete: (path: string) => Promise<any>;
     rename: (path: string, newname: string) => Promise<any>;
 }
@@ -93,12 +95,20 @@ const projectState = create<projectContext>()((set, get) => ({
     getParentPath: () => {
         const { selectedPath, root } = get();
         if (!selectedPath) return root;
-        const segments = selectedPath.split("/").filter(s => s !== "");
-        const lastSegment = segments[segments.length - 1] || "";
+        
+        // selectedPath is already an absolute path
+        // For files, return the parent directory; for folders, return the path as-is
+        const lastSegment = selectedPath.split("/").pop() || "";
         const isFile = lastSegment.includes(".");
-        if (isFile) segments.pop();
-        const relativePath = segments.join("/");
-        return relativePath ? `${root}/${relativePath}` : root;
+        
+        if (isFile) {
+            // Return the parent directory of the file
+            const parentPath = selectedPath.substring(0, selectedPath.lastIndexOf("/"));
+            return parentPath || root;
+        }
+        
+        // For folders, return the selected folder path (create new items inside it)
+        return selectedPath;
     },
 
     isFileEditorOpen: false,
@@ -167,9 +177,9 @@ const projectState = create<projectContext>()((set, get) => ({
     },
 
     //api call
-    createNew: async (path: string) => {
+    createNewFile: async (path: string) => {
         try {
-            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/new`, {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/newfile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ path }),
@@ -180,6 +190,21 @@ const projectState = create<projectContext>()((set, get) => ({
             return { error: "Failed to create" };
         }
     },
+
+    createNewFolder: async (path: string) => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/newfolder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path }),
+            });
+            return await response.json();
+        } catch (e) {
+            console.error(e);
+            return { error: "Failed to create" };
+        }
+    },
+
     delete: async (path: string) => {
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/delete`, {

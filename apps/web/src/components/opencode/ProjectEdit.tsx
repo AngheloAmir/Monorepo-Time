@@ -6,16 +6,27 @@ export default function ProjectEdit() {
     const loadProjectTree   = useProjectState.use.loadProjectTree();
     const showModal         = useModal.use.showModal();
     const selectedFolder    = useProjectState.use.selectedFolder();
-    const createNew         = useProjectState.use.createNew();
+    const createNewFolder   = useProjectState.use.createNewFolder();
+    const createNewFile     = useProjectState.use.createNewFile();
     const getParentPath     = useProjectState.use.getParentPath();
 
-
-    async function onFileOrFolder() {
-        showModal("prompt", "New File or Folder", `Include the extension if you want to create a file, otherwise it will be a folder. At ${selectedFolder}`, "success", async (newName: any) => {
+    async function onFolder() {
+        showModal("prompt", "New Folder", `Create a new folder at ${selectedFolder}`, "success", async (newName: any) => {
             if (newName) {
                 const parentPath = getParentPath();
                 const fullPath   = `${parentPath}/${newName}`;
-                await createNew(fullPath);
+                await createNewFolder(fullPath);
+                loadProjectTree();
+            }
+        });
+    }
+
+    async function onFile() {
+        showModal("prompt", "New File", `Create a new file at ${selectedFolder}`, "success", async (newName: any) => {
+            if (newName) {
+                const parentPath = getParentPath();
+                const fullPath   = `${parentPath}/${newName}`;
+                await createNewFile(fullPath);
                 loadProjectTree();
             }
         });
@@ -33,7 +44,15 @@ export default function ProjectEdit() {
 
             <div className='flex flex-end gap-2'>
                 <button
-                    onClick={onFileOrFolder}
+                    onClick={onFile}
+                    className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                    title="New File"
+                >
+                    <i className="fas fa-file text-xs"></i>
+                </button>
+
+                <button
+                    onClick={onFolder}
                     className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                     title="New Folder"
                 >

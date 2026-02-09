@@ -155,9 +155,9 @@ router.post('/delete', async (req: Request, res: Response) => {
     }
 });
 
-// POST /new - Create a new file or folder - valid body: { path: string }
-// If path has an extension (contains "."), creates a file; otherwise creates a folder
-router.post('/new', async (req: Request, res: Response) => {
+// POST /newfile - Create a new file - valid body: { path: string }
+// Always creates a file, even without an extension
+router.post('/newfile', async (req: Request, res: Response) => {
     try {
         let { path: itemPath } = req.body;
 
@@ -173,30 +173,51 @@ router.post('/new', async (req: Request, res: Response) => {
         // Check if path already exists
         if (await fs.pathExists(itemPath)) {
             console.log('Path already exists');
-            res.status(400).json({ error: 'A file or folder with that path already exists' });
+            res.status(400).json({ error: 'A file with that path already exists' });
             return;
         }
 
-        // Determine if it's a file or folder based on extension
-        const name = path.basename(itemPath);
-        const isFile = name.includes('.');
-
-        if (isFile) {
-            // Create empty file (ensures parent directories exist)
-            console.log('Creating file', itemPath);
-            await fs.outputFile(itemPath, '');
-            res.json({ success: true, message: 'File created successfully', type: 'file' });
-        } else {
-            // Create folder
-            console.log('Creating folder', itemPath);
-            await fs.ensureDir(itemPath);
-            const exists = await fs.pathExists(itemPath);
-            console.log('Folder created, exists:', exists);
-            res.json({ success: true, message: 'Folder created successfully', type: 'folder', path: itemPath, verified: exists });
-        }
+        // Create empty file (ensures parent directories exist)
+        console.log('Creating file', itemPath);
+        await fs.outputFile(itemPath, '');
+        res.json({ success: true, message: 'File created successfully', type: 'file' });
     } catch (error: any) {
-        console.error('Error creating:', error);
-        res.status(500).json({ error: 'Failed to create', details: error.message });
+        console.error('Error creating file:', error);
+        res.status(500).json({ error: 'Failed to create file', details: error.message });
+    }
+});
+
+// POST /newfolder - Create a new folder - valid body: { path: string }
+// Always creates a folder
+router.post('/newfolder', async (req: Request, res: Response) => {
+    try {
+        let { path: itemPath } = req.body;
+
+        if (!itemPath) {
+            console.log('Path is required');
+            res.status(400).json({ error: 'Path is required' });
+            return;
+        }
+
+        // Resolve path relative to ROOT
+        itemPath = resolvePath(itemPath);
+
+        // Check if path already exists
+        if (await fs.pathExists(itemPath)) {
+            console.log('Path already exists');
+            res.status(400).json({ error: 'A folder with that path already exists' });
+            return;
+        }
+
+        // Create folder
+        console.log('Creating folder', itemPath);
+        await fs.ensureDir(itemPath);
+        const exists = await fs.pathExists(itemPath);
+        console.log('Folder created, exists:', exists);
+        res.json({ success: true, message: 'Folder created successfully', type: 'folder', path: itemPath, verified: exists });
+    } catch (error: any) {
+        console.error('Error creating folder:', error);
+        res.status(500).json({ error: 'Failed to create folder', details: error.message });
     }
 });
 
