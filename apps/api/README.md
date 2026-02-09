@@ -37,7 +37,6 @@ npx monorepotime init
 This will automatically:
 1. Add Monorepotime to your `package.json` dependencies
 2. Configure the necessary scripts
-3. Set up the monorepo structure if needed
 
 Your `package.json` will be updated with:
 
@@ -45,7 +44,7 @@ Your `package.json` will be updated with:
 {
   "packageManager": "npm@<your-package-manager-version>",
   "scripts": {
-    "monorepotime": "monorepotime"
+    "dev": "monorepotime"
   },
   "devDependencies": {
     "monorepotime": "^<latest-version>"
@@ -53,10 +52,10 @@ Your `package.json` will be updated with:
 }
 ```
 
-### Running MonoTime
+### Running Monorepotime
 
 ```bash
-npm run monorepotime
+npm run dev
 ```
 
 Or if installed globally:
@@ -117,17 +116,6 @@ MonoTime is distributed as an npm package and includes:
 - Cross-platform compatibility (Windows, macOS, Linux)
 - Automatic port detection and configuration
 
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](../../CONTRIBUTING.md) for details.
-
 ## License
 
 ISC © [Anghelo Amir](https://github.com/AngheloAmir/Monorepo-Time)
-
-## Links
-
-- [GitHub Repository](https://github.com/AngheloAmir/Monorepo-Time)
-- [npm Package](https://www.npmjs.com/package/monorepotime)
-- [Issues and Support](https://github.com/AngheloAmir/Monorepo-Time/issues)
-- [Documentation](https://github.com/AngheloAmir/Monorepo-Time/blob/main/docs/README.md)

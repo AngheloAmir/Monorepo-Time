@@ -63,10 +63,15 @@ export async function initCommand() {
       packageJson.scripts = {};
     }
 
-    // Add monorepotime script
-    if (!packageJson.scripts.monorepotime) {
+    let scriptName = 'dev';
+    if (!packageJson.scripts.dev) {
+      packageJson.scripts.dev = 'monorepotime';
+      console.log(chalk.green(`Added "dev" to package.json scripts`));
+    }
+    else {
       packageJson.scripts.monorepotime = 'monorepotime';
       console.log(chalk.green(`Added "monorepotime" to package.json scripts`));
+      scriptName = 'monorepotime';
     }
 
     // Add packageManager field if missing
@@ -78,9 +83,9 @@ export async function initCommand() {
         packageJson.packageManager = `${pm}@${version}`;
         console.log(chalk.green(`Added "packageManager": "${pm}@${version}" to package.json`));
       } catch (e) {
-         // If version check fails, default to generic latest or skip
-         packageJson.packageManager = `${pm}@latest`;
-         console.log(chalk.yellow(`Could not detect ${pm} version, defaulting to "latest"`));
+        // If version check fails, default to generic latest or skip
+        packageJson.packageManager = `${pm}@latest`;
+        console.log(chalk.yellow(`Could not detect ${pm} version, defaulting to "latest"`));
       }
     }
 
@@ -89,7 +94,7 @@ export async function initCommand() {
 
     console.log(chalk.green('✅ Successfully initialized monorepotime!'));
     console.log(chalk.cyan('\nYou can now run:'));
-    console.log(chalk.white(`  ${pm} run monorepotime`));
+    console.log(chalk.white(`  ${pm} run ${scriptName}`));
     console.log();
 
   } catch (error: any) {
