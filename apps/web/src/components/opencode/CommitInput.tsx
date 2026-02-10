@@ -2,11 +2,12 @@ import useGitControlContext from "../../appstates/gitcontrol";
 import useProjectState from "../../appstates/project";
 
 export default function CommitInput() {
-    const handleCommit = useGitControlContext.use.handleCommit();
-    const commitMessage = useGitControlContext.use.commitMessage();
+    const handleCommit     = useGitControlContext.use.handleCommit();
+    const commitMessage    = useGitControlContext.use.commitMessage();
     const setCommitMessage = useGitControlContext.use.setCommitMessage();
-    const commitLoading = useGitControlContext.use.commitLoading();
-    const loadProjectTree = useProjectState.use.loadProjectTree();
+    const commitLoading    = useGitControlContext.use.commitLoading();
+    const loadProjectTree  = useProjectState.use.loadProjectTree();
+    const setShowStash     = useGitControlContext.use.setShowStash();
 
     return (
         <form
@@ -17,17 +18,19 @@ export default function CommitInput() {
             }}
             className="flex flex-col gap-2"
         >
-            <div className="flex justify-between">
+            <div className="relative flex justify-between">
                 <div className="text-sm text-white/40 uppercase font-bold tracking-wider">
                     GIT ADD THEN PUSH
                 </div>
                 <button
-                    type="submit"
-                    disabled={commitLoading || !commitMessage.trim()}
-                    className={`w-12 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                    id="git-stash-button"
+                    type="button"
+                    disabled={commitLoading}
+                    className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                     title="Git Stash"
+                    onClick={() => setShowStash(true)}
                 >
-                    Stash
+                    <i className="fa-solid fa-clock-rotate-left"></i>
                 </button>
             </div>
 

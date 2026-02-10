@@ -7,6 +7,7 @@ import { OpenCodeContent, OpenCodeInit } from "../opencode/OpenCodeInit";
 import ProjectBrowser from "../opencode/ProjectBrowser";
 import useProjectState from "../../appstates/project";
 import FileEditor from "../opencode/FileEditor";
+import GitStashContainer from "../opencode/GitStashContainer";
 
 interface CloudflareProps {
     isVisible: boolean
@@ -100,9 +101,7 @@ export default function OpenCode(props: CloudflareProps) {
                             setIsRunning(false);
                         }}
                     />
-
                     <FileEditor/>
-
                     <OpenCodeInit
                         isVisible={props.isVisible && !isRunning && isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
                         onStart={() => {
@@ -125,6 +124,8 @@ export default function OpenCode(props: CloudflareProps) {
                     />
                 </div>
             </div>
+
+            <GitStashContainer />
         </div>
     )
 }
