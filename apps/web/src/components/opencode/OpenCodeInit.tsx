@@ -150,9 +150,9 @@ export function OpenCodeInit({ isVisible, onStart }: { isVisible: boolean, onSta
                     { latest?.updateAvailable && (
                         <button
                         onClick={updateOpenCode}
-                        className="group relative inline-flex items-center justify-center px-16 py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900 text-xl transform hover:-translate-y-1"
+                        className="group relative inline-flex items-center justify-center py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900 text-xl transform hover:-translate-y-1"
                     >
-                        Update OpenCode Latest: {latest.latest}
+                        Update to {latest.latest}
                     </button>
                     )}
                 </div>
