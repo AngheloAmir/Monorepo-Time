@@ -3,8 +3,8 @@ import fs from "fs";
 import { exec } from "child_process";
 import os from "os";
 import pidusage from "pidusage";
-import { activeProcesses } from "./runcmddev";
-import { activeTerminals } from "./interactiveTerminal";
+import { activeProcesses } from "../terminal/runcmddev";
+import { activeTerminals } from "../terminal/interactiveTerminal";
 import { ChildProcess } from "child_process";
 
 const router = Router();

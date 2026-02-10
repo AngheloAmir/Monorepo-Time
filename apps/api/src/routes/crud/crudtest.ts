@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import fs from "fs-extra";
 import path from "path";
-import { ROOT } from "./rootPath";
+import { ROOT } from "../utils/rootPath";
 
 const router = Router();
 const monorepoTimePath = path.join(ROOT, "monorepotime.json");
@@ -14,26 +14,28 @@ router.get("/", async (req: Request, res: Response) => {
 
     try {
         const data = await fs.readJson(monorepoTimePath);
-        res.json({ notes: data.notes || "" });
+        res.json({ crudtest: data.crudtest || [] });
     } catch (error) {
-        res.status(500).json({ error: "Failed to read notes" });
+        console.error("Error reading crudtest:", error);
+        res.status(500).json({ error: "Failed to read crudtest" });
     }
-}); 
+});
 
 router.post("/", async (req: Request, res: Response) => {
     try {
-        const { notes } = req.body;
-        if (typeof notes !== 'string') {
-            res.status(400).json({ error: "Invalid notes format" });
+        const { crudtest } = req.body;
+        if (!Array.isArray(crudtest)) {
+            res.status(400).json({ error: "Invalid crudtest format, must be an array" });
             return;
         }
 
         const data = await fs.readJson(monorepoTimePath);
-        data.notes = notes;
+        data.crudtest = crudtest;
         await fs.writeJson(monorepoTimePath, data, { spaces: 4 });
         res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: "Failed to save notes" });
+        console.error("Error saving crudtest:", error);
+        res.status(500).json({ error: "Failed to save crudtest" });
     }
 });
 

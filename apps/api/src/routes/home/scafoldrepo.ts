@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import fs from "fs-extra";
 import path from "path";
 import { exec } from "child_process";
-import { ROOT } from "./rootPath";
+import { ROOT } from "../utils/rootPath";
 
 const router = Router();
 const packageJsonPath = path.join(ROOT, "package.json");

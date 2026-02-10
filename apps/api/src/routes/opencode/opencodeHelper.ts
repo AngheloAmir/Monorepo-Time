@@ -2,7 +2,7 @@ import { Router } from "express";
 import fs from "fs-extra";
 import path from "path";
 import { execa } from "execa";
-import { ROOT }  from "./rootPath";
+import { ROOT }  from "../utils/rootPath";
 
 const router = Router();
 

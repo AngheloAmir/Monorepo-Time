@@ -105,6 +105,8 @@ const apiRoute = {
     opencodeTerminal: 'opencodeterminal',
     scanProject: 'scanproject',
     textEditor: 'texteditor',
+
+    gitStash: 'gitstash',
 }
 
 export default apiRoute;

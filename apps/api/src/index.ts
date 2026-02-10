@@ -40,35 +40,6 @@ import { Server } from 'socket.io';
 import net from 'net';
 
 //routers
-import tester from './routes/_tester';
-import apiScanWorkspace from './routes/scanworkspace';
-import runCmdDevSocket from './routes/runcmddev';
-import stopProcess from './routes/stopcmd';
-import listWorkspacesDir from './routes/listworkspacedirs';
-import newWorkspace from './routes/newworkspace';
-import interactiveTerminal, { interactiveTerminalSocket } from './routes/interactiveTerminal';
-import stopInteractiveTerm from './routes/stopInteractiveTerminal';
-import updateWorkspace from './routes/updateworkspace';
-import vscodeHideShow from './routes/vscodeHideShow';
-import rootPath from './routes/rootPath';
-import scaffoldRepo from './routes/scafoldrepo';
-import turborepoExist from './routes/turborepoexist';
-import firstRunRoute from './routes/firstrun';
-import notesRoute from './routes/notes';
-import crudTestRoute from './routes/crudtest';
-import gitControlHelper from './routes/gitControlHelper';
-import initMonorepoTime from './routes/initmonorepotime';
-import processTree from './routes/processUsage';
-import apiDocker from './routes/apidocker';
-import availableTemplates from './routes/availabletemplates';
-import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/setworkspace';
-import stopTerminalWorkspace from './routes/stopTerminalWorkspace';
-import deleteWorkspace from './routes/deleteWorkspace';
-import opencodeHelper from './routes/opencodeHelper';
-import opencodeTerminal, { opencodeTerminalSocket } from './routes/opencodeTerminal';
-import scanProject from './routes/scanProject';
-import textEditor from './routes/textEditor';
-
 const app = express();
 const port = config.apiPort;
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -102,6 +73,36 @@ app.use(express.static('public'));
 app.use(express.json());
 
 //routes=======================================================================
+import tester from './routes/utils/_tester';
+import apiScanWorkspace from './routes/workspace/scanworkspace';
+import runCmdDevSocket from './routes/terminal/runcmddev';
+import stopProcess from './routes/terminal/stopcmd';
+import listWorkspacesDir from './routes/workspace/listworkspacedirs';
+import newWorkspace from './routes/workspace/newworkspace';
+import interactiveTerminal, { interactiveTerminalSocket } from './routes/terminal/interactiveTerminal';
+import stopInteractiveTerm from './routes/terminal/stopInteractiveTerminal';
+import updateWorkspace from './routes/workspace/updateworkspace';
+import vscodeHideShow from './routes/utils/vscodeHideShow';
+import rootPath from './routes/utils/rootPath';
+import scaffoldRepo from './routes/home/scafoldrepo';
+import turborepoExist from './routes/home/turborepoexist';
+import firstRunRoute from './routes/home/firstrun';
+import notesRoute from './routes/home/notes';
+import crudTestRoute from './routes/crud/crudtest';
+import gitControlHelper from './routes/utils/gitControlHelper';
+import initMonorepoTime from './routes/home/initmonorepotime';
+import processTree from './routes/home/processUsage';
+import apiDocker from './routes/home/apidocker';
+import availableTemplates from './routes/workspace/availabletemplates';
+import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/workspace/setworkspace';
+import stopTerminalWorkspace from './routes/terminal/stopTerminalWorkspace';
+import deleteWorkspace from './routes/workspace/deleteWorkspace';
+import opencodeHelper from './routes/opencode/opencodeHelper';
+import opencodeTerminal, { opencodeTerminalSocket } from './routes/opencode/opencodeTerminal';
+import scanProject from './routes/opencode/scanProject';
+import textEditor from './routes/opencode/textEditor';
+import gitStashHelper from './routes/utils/gitStashHelper';
+
 app.use("/", tester);
 app.use("/" + apiRoute.scanWorkspace, apiScanWorkspace);
 app.use("/" + apiRoute.stopProcess, stopProcess);
@@ -129,6 +130,7 @@ app.use("/" + apiRoute.opencodeHelper, opencodeHelper);
 app.use("/" + apiRoute.opencodeTerminal, opencodeTerminal);
 app.use("/" + apiRoute.scanProject, scanProject);
 app.use("/" + apiRoute.textEditor, textEditor);
+app.use("/" + apiRoute.gitStash, gitStashHelper);
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');
