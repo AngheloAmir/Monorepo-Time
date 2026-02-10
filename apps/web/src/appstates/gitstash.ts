@@ -5,7 +5,9 @@ import config from 'config';
 
 interface gitStashContext {
     showStash: boolean;
-    stashList: string[];
+    setShowStash: ( isShow :boolean) => void;
+    stashList:  string[];
+    stashCount: number;
 
     loadGitStashList: () => Promise<void>;
     addGitStash:      (stashName: string) => Promise<void>;
@@ -16,10 +18,16 @@ interface gitStashContext {
 const gitStashContext = create<gitStashContext>()((set) => ({
     showStash: false,
     stashList: [],
+    stashCount: 0,
+
+    setShowStash: (isShow: boolean) => set({ showStash: isShow }),
 
     loadGitStashList: async () => {
         const res  = await fetch(`${config.serverPath}${apiRoute.gitStash}/list`);
         const data = await res.json();
+        if(data.length > 0) {
+            set({ stashCount: data.length });
+        }
         set({ stashList: data });
     },
 
@@ -53,5 +61,5 @@ const gitStashContext = create<gitStashContext>()((set) => ({
     },
 }));
 
-const useGitStashContext = createSelectors(gitStashContext);
-export default useGitStashContext;
+const useGitStash = createSelectors(gitStashContext);
+export default useGitStash;

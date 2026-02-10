@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import useGitControlContext from "../../appstates/gitcontrol";
+import useGitStash from "../../appstates/gitstash";
+import GitStash from "./GitStash";
 
 export default function GitStashContainer() {
-    const showStash    = useGitControlContext.use.showStash();
-    const setShowStash = useGitControlContext.use.setShowStash();
-    const [coords, setCoords] = useState<{ x: number; y: number } | null>(null);
+    const showStash    = useGitStash.use.showStash();
+    const setShowStash = useGitStash.use.setShowStash();
+    const [coords, setCoords]       = useState<{ x: number; y: number } | null>(null);
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -47,20 +48,15 @@ export default function GitStashContainer() {
         <>
             <div className="fixed inset-0 z-40" onClick={() => setShowStash(false)} />
             <div
-                className="fixed w-64 bg-zinc-900 border border-white/10 rounded-lg shadow-xl overflow-hidden z-50 flex flex-col"
+                className="fixed w-72 min-h-64 bg-gray-900  border border-blue-500/50 rounded overflow-hidden z-50 flex flex-col"
                 style={{
                     left:    coords.x,
-                    bottom:  coords.y + 8, // Add a small gap from the button
+                    bottom:  coords.y + 8,
                     opacity: isVisible ? 1 : 0,
                     transition: "opacity 0.2s ease-in-out",
                 }}
             >
-                <div className="p-3 bg-white/5 border-b border-white/10 font-medium text-xs text-white uppercase tracking-wider">
-                    Stashed Changes
-                </div>
-                <div className="p-4 text-center text-white/30 text-xs italic">
-                    No stash entries found
-                </div>
+                <GitStash />
             </div>
         </>,
         document.body

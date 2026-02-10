@@ -24,10 +24,6 @@ interface gitControlContext {
     fetchData: () => Promise<void>;
     handleCommit: (e?: React.FormEvent) => Promise<void>;
     handleRevert: () => Promise<void>;
-
-    //stash
-    showStash: boolean;
-    setShowStash: (showStash: boolean) => void;
 }
 
 const gitControlContext = create<gitControlContext>()((set, get) => ({
@@ -124,10 +120,6 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
             set({ loading: false });
         }
     },
-
-    //stash=======================================================================================
-    showStash: false,
-    setShowStash: (showStash) => set({ showStash }),
 }));
 
 const useGitControlContext = createSelectors(gitControlContext);

@@ -1,4 +1,5 @@
 import useGitControlContext from "../../appstates/gitcontrol";
+import useGitStash from "../../appstates/gitstash";
 import useProjectState from "../../appstates/project";
 
 export default function CommitInput() {
@@ -7,7 +8,8 @@ export default function CommitInput() {
     const setCommitMessage = useGitControlContext.use.setCommitMessage();
     const commitLoading    = useGitControlContext.use.commitLoading();
     const loadProjectTree  = useProjectState.use.loadProjectTree();
-    const setShowStash     = useGitControlContext.use.setShowStash();
+    const setShowStash     = useGitStash.use.setShowStash();
+    const stashCount       = useGitStash.use.stashCount();
 
     return (
         <form
@@ -26,10 +28,15 @@ export default function CommitInput() {
                     id="git-stash-button"
                     type="button"
                     disabled={commitLoading}
-                    className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                    className={`relative w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                     title="Git Stash"
                     onClick={() => setShowStash(true)}
                 >
+                    { stashCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-red-500/30 pointer-events-none">
+                            {stashCount}
+                        </span>
+                    )}
                     <i className="fa-solid fa-clock-rotate-left"></i>
                 </button>
             </div>
