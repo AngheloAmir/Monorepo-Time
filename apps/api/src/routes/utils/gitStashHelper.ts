@@ -16,7 +16,7 @@ async function runGit(command: string) {
     }
     return stdout.trim();
 }
-
+ 
 // Remove stale git lock files that can block git operations.
 // Only removes locks if no other git process is actively running.
 async function cleanStaleLocks() {
@@ -172,7 +172,8 @@ router.post('/revert', async (req: Request, res: Response) => {
 
         // Create a safety stash of current state before reverting
         try {
-            await runGit('git stash push -m "__monotime_pre_revert_backup__"');
+            const timestamp = new Date().toLocaleTimeString();
+            await runGit(`git stash push -m "__backup_${timestamp}__"`);
         } catch {
             // Nothing to stash is fine
         }
@@ -183,7 +184,7 @@ router.post('/revert', async (req: Request, res: Response) => {
         let newStashIndex: number | null = null;
         const updatedLines = updatedRawList.split('\n').filter(Boolean);
         for (let i = 0; i < updatedLines.length; i++) {
-            if (updatedLines[i].includes(stashName) && !updatedLines[i].includes('__monotime_pre_revert_backup__')) {
+            if (updatedLines[i].includes(stashName) && !updatedLines[i].includes('__backup_')) {
                 newStashIndex = i;
                 break;
             }

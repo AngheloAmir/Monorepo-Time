@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import useAppState from "../../appstates/app";
 import Button3 from "../ui/Button3"
 
 export function OpenCodeContent({ isVisible, onInstall }: { isVisible: boolean, onInstall: () => void }) {
@@ -26,6 +28,20 @@ export function OpenCodeContent({ isVisible, onInstall }: { isVisible: boolean, 
 }
 
 export function OpenCodeInit({ isVisible, onStart }: { isVisible: boolean, onStart: () => void }) {
+    const checkForUpdates = useAppState.use.checkForUpdates();
+    const updateOpenCode  = useAppState.use.updateOpenCode();
+    const [latest, setLatest] = useState<{ updateAvailable: boolean; current: string; latest: string }>({
+        updateAvailable: false,
+        current: "",
+        latest: ""
+    });
+
+    useEffect(() => {
+        checkForUpdates().then((data) => {
+            setLatest(data);
+        });
+    }, []);
+
     return (
         <div className={`h-full w-full flex items-center justify-center p-4 ${isVisible ? 'flex' : 'hidden'}`}>
             <div className="w-full h-full max-w-6xl flex flex-col items-center justify-center text-center relative overflow-hidden">
@@ -122,7 +138,7 @@ export function OpenCodeInit({ isVisible, onStart }: { isVisible: boolean, onSta
                     </div>
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-8 flex flex-col gap-4">
                     <button
                         onClick={onStart}
                         className="group relative inline-flex items-center justify-center px-16 py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900 text-xl transform hover:-translate-y-1"
@@ -130,6 +146,15 @@ export function OpenCodeInit({ isVisible, onStart }: { isVisible: boolean, onSta
                         <i className="fas fa-terminal mr-3"></i>
                         Launch Terminal
                     </button>
+
+                    { latest?.updateAvailable && (
+                        <button
+                        onClick={updateOpenCode}
+                        className="group relative inline-flex items-center justify-center px-16 py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900 text-xl transform hover:-translate-y-1"
+                    >
+                        Update OpenCode Latest: {latest.latest}
+                    </button>
+                    )}
                 </div>
 
                 <div className="absolute bottom-6 left-0 right-0 text-center">

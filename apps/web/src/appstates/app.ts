@@ -29,6 +29,8 @@ interface appContext {
     loadingIfOpenCodeInstalled: boolean;
     checkIfInstalled: () => Promise<void>;
     installOpenCode: () => Promise<void>;
+    checkForUpdates: () => Promise<{ updateAvailable: boolean; current: string; latest: string }>;
+    updateOpenCode: () => Promise<void>;
 
     terminalFontSize: number;
     loadTerminalFontSize: () => void;
@@ -189,6 +191,17 @@ const appstate = create<appContext>()((set, get) => ({
     installOpenCode: async () => {
         if(config.useDemo) return;
         await fetch(`${config.serverPath}${apiRoute.opencodeHelper}/install`);
+        await get().checkIfInstalled();
+    },
+    checkForUpdates: async () => {
+        if(config.useDemo) return { updateAvailable: false, current: "", latest: "" };
+        const response = await fetch(`${config.serverPath}${apiRoute.opencodeHelper}/version`);
+        const data     = await response.json();
+        return data;
+    },
+    updateOpenCode: async () => {
+        if(config.useDemo) return;
+        await fetch(`${config.serverPath}${apiRoute.opencodeHelper}/update`);
         await get().checkIfInstalled();
     },
 }));

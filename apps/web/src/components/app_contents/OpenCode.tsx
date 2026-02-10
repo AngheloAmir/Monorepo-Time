@@ -8,6 +8,7 @@ import ProjectBrowser from "../opencode/ProjectBrowser";
 import useProjectState from "../../appstates/project";
 import FileEditor from "../opencode/FileEditor";
 import GitStashContainer from "../opencode/GitStashContainer";
+import useGitStash from "../../appstates/gitstash";
 
 interface CloudflareProps {
     isVisible: boolean
@@ -21,6 +22,8 @@ export default function OpenCode(props: CloudflareProps) {
     const rootDir = useAppState.use.rootDir();
     const loadRootDir = useAppState.use.loadRootDir();
     const loadProjectTree = useProjectState.use.loadProjectTree();
+    const loadGitStashList = useGitStash.use.loadGitStashList();
+
     const [isRunning, setIsRunning] = useState(false);
     const [sidebarWidth, setSidebarWidth] = useState(285);
     const [isResizing, setIsResizing] = useState(false);
@@ -55,6 +58,7 @@ export default function OpenCode(props: CloudflareProps) {
             checkIfInstalled();
             loadRootDir();
             loadProjectTree();
+            loadGitStashList();
         }
     }, [props.isVisible]);
 
@@ -62,6 +66,7 @@ export default function OpenCode(props: CloudflareProps) {
         checkIfInstalled();
         loadRootDir();
         loadProjectTree();
+        loadGitStashList();
         return () => {
             clearInterval(projectTreeInterval);
         }
@@ -74,6 +79,7 @@ export default function OpenCode(props: CloudflareProps) {
             }, 50);
             const intervalId = setInterval(() => {
                 loadProjectTree();
+                loadGitStashList();
             }, 5000);
             setProjectTreeInterval(intervalId);
         }

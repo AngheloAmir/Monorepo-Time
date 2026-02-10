@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useGitStash from "../../appstates/gitstash";
 import useModal from "../../modal/modals";
 
@@ -11,10 +11,6 @@ export default function GitStash() {
     const stashList = useGitStash.use.stashList();
     const [stashName, setStashName] = useState<string>("");
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        loadGitStashList();
-    }, []);
 
     async function handleRevertStash(name: string) {
         showModal("confirm",
