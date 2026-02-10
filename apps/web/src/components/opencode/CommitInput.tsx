@@ -10,6 +10,7 @@ export default function CommitInput() {
     const loadProjectTree  = useProjectState.use.loadProjectTree();
     const setShowStash     = useGitStash.use.setShowStash();
     const stashCount       = useGitStash.use.stashCount();
+    const loadGitStashList = useGitStash.use.loadGitStashList();
 
     return (
         <form
@@ -17,11 +18,12 @@ export default function CommitInput() {
                 e.preventDefault();
                 await handleCommit(e);
                 await loadProjectTree();
+                await loadGitStashList();
             }}
             className="flex flex-col gap-2"
         >
             <div className="relative flex justify-between">
-                <div className="text-sm text-white/40 uppercase font-bold tracking-wider">
+                <div className="text-xs text-white/40 uppercase font-bold tracking-wider">
                     GIT ADD THEN PUSH
                 </div>
                 <button
