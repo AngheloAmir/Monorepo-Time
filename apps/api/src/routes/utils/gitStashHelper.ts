@@ -91,13 +91,20 @@ router.post('/add', async (req: Request, res: Response) => {
         // Stage all changes (including untracked files)
         await runGit('git add -A');
 
-        // Create the stash.
-        // --include-untracked ensures new files are also stashed.
-        // Using `git stash push` (modern form) with a message.
+        // Use `git stash create` to build a stash commit WITHOUT modifying
+        // the working tree (changes stay in place — acts like a checkpoint).
+        // Then `git stash store` saves it to the stash reflog with a name.
+        const safeName = stashName.replace(/"/g, '\\"');
         try {
-            await runGit(`git stash push -m "${stashName.replace(/"/g, '\\"')}"`);
+            const stashHash = await runGit('git stash create');
+            if (!stashHash) {
+                // Nothing to stash — no changes detected
+                const list = await getStashList();
+                res.json(list);
+                return;
+            }
+            await runGit(`git stash store -m "${safeName}" ${stashHash}`);
         } catch (e: any) {
-            // If there's nothing to stash, git exits with an error
             if (
                 e.message?.includes('No local changes to save') ||
                 e.stdout?.includes('No local changes to save')
