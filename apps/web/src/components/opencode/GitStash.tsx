@@ -67,7 +67,7 @@ export default function GitStash() {
                     <button
                         onClick={handleClearStash}
                         disabled={loading}
-                        className="text-[10px] text-red-400/60 hover:text-red-400 transition-colors disabled:opacity-30"
+                        className="text-xs text-red-400/60 hover:text-red-400 transition-colors disabled:opacity-30"
                         title="Clear all stashes"
                     >
                         <i className="fa-solid fa-trash-can mr-1" />
@@ -93,10 +93,10 @@ export default function GitStash() {
                                 className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-white/5 transition-colors group disabled:opacity-30"
                             >
                                 <i className="fa-solid fa-code-branch text-xs text-blue-400/40 group-hover:text-blue-400 transition-colors" />
-                                <span className="flex-1 text-xs text-white/50 group-hover:text-white/80 transition-colors truncate">
+                                <span className="flex-1 text-xs text-white transition-colors truncate">
                                     {stash}
                                 </span>
-                                <i className="fa-solid fa-rotate-left text-xs text-white/0 group-hover:text-white/30 transition-colors" />
+                                <i className="fa-solid fa-rotate-left text-xs text-white/0 group-hover:text-white transition-colors" />
                             </button>
                         ))}
                     </div>

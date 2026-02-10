@@ -2,6 +2,8 @@ import { Router, Request, Response } from 'express';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { ROOT } from './rootPath';
+import fs from 'fs';
+import path from 'path';
 
 const execAsync = promisify(exec);
 const router = Router();
@@ -15,6 +17,30 @@ async function runGit(command: string) {
         console.log('Git Output (stderr):', stderr);
     }
     return stdout.trim();
+}
+
+// Remove stale git lock files that can block git operations (e.g. from interrupted stash).
+async function cleanStaleLocks() {
+    const lockFiles = [
+        path.join(ROOT, '.git', 'index.lock'),
+        path.join(ROOT, '.git', 'refs', 'stash.lock'),
+    ];
+    for (const lockFile of lockFiles) {
+        if (fs.existsSync(lockFile)) {
+            try {
+                await execAsync('pgrep -x git');
+                // git is still running — don't remove
+            } catch {
+                // no git process running — safe to remove stale lock
+                try {
+                    fs.unlinkSync(lockFile);
+                    console.log(`Removed stale git lock: ${lockFile}`);
+                } catch (e) {
+                    console.error(`Failed to remove lock ${lockFile}:`, e);
+                }
+            }
+        }
+    }
 }
 
 router.get('/history', async (req: Request, res: Response) => {
@@ -86,6 +112,9 @@ router.post('/push', async (req: Request, res: Response) => {
             return;
         }
         
+        // Clean stale locks that may have been left by interrupted stash operations
+        await cleanStaleLocks();
+
         try {
             await runGit('git add .');
             // Escape quotes in message
@@ -103,6 +132,14 @@ router.post('/push', async (req: Request, res: Response) => {
         }
         
         await runGit('git push');
+
+        // Clear all stashes after successful push — committed state is now the source of truth
+        try {
+            await runGit('git stash clear');
+        } catch {
+            // Non-critical: don't fail the push if stash clear fails
+        }
+
         res.json({ success: true });
     } catch (error: any) {
         console.error("Git Push Error:", error);
