@@ -1,15 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "agent": {
-    "build": {
-      "mode": "primary",
-      "prompt": "Before making any code changes, ALWAYS create a git stash snapshot first by running these commands in bash: 1) `git add -A` to stage all files, 2) `HASH=$(git stash create)` to create a stash commit without modifying the working tree, 3) If HASH is not empty, run `git stash store -m \"<short_task_summary>\" $HASH` where <short_task_summary> is a brief description of what you are about to change (e.g. 'pre-refactor-auth-module' or 'before-fix-login-bug'). This creates a checkpoint the user can revert to. After the stash is saved, proceed with the requested changes normally.",
-      "tools": {
-        "write": true,
-        "edit":  true,
-        "bash":  true
-      }
-    },
     "review": {
       "description": "Reviews code for best practices and potential issues"
     }

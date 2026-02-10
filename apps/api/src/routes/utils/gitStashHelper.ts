@@ -59,7 +59,6 @@ async function getStashList(): Promise<string[]> {
     }
 }
 
-
 // ─── GET /list ──────────────────────────────────────────────
 // Returns an array of stash entry names, e.g. ["my-checkpoint", "wip-feature"]
 router.get('/list', async (req: Request, res: Response) => {

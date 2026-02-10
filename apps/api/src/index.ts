@@ -40,7 +40,7 @@ import { Server } from 'socket.io';
 import net from 'net';
 
 //routers
-const app = express();
+const app  = express();
 const port = config.apiPort;
 const isDevelopment = process.env.NODE_ENV === 'development'
 let actualPort      = port;
