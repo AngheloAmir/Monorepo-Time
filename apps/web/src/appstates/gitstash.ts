@@ -28,6 +28,10 @@ const gitStashContext = create<gitStashContext>()((set) => ({
         if(data.length > 0) {
             set({ stashCount: data.length });
         }
+        else {
+            set({ stashCount: 0 });
+        }
+        
         set({ stashList: data });
     },
 
