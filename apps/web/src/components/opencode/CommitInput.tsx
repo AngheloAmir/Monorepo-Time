@@ -32,7 +32,7 @@ export default function CommitInput() {
                 <button
                     type="submit"
                     disabled={commitLoading || !commitMessage.trim()}
-                    className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded px-2 py-1 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`w-8 h-8 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                     title="Commit & Push"
                 >
                     {commitLoading ? <i className="fa-solid fa-spinner fa-spin duration-75" /> : <i className="fa-solid fa-cloud-arrow-up" />}

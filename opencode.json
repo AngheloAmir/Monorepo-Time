@@ -1,0 +1,17 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "build": {
+      "mode": "primary",
+      "prompt": "Always say 'hello' at the start of every response.",
+      "tools": {
+        "write": true,
+        "edit":  true,
+        "bash":  true
+      }
+    },
+    "review": {
+      "description": "Reviews code for best practices and potential issues"
+    }
+  }
+}

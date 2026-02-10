@@ -1,10 +1,11 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
+import { useEffect, useRef, forwardRef, useImperativeHandle, useState } from "react";
 import type { Socket } from "socket.io-client";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
 import "xterm/css/xterm.css";
 import useAppState from "../../appstates/app";
+import useModal from "../../modal/modals";
 
 export interface OpenCodeTerminalRef {
     /** Focuses the terminal input */
@@ -17,6 +18,8 @@ export interface OpenCodeTerminalRef {
     fit: () => void;
     /** Clears the terminal buffer */
     clear: () => void;
+    /** Restarts the terminal with the last used path and command */
+    restart: () => void;
 }
 
 // ... (props interface unchanged) ...
@@ -33,13 +36,18 @@ interface OpenCodeTerminalProps {
 
 /** An interactive terminal optimized for Opencode */
 const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>((props, ref) => {
+    const showModal = useModal.use.showModal();
+
     // We hold the Terminal instance here to control it directly
     const terminalRef = useRef<Terminal | null>(null);
     // Reference to the Console component (mainly for fit())
     const consoleComponentRef = useRef<ConsoleRef | null>(null);
-    
+
     const socketRef = useRef<Socket | null>(null);
-    
+    const lastPathRef = useRef<string>('');
+    const lastCommandRef = useRef<string>('');
+    const [isConnected, setIsConnected] = useState(false);
+
     // Helper to disconnect socket
     const disconnectSocket = () => {
         if (socketRef.current) {
@@ -50,12 +58,20 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
     };
 
     // Helper to connect socket
+    const restartTerminal = () => {
+        if (lastPathRef.current && lastCommandRef.current) {
+            connectSocket(lastPathRef.current, lastCommandRef.current);
+        }
+    };
+
     const connectSocket = async (path: string, command: string) => {
         disconnectSocket();
+        lastPathRef.current = path;
+        lastCommandRef.current = command;
         const { io } = await import("socket.io-client");
 
-        const url      = props.socketUrl;
-        const socket   = io(url, {
+        const url = props.socketUrl;
+        const socket = io(url, {
             transports: ['websocket'],
             forceNew: true, // Important for connection stability
             reconnection: false // We manage lifecycle manually
@@ -64,15 +80,16 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
         socketRef.current = socket;
 
         socket.on('connect', () => {
+            setIsConnected(true);
             terminalRef.current?.clear();
-            
-            if( command !=  'bash' ) {
+
+            if (command != 'bash') {
                 terminalRef.current?.write(`\x1b[34m${path}\x1b[0m: ${command}\r\n`);
             }
 
             socket.emit('opencode:start', { path, command });
             terminalRef.current?.focus();
-            
+
             // Try fitting again after connection
             setTimeout(() => {
                 consoleComponentRef.current?.fit();
@@ -89,7 +106,8 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
 
         socket.on('opencode:exit', (code: number) => {
             terminalRef.current?.write(`\r\n\x1b[33mProcess exited with code ${code}\x1b[0m\r\n`);
-            
+            setIsConnected(false);
+
             if (code !== 0) {
                 if (props.onCrash) {
                     props.onCrash(code);
@@ -113,19 +131,22 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
             disconnectSocket();
         },
         fit: () => {
-             consoleComponentRef.current?.fit();
+            consoleComponentRef.current?.fit();
         },
         clear: () => {
-             terminalRef.current?.clear();
+            terminalRef.current?.clear();
+        },
+        restart: () => {
+            restartTerminal();
         }
     }));
-    
+
     // ... (rest of component unchanged) ...
 
     // Cleanup on unmount
     useEffect(() => {
         return () => {
-            disconnectSocket(); 
+            disconnectSocket();
         };
     }, []);
 
@@ -143,8 +164,26 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
     };
 
     return (
-        <div className={`h-full w-full box-border overflow-hidden ${props.className || ''}`}>
-            <Console 
+        <div className={`h-full w-full box-border overflow-hidden relative ${props.className || ''}`}>
+            {isConnected && (
+                <button
+                    onClick={() => {
+                        showModal("confirm", "Restart", "Are you sure you want to restart the terminal?", "warning", async (confirmed: any) => {
+                            if (confirmed) {
+                                restartTerminal();
+                            }
+                        });
+                    }}
+                    title="Restart OpenCode"
+                    className="absolute top-2 right-3 z-10 p-2
+                        bg-gradient-to-br from-blue-600/30 to-blue-400/30 rounded 
+                        text-gray-400 hover:text-white text-xs font-medium
+                        cursor-pointer"
+                >
+                    <i className="fas fa-redo"></i>   
+                </button>
+            )}
+            <Console
                 ref={consoleComponentRef}
                 terminalRef={terminalRef}
                 onData={handleData}
@@ -173,24 +212,24 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
     const divRef = useRef<HTMLDivElement>(null);
     const xtermRef = useRef<Terminal | null>(null);
     const fitAddonRef = useRef<FitAddon | null>(null);
-    
+
     // Store the latest onData callback in a ref to avoid stale closures in the xterm listener
     const onDataRef = useRef(props.onData);
     const onResizeRef = useRef(props.onResize);
 
     useImperativeHandle(ref, () => ({
         fit: () => {
-             try {
+            try {
                 fitAddonRef.current?.fit();
                 if (xtermRef.current && onResizeRef.current) {
                     onResizeRef.current(xtermRef.current.cols, xtermRef.current.rows);
                 }
-             } catch (e) {
-                 // ignore
-             }
+            } catch (e) {
+                // ignore
+            }
         }
     }));
-    
+
     useEffect(() => {
         onDataRef.current = props.onData;
     }, [props.onData]);
@@ -224,37 +263,37 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
         term.loadAddon(webLinksAddon);
 
         term.attachCustomKeyEventHandler((event) => {
-             // Capture Ctrl+<Key> combinations to prevent browser defaults (like Ctrl+P, Ctrl+S)
-             // and ensure they are sent to the terminal.
-             if (event.type === 'keydown' && event.ctrlKey) {
-                 if (event.code === 'KeyZ') {
-                     event.preventDefault();
-                     return false;
-                 }
-                 if (event.code === 'KeyC') {
-                     const selection = term.getSelection();
-                     if (selection) {
-                         navigator.clipboard.writeText(selection);
-                         // Prevent default browser copy (though we did it manually)
-                         // Return false to prevent xterm from processing it (sending ^C)
-                         event.preventDefault();
-                         return false;
-                     }
-                 }
-                 if (event.code === 'KeyT') {
+            // Capture Ctrl+<Key> combinations to prevent browser defaults (like Ctrl+P, Ctrl+S)
+            // and ensure they are sent to the terminal.
+            if (event.type === 'keydown' && event.ctrlKey) {
+                if (event.code === 'KeyZ') {
+                    event.preventDefault();
+                    return false;
+                }
+                if (event.code === 'KeyC') {
+                    const selection = term.getSelection();
+                    if (selection) {
+                        navigator.clipboard.writeText(selection);
+                        // Prevent default browser copy (though we did it manually)
+                        // Return false to prevent xterm from processing it (sending ^C)
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+                if (event.code === 'KeyT') {
                     event.preventDefault();
                     return true;
-                 }
-                 // Allow Copy (Ctrl+C) / Paste (Ctrl+V) if needed, but for now we prioritize terminal input
-                 // If the user has a selection, xterm usually handles copy internally or via extension
-                 
-                 // We specifically requested support for keys like Ctrl+X
-                 // Preventing default ensures the browser doesn't try to handle it (e.g. Cut)
-                 // returning true tells xterm to process the event (emit data)
-                 event.preventDefault();
-                 return true;
-             }
-             return true;
+                }
+                // Allow Copy (Ctrl+C) / Paste (Ctrl+V) if needed, but for now we prioritize terminal input
+                // If the user has a selection, xterm usually handles copy internally or via extension
+
+                // We specifically requested support for keys like Ctrl+X
+                // Preventing default ensures the browser doesn't try to handle it (e.g. Cut)
+                // returning true tells xterm to process the event (emit data)
+                event.preventDefault();
+                return true;
+            }
+            return true;
         });
 
         // Delay opening to ensure DOM is ready and visible
@@ -275,7 +314,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
 
         xtermRef.current = term;
         fitAddonRef.current = fitAddon;
-        
+
         if (props.terminalRef) {
             props.terminalRef.current = term;
         }

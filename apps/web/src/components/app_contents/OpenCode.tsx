@@ -61,7 +61,6 @@ export default function OpenCode(props: CloudflareProps) {
         checkIfInstalled();
         loadRootDir();
         loadProjectTree();
-
         return () => {
             clearInterval(projectTreeInterval);
         }
@@ -72,14 +71,11 @@ export default function OpenCode(props: CloudflareProps) {
             setTimeout(() => {
                 terminalRef.current?.fit();
             }, 50);
-
             const intervalId = setInterval(() => {
                 loadProjectTree();
             }, 5000);
             setProjectTreeInterval(intervalId);
         }
-
-        //remove interval when component unmounts
         else
             clearInterval(projectTreeInterval);
     }, [props.isVisible]);
