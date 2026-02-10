@@ -10,25 +10,28 @@ export default function CommitInput() {
 
     return (
         <form
-            onSubmit={ async (e) => {
+            onSubmit={async (e) => {
                 e.preventDefault();
                 await handleCommit(e);
                 await loadProjectTree();
             }}
             className="flex flex-col gap-2"
         >
-            <div className="text-sm text-white/40 uppercase font-bold tracking-wider">
-                GIT ADD THEN PUSH
+            <div className="flex justify-between">
+                <div className="text-sm text-white/40 uppercase font-bold tracking-wider">
+                    GIT ADD THEN PUSH
+                </div>
+                <button
+                    type="submit"
+                    disabled={commitLoading || !commitMessage.trim()}
+                    className={`w-12 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                    title="Git Stash"
+                >
+                    Stash
+                </button>
             </div>
+
             <div className="flex gap-2">
-                <input
-                    type="text"
-                    className="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1 text-sm text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
-                    placeholder="Git commit message"
-                    value={commitMessage}
-                    onChange={(e) => setCommitMessage(e.target.value)}
-                    disabled={commitLoading}
-                />
                 <button
                     type="submit"
                     disabled={commitLoading || !commitMessage.trim()}
@@ -37,6 +40,14 @@ export default function CommitInput() {
                 >
                     {commitLoading ? <i className="fa-solid fa-spinner fa-spin duration-75" /> : <i className="fa-solid fa-cloud-arrow-up" />}
                 </button>
+                <input
+                    type="text"
+                    className="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1 text-sm text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
+                    placeholder="Git commit message"
+                    value={commitMessage}
+                    onChange={(e) => setCommitMessage(e.target.value)}
+                    disabled={commitLoading}
+                />
             </div>
         </form>
     );
