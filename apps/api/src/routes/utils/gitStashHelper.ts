@@ -10,10 +10,7 @@ const router = Router();
 
 // Helper to run git command in ROOT
 async function runGit(command: string) {
-    const { stdout, stderr } = await execAsync(command, { cwd: ROOT });
-    if (stderr) {
-        console.log('Git Stash Output (stderr):', stderr);
-    }
+    const { stdout } = await execAsync(command, { cwd: ROOT });
     return stdout.trim();
 }
  
@@ -28,18 +25,11 @@ async function cleanStaleLocks() {
     for (const lockFile of lockFiles) {
         if (fs.existsSync(lockFile)) {
             try {
-                // Check if any git process is still running
                 await execAsync('pgrep -x git');
-                // If pgrep succeeds, git is still running — don't remove lock
-                console.log(`Git lock file exists but git process is running, skipping removal: ${lockFile}`);
             } catch {
-                // pgrep failed → no git process running → safe to remove stale lock
                 try {
                     fs.unlinkSync(lockFile);
-                    console.log(`Removed stale git lock file: ${lockFile}`);
-                } catch (e) {
-                    console.error(`Failed to remove lock file ${lockFile}:`, e);
-                }
+                } catch (e) { }
             }
         }
     }
@@ -86,18 +76,12 @@ router.post('/add', async (req: Request, res: Response) => {
         }
 
         await cleanStaleLocks();
-
-        // Stage all changes (including untracked files)
         await runGit('git add -A');
 
-        // Use `git stash create` to build a stash commit WITHOUT modifying
-        // the working tree (changes stay in place — acts like a checkpoint).
-        // Then `git stash store` saves it to the stash reflog with a name.
         const safeName = stashName.replace(/"/g, '\\"');
         try {
             const stashHash = await runGit('git stash create');
             if (!stashHash) {
-                // Nothing to stash — no changes detected
                 const list = await getStashList();
                 res.json(list);
                 return;
@@ -123,7 +107,6 @@ router.post('/add', async (req: Request, res: Response) => {
     }
 });
 
-
 // ─── POST /revert ───────────────────────────────────────────
 // Body: { stashName: string }
 // Finds the stash whose message matches stashName, stages current
@@ -139,7 +122,6 @@ router.post('/revert', async (req: Request, res: Response) => {
 
         await cleanStaleLocks();
 
-        // Find the stash index matching the given name
         const rawList = await runGit('git stash list');
         if (!rawList) {
             res.status(404).json({ error: 'No stashes found' });
