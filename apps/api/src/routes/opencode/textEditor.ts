@@ -1,11 +1,8 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs-extra';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { execa } from 'execa';
 import { ROOT } from '../utils/rootPath';
-
-const execAsync = promisify(exec);
 
 const router = Router();
 
@@ -250,15 +247,18 @@ router.post('/diff', async (req: Request, res: Response) => {
 
         const added: number[] = [];
         const modified: number[] = [];
+        let isUntracked = false;
 
         try {
             // First check if file is tracked by git
-            const { stdout: trackedCheck } = await execAsync(
-                `git ls-files --error-unmatch "${relativePath}" 2>/dev/null || echo "untracked"`,
-                { cwd: ROOT }
-            );
+            // git ls-files --error-unmatch throws if untracked.
+            try {
+                await execa('git', ['ls-files', '--error-unmatch', relativePath], { cwd: ROOT });
+            } catch (e) {
+                isUntracked = true;
+            }
 
-            if (trackedCheck.trim() === 'untracked') {
+            if (isUntracked) {
                 // File is untracked - all lines are "added" (new file)
                 const content = await fs.readFile(filePath, 'utf-8');
                 const lineCount = content.split('\n').length;
@@ -270,8 +270,10 @@ router.post('/diff', async (req: Request, res: Response) => {
             }
 
             // Get diff for tracked file using unified format with 0 context lines
-            const { stdout: diffOutput } = await execAsync(
-                `git diff -U0 HEAD -- "${relativePath}"`,
+            // execa returns stdout in the result object
+            const { stdout: diffOutput } = await execa(
+                'git', 
+                ['diff', '-U0', 'HEAD', '--', relativePath], 
                 { cwd: ROOT }
             );
 

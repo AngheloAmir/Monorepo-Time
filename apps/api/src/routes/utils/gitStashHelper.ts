@@ -1,16 +1,14 @@
 import { Router, Request, Response } from 'express';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { execa } from 'execa';
 import { ROOT } from './rootPath';
 import fs from 'fs';
 import path from 'path';
 
-const execAsync = promisify(exec);
 const router = Router();
 
 // Helper to run git command in ROOT
-async function runGit(command: string) {
-    const { stdout } = await execAsync(command, { cwd: ROOT });
+async function runGit(args: string[]) {
+    const { stdout } = await execa('git', args, { cwd: ROOT });
     return stdout.trim();
 }
  
@@ -25,8 +23,11 @@ async function cleanStaleLocks() {
     for (const lockFile of lockFiles) {
         if (fs.existsSync(lockFile)) {
             try {
-                await execAsync('pgrep -x git');
+                // pgrep returns 0 if match found, 1 if not. execa throws on non-zero.
+                // So if this succeeds, git is running.
+                await execa('pgrep', ['-x', 'git']);
             } catch {
+                // git not running
                 try {
                     fs.unlinkSync(lockFile);
                 } catch (e) { }
@@ -38,7 +39,7 @@ async function cleanStaleLocks() {
 // Helper to get the current stash list as an array of stash names
 async function getStashList(): Promise<string[]> {
     try {
-        const output = await runGit('git stash list --format="%gs"');
+        const output = await runGit(['stash', 'list', '--format=%gs']);
         if (!output) return [];
         return output
             .split('\n')
@@ -76,17 +77,17 @@ router.post('/add', async (req: Request, res: Response) => {
         }
 
         await cleanStaleLocks();
-        await runGit('git add -A');
+        await runGit(['add', '-A']);
 
-        const safeName = stashName.replace(/"/g, '\\"');
+        // execa handles escaping, so we pass stashName directly.
         try {
-            const stashHash = await runGit('git stash create');
+            const stashHash = await runGit(['stash', 'create']);
             if (!stashHash) {
                 const list = await getStashList();
                 res.json(list);
                 return;
             }
-            await runGit(`git stash store -m "${safeName}" ${stashHash}`);
+            await runGit(['stash', 'store', '-m', stashName, stashHash]);
         } catch (e: any) {
             if (
                 e.message?.includes('No local changes to save') ||
@@ -122,7 +123,7 @@ router.post('/revert', async (req: Request, res: Response) => {
 
         await cleanStaleLocks();
 
-        const rawList = await runGit('git stash list');
+        const rawList = await runGit(['stash', 'list']);
         if (!rawList) {
             res.status(404).json({ error: 'No stashes found' });
             return;
@@ -146,7 +147,7 @@ router.post('/revert', async (req: Request, res: Response) => {
         // Stage current changes first so `git stash apply` won't refuse
         // due to a dirty working tree.
         try {
-            await runGit('git add -A');
+            await runGit(['add', '-A']);
         } catch {
             // Ignore — staging might fail if repo is empty, etc.
         }
@@ -154,14 +155,14 @@ router.post('/revert', async (req: Request, res: Response) => {
         // Create a safety stash of current state before reverting
         try {
             const timestamp = new Date().toLocaleTimeString();
-            await runGit(`git stash push -m "__backup_${timestamp}__"`);
+            await runGit(['stash', 'push', '-m', `__backup_${timestamp}__`]);
         } catch {
             // Nothing to stash is fine
         }
 
         // Now apply the target stash (after the safety push, index may have shifted +1)
         // Re-read stash list to find the correct index
-        const updatedRawList = await runGit('git stash list');
+        const updatedRawList = await runGit(['stash', 'list']);
         let newStashIndex: number | null = null;
         const updatedLines = updatedRawList.split('\n').filter(Boolean);
         for (let i = 0; i < updatedLines.length; i++) {
@@ -177,7 +178,7 @@ router.post('/revert', async (req: Request, res: Response) => {
         }
 
         // Apply the stash (does not remove it from the list)
-        await runGit(`git stash apply stash@{${newStashIndex}}`);
+        await runGit(['stash', 'apply', `stash@{${newStashIndex}}`]);
 
         const list = await getStashList();
         res.json(list);
@@ -193,7 +194,7 @@ router.post('/revert', async (req: Request, res: Response) => {
 router.get('/clear', async (req: Request, res: Response) => {
     try {
         await cleanStaleLocks();
-        await runGit('git stash clear');
+        await runGit(['stash', 'clear']);
         res.json([]);
     } catch (error: any) {
         console.error('Git Stash Clear Error:', error);

@@ -1,8 +1,8 @@
 import { Request, Response, Router } from "express";
 import fs from "fs";
-import { exec } from "child_process";
 import os from "os";
 import pidusage from "pidusage";
+import { execa } from "execa";
 import { activeProcesses } from "../terminal/runcmddev";
 import { activeTerminals } from "../terminal/interactiveTerminal";
 import { ChildProcess } from "child_process";
@@ -31,26 +31,25 @@ function getPSS(pid: number): number {
    Process Tree Builder
    ============================================================ */
 
-function getProcessTree(): Promise<Map<number, number[]>> {
-    return new Promise((resolve) => {
-        exec('ps -A -o pid,ppid', (err, stdout) => {
-            if (err) return resolve(new Map());
+async function getProcessTree(): Promise<Map<number, number[]>> {
+    try {
+        const { stdout } = await execa('ps', ['-A', '-o', 'pid,ppid']);
+        const parentMap = new Map<number, number[]>();
+        const lines = stdout.trim().split('\n');
 
-            const parentMap = new Map<number, number[]>();
-            const lines = stdout.trim().split('\n');
-
-            for (let i = 1; i < lines.length; i++) {
-                const parts = lines[i].trim().split(/\s+/).map(Number);
-                const pid = parts[0];
-                const ppid = parts[1];
-                if (!isNaN(pid) && !isNaN(ppid)) {
-                    if (!parentMap.has(ppid)) parentMap.set(ppid, []);
-                    parentMap.get(ppid)?.push(pid);
-                }
+        for (let i = 1; i < lines.length; i++) {
+            const parts = lines[i].trim().split(/\s+/).map(Number);
+            const pid = parts[0];
+            const ppid = parts[1];
+            if (!isNaN(pid) && !isNaN(ppid)) {
+                if (!parentMap.has(ppid)) parentMap.set(ppid, []);
+                parentMap.get(ppid)?.push(pid);
             }
-            resolve(parentMap);
-        });
-    });
+        }
+        return parentMap;
+    } catch (err) {
+        return new Map();
+    }
 }
 
 function getAllDescendants(rootPid: number, parentMap: Map<number, number[]>) {
@@ -193,16 +192,21 @@ async function getStats() {
    Kill Port
    ============================================================ */
 
-function killPortFunc(port: number): Promise<boolean> {
-    return new Promise((resolve) => {
-        exec(`lsof -t -i:${port}`, (err, stdout) => {
-            if (err || !stdout.trim()) return resolve(false);
+async function killPortFunc(port: number): Promise<boolean> {
+    try {
+        // Find pids using lsof
+        const { stdout } = await execa('lsof', ['-t', `-i:${port}`]);
+        if (!stdout.trim()) return false;
 
-            exec(`kill -9 ${stdout.trim().split('\n').join(' ')}`, () => {
-                resolve(true);
-            });
-        });
-    });
+        const pids = stdout.trim().split('\n');
+        // Kill pids
+        // Pass pids as separate arguments to kill -9
+        await execa('kill', ['-9', ...pids]);
+        return true;
+    } catch (err) {
+        // execa throws if command fails (e.g. lsof finds nothing, or kill fails)
+        return false;
+    }
 }
 
 // Routes

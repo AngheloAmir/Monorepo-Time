@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { Server, Socket } from "socket.io";
-import { spawn, ChildProcess } from "child_process";
+import { ChildProcess } from "child_process";
+import { execa } from "execa";
 
 const router = Router();
 
@@ -87,7 +88,7 @@ export function interactiveTerminalSocket(io: Server) {
 
                 if (process.platform === 'win32') {
                     // Windows does not support the python pty module.
-                    // We fall back to standard spawn with shell: true.
+                    // We fall back to standard spawn (via execa) with shell: true.
                     // Interactivity might be limited (arrow keys might not work in some apps),
                     // but standard input/output should function.
                     socket.emit('terminal:log', '\x1b[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1b[0m\r\n');
@@ -95,12 +96,16 @@ export function interactiveTerminalSocket(io: Server) {
                     const baseCMD = command.split(" ")[0];
                     const args = command.split(" ").slice(1);
                     
-                    child = spawn(baseCMD, args, {
+                    // reject: false ensures the promise doesn't throw on exit code != 0
+                    // buffer: false ensures we stream output instead of buffering it
+                    child = execa(baseCMD, args, {
                         cwd: path,
                         env: env,
                         shell: true,
-                        stdio: ['pipe', 'pipe', 'pipe']
-                    });
+                        stdio: ['pipe', 'pipe', 'pipe'],
+                        buffer: false,
+                        reject: false
+                    }) as any as ChildProcess;
                 } else {
                     // Linux/Mac: Use Python PTY bridge for full interactivity
                     env.CMD = command;
@@ -124,11 +129,13 @@ except ImportError:
 except Exception as e:
     sys.exit(1)
 `;
-                    child = spawn('python3', ['-u', '-c', pythonScript], {
+                    child = execa('python3', ['-u', '-c', pythonScript], {
                         cwd: path,
                         env: env,
-                        stdio: ['pipe', 'pipe', 'pipe']
-                    });
+                        stdio: ['pipe', 'pipe', 'pipe'],
+                        buffer: false,
+                        reject: false
+                    }) as any as ChildProcess;
                 }
 
                 activeTerminals.set(socket.id, { child, workspaceName, socket });
@@ -154,7 +161,7 @@ except Exception as e:
                     // Check for our custom "Python missing pty" code or general failure logic
                    if (code === 127 && process.platform !== 'win32') {
                          socket.emit('terminal:error', '\r\n\x1b[31mError: Python PTY module issue.\x1b[0m');
-                    } else if (code !== 0) {
+                    } else if (code !== 0 && code !== null) {
                         socket.emit('terminal:error', `\r\nProcess exited with code ${code}`);
                     } else {
                         //socket.emit('terminal:log', `\r\nProcess finished successfully.`);

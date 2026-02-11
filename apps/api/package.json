@@ -20,6 +20,7 @@
     "express": "^5.2.1",
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.3",
+    "node-pty": "^1.1.0",
     "open": "^11.0.0",
     "pidusage": "^4.0.1",
     "socket.io": "^4.8.3",

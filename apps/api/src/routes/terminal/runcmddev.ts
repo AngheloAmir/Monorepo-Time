@@ -2,6 +2,7 @@ import { spawn, ChildProcess } from "child_process";
 import { Server, Socket } from "socket.io";
 import { WorkspaceInfo } from "types";
 import chalk from "chalk";
+import { execa } from "execa";
 
 export const activeProcesses = new Map<string, ChildProcess>();
 export const sockets         = new Map<string, Socket>();
@@ -38,9 +39,10 @@ async function handleOnRun( socket: Socket, data: RequestBody) {
 
     socket.emit('log', chalk.green(`${data.workspace.path}: ${commandToRun}`));
     
-    // Use command as single string with shell: true to avoid DEP0190 warning
-    // When shell: true is used, args should be empty array
-    const child = spawn(commandToRun, [], {
+    // execa with shell: true treats the first argument as command string
+    // buffer: false ensures streaming
+    // reject: false ensures no throwing on non-zero exit
+    const child = execa(commandToRun, [], {
         cwd: workspace.path,
         env: {
             ...process.env,
@@ -49,19 +51,22 @@ async function handleOnRun( socket: Socket, data: RequestBody) {
         },
         stdio: ['ignore', 'pipe', 'pipe'],
         shell: true,
-        detached: process.platform !== 'win32'
-    });
+        detached: process.platform !== 'win32',
+        buffer: false,
+        reject: false
+    }) as any as ChildProcess;
+
     activeProcesses.set(workspace.name, child);
    
     child.on('error', (error) => {
         socket.emit('error', error.message);
     });
 
-    child.stdout.on('data', (data) => {
+    child.stdout?.on('data', (data) => {
         socket.emit('log', data.toString() );
     });
 
-    child.stderr.on('data', (data) => {
+    child.stderr?.on('data', (data) => {
         socket.emit('error', data.toString());
     });
 

@@ -5205,7 +5205,7 @@ var require_cross_spawn = __commonJS({
     var cp = require("child_process");
     var parse = require_parse();
     var enoent = require_enoent();
-    function spawn5(command2, args2, options) {
+    function spawn3(command2, args2, options) {
       const parsed = parse(command2, args2, options);
       const spawned = cp.spawn(parsed.command, parsed.args, parsed.options);
       enoent.hookChildProcess(spawned, parsed);
@@ -5217,8 +5217,8 @@ var require_cross_spawn = __commonJS({
       result.error = result.error || enoent.verifyENOENTSync(result.status, parsed);
       return result;
     }
-    module2.exports = spawn5;
-    module2.exports.spawn = spawn5;
+    module2.exports = spawn3;
+    module2.exports.spawn = spawn3;
     module2.exports.sync = spawnSync2;
     module2.exports._parse = parse;
     module2.exports._enoent = enoent;
@@ -81713,14 +81713,14 @@ var require_out4 = __commonJS({
 var require_bin = __commonJS({
   "../../node_modules/pidusage/lib/bin.js"(exports2, module2) {
     "use strict";
-    var spawn5 = require("child_process").spawn;
+    var spawn3 = require("child_process").spawn;
     function run(cmd, args2, options, done) {
       if (typeof options === "function") {
         done = options;
         options = void 0;
       }
       let executed = false;
-      const ch = spawn5(cmd, args2, options);
+      const ch = spawn3(cmd, args2, options);
       let stdout = "";
       let stderr = "";
       ch.stdout.on("data", function(d) {
@@ -81969,7 +81969,7 @@ var require_cpu = __commonJS({
     "use strict";
     var os3 = require("os");
     var fs30 = require("fs");
-    var exec8 = require("child_process").exec;
+    var exec4 = require("child_process").exec;
     var parallel = require_parallel();
     function updateCpu(cpu, next) {
       if (cpu !== null) {
@@ -82023,7 +82023,7 @@ var require_cpu = __commonJS({
         next = options;
         options = { default: "" };
       }
-      exec8("getconf " + keyword, function(error, stdout, stderr) {
+      exec4("getconf " + keyword, function(error, stdout, stderr) {
         if (error !== null) {
           if (!process.env.PIDUSAGE_SILENT) {
             console.error('Error while calling "getconf ' + keyword + '"', error);
@@ -82416,7 +82416,7 @@ var require_stats = __commonJS({
     "use strict";
     var fs30 = require("fs");
     var os3 = require("os");
-    var spawn5 = require("child_process").spawn;
+    var spawn3 = require("child_process").spawn;
     var requireMap = {
       ps: () => require_ps(),
       procfile: () => require_procfile(),
@@ -82457,7 +82457,7 @@ var require_stats = __commonJS({
       if (platform3 === "win") {
         let child;
         try {
-          child = spawn5("wmic", function(err) {
+          child = spawn3("wmic", function(err) {
             if (err) throw new Error(err);
           });
         } catch (err) {
@@ -82538,8 +82538,8 @@ var require_tree_kill = __commonJS({
   "../../node_modules/tree-kill/index.js"(exports2, module2) {
     "use strict";
     var childProcess4 = require("child_process");
-    var spawn5 = childProcess4.spawn;
-    var exec8 = childProcess4.exec;
+    var spawn3 = childProcess4.spawn;
+    var exec4 = childProcess4.exec;
     module2.exports = function(pid, signal, callback) {
       if (typeof signal === "function" && callback === void 0) {
         callback = signal;
@@ -82559,11 +82559,11 @@ var require_tree_kill = __commonJS({
       pidsToProcess[pid] = 1;
       switch (process.platform) {
         case "win32":
-          exec8("taskkill /pid " + pid + " /T /F", callback);
+          exec4("taskkill /pid " + pid + " /T /F", callback);
           break;
         case "darwin":
           buildProcessTree(pid, tree, pidsToProcess, function(parentPid) {
-            return spawn5("pgrep", ["-P", parentPid]);
+            return spawn3("pgrep", ["-P", parentPid]);
           }, function() {
             killAll(tree, signal, callback);
           });
@@ -82575,7 +82575,7 @@ var require_tree_kill = __commonJS({
         //     break;
         default:
           buildProcessTree(pid, tree, pidsToProcess, function(parentPid) {
-            return spawn5("ps", ["-o", "pid", "--no-headers", "--ppid", parentPid]);
+            return spawn3("ps", ["-o", "pid", "--no-headers", "--ppid", parentPid]);
           }, function() {
             killAll(tree, signal, callback);
           });
@@ -83756,8 +83756,8 @@ route.get("/", async (req, res) => {
 var scanworkspace_default = route;
 
 // src/routes/terminal/runcmddev.ts
-var import_child_process = require("child_process");
 var import_chalk2 = __toESM(require_source());
+init_execa();
 var activeProcesses = /* @__PURE__ */ new Map();
 var sockets = /* @__PURE__ */ new Map();
 function runCmdDevSocket(io3) {
@@ -83775,13 +83775,14 @@ function runCmdDevSocket(io3) {
   });
 }
 async function handleOnRun(socket, data) {
+  var _a2, _b2;
   const { workspace, runas } = data;
   if (activeProcesses.has(workspace.name))
     return socket.emit("log", "Attached to already running process...");
   const commandToRun = runas === "dev" ? workspace.devCommand : workspace.startCommand;
   if (!commandToRun) throw new Error("No command to run");
   socket.emit("log", import_chalk2.default.green(`${data.workspace.path}: ${commandToRun}`));
-  const child = (0, import_child_process.spawn)(commandToRun, [], {
+  const child = execa(commandToRun, [], {
     cwd: workspace.path,
     env: {
       ...process.env,
@@ -83790,16 +83791,18 @@ async function handleOnRun(socket, data) {
     },
     stdio: ["ignore", "pipe", "pipe"],
     shell: true,
-    detached: process.platform !== "win32"
+    detached: process.platform !== "win32",
+    buffer: false,
+    reject: false
   });
   activeProcesses.set(workspace.name, child);
   child.on("error", (error) => {
     socket.emit("error", error.message);
   });
-  child.stdout.on("data", (data2) => {
+  (_a2 = child.stdout) == null ? void 0 : _a2.on("data", (data2) => {
     socket.emit("log", data2.toString());
   });
-  child.stderr.on("data", (data2) => {
+  (_b2 = child.stderr) == null ? void 0 : _b2.on("data", (data2) => {
     socket.emit("error", data2.toString());
   });
   child.on("exit", (code) => {
@@ -83810,7 +83813,7 @@ async function handleOnRun(socket, data) {
 // src/routes/terminal/stopcmd.ts
 var import_express3 = __toESM(require_express2());
 var import_chalk3 = __toESM(require_source());
-var import_child_process2 = require("child_process");
+var import_child_process = require("child_process");
 var router2 = (0, import_express3.Router)();
 router2.post("/", async (req, res) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -83826,7 +83829,7 @@ router2.post("/", async (req, res) => {
       currentSocket == null ? void 0 : currentSocket.emit("log", import_chalk3.default.yellow("Stopping process tree..."));
       if (currentProcess.pid) {
         if (process.platform === "win32") {
-          (0, import_child_process2.exec)(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
+          (0, import_child_process.exec)(`taskkill /pid ${currentProcess.pid} /T /F`, (err) => {
             if (err) {
               currentProcess.kill();
             }
@@ -84019,7 +84022,7 @@ var newworkspace_default = router4;
 
 // src/routes/terminal/interactiveTerminal.ts
 var import_express6 = __toESM(require_express2());
-var import_child_process3 = require("child_process");
+init_execa();
 var router5 = (0, import_express6.Router)();
 router5.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
@@ -84068,11 +84071,13 @@ function interactiveTerminalSocket(io3) {
           socket.emit("terminal:log", "\x1B[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1B[0m\r\n");
           const baseCMD = command2.split(" ")[0];
           const args2 = command2.split(" ").slice(1);
-          child = (0, import_child_process3.spawn)(baseCMD, args2, {
+          child = execa(baseCMD, args2, {
             cwd: path33,
             env,
             shell: true,
-            stdio: ["pipe", "pipe", "pipe"]
+            stdio: ["pipe", "pipe", "pipe"],
+            buffer: false,
+            reject: false
           });
         } else {
           env.CMD = command2;
@@ -84096,10 +84101,12 @@ except ImportError:
 except Exception as e:
     sys.exit(1)
 `;
-          child = (0, import_child_process3.spawn)("python3", ["-u", "-c", pythonScript], {
+          child = execa("python3", ["-u", "-c", pythonScript], {
             cwd: path33,
             env,
-            stdio: ["pipe", "pipe", "pipe"]
+            stdio: ["pipe", "pipe", "pipe"],
+            buffer: false,
+            reject: false
           });
         }
         activeTerminals.set(socket.id, { child, workspaceName, socket });
@@ -84120,7 +84127,7 @@ except Exception as e:
         child.on("exit", (code) => {
           if (code === 127 && process.platform !== "win32") {
             socket.emit("terminal:error", "\r\n\x1B[31mError: Python PTY module issue.\x1B[0m");
-          } else if (code !== 0) {
+          } else if (code !== 0 && code !== null) {
             socket.emit("terminal:error", `\r
 Process exited with code ${code}`);
           } else {
@@ -84374,7 +84381,7 @@ var rootPath_default = route2;
 var import_express11 = __toESM(require_express2());
 var import_fs_extra8 = __toESM(require_lib());
 var import_path10 = __toESM(require("path"));
-var import_child_process4 = require("child_process");
+var import_child_process2 = require("child_process");
 var router9 = (0, import_express11.Router)();
 var packageJsonPath = import_path10.default.join(ROOT3, "package.json");
 var turboJsonPath = import_path10.default.join(ROOT3, "turbo.json");
@@ -84565,7 +84572,7 @@ async function InitializeGitIfNotExist() {
 function runCommand(cmd, cwd) {
   console.log(`Running: ${cmd} in ${cwd}`);
   return new Promise((resolve, reject) => {
-    (0, import_child_process4.exec)(cmd, { cwd }, (error, stdout, stderr) => {
+    (0, import_child_process2.exec)(cmd, { cwd }, (error, stdout, stderr) => {
       if (error) {
         console.error("Exec error:", stderr);
         reject(error);
@@ -84698,14 +84705,12 @@ var crudtest_default = router13;
 
 // src/routes/utils/gitControlHelper.ts
 var import_express16 = __toESM(require_express2());
-var import_child_process5 = require("child_process");
-var import_util = require("util");
+init_execa();
 var import_fs3 = __toESM(require("fs"));
 var import_path15 = __toESM(require("path"));
-var execAsync = (0, import_util.promisify)(import_child_process5.exec);
 var router14 = (0, import_express16.Router)();
-async function runGit(command2) {
-  const { stdout, stderr } = await execAsync(command2, { cwd: ROOT3 });
+async function runGit(args2) {
+  const { stdout, stderr } = await execa("git", args2, { cwd: ROOT3 });
   if (stderr) {
     console.log("Git Output (stderr):", stderr);
   }
@@ -84719,7 +84724,7 @@ async function cleanStaleLocks() {
   for (const lockFile of lockFiles) {
     if (import_fs3.default.existsSync(lockFile)) {
       try {
-        await execAsync("pgrep -x git");
+        await execa("pgrep", ["-x", "git"]);
       } catch {
         try {
           import_fs3.default.unlinkSync(lockFile);
@@ -84734,7 +84739,7 @@ async function cleanStaleLocks() {
 router14.get("/history", async (req, res) => {
   var _a2;
   try {
-    const output = await runGit('git log -n 10 --pretty=format:"%h|%s|%ar"');
+    const output = await runGit(["log", "-n", "10", "--pretty=format:%h|%s|%ar"]);
     const history = output.split("\n").filter(Boolean).map((line) => {
       const parts = line.split("|");
       return {
@@ -84754,7 +84759,7 @@ router14.get("/history", async (req, res) => {
 router14.get("/branch", async (req, res) => {
   var _a2;
   try {
-    const branch = await runGit("git branch --show-current");
+    const branch = await runGit(["branch", "--show-current"]);
     res.json({ branch });
   } catch (error) {
     if (!((_a2 = error.message) == null ? void 0 : _a2.includes("not a git repository"))) {
@@ -84770,12 +84775,82 @@ router14.post("/revert", async (req, res) => {
       res.status(400).json({ error: "Hash is required" });
       return;
     }
-    const currentHead = await runGit("git rev-parse HEAD");
-    const newCommitHash = await runGit(`git commit-tree ${hash}^{tree} -p ${currentHead} -m "Reverted to ${hash}"`);
-    await runGit(`git reset --hard ${newCommitHash}`);
+    const status = await runGit(["status", "--porcelain"]);
+    if (status) {
+      return res.status(400).json({
+        error: "Cannot revert with pending changes. Please commit your changes first."
+      });
+    }
+    const currentHead = await runGit(["rev-parse", "HEAD"]);
+    const newCommitHash = await runGit(["commit-tree", `${hash}^{tree}`, "-p", currentHead, "-m", `Reverted to ${hash}`]);
+    await runGit(["reset", "--hard", newCommitHash]);
     res.json({ success: true, message: `Reverted to ${hash}` });
   } catch (error) {
     console.error("Git Revert Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.get("/branches", async (req, res) => {
+  try {
+    const output = await runGit(["branch", "--list"]);
+    const branches = output.split("\n").filter(Boolean).map((line) => {
+      const isCurrent = line.startsWith("*");
+      const name = line.replace("*", "").trim();
+      return { name, isCurrent };
+    });
+    res.json({ branches });
+  } catch (error) {
+    console.error("Git Branches Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.post("/branch/checkout", async (req, res) => {
+  try {
+    const { branch } = req.body;
+    if (!branch) return res.status(400).json({ error: "Branch name is required" });
+    const status = await runGit(["status", "--porcelain"]);
+    if (status) {
+      return res.status(400).json({
+        error: "Cannot checkout with pending changes. Please commit your changes first."
+      });
+    }
+    await runGit(["checkout", branch]);
+    res.json({ success: true, message: `Switched to branch ${branch}` });
+  } catch (error) {
+    console.error("Git Checkout Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.post("/branch/create", async (req, res) => {
+  try {
+    const { branch } = req.body;
+    if (!branch) return res.status(400).json({ error: "Branch name is required" });
+    await runGit(["checkout", "-b", branch]);
+    res.json({ success: true, message: `Created and switched to branch ${branch}` });
+  } catch (error) {
+    console.error("Git Create Branch Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.post("/branch/delete", async (req, res) => {
+  try {
+    const { branch } = req.body;
+    if (!branch) return res.status(400).json({ error: "Branch name is required" });
+    await runGit(["branch", "-D", branch]);
+    res.json({ success: true, message: `Deleted branch ${branch}` });
+  } catch (error) {
+    console.error("Git Delete Branch Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+router14.post("/branch/merge", async (req, res) => {
+  try {
+    const { branch } = req.body;
+    if (!branch) return res.status(400).json({ error: "Branch name is required" });
+    await runGit(["merge", branch]);
+    res.json({ success: true, message: `Merged branch ${branch}` });
+  } catch (error) {
+    console.error("Git Merge Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -84788,9 +84863,8 @@ router14.post("/push", async (req, res) => {
     }
     await cleanStaleLocks();
     try {
-      await runGit("git add .");
-      const safeMessage = message.replace(/"/g, '\\"');
-      await runGit(`git commit -m "${safeMessage}"`);
+      await runGit(["add", "."]);
+      await runGit(["commit", "-m", message]);
     } catch (e) {
       if (e.stdout && e.stdout.includes("nothing to commit")) {
       } else if (e.message && e.message.includes("nothing to commit")) {
@@ -84798,9 +84872,9 @@ router14.post("/push", async (req, res) => {
         throw e;
       }
     }
-    await runGit("git push");
+    await runGit(["push"]);
     try {
-      await runGit("git stash clear");
+      await runGit(["stash", "clear"]);
     } catch {
     }
     res.json({ success: true });
@@ -84901,9 +84975,9 @@ var initmonorepotime_default = router15;
 // src/routes/home/processUsage.ts
 var import_express18 = __toESM(require_express2());
 var import_fs4 = __toESM(require("fs"));
-var import_child_process6 = require("child_process");
 var import_os = __toESM(require("os"));
 var import_pidusage = __toESM(require_pidusage());
+init_execa();
 var router16 = (0, import_express18.Router)();
 var workSpaceData = {};
 var getActiveJobs = () => /* @__PURE__ */ new Map();
@@ -84919,25 +84993,25 @@ function getPSS(pid) {
     return 0;
   }
 }
-function getProcessTree() {
-  return new Promise((resolve) => {
-    (0, import_child_process6.exec)("ps -A -o pid,ppid", (err, stdout) => {
-      var _a2;
-      if (err) return resolve(/* @__PURE__ */ new Map());
-      const parentMap = /* @__PURE__ */ new Map();
-      const lines = stdout.trim().split("\n");
-      for (let i2 = 1; i2 < lines.length; i2++) {
-        const parts = lines[i2].trim().split(/\s+/).map(Number);
-        const pid = parts[0];
-        const ppid = parts[1];
-        if (!isNaN(pid) && !isNaN(ppid)) {
-          if (!parentMap.has(ppid)) parentMap.set(ppid, []);
-          (_a2 = parentMap.get(ppid)) == null ? void 0 : _a2.push(pid);
-        }
+async function getProcessTree() {
+  var _a2;
+  try {
+    const { stdout } = await execa("ps", ["-A", "-o", "pid,ppid"]);
+    const parentMap = /* @__PURE__ */ new Map();
+    const lines = stdout.trim().split("\n");
+    for (let i2 = 1; i2 < lines.length; i2++) {
+      const parts = lines[i2].trim().split(/\s+/).map(Number);
+      const pid = parts[0];
+      const ppid = parts[1];
+      if (!isNaN(pid) && !isNaN(ppid)) {
+        if (!parentMap.has(ppid)) parentMap.set(ppid, []);
+        (_a2 = parentMap.get(ppid)) == null ? void 0 : _a2.push(pid);
       }
-      resolve(parentMap);
-    });
-  });
+    }
+    return parentMap;
+  } catch (err) {
+    return /* @__PURE__ */ new Map();
+  }
 }
 function getAllDescendants(rootPid, parentMap) {
   const results = [rootPid];
@@ -85040,15 +85114,16 @@ async function getStats() {
     dockerTotalMem: dockerData.totalMem
   };
 }
-function killPortFunc(port3) {
-  return new Promise((resolve) => {
-    (0, import_child_process6.exec)(`lsof -t -i:${port3}`, (err, stdout) => {
-      if (err || !stdout.trim()) return resolve(false);
-      (0, import_child_process6.exec)(`kill -9 ${stdout.trim().split("\n").join(" ")}`, () => {
-        resolve(true);
-      });
-    });
-  });
+async function killPortFunc(port3) {
+  try {
+    const { stdout } = await execa("lsof", ["-t", `-i:${port3}`]);
+    if (!stdout.trim()) return false;
+    const pids = stdout.trim().split("\n");
+    await execa("kill", ["-9", ...pids]);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 router16.post("/kill-port", async (req, res) => {
   try {
@@ -85100,7 +85175,7 @@ var processUsage_default = router16;
 
 // src/routes/home/apidocker.ts
 var import_express19 = __toESM(require_express2());
-var import_child_process7 = require("child_process");
+var import_child_process3 = require("child_process");
 var router17 = (0, import_express19.Router)();
 function parseMemory(memStr) {
   const units = {
@@ -85124,7 +85199,7 @@ function parseMemory(memStr) {
 }
 function getDockerContainers2() {
   return new Promise((resolve) => {
-    (0, import_child_process7.exec)('docker ps --format "{{.ID}}|{{.Image}}|{{.Status}}|{{.Names}}"', (err, stdout) => {
+    (0, import_child_process3.exec)('docker ps --format "{{.ID}}|{{.Image}}|{{.Status}}|{{.Names}}"', (err, stdout) => {
       if (err) return resolve({ containers: [], totalMem: 0 });
       const lines = stdout.trim().split("\n");
       if (lines.length === 0 || lines.length === 1 && lines[0] === "") {
@@ -85141,7 +85216,7 @@ function getDockerContainers2() {
           memoryBytes: 0
         };
       });
-      (0, import_child_process7.exec)('docker stats --no-stream --format "{{.ID}}|{{.MemUsage}}"', (err2, stdout2) => {
+      (0, import_child_process3.exec)('docker stats --no-stream --format "{{.ID}}|{{.MemUsage}}"', (err2, stdout2) => {
         let totalMem = 0;
         if (!err2) {
           const statLines = stdout2.trim().split("\n");
@@ -85168,7 +85243,7 @@ function getDockerContainers2() {
 }
 function stopContainer(id) {
   return new Promise((resolve) => {
-    (0, import_child_process7.exec)(`docker stop ${id}`, (err) => {
+    (0, import_child_process3.exec)(`docker stop ${id}`, (err) => {
       if (err) return resolve({ success: false, error: err.message });
       resolve({ success: true });
     });
@@ -85176,7 +85251,7 @@ function stopContainer(id) {
 }
 function stopAllContainers() {
   return new Promise((resolve) => {
-    (0, import_child_process7.exec)("docker stop $(docker ps -q)", (err) => {
+    (0, import_child_process3.exec)("docker stop $(docker ps -q)", (err) => {
       if (err) {
         if (err.message.includes("requires at least 1 argument") || err.message.includes("Usage:")) {
           return resolve({ success: true, message: "No containers to stop" });
@@ -85185,7 +85260,7 @@ function stopAllContainers() {
       }
       resolve({ success: true });
     });
-    (0, import_child_process7.exec)("docker network prune -f", (err) => {
+    (0, import_child_process3.exec)("docker network prune -f", (err) => {
       if (err) return resolve({ success: false, error: err.message });
       resolve({ success: true });
     });
@@ -94674,7 +94749,7 @@ var opencodeHelper_default = router22;
 
 // src/routes/opencode/opencodeTerminal.ts
 var import_express27 = __toESM(require_express2());
-var import_child_process8 = require("child_process");
+var import_child_process4 = require("child_process");
 var router23 = (0, import_express27.Router)();
 router23.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
@@ -94719,7 +94794,7 @@ function opencodeTerminalSocket(io3) {
           socket.emit("opencode:log", "\x1B[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1B[0m\r\n");
           const baseCMD = command2.split(" ")[0];
           const args2 = command2.split(" ").slice(1);
-          child = (0, import_child_process8.spawn)(baseCMD, args2, {
+          child = (0, import_child_process4.spawn)(baseCMD, args2, {
             cwd: path33,
             env,
             shell: true,
@@ -94812,7 +94887,7 @@ try:
 except Exception as e:
     sys.exit(1)
 `;
-          child = (0, import_child_process8.spawn)("python3", ["-u", "-c", pythonScript], {
+          child = (0, import_child_process4.spawn)("python3", ["-u", "-c", pythonScript], {
             cwd: path33,
             env,
             stdio: ["pipe", "pipe", "pipe", "pipe"]
@@ -95083,9 +95158,7 @@ var scanProject_default = router24;
 var import_express29 = __toESM(require_express2());
 var import_fs_extra17 = __toESM(require_lib());
 var import_path24 = __toESM(require("path"));
-var import_child_process9 = require("child_process");
-var import_util2 = require("util");
-var execAsync2 = (0, import_util2.promisify)(import_child_process9.exec);
+init_execa();
 var router25 = (0, import_express29.Router)();
 function resolvePath(itemPath) {
   if (itemPath.startsWith(ROOT3)) {
@@ -95252,12 +95325,14 @@ router25.post("/diff", async (req, res) => {
     const relativePath = import_path24.default.relative(ROOT3, filePath);
     const added = [];
     const modified = [];
+    let isUntracked = false;
     try {
-      const { stdout: trackedCheck } = await execAsync2(
-        `git ls-files --error-unmatch "${relativePath}" 2>/dev/null || echo "untracked"`,
-        { cwd: ROOT3 }
-      );
-      if (trackedCheck.trim() === "untracked") {
+      try {
+        await execa("git", ["ls-files", "--error-unmatch", relativePath], { cwd: ROOT3 });
+      } catch (e) {
+        isUntracked = true;
+      }
+      if (isUntracked) {
         const content = await import_fs_extra17.default.readFile(filePath, "utf-8");
         const lineCount = content.split("\n").length;
         for (let i2 = 1; i2 <= lineCount; i2++) {
@@ -95266,8 +95341,9 @@ router25.post("/diff", async (req, res) => {
         res.json({ added, modified, isUntracked: true });
         return;
       }
-      const { stdout: diffOutput } = await execAsync2(
-        `git diff -U0 HEAD -- "${relativePath}"`,
+      const { stdout: diffOutput } = await execa(
+        "git",
+        ["diff", "-U0", "HEAD", "--", relativePath],
         { cwd: ROOT3 }
       );
       if (!diffOutput.trim()) {
@@ -95306,14 +95382,12 @@ var textEditor_default = router25;
 
 // src/routes/utils/gitStashHelper.ts
 var import_express30 = __toESM(require_express2());
-var import_child_process10 = require("child_process");
-var import_util3 = require("util");
+init_execa();
 var import_fs7 = __toESM(require("fs"));
 var import_path25 = __toESM(require("path"));
-var execAsync3 = (0, import_util3.promisify)(import_child_process10.exec);
 var router26 = (0, import_express30.Router)();
-async function runGit2(command2) {
-  const { stdout } = await execAsync3(command2, { cwd: ROOT3 });
+async function runGit2(args2) {
+  const { stdout } = await execa("git", args2, { cwd: ROOT3 });
   return stdout.trim();
 }
 async function cleanStaleLocks2() {
@@ -95324,7 +95398,7 @@ async function cleanStaleLocks2() {
   for (const lockFile of lockFiles) {
     if (import_fs7.default.existsSync(lockFile)) {
       try {
-        await execAsync3("pgrep -x git");
+        await execa("pgrep", ["-x", "git"]);
       } catch {
         try {
           import_fs7.default.unlinkSync(lockFile);
@@ -95336,7 +95410,7 @@ async function cleanStaleLocks2() {
 }
 async function getStashList() {
   try {
-    const output = await runGit2('git stash list --format="%gs"');
+    const output = await runGit2(["stash", "list", "--format=%gs"]);
     if (!output) return [];
     return output.split("\n").filter(Boolean).map((line) => line.replace(/^On [^:]+: /, ""));
   } catch {
@@ -95362,16 +95436,15 @@ router26.post("/add", async (req, res) => {
       return;
     }
     await cleanStaleLocks2();
-    await runGit2("git add -A");
-    const safeName = stashName.replace(/"/g, '\\"');
+    await runGit2(["add", "-A"]);
     try {
-      const stashHash = await runGit2("git stash create");
+      const stashHash = await runGit2(["stash", "create"]);
       if (!stashHash) {
         const list2 = await getStashList();
         res.json(list2);
         return;
       }
-      await runGit2(`git stash store -m "${safeName}" ${stashHash}`);
+      await runGit2(["stash", "store", "-m", stashName, stashHash]);
     } catch (e) {
       if (((_a2 = e.message) == null ? void 0 : _a2.includes("No local changes to save")) || ((_b2 = e.stdout) == null ? void 0 : _b2.includes("No local changes to save"))) {
         const list2 = await getStashList();
@@ -95395,7 +95468,7 @@ router26.post("/revert", async (req, res) => {
       return;
     }
     await cleanStaleLocks2();
-    const rawList = await runGit2("git stash list");
+    const rawList = await runGit2(["stash", "list"]);
     if (!rawList) {
       res.status(404).json({ error: "No stashes found" });
       return;
@@ -95413,15 +95486,15 @@ router26.post("/revert", async (req, res) => {
       return;
     }
     try {
-      await runGit2("git add -A");
+      await runGit2(["add", "-A"]);
     } catch {
     }
     try {
       const timestamp = (/* @__PURE__ */ new Date()).toLocaleTimeString();
-      await runGit2(`git stash push -m "__backup_${timestamp}__"`);
+      await runGit2(["stash", "push", "-m", `__backup_${timestamp}__`]);
     } catch {
     }
-    const updatedRawList = await runGit2("git stash list");
+    const updatedRawList = await runGit2(["stash", "list"]);
     let newStashIndex = null;
     const updatedLines = updatedRawList.split("\n").filter(Boolean);
     for (let i2 = 0; i2 < updatedLines.length; i2++) {
@@ -95434,7 +95507,7 @@ router26.post("/revert", async (req, res) => {
       res.status(404).json({ error: `Stash "${stashName}" not found after safety backup` });
       return;
     }
-    await runGit2(`git stash apply stash@{${newStashIndex}}`);
+    await runGit2(["stash", "apply", `stash@{${newStashIndex}}`]);
     const list = await getStashList();
     res.json(list);
   } catch (error) {
@@ -95445,7 +95518,7 @@ router26.post("/revert", async (req, res) => {
 router26.get("/clear", async (req, res) => {
   try {
     await cleanStaleLocks2();
-    await runGit2("git stash clear");
+    await runGit2(["stash", "clear"]);
     res.json([]);
   } catch (error) {
     console.error("Git Stash Clear Error:", error);
