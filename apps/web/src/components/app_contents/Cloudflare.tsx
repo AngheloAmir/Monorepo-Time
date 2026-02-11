@@ -81,10 +81,12 @@ export default function Cloudflare(props: CloudflareProps) {
                             ** Closing the browser, refeshing the page, or starting a new tunnel
                             will close the previous tunnel.
                             <br />
-                            *** Use only for testing purposes. I am not responsible for any
+                            *** Not affiliated with Cloudflare.  Use only for testing purposes. I am not responsible for any
                             issues caused by using this feature. It is a bad idea to use this
                             feature in production as Cloudflare can close the tunnel at any time
                             without any warning.
+                            <br/>
+           
                         </p>
                     </TransparentCard>
 

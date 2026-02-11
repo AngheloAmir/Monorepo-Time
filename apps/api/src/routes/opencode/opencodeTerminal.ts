@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { Server, Socket } from "socket.io";
 import { spawn, ChildProcess } from "child_process";
 import { Writable } from "stream";
+import * as pty from "node-pty";
 
 const router = Router();
 
@@ -13,7 +14,8 @@ router.get("/", async (req: Request, res: Response) => {
 export default router;
 
 interface TerminalSession {
-    child: ChildProcess;
+    child?: ChildProcess;
+    ptyProcess?: pty.IPty;
     workspaceName?: string;
     socket: Socket;
     controlPipe?: Writable;
@@ -40,7 +42,7 @@ export function stopOpencodeTerminalProcess(socketId?: string): boolean {
             return false;
         }
 
-        const { child, socket } = session;
+        const { child, ptyProcess, socket } = session;
         
         // Emit closing log before killing
         if (socket.connected) {
@@ -48,11 +50,17 @@ export function stopOpencodeTerminalProcess(socketId?: string): boolean {
         }
 
         // Remove active listeners to prevent side effects during kill
-        child.removeAllListeners();
-        child.stdout?.removeAllListeners();
-        child.stderr?.removeAllListeners();
+        if (child) {
+            child.removeAllListeners();
+            child.stdout?.removeAllListeners();
+            child.stderr?.removeAllListeners();
+            child.kill(); 
+        }
 
-        child.kill(); 
+        if (ptyProcess) {
+            ptyProcess.kill();
+        }
+
         activeOpencodeTerminal = null;
         return true;
     }
@@ -89,21 +97,34 @@ export function opencodeTerminalSocket(io: Server) {
                 // Use PROMPT_COMMAND to force the PS1 prompt. 
                 env.PROMPT_COMMAND = 'export PS1="\\[\\033[34m\\][PATH] \\[\\033[32m\\]\\w\\[\\033[0m\\]\\n$ ";';
 
-                let child: ChildProcess;
+                let child: ChildProcess | undefined;
+                let ptyProcess: pty.IPty | undefined;
                 let controlPipe: Writable | undefined;
 
                 if (process.platform === 'win32') {
-                    // Windows does not support the python pty module.
-                    socket.emit('opencode:log', '\x1b[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1b[0m\r\n');
-                    
-                    const baseCMD = command.split(" ")[0];
-                    const args = command.split(" ").slice(1);
-                    
-                    child = spawn(baseCMD, args, {
+                    // Windows: Use node-pty for full PTY support
+                    // We run via cmd.exe /C to ensure we can run command strings (like 'npm run dev') 
+                    // and handle PATH resolution correctly, similar to shell: true or bash -c.
+                    ptyProcess = pty.spawn('cmd.exe', ['/C', command], {
+                        name: 'xterm-256color',
+                        cols: 80,
+                        rows: 30,
                         cwd: path,
-                        env: env,
-                        shell: true,
-                        stdio: ['pipe', 'pipe', 'pipe']
+                        env: env as any,
+                    });
+
+                    activeOpencodeTerminal = { ptyProcess, workspaceName, socket };
+
+                    ptyProcess.onData((data) => {
+                         socket.emit('opencode:log', data);
+                    });
+
+                    ptyProcess.onExit(({ exitCode }) => {
+                         if (exitCode !== 0) {
+                             socket.emit('opencode:error', `\r\nProcess exited with code ${exitCode}`);
+                         }
+                         socket.emit('opencode:exit', exitCode || 0);
+                         cleanup();
                     });
                 } else {
                     // Linux/Mac: Use Python PTY bridge for full interactivity
@@ -203,37 +224,37 @@ except Exception as e:
                     if (child.stdio[3]) {
                         controlPipe = child.stdio[3] as Writable;
                     }
+                    
+                    activeOpencodeTerminal = { child, workspaceName, socket, controlPipe };
+
+                    child.stdout?.on('data', (chunk) => {
+                        // Emit to the current socket that started this process
+                        socket.emit('opencode:log', chunk.toString());
+                    });
+    
+                    child.stderr?.on('data', (chunk) => {
+                        socket.emit('opencode:log', chunk.toString()); 
+                    });
+    
+                    child.on('error', (err: any) => {
+                        if (err.code === 'ENOENT' && process.platform !== 'win32') {
+                             socket.emit('opencode:error', '\r\n\x1b[31mError: Python3 is required for interactive mode on Linux/Mac but was not found.\x1b[0m');
+                        } else {
+                             socket.emit('opencode:error', `Failed to start command: ${err.message}`);
+                        }
+                        cleanup();
+                    });
+    
+                    child.on('exit', (code) => {
+                        if (code === 127 && process.platform !== 'win32') {
+                             socket.emit('opencode:error', '\r\n\x1b[31mError: Python PTY module issue.\x1b[0m');
+                        } else if (code !== 0 && code !== null) { // code is null if killed by signal
+                            socket.emit('opencode:error', `\r\nProcess exited with code ${code}`);
+                        }
+                        socket.emit('opencode:exit', code || 0);
+                        cleanup();
+                    });
                 }
-
-                activeOpencodeTerminal = { child, workspaceName, socket, controlPipe };
-
-                child.stdout?.on('data', (chunk) => {
-                    // Emit to the current socket that started this process
-                    socket.emit('opencode:log', chunk.toString());
-                });
-
-                child.stderr?.on('data', (chunk) => {
-                    socket.emit('opencode:log', chunk.toString()); 
-                });
-
-                child.on('error', (err: any) => {
-                    if (err.code === 'ENOENT' && process.platform !== 'win32') {
-                         socket.emit('opencode:error', '\r\n\x1b[31mError: Python3 is required for interactive mode on Linux/Mac but was not found.\x1b[0m');
-                    } else {
-                         socket.emit('opencode:error', `Failed to start command: ${err.message}`);
-                    }
-                    cleanup();
-                });
-
-                child.on('exit', (code) => {
-                    if (code === 127 && process.platform !== 'win32') {
-                         socket.emit('opencode:error', '\r\n\x1b[31mError: Python PTY module issue.\x1b[0m');
-                    } else if (code !== 0 && code !== null) { // code is null if killed by signal
-                        socket.emit('opencode:error', `\r\nProcess exited with code ${code}`);
-                    }
-                    socket.emit('opencode:exit', code || 0);
-                    cleanup();
-                });
 
             } catch (error: any) {
                 socket.emit('opencode:error', `Error handling command: ${error.message}`);
@@ -245,19 +266,31 @@ except Exception as e:
         socket.on('opencode:input', (input: string) => {
             // Allow input from the socket that owns the terminal
             const session = activeOpencodeTerminal;
-            if (session && session.socket.id === socket.id && session.child.stdin) {
-                session.child.stdin.write(input);
+            if (session && session.socket.id === socket.id) {
+                if (session.child && session.child.stdin) {
+                    session.child.stdin.write(input);
+                } else if (session.ptyProcess) {
+                    session.ptyProcess.write(input);
+                }
             }
         });
 
         socket.on('opencode:resize', (data: { cols: number, rows: number }) => {
             const session = activeOpencodeTerminal;
-            if (session && session.socket.id === socket.id && session.controlPipe) {
-                try {
-                    // Send "rows cols" to the control pipe
-                    session.controlPipe.write(`${data.rows} ${data.cols}`);
-                } catch (e) {
-                    // ignore
+            if (session && session.socket.id === socket.id) {
+                if (session.controlPipe) {
+                    try {
+                        // Send "rows cols" to the control pipe
+                        session.controlPipe.write(`${data.rows} ${data.cols}`);
+                    } catch (e) {
+                        // ignore
+                    }
+                } else if (session.ptyProcess) {
+                    try {
+                        session.ptyProcess.resize(data.cols, data.rows);
+                    } catch (e) {
+                        // ignore
+                    }
                 }
             }
         });
