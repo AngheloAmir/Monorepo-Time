@@ -84,17 +84,14 @@ router.post('/revert', async (req: Request, res: Response) => {
              return;
         }
 
-        // Non-destructive revert:
-        // 1. Get current HEAD to use as parent
-        const currentHead = await runGit('git rev-parse HEAD');
-        
-        // 2. Create a new commit object that has:
-        //    - The TREE of the target hash (effectively restoring that state)
-        //    - The PARENT of the current HEAD (maintaining history)
-        //    - A message indicating the revert
+        const status = await runGit('git status --porcelain');
+        if (status) {
+            return res.status(400).json({ 
+                error: "Cannot revert with pending changes. Please commit your changes first." 
+            });
+        }
+        const currentHead   = await runGit('git rev-parse HEAD');
         const newCommitHash = await runGit(`git commit-tree ${hash}^{tree} -p ${currentHead} -m "Reverted to ${hash}"`);
-        
-        // 3. Move HEAD to this new commit and update the working directory
         await runGit(`git reset --hard ${newCommitHash}`);
 
         res.json({ success: true, message: `Reverted to ${hash}` });
