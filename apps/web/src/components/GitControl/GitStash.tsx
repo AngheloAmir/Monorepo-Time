@@ -52,7 +52,7 @@ export default function GitStash() {
     }
 
     return (
-        <div className="flex flex-col flex-1 max-h-72">
+        <div className="flex flex-col h-full">
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-white/10">
                 <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">

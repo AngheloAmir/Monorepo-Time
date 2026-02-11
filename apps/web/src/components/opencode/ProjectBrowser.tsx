@@ -1,7 +1,6 @@
 import config from 'config';
 import TreeItem from "./TreeItem";
 import useProjectState from "../../appstates/project";
-import CommitInput from "./CommitInput";
 import ProjectEdit from './ProjectEdit';
 
 interface ProjectBrowserProps {
@@ -31,10 +30,6 @@ export default function ProjectBrowser(props: ProjectBrowserProps) {
                         {config.useDemo ? "Demo Mode - No Project" : "Loading or empty..."}
                     </div>
                 )}
-            </div>
-
-            <div className="p-2">
-                <CommitInput />
             </div>
         </div>
     );

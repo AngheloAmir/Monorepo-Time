@@ -7,7 +7,6 @@ import { OpenCodeContent, OpenCodeInit } from "../opencode/OpenCodeInit";
 import ProjectBrowser from "../opencode/ProjectBrowser";
 import useProjectState from "../../appstates/project";
 import FileEditor from "../opencode/FileEditor";
-import GitStashContainer from "../opencode/GitStashContainer";
 import useGitStash from "../../appstates/gitstash";
 
 interface CloudflareProps {
@@ -130,8 +129,6 @@ export default function OpenCode(props: CloudflareProps) {
                     />
                 </div>
             </div>
-
-            <GitStashContainer />
         </div>
     )
 }
