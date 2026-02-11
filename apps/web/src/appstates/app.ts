@@ -39,6 +39,9 @@ interface appContext {
     projectTreeFontSize: number;
     loadProjectTreeFontSize: () => void;
     setProjectTreeFontSize: (size: number) => void;
+
+    showGit: boolean;
+    setShowGit: (show: boolean) => void;
 }
 
 const appstate = create<appContext>()((set, get) => ({
@@ -59,6 +62,9 @@ const appstate = create<appContext>()((set, get) => ({
             set({ terminalFontSize: parseInt(fontSize) });
         }
     },
+
+    showGit: false,
+    setShowGit: (show: boolean) => set({ showGit: show }),
 
     projectTreeFontSize: 14,
     setProjectTreeFontSize: (size: number) => {

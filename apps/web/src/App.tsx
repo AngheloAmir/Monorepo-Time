@@ -18,6 +18,7 @@ import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
 import OpenCode from './components/app_contents/OpenCode';
+import GitControl from './components/GitControl/GitControl';
 
 declare global {
     interface Window {
@@ -29,11 +30,23 @@ export default function App() {
     const currentPage = useNavState.use.currentPage();
     const navAction = useNavState.use.action();
     const loadRootDir = useAppState.use.loadRootDir();
-    const checkIfFirstTime = useAppState.use.checkIfFirstTime();
-    const showAboutModal = useAppState.use.showAboutModal();
+    const checkIfFirstTime  = useAppState.use.checkIfFirstTime();
+    const showAboutModal    = useAppState.use.showAboutModal();
     const setShowAboutModal = useAppState.use.setShowAboutModal();
+    const setShowGit        = useAppState.use.setShowGit();
     const [isFlashVisible, setIsFlashVisible] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {   
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                setShowGit(true);
+            }
+        }   
+        window.addEventListener('keydown', handleKeyDown, { capture: true });
+        return () => window.removeEventListener('keydown', handleKeyDown, { capture: true });
+    }, []);
 
     useEffect(() => {
         setLoading(false);
@@ -142,6 +155,7 @@ export default function App() {
             <Modal />
             <RootTerminal />
             <AboutModal isOpen={showAboutModal} setIsOpen={() => setShowAboutModal(false)} />
+            <GitControl />                
         </div>
     )
 }

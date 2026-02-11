@@ -1,4 +1,4 @@
-import useGitControlContext from "../../../appstates/gitcontrol";
+import useGitControlContext from "../../appstates/gitcontrol";
 
 export default function GitHistory() {
     const isLoading         = useGitControlContext.use.loading();
@@ -6,7 +6,7 @@ export default function GitHistory() {
     const setSelectedCommit = useGitControlContext.use.setSelectedCommit();
 
     return (
-        <div className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
+        <div className="overflow-y-auto p-2 space-y-2 custom-scrollbar">
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-2">
                     <i className="fas fa-circle-notch fa-spin"></i>
