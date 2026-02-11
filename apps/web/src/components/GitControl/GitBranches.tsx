@@ -2,12 +2,12 @@ import { useState } from "react";
 import useGitControlContext from "../../appstates/gitcontrol";
 
 export default function GitBranches() {
-    const commitLoading     = useGitControlContext.use.commitLoading();
-    const branches          = useGitControlContext.use.branches();
-    const checkoutBranch    = useGitControlContext.use.checkoutBranch();
-    const createBranch      = useGitControlContext.use.createBranch();
-    const deleteBranch      = useGitControlContext.use.deleteBranch();
-    const mergeBranch       = useGitControlContext.use.mergeBranch();
+    const commitLoading = useGitControlContext.use.commitLoading();
+    const branches = useGitControlContext.use.branches();
+    const checkoutBranch = useGitControlContext.use.checkoutBranch();
+    const createBranch = useGitControlContext.use.createBranch();
+    const deleteBranch = useGitControlContext.use.deleteBranch();
+    const mergeBranch = useGitControlContext.use.mergeBranch();
 
     const [newBranchName, setNewBranchName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
@@ -20,15 +20,15 @@ export default function GitBranches() {
     };
 
     return (
-        <div className="flex flex-col h-full border-r border-white/10 bg-black/20 w-[250px]">
-            <div className="p-3 border-b border-white/10 flex items-center justify-between">
+        <div className="flex flex-col h-full">
+            <div className="h-12 p-3 border-b border-white/10 flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-300">Branches</span>
-                <button 
-                    disabled={commitLoading}
+                <button
                     onClick={() => setIsCreating(!isCreating)}
-                    className="text-xs px-2 py-1 bg-blue-600/20 text-blue-400 hover:bg-blue-600/40 rounded transition-colors"
+                    className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                    title="Add Branch"
                 >
-                    <i className="fas fa-plus"></i>
+                    <i className="fas fa-plus text-xs"></i>
                 </button>
             </div>
 
@@ -44,7 +44,7 @@ export default function GitBranches() {
                             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                             autoFocus
                         />
-                        <button 
+                        <button
                             disabled={commitLoading}
                             onClick={handleCreate}
                             className="bg-blue-600 text-white px-2 rounded hover:bg-blue-500"
@@ -57,14 +57,14 @@ export default function GitBranches() {
 
             <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
                 {branches.map((branch, idx) => (
-                    <div 
+                    <div
                         key={idx}
                         className={`
                             group flex items-center justify-between p-2 rounded cursor-pointer transition-colors
-                            ${branch.isCurrent ? "bg-blue-600/20 border border-blue-500/30" : "hover:bg-white/5 border border-transparent"}
+                            ${branch.isCurrent ? "bg-gradient-to-br from-blue-600/50 to-blue-400/50" : "bg-gradient-to-br hover:from-blue-600/30 hover:to-blue-400/30"}
                         `}
                     >
-                        <div 
+                        <div
                             className="flex items-center gap-2 flex-1 min-w-0"
                             onClick={() => !branch.isCurrent && checkoutBranch(branch.name)}
                             title={branch.isCurrent ? "Current Branch" : "Switch to " + branch.name}
@@ -74,7 +74,7 @@ export default function GitBranches() {
                                 {branch.name}
                             </span>
                         </div>
-                        
+
                         {!branch.isCurrent && (
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
@@ -99,7 +99,7 @@ export default function GitBranches() {
                 ))}
 
                 {branches.length === 0 && (
-                     <div className="text-gray-600 text-xs text-center py-4">No branches found</div>
+                    <div className="text-gray-600 text-xs text-center py-4">No branches found</div>
                 )}
             </div>
         </div>

@@ -54,10 +54,8 @@ export default function GitStash() {
     return (
         <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between px-3 py-2 border-b border-white/10">
-                <span className="text-xs font-semibold text-white/70 uppercase tracking-wider">
-                    GIT STASH
-                </span>
+            <div className="h-12 p-3 border-b border-white/10 flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-300">Git Stash</span>
 
                 {stashList.length > 0 && (
                     <button
@@ -100,26 +98,22 @@ export default function GitStash() {
             </div>
 
             {/* Add Stash Input */}
-            <div className="mt-auto flex items-center gap-1.5 px-2 py-2 border-t border-white/10">
+            <div className="mt-auto flex gap-1 p-2">
                 <input
                     type="text"
-                    className="flex-1 bg-black/30 border border-white/10 rounded px-2 py-1 text-xs text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
-                    placeholder="Checkpoint name..."
                     value={stashName}
                     onChange={(e) => setStashName(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAddStash()}
                     disabled={loading}
+                    placeholder="Checkpoint name..."
+                    className="flex-1 border border-white/10 rounded px-2 py-1 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
                 />
+
                 <button
-                    onClick={handleAddStash}
-                    disabled={loading || !stashName.trim()}
-                    className="w-7 h-7 bg-gradient-to-br from-blue-600/50 to-blue-400/50 hover:from-blue-600/70 hover:to-blue-400/70 disabled:from-white/5 disabled:to-white/5 rounded flex items-center justify-center text-white disabled:text-white/20 transition-all"
-                    title="Save stash"
+                    onClick={() => handleAddStash()}
+                    className={`w-8 h-8 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
+                    title="Add stash"
                 >
-                    {loading
-                        ? <i className="fa-solid fa-spinner fa-spin text-[10px]" />
-                        : <i className="fa-solid fa-plus text-[10px]" />
-                    }
+                    <i className="fas fa-plus text-xs"></i>
                 </button>
             </div>
         </div>

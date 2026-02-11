@@ -21,9 +21,9 @@ export default function GitHistory() {
                         onClick={() => setSelectedCommit(item)}
                         className={`
                             w-full text-left group flex flex-col gap-1 p-2
-                            rounded border border-white/7
+                            rounded 
                             bg-gradient-to-r hover:from-blue-500/50 hover:to-blue-300/50
-                            transition-all duration-200 opacity-80
+                            transition-all duration-200
                         `}
                     >
                         <div className="flex items-start justify-between gap-4">
