@@ -62,7 +62,7 @@ export default function App() {
         <div className='w-screen h-screen overflow-hidden bg-[#090909] relative'>
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute -top-[20%]    -left-[10%]  w-[70%] h-[50%] bg-blue-600/8 rounded-full blur-[160px]"></div>
-                <div className="absolute -bottom-[25%] -right-[10%]  w-[70%] h-[50%] bg-blue-500/7 rounded-full blur-[160px]"></div>
+                {/* <div className="absolute -bottom-[25%] -right-[10%]  w-[70%] h-[50%] bg-blue-500/7 rounded-full blur-[160px]"></div> */}
             </div>
 
             <Header />

@@ -38,7 +38,7 @@ export default function RootTerminal() {
 
     if (!showTerminal) return null;
     return (
-       <ModalBody width="700px">
+       <ModalBody width="800px">
              <ModalHeader
                 close={close}
                 title={"Root Terminal"}

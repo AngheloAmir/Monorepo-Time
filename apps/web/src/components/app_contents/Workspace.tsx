@@ -6,7 +6,6 @@ import WorkspaceOptionModal from "../workspace/WorkspaceOptionModal";
 import WorkspaceNew from "../workspace/WorkspaceNew";
 import ModalTerminal from "../workspace/ModalTerminal";
 import FloatingBtn from "../workspace/FloatingBtn";
-import GitControl from "../workspace/GitControl";
 import Loading from "../workspace/Loading";
 import { WorkspaceTabToggle } from "../workspace/WorkspaceTabToggle";
 
@@ -21,7 +20,6 @@ export default function Workspace(props: WorkspaceProps) {
     const [currentWorkspace, setCurrentWorkspace] = useState<WorkspaceItem[] | null>(null);
     const [isTabTerminalVisible, setIsTabTerminalVisible] = useState(false);
     const [isTerminalMaximized, setIsTerminalMaximized] = useState(false);
-    const [isGitControlVisible, setIsGitControlVisible] = useState(false);
 
     useEffect(() => {
         if (props.isVisible) {
@@ -67,8 +65,8 @@ export default function Workspace(props: WorkspaceProps) {
             <div className={`relative flex flex-col w-full h-[calc(100vh-54px)] ${props.isVisible ? '' : 'hidden'}`}>
                 <div className="flex flex-col h-full min-h-0">
 
-                    <div className={`flex-1 min-h-0 ${isGitControlVisible ? "grid grid-cols-4 gap-2" : "flex"} overflow-hidden p-2 transition-all duration-500 ${isTerminalMaximized ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}>
-                        <div className={`pr-4 ${isGitControlVisible ? 'col-span-3 xl:grid-cols-3' : 'flex-1 xl:grid-cols-4'} pt-9 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 content-start gap-4 relative transition-all duration-300`}>
+                    <div className={`flex-1 min-h-0 flex overflow-hidden p-2 transition-all duration-500 ${isTerminalMaximized ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}>
+                        <div className={`pr-4 flex-1 xl:grid-cols-4 pt-9 h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 content-start gap-4 relative transition-all duration-300`}>
                             {groupedWorkspaces.map((group) => (
                                 <div key={group.dir} className="contents">
                                     {whichShow === "all" && (
@@ -86,25 +84,6 @@ export default function Workspace(props: WorkspaceProps) {
                                 </div>
                             ))}
                         </div> 
-
-                        {isGitControlVisible ? (
-                            <div className="col-span-1 h-full overflow-hidden relative group/git-panel">
-                                <GitControl onMinimize={() => setIsGitControlVisible(false)} />
-                            </div>
-                        ) : (
-                            <div className="w-12 h-full flex flex-col items-center py-4 gap-4 border-l border-white/5 bg-black/20">
-                                <button
-                                    onClick={() => setIsGitControlVisible(true)}
-                                    className="w-8 h-8 rounded bg-gradient-to-br from-blue-600 to-blue-400 text-white flex items-center justify-center transition-all shadow-[0_0_15px_rgba(249,115,22,0.1)] hover:shadow-[0_0_20px_rgba(249,115,22,0.3)]"
-                                    title="Expand Git Control"
-                                >
-                                    <i className="fab fa-git-alt text-lg"></i>
-                                </button>
-                                <div className="vertical-rl rotate-180 text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase select-none" style={{ writingMode: 'vertical-rl' }}>
-                                    Git Control
-                                </div>
-                            </div>
-                        )}
                     </div>
 
                     <div

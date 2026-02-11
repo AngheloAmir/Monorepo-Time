@@ -34,7 +34,7 @@ export default function ModalTerminal() {
 
     if (!showNewTerminalWindow) return null;
     return (
-        <ModalBody width="700px">
+        <ModalBody width="800px">
             <ModalHeader
                 close={close}
                 title={showNewTerminalWindow.name || ""}

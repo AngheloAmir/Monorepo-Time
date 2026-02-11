@@ -9,7 +9,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
 
     return (
         <GradientBody className="rounded overflow-hidden">
-            <header className="p-3 flex items-start gap-4 bg-blue-400/15">
+            <header className="p-3 flex items-start gap-4 bg-blue-400/10">
                 <div className="w-10 h-10 rounded flex items-center justify-center border border-white/10">
                     <i className={`text-xl ${props.info.fontawesomeIcon ?? 'text-gray-400 fa fa-cube'}`}></i>
                 </div>
@@ -25,7 +25,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setShowNewTerminalWindow(props.info)}
-                        className="w-8 h-8 rounded-lg bg-gray-800/50 hover:bg-blue-600 hover:text-white text-gray-500 flex items-center justify-center transition-colors" >
+                        className="w-8 h-8 rounded-lg bg-gray-800 hover:bg-blue-600 hover:text-white text-gray-500 flex items-center justify-center transition-colors" >
                         <i className="fas fa-terminal text-xs"></i>
                     </button>
                     <button

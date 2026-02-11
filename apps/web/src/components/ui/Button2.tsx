@@ -54,7 +54,7 @@ function Button2(props: ButtonProps) {
 
             {/* Inner Content Container */}
             <div className={`
-                relative h-full w-full rounded bg-[#0A0A0A]/80 p-2 flex items-center gap-3 overflow-hidden
+                relative h-full w-full rounded bg-gradient-to-br from-blue-600/15 to-blue-400/15 p-2 flex items-center gap-3 overflow-hidden
                 transition-colors duration-300
                 ${!props.disabled && !props.bg ? 'group-hover:bg-[#212121]/70' : ''}
             `}>

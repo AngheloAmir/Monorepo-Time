@@ -122,7 +122,7 @@ export default function Turborepo(props: TurborepoProps) {
                 {/* Scrollable Command Groups */}
                 <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     {commandGroups.map((group) => (
-                        <TransparentCard key={group.title} title={group.title} description={`${group.commands.length} commands`}>
+                        <TransparentCard key={group.title} title={group.title} description={""}>
                             {group.commands.map((c) => (
                                 <Button2
                                     key={c.label}
