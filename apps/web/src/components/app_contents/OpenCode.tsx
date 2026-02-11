@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import OpenCodeTerminal, { type OpenCodeTerminalRef } from "../opencode/OpenCodeTerminal";
 import config from 'config';
 import useAppState from "../../appstates/app";
-import { OpenCodeContent, OpenCodeInit } from "../opencode/OpenCodeInit";
 
 import ProjectBrowser from "../opencode/ProjectBrowser";
 import useProjectState from "../../appstates/project";
 import FileEditor from "../opencode/FileEditor";
 import useGitStash from "../../appstates/gitstash";
+import ReadyMessage from "../opencode/ReadyMessage";
+import OpenCodeInitMessage from "../opencode/OpenCodeInit";
 
 interface CloudflareProps {
     isVisible: boolean
@@ -107,7 +108,7 @@ export default function OpenCode(props: CloudflareProps) {
                         }}
                     />
                     <FileEditor/>
-                    <OpenCodeInit
+                    <ReadyMessage
                         isVisible={props.isVisible && !isRunning && isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
                         onStart={() => {
                             if (terminalRef.current) {
@@ -117,9 +118,17 @@ export default function OpenCode(props: CloudflareProps) {
                                 terminalRef.current?.focus();
                             }
                         }}
+                        onStartManual={() => {
+                            if (terminalRef.current) {
+                                setIsRunning(true);
+                                terminalRef.current?.fit();
+                                terminalRef.current?.connect(rootDir, 'bash');
+                                terminalRef.current?.focus();
+                            }
+                        }}
                     />
 
-                    <OpenCodeContent
+                    <OpenCodeInitMessage
                         isVisible={props.isVisible && !isRunning && !isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
                         onInstall={() => {
                             useAppState.getState().installOpenCode();

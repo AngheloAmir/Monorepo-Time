@@ -81,7 +81,7 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
 
         socket.on('connect', () => {
             setIsConnected(true);
-            terminalRef.current?.clear();
+            terminalRef.current?.reset();
 
             if (command != 'bash') {
                 terminalRef.current?.write(`\x1b[34m${path}\x1b[0m: ${command}\r\n`);
