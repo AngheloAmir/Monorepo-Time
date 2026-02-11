@@ -70,7 +70,7 @@ function ButtonSkeleton(props: ButtonProps) {
 
             {/* Inner Content Container */}
             <div className={`
-                relative h-full w-full rounded bg-blue-400/20 p-2 flex items-center gap-3 overflow-hidden
+                relative h-full w-full rounded bg-blue-400/10 p-2 flex items-center gap-3 overflow-hidden
                 transition-colors duration-300
             `}>
                 {/* Active Low-Opacity Background Overlay */}
