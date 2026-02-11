@@ -5205,7 +5205,7 @@ var require_cross_spawn = __commonJS({
     var cp = require("child_process");
     var parse = require_parse();
     var enoent = require_enoent();
-    function spawn3(command2, args2, options) {
+    function spawn4(command2, args2, options) {
       const parsed = parse(command2, args2, options);
       const spawned = cp.spawn(parsed.command, parsed.args, parsed.options);
       enoent.hookChildProcess(spawned, parsed);
@@ -5217,8 +5217,8 @@ var require_cross_spawn = __commonJS({
       result.error = result.error || enoent.verifyENOENTSync(result.status, parsed);
       return result;
     }
-    module2.exports = spawn3;
-    module2.exports.spawn = spawn3;
+    module2.exports = spawn4;
+    module2.exports.spawn = spawn4;
     module2.exports.sync = spawnSync2;
     module2.exports._parse = parse;
     module2.exports._enoent = enoent;
@@ -81713,14 +81713,14 @@ var require_out4 = __commonJS({
 var require_bin = __commonJS({
   "../../node_modules/pidusage/lib/bin.js"(exports2, module2) {
     "use strict";
-    var spawn3 = require("child_process").spawn;
+    var spawn4 = require("child_process").spawn;
     function run(cmd, args2, options, done) {
       if (typeof options === "function") {
         done = options;
         options = void 0;
       }
       let executed = false;
-      const ch = spawn3(cmd, args2, options);
+      const ch = spawn4(cmd, args2, options);
       let stdout = "";
       let stderr = "";
       ch.stdout.on("data", function(d) {
@@ -82416,7 +82416,7 @@ var require_stats = __commonJS({
     "use strict";
     var fs30 = require("fs");
     var os3 = require("os");
-    var spawn3 = require("child_process").spawn;
+    var spawn4 = require("child_process").spawn;
     var requireMap = {
       ps: () => require_ps(),
       procfile: () => require_procfile(),
@@ -82457,7 +82457,7 @@ var require_stats = __commonJS({
       if (platform3 === "win") {
         let child;
         try {
-          child = spawn3("wmic", function(err) {
+          child = spawn4("wmic", function(err) {
             if (err) throw new Error(err);
           });
         } catch (err) {
@@ -82538,7 +82538,7 @@ var require_tree_kill = __commonJS({
   "../../node_modules/tree-kill/index.js"(exports2, module2) {
     "use strict";
     var childProcess4 = require("child_process");
-    var spawn3 = childProcess4.spawn;
+    var spawn4 = childProcess4.spawn;
     var exec4 = childProcess4.exec;
     module2.exports = function(pid, signal, callback) {
       if (typeof signal === "function" && callback === void 0) {
@@ -82563,7 +82563,7 @@ var require_tree_kill = __commonJS({
           break;
         case "darwin":
           buildProcessTree(pid, tree, pidsToProcess, function(parentPid) {
-            return spawn3("pgrep", ["-P", parentPid]);
+            return spawn4("pgrep", ["-P", parentPid]);
           }, function() {
             killAll(tree, signal, callback);
           });
@@ -82575,7 +82575,7 @@ var require_tree_kill = __commonJS({
         //     break;
         default:
           buildProcessTree(pid, tree, pidsToProcess, function(parentPid) {
-            return spawn3("ps", ["-o", "pid", "--no-headers", "--ppid", parentPid]);
+            return spawn4("ps", ["-o", "pid", "--no-headers", "--ppid", parentPid]);
           }, function() {
             killAll(tree, signal, callback);
           });
@@ -94750,6 +94750,7 @@ var opencodeHelper_default = router22;
 // src/routes/opencode/opencodeTerminal.ts
 var import_express27 = __toESM(require_express2());
 var import_child_process4 = require("child_process");
+var pty = __toESM(require("node-pty"));
 var router23 = (0, import_express27.Router)();
 router23.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
@@ -94763,14 +94764,19 @@ function stopOpencodeTerminalProcess(socketId) {
     if (socketId && session.socket.id !== socketId) {
       return false;
     }
-    const { child, socket } = session;
+    const { child, ptyProcess, socket } = session;
     if (socket.connected) {
       socket.emit("opencode:log", "\r\n\x1B[33m[System] Stopping interactive terminal process...\x1B[0m\r\n");
     }
-    child.removeAllListeners();
-    (_a2 = child.stdout) == null ? void 0 : _a2.removeAllListeners();
-    (_b2 = child.stderr) == null ? void 0 : _b2.removeAllListeners();
-    child.kill();
+    if (child) {
+      child.removeAllListeners();
+      (_a2 = child.stdout) == null ? void 0 : _a2.removeAllListeners();
+      (_b2 = child.stderr) == null ? void 0 : _b2.removeAllListeners();
+      child.kill();
+    }
+    if (ptyProcess) {
+      ptyProcess.kill();
+    }
     activeOpencodeTerminal = null;
     return true;
   }
@@ -94789,16 +94795,27 @@ function opencodeTerminalSocket(io3) {
         env.FORCE_COLOR = "1";
         env.PROMPT_COMMAND = 'export PS1="\\[\\033[34m\\][PATH] \\[\\033[32m\\]\\w\\[\\033[0m\\]\\n$ ";';
         let child;
+        let ptyProcess;
         let controlPipe;
         if (process.platform === "win32") {
-          socket.emit("opencode:log", "\x1B[33m[System] Windows detected. Running in compatible mode (limited interactivity).\x1B[0m\r\n");
-          const baseCMD = command2.split(" ")[0];
-          const args2 = command2.split(" ").slice(1);
-          child = (0, import_child_process4.spawn)(baseCMD, args2, {
+          ptyProcess = pty.spawn("cmd.exe", ["/C", command2], {
+            name: "xterm-256color",
+            cols: 80,
+            rows: 30,
             cwd: path33,
-            env,
-            shell: true,
-            stdio: ["pipe", "pipe", "pipe"]
+            env
+          });
+          activeOpencodeTerminal = { ptyProcess, workspaceName, socket };
+          ptyProcess.onData((data2) => {
+            socket.emit("opencode:log", data2);
+          });
+          ptyProcess.onExit(({ exitCode }) => {
+            if (exitCode !== 0) {
+              socket.emit("opencode:error", `\r
+Process exited with code ${exitCode}`);
+            }
+            socket.emit("opencode:exit", exitCode || 0);
+            cleanup();
           });
         } else {
           env.CMD = command2;
@@ -94896,32 +94913,32 @@ except Exception as e:
           if (child.stdio[3]) {
             controlPipe = child.stdio[3];
           }
-        }
-        activeOpencodeTerminal = { child, workspaceName, socket, controlPipe };
-        (_a2 = child.stdout) == null ? void 0 : _a2.on("data", (chunk) => {
-          socket.emit("opencode:log", chunk.toString());
-        });
-        (_b2 = child.stderr) == null ? void 0 : _b2.on("data", (chunk) => {
-          socket.emit("opencode:log", chunk.toString());
-        });
-        child.on("error", (err) => {
-          if (err.code === "ENOENT" && process.platform !== "win32") {
-            socket.emit("opencode:error", "\r\n\x1B[31mError: Python3 is required for interactive mode on Linux/Mac but was not found.\x1B[0m");
-          } else {
-            socket.emit("opencode:error", `Failed to start command: ${err.message}`);
-          }
-          cleanup();
-        });
-        child.on("exit", (code) => {
-          if (code === 127 && process.platform !== "win32") {
-            socket.emit("opencode:error", "\r\n\x1B[31mError: Python PTY module issue.\x1B[0m");
-          } else if (code !== 0 && code !== null) {
-            socket.emit("opencode:error", `\r
+          activeOpencodeTerminal = { child, workspaceName, socket, controlPipe };
+          (_a2 = child.stdout) == null ? void 0 : _a2.on("data", (chunk) => {
+            socket.emit("opencode:log", chunk.toString());
+          });
+          (_b2 = child.stderr) == null ? void 0 : _b2.on("data", (chunk) => {
+            socket.emit("opencode:log", chunk.toString());
+          });
+          child.on("error", (err) => {
+            if (err.code === "ENOENT" && process.platform !== "win32") {
+              socket.emit("opencode:error", "\r\n\x1B[31mError: Python3 is required for interactive mode on Linux/Mac but was not found.\x1B[0m");
+            } else {
+              socket.emit("opencode:error", `Failed to start command: ${err.message}`);
+            }
+            cleanup();
+          });
+          child.on("exit", (code) => {
+            if (code === 127 && process.platform !== "win32") {
+              socket.emit("opencode:error", "\r\n\x1B[31mError: Python PTY module issue.\x1B[0m");
+            } else if (code !== 0 && code !== null) {
+              socket.emit("opencode:error", `\r
 Process exited with code ${code}`);
-          }
-          socket.emit("opencode:exit", code || 0);
-          cleanup();
-        });
+            }
+            socket.emit("opencode:exit", code || 0);
+            cleanup();
+          });
+        }
       } catch (error) {
         socket.emit("opencode:error", `Error handling command: ${error.message}`);
         socket.emit("opencode:error", `Error handling command: ${error.message}`);
@@ -94930,16 +94947,27 @@ Process exited with code ${code}`);
     });
     socket.on("opencode:input", (input) => {
       const session = activeOpencodeTerminal;
-      if (session && session.socket.id === socket.id && session.child.stdin) {
-        session.child.stdin.write(input);
+      if (session && session.socket.id === socket.id) {
+        if (session.child && session.child.stdin) {
+          session.child.stdin.write(input);
+        } else if (session.ptyProcess) {
+          session.ptyProcess.write(input);
+        }
       }
     });
     socket.on("opencode:resize", (data) => {
       const session = activeOpencodeTerminal;
-      if (session && session.socket.id === socket.id && session.controlPipe) {
-        try {
-          session.controlPipe.write(`${data.rows} ${data.cols}`);
-        } catch (e) {
+      if (session && session.socket.id === socket.id) {
+        if (session.controlPipe) {
+          try {
+            session.controlPipe.write(`${data.rows} ${data.cols}`);
+          } catch (e) {
+          }
+        } else if (session.ptyProcess) {
+          try {
+            session.ptyProcess.resize(data.cols, data.rows);
+          } catch (e) {
+          }
         }
       }
     });

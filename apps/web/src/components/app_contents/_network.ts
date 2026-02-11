@@ -93,12 +93,7 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
             },
         ]
     },
-
-    {
-        title: "Docker",
-        commands: []
-    },
-
+    
     {
         title: 'Docker Management',
         commands: [
@@ -263,11 +258,6 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
     },
 
     {
-        title: "Network",
-        commands: []
-    },
-
-    {
         title: "Network Troubleshooting",
         commands: [
             {
@@ -300,107 +290,5 @@ export const commandGroups: { title: string; commands: Command[] }[] = [
                 confirmMessage: 'This will briefly disconnect your internet connection. Continue?'
             },
         ]
-    },
-
-    {
-        title: 'Network Debugging',
-        commands: [
-            {
-                label: 'Info',
-                displayCmd: 'iptables/netsh',
-                cmd: 'sudo iptables -L -n -v',
-                cmdWindow: 'netsh advfirewall show allprofiles',
-                cmdMac: 'sudo pfctl -s rules',
-                icon: 'fa-shield-alt',
-                color: 'blueIndigo'
-            },
-            {
-                label: 'UFW Status',
-                displayCmd: 'ufw status',
-                cmd: 'sudo ufw status verbose',
-                cmdWindow: 'netsh advfirewall show allprofiles', // Fallback
-                cmdMac: 'sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate',
-                icon: 'fa-fire-alt',
-                color: 'emeraldTeal'
-            },
-            {
-                label: 'Dig (DNS)',
-                displayCmd: 'dig +short',
-                cmd: 'dig {{input}} +short',
-                cmdWindow: 'nslookup {{input}}',
-                cmdMac: 'dig {{input}} +short',
-                icon: 'fa-search',
-                color: 'blueIndigo',
-                requiresInput: true,
-                inputLabel: 'Domain',
-                inputPlaceholder: 'example.com'
-            },
-            {
-                label: 'Container DNS Config',
-                displayCmd: 'cat /etc/resolv.conf',
-                cmd: 'docker exec {{input}} cat /etc/resolv.conf',
-                cmdWindow: 'docker exec {{input}} cat /etc/resolv.conf',
-                cmdMac: 'docker exec {{input}} cat /etc/resolv.conf',
-                icon: 'fa-file-alt',
-                color: 'blueIndigo',
-                requiresInput: true,
-                inputLabel: 'Container Name/ID',
-                inputPlaceholder: 'container_name'
-            },
-            {
-                label: 'Live Connections',
-                displayCmd: 'ss established',
-                cmd: 'ss -tn state established',
-                cmdWindow: 'netstat -an | findstr ESTABLISHED',
-                cmdMac: 'netstat -an | grep ESTABLISHED',
-                icon: 'fa-project-diagram',
-                color: 'indigoFuchsia'
-            },
-            {
-                label: 'ARP Table',
-                displayCmd: 'arp -a',
-                cmd: 'arp -a 2>/dev/null || ip neigh show',
-                cmdWindow: 'arp -a',
-                cmdMac: 'arp -a',
-                icon: 'fa-table',
-                color: 'yellowOrange'
-            },
-            {
-                label: 'Network Errors',
-                displayCmd: 'netstat -i',
-                cmd: 'netstat -i 2>/dev/null || cat /proc/net/dev',
-                cmdWindow: 'netstat -e',
-                cmdMac: 'netstat -i',
-                icon: 'fa-exclamation-triangle',
-                color: 'yellowOrange'
-            },
-            {
-                label: 'Dropped Packets',
-                displayCmd: 'ip -s link',
-                cmd: 'ip -s link | grep -A 2 "RX\\|TX"',
-                cmdWindow: 'netstat -e',
-                cmdMac: 'netstat -ib',
-                icon: 'fa-times-circle',
-                color: 'skyBlue'
-            },
-            {
-                label: 'MTU Values',
-                displayCmd: 'ip link show',
-                cmd: 'ip link show | grep mtu',
-                cmdWindow: 'netsh interface ipv4 show subinterfaces',
-                cmdMac: 'ifconfig | grep mtu',
-                icon: 'fa-ruler',
-                color: 'blueIndigo'
-            },
-            {
-                label: 'Kernel Network',
-                displayCmd: 'sysctl -a',
-                cmd: 'sysctl -a 2>/dev/null | grep net.ipv4 | head -20',
-                cmdWindow: 'netsh interface ipv4 show global',
-                cmdMac: 'sysctl -a | grep net.inet.ip | head -n 20',
-                icon: 'fa-terminal',
-                color: 'cyanBlue'
-            },
-        ]
-    },
+    }
 ];
