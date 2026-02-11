@@ -3,6 +3,7 @@ import useGitControlContext from "../../appstates/gitcontrol";
 export default function GitHistory() {
     const isLoading         = useGitControlContext.use.loading();
     const history           = useGitControlContext.use.history();
+    const commitLoading     = useGitControlContext.use.commitLoading();
     const setSelectedCommit = useGitControlContext.use.setSelectedCommit();
 
     return (
@@ -15,6 +16,7 @@ export default function GitHistory() {
             ) : (
                 history.map((item) => (
                     <button
+                        disabled={commitLoading}
                         key={item.hash}
                         onClick={() => setSelectedCommit(item)}
                         className={`

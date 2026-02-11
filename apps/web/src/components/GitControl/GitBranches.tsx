@@ -2,11 +2,12 @@ import { useState } from "react";
 import useGitControlContext from "../../appstates/gitcontrol";
 
 export default function GitBranches() {
-    const branches = useGitControlContext.use.branches();
-    const checkoutBranch = useGitControlContext.use.checkoutBranch();
-    const createBranch = useGitControlContext.use.createBranch();
-    const deleteBranch = useGitControlContext.use.deleteBranch();
-    const mergeBranch = useGitControlContext.use.mergeBranch();
+    const commitLoading     = useGitControlContext.use.commitLoading();
+    const branches          = useGitControlContext.use.branches();
+    const checkoutBranch    = useGitControlContext.use.checkoutBranch();
+    const createBranch      = useGitControlContext.use.createBranch();
+    const deleteBranch      = useGitControlContext.use.deleteBranch();
+    const mergeBranch       = useGitControlContext.use.mergeBranch();
 
     const [newBranchName, setNewBranchName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
@@ -23,6 +24,7 @@ export default function GitBranches() {
             <div className="p-3 border-b border-white/10 flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-300">Branches</span>
                 <button 
+                    disabled={commitLoading}
                     onClick={() => setIsCreating(!isCreating)}
                     className="text-xs px-2 py-1 bg-blue-600/20 text-blue-400 hover:bg-blue-600/40 rounded transition-colors"
                 >
@@ -43,6 +45,7 @@ export default function GitBranches() {
                             autoFocus
                         />
                         <button 
+                            disabled={commitLoading}
                             onClick={handleCreate}
                             className="bg-blue-600 text-white px-2 rounded hover:bg-blue-500"
                         >
@@ -75,6 +78,7 @@ export default function GitBranches() {
                         {!branch.isCurrent && (
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
+                                    disabled={commitLoading}
                                     onClick={(e) => { e.stopPropagation(); mergeBranch(branch.name); }}
                                     className="w-5 h-5 flex items-center justify-center rounded hover:bg-purple-500/20 text-gray-500 hover:text-purple-400"
                                     title="Merge into current"
@@ -82,6 +86,7 @@ export default function GitBranches() {
                                     <i className="fas fa-code-merge text-[10px]"></i>
                                 </button>
                                 <button
+                                    disabled={commitLoading}
                                     onClick={(e) => { e.stopPropagation(); deleteBranch(branch.name); }}
                                     className="w-5 h-5 flex items-center justify-center rounded hover:bg-red-500/20 text-gray-500 hover:text-red-400"
                                     title="Delete branch"
