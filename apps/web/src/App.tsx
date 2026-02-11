@@ -153,11 +153,11 @@ export default function App() {
                     </div>
                 </main>
             </div>
-
-            <Modal />
+            
+            <GitPanel />   
             <RootTerminal />
             <AboutModal isOpen={showAboutModal} setIsOpen={() => setShowAboutModal(false)} />
-            <GitPanel />                
+            <Modal />
         </div>
     )
 }

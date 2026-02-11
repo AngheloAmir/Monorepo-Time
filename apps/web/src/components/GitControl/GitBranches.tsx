@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useGitControlContext from "../../appstates/gitcontrol";
+import useModal from "../../modal/modals";
 
 export default function GitBranches() {
     const commitLoading = useGitControlContext.use.commitLoading();
@@ -8,6 +9,7 @@ export default function GitBranches() {
     const createBranch = useGitControlContext.use.createBranch();
     const deleteBranch = useGitControlContext.use.deleteBranch();
     const mergeBranch = useGitControlContext.use.mergeBranch();
+    const showModal = useModal.use.showModal();
 
     const [newBranchName, setNewBranchName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
@@ -17,6 +19,54 @@ export default function GitBranches() {
         await createBranch(newBranchName);
         setNewBranchName("");
         setIsCreating(false);
+    };
+
+    const handleDelete = async (branchName: string) => {
+        if (branchName != 'master')
+            showModal(
+                "prompt",
+                "Delete Branch",
+                `Delete this branch ${branchName} pernamently? Enter the branch name to confirm.`,
+                "warning",
+                (result: any) => {
+                    if (result == branchName) {
+                        deleteBranch(branchName);
+                    }
+                }
+            )
+        else
+            showModal(
+                "alert",
+                "Error",
+                "Master branch cannot be deleted!",
+                "error",
+            )
+    };
+
+    const handleMerge = async (branchName: string) => {
+        showModal(
+            "confirm",
+            "Merge Branch",
+            "Merge this branch into current branch?",
+            "warning",
+            (result: any) => {
+                if (result) {
+                    mergeBranch(branchName);
+                }
+            }
+        )
+    };
+
+    const handleCheckout = async (branchName: string) => {
+        const r = await checkoutBranch(branchName);
+        if (r) {
+            showModal(
+                "alert",
+                "Error",
+                r,
+                "error",
+            )
+        }
     };
 
     return (
@@ -34,12 +84,15 @@ export default function GitBranches() {
 
             {isCreating && (
                 <div className="p-2 border-b border-white/10 animate-fadeIn">
+                    <p className="text-xs text-gray-500 mb-2">
+                        Create New Branch and then Checkout
+                    </p>
                     <div className="flex gap-2">
                         <input
                             type="text"
                             value={newBranchName}
                             onChange={(e) => setNewBranchName(e.target.value)}
-                            placeholder="Branch name..."
+                            placeholder="new branch name"
                             className="w-full bg-black/40 border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500"
                             onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                             autoFocus
@@ -66,7 +119,7 @@ export default function GitBranches() {
                     >
                         <div
                             className="flex items-center gap-2 flex-1 min-w-0"
-                            onClick={() => !branch.isCurrent && checkoutBranch(branch.name)}
+                            onClick={() => !branch.isCurrent && handleCheckout(branch.name)}
                             title={branch.isCurrent ? "Current Branch" : "Switch to " + branch.name}
                         >
                             <i className={`fas fa-code-branch text-xs ${branch.isCurrent ? "text-blue-400" : "text-gray-500"}`}></i>
@@ -79,7 +132,10 @@ export default function GitBranches() {
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button
                                     disabled={commitLoading}
-                                    onClick={(e) => { e.stopPropagation(); mergeBranch(branch.name); }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleMerge(branch.name);
+                                    }}
                                     className="w-5 h-5 flex items-center justify-center rounded hover:bg-purple-500/20 text-gray-500 hover:text-purple-400"
                                     title="Merge into current"
                                 >
@@ -87,7 +143,10 @@ export default function GitBranches() {
                                 </button>
                                 <button
                                     disabled={commitLoading}
-                                    onClick={(e) => { e.stopPropagation(); deleteBranch(branch.name); }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(branch.name);
+                                    }}
                                     className="w-5 h-5 flex items-center justify-center rounded hover:bg-red-500/20 text-gray-500 hover:text-red-400"
                                     title="Delete branch"
                                 >

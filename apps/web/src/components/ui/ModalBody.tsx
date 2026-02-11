@@ -9,8 +9,8 @@ export default function ModalBody( props: ModalBodyProps ) {
 
     return (
         <>
-            <div className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm" aria-hidden="true" />
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
+            <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm" aria-hidden="true" />
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
                 <div 
                     onClick={(e) => e.stopPropagation()} 
                     className={`

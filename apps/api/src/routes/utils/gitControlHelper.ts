@@ -127,25 +127,15 @@ router.post('/branch/checkout', async (req: Request, res: Response) => {
 
         const status = await runGit('git status --porcelain');
         if (status) {
-            return res.status(400).json({ error: "Cannot checkout with pending changes. Please stash or commit your changes first." });
+            return res.status(400).json({
+                error: "Cannot checkout with pending changes. Please commit your changes first."
+            });
         }
 
         await runGit(`git checkout ${branch}`);
         res.json({ success: true, message: `Switched to branch ${branch}` });
     } catch (error: any) {
         console.error("Git Checkout Error:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-router.post('/branch/newcheckout', async (req: Request, res: Response) => {
-    try {
-        const { branch } = req.body;
-        if (!branch) return res.status(400).json({ error: "Branch name is required" });
-        await runGit(`git checkout -b ${branch}`);
-        res.json({ success: true, message: `Created and switched to branch ${branch}` });
-    } catch (error: any) {
-        console.error("Git New Branch Checkout Error:", error);
         res.status(500).json({ error: error.message });
     }
 });

@@ -31,7 +31,7 @@ interface gitControlContext {
     handleCommit: (e?: React.FormEvent) => Promise<void>;
     handleRevert: () => Promise<void>;
 
-    checkoutBranch: (name: string) => Promise<void>;
+    checkoutBranch: (name: string) => Promise<null | any>;
     createBranch: (name: string) => Promise<void>;
     deleteBranch: (name: string) => Promise<void>;
     mergeBranch: (name: string) => Promise<void>;
@@ -93,17 +93,22 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
         if(config.useDemo) return;
         set({ loading: true });
         try {
-            await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/checkout`, {
+            const r = await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/checkout`, {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ branch: branchName })
             });
+            const data = await r.json();
+            if(data.error){
+                set({ loading: false });
+                return data.error;
+            }
             await get().fetchData();
-        } catch (e) {
-            console.error(e);
-            alert("Failed to checkout branch");
-        } finally {
             set({ loading: false });
-        }
+            return null;
+        } catch (e) {
+            set({ loading: false });
+            return e;
+        } 
     },
 
     createBranch: async (branchName: string) => {
@@ -125,9 +130,8 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
 
     deleteBranch: async (branchName: string) => {
         if(config.useDemo) return;
-        if(!confirm(`Are you sure you want to delete branch ${branchName}?`)) return;
-
         set({ loading: true });
+        
         try {
             await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/delete`, {
                 method: "POST", headers: { "Content-Type": "application/json" },
