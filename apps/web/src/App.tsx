@@ -43,9 +43,6 @@ export default function App() {
                 if (e.key.toLowerCase() === 's') {
                     e.preventDefault();
                     setShowGit(true);
-                } else if (e.key.toLowerCase() === 'x') {
-                    e.preventDefault();
-                    setShowGit(true);
                 }
             }
         }   

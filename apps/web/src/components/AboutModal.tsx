@@ -8,16 +8,20 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
 
     return (
         <div onClick={() => setIsOpen(false)} className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="w-full max-w-lg bg-[#111] border border-white/10 rounded-xl shadow-2xl overflow-hidden scale-100 animate-scaleIn relative">
-                <div className="p-8 flex flex-col items-center text-center">
-                    <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg">
-                        <img src="/logo.svg" alt="Logo" className="w-12 h-12" />
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-4xl bg-[#111] border border-white/10 rounded-xl shadow-2xl overflow-hidden scale-100 animate-scaleIn relative flex flex-col md:flex-row"
+            >
+                {/* Left Column: Main App Info */}
+                <div className="flex-1 p-8 flex flex-col items-center text-center justify-center border-b md:border-b-0 md:border-r border-white/10">
+                    <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-400 rounded-2xl mb-6 shadow-lg shadow-blue-500/20">
+                        <img src="/logo.svg" alt="Logo" className="w-14 h-14" />
                     </div>
 
                     {/* Title & Version */}
-                    <h2 className="text-3xl font-bold text-white mb-2 mt-2">
+                    <h2 className="text-3xl font-bold text-white mb-2">
                         Monorepo
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-400"> Time</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200"> Time</span>
                     </h2>
 
                     {/* Description */}
@@ -38,6 +42,36 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                         <span className="relative">Buy me a coffee</span>
                     </a>
                 </div>
+
+                {/* Right Column: Acknowledgments/Inspirations */}
+                <div className="w-full md:w-80 bg-white/5 p-8 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10">
+                    <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+                        <span className="text-white font-medium">Disclaimer:</span> Not affiliated with the projects below.
+                        We simply love these tools and provide templates to help you use them.
+                    </p>
+
+                    {/* Section 1: Core Stack */}
+                    <div className="mb-6">
+                        <h3 className="text-xs text-blue-400 uppercase tracking-widest font-bold mb-3">
+                            Powered By
+                        </h3>
+                        <AppLink name="OpenCode" url="https://opencode.ai" />
+                        <AppLink name="Turborepo" url="https://turbo.build/repo" />
+                        <AppLink name="Cloudflare" url="https://www.cloudflare.com" />
+                    </div>
+
+                    {/* Section 2: Templates */}
+                    <div>
+                        <h3 className="text-xs text-green-400 uppercase tracking-widest font-bold mb-3">
+                            Integrated Templates
+                        </h3>
+                        <AppLink name="n8n" url="https://n8n.io" />
+                        <AppLink name="LocalStack" url="https://localstack.cloud" />
+                        <AppLink name="DrawDB" url="https://drawdb.vercel.app" />
+                        <AppLink name="Penpot" url="https://penpot.app" />
+                        <AppLink name="Mattermost" url="https://mattermost.com" />
+                    </div>
+                </div>
             </div>
 
             <style>{`
@@ -48,5 +82,19 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                 .animate-scaleIn { animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
             `}</style>
         </div>
+    );
+}
+
+function AppLink({ name, url }: { name: string; url: string }) {
+    return (
+        <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between group p-2 rounded-lg hover:bg-white/5 transition-colors"
+        >
+            <span className="text-sm text-gray-400 group-hover:text-white transition-colors">{name}</span>
+            <i className="fas fa-external-link-alt text-xs text-gray-600 group-hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100" />
+        </a>
     );
 }

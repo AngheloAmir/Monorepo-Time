@@ -28,8 +28,6 @@ export default function Header() {
                         <i className="text-2xl fa-brands fa-git-alt text-blue-400 group-hover:text-blue-300"></i>
                         <span className="text-sm">Press 
                             <span className="font-bold text-white"> Ctrl + S </span> 
-                            or 
-                            <span className="font-bold text-white"> Ctrl + X </span> 
                             to open Git Panel
                         </span>
                     </button>
