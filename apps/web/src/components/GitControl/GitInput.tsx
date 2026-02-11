@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import useGitControlContext from "../../appstates/gitcontrol";
+import useAppState from "../../appstates/app";
 
 export default function GitInput() {
     const commitMessage    = useGitControlContext.use.commitMessage();
@@ -7,6 +8,7 @@ export default function GitInput() {
     const commitLoading    = useGitControlContext.use.commitLoading();
     const handleCommit     = useGitControlContext.use.handleCommit();
     const setCommitMessage = useGitControlContext.use.setCommitMessage();
+    const setShowGit       = useAppState.use.setShowGit();
     const ref              = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -15,7 +17,10 @@ export default function GitInput() {
 
     return (
         <div className="">
-            <form onSubmit={handleCommit} className="flex gap-2">
+            <form onSubmit={async (e) => {
+                await handleCommit(e);
+                setShowGit(false);
+            }} className="flex gap-2">
                 <input
                     ref={ref}
                     type="text"
