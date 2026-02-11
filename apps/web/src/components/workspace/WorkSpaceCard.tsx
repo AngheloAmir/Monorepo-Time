@@ -8,8 +8,8 @@ export default function WorkspaceCard(props: WorkspaceItem) {
     const setShowNewTerminalWindow = useWorkspaceState.use.setShowNewTerminalWindow();
 
     return (
-        <GradientBody className="rounded-lg overflow-hidden">
-            <header className="p-3 flex items-start gap-4 bg-white/6">
+        <GradientBody className="rounded overflow-hidden">
+            <header className="p-3 flex items-start gap-4 bg-blue-400/15">
                 <div className="w-10 h-10 rounded flex items-center justify-center border border-white/10">
                     <i className={`text-xl ${props.info.fontawesomeIcon ?? 'text-gray-400 fa fa-cube'}`}></i>
                 </div>
@@ -37,7 +37,7 @@ export default function WorkspaceCard(props: WorkspaceItem) {
 
             </header>
 
-            <div className="mt-auto p-3 bg-gray-800/10 flex gap-2 relative">
+            <div className="mt-auto p-3 bg-blue-400/5 flex gap-2 relative">
                 <WorkSpaceCardButtons {...props} />
             </div>
         </GradientBody>
