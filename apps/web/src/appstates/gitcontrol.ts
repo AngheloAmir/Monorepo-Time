@@ -9,10 +9,16 @@ export interface GitHistory {
     date: string;
 }
 
+interface GitBranch {
+    name: string;
+    isCurrent: boolean;
+}
+
 interface gitControlContext {
     loading: boolean;
     history: GitHistory[];
     branch: string;
+    branches: GitBranch[];
     commitMessage: string;
     selectedCommit: GitHistory | null;
     commitLoading: boolean;
@@ -24,12 +30,18 @@ interface gitControlContext {
     fetchData: () => Promise<void>;
     handleCommit: (e?: React.FormEvent) => Promise<void>;
     handleRevert: () => Promise<void>;
+
+    checkoutBranch: (name: string) => Promise<void>;
+    createBranch: (name: string) => Promise<void>;
+    deleteBranch: (name: string) => Promise<void>;
+    mergeBranch: (name: string) => Promise<void>;
 }
 
 const gitControlContext = create<gitControlContext>()((set, get) => ({
     loading: false,
     history: [],
     branch: "",
+    branches: [],
     commitMessage: "",
     selectedCommit: null,
     commitLoading: false,
@@ -40,30 +52,110 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
 
     fetchData: async () => {
         if(config.useDemo) {
-            set({ history: [{
-                hash:    "demo-hash",
-                message: "demo-message",
-                date:    "demo-date"
-            }], branch: "demo-branch", loading: false });
+            set({ 
+                history: [{
+                    hash:    "demo-hash",
+                    message: "demo-message",
+                    date:    "demo-date"
+                }], 
+                branch: "demo-branch", 
+                branches: [{ name: "demo-branch", isCurrent: true }, { name: "demo-dev", isCurrent: false }],
+                loading: false 
+            });
             return;
         }
 
         set({ loading: true });
         try {
-            const [historyRes, branchRes] = await Promise.all([
+            const [historyRes, branchRes, branchesRes] = await Promise.all([
                 fetch(`${config.serverPath}${apiRoute.gitControl}/history`),
-                fetch(`${config.serverPath}${apiRoute.gitControl}/branch`)
+                fetch(`${config.serverPath}${apiRoute.gitControl}/branch`),
+                fetch(`${config.serverPath}${apiRoute.gitControl}/branches`)
             ]);
 
             const historyData = await historyRes.json();
             const branchData = await branchRes.json();
+            const branchesData = await branchesRes.json();
 
             set({
                 history: historyData.history || [],
-                branch: branchData.branch || ""
+                branch: branchData.branch || "",
+                branches: branchesData.branches || []
             });
         } catch (error) {
             console.error("Failed to fetch git data", error);
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    checkoutBranch: async (branchName: string) => {
+        if(config.useDemo) return;
+        set({ loading: true });
+        try {
+            await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/checkout`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ branch: branchName })
+            });
+            await get().fetchData();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to checkout branch");
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    createBranch: async (branchName: string) => {
+        if(config.useDemo) return;
+        set({ loading: true });
+        try {
+            await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/create`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ branch: branchName })
+            });
+            await get().fetchData();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to create branch");
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    deleteBranch: async (branchName: string) => {
+        if(config.useDemo) return;
+        if(!confirm(`Are you sure you want to delete branch ${branchName}?`)) return;
+
+        set({ loading: true });
+        try {
+            await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/delete`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ branch: branchName })
+            });
+            await get().fetchData();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to delete branch");
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    mergeBranch: async (branchName: string) => {
+        if(config.useDemo) return;
+        if(!confirm(`Are you sure you want to merge ${branchName} into current branch?`)) return;
+        
+        set({ loading: true });
+        try {
+            await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/merge`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ branch: branchName })
+            });
+            await get().fetchData();
+        } catch (e) {
+            console.error(e);
+            alert("Failed to merge branch");
         } finally {
             set({ loading: false });
         }

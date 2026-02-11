@@ -1,26 +1,23 @@
+import { useEffect, useRef } from "react";
 import useGitControlContext from "../../appstates/gitcontrol";
 
 export default function GitInput() {
-    const branch           = useGitControlContext.use.branch();
     const commitMessage    = useGitControlContext.use.commitMessage();
     const loading          = useGitControlContext.use.loading();
     const commitLoading    = useGitControlContext.use.commitLoading();
     const handleCommit     = useGitControlContext.use.handleCommit();
     const setCommitMessage = useGitControlContext.use.setCommitMessage();
-    
+    const ref              = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        ref.current?.focus();
+    }, []);
+
     return (
         <div className="">
-            <div className="flex items-center gap-2 my-1 px-1">
-                <span className="text-xs font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-                    Commiting to branch:
-                    <span className="mx-1 text-blue-500">
-                        {branch || "..."}
-                    </span>
-                </span>
-            </div>
-
             <form onSubmit={handleCommit} className="flex gap-2">
                 <input
+                    ref={ref}
                     type="text"
                     value={commitMessage}
                     onChange={(e) => setCommitMessage(e.target.value)}

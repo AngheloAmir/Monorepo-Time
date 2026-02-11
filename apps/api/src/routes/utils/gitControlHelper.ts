@@ -103,6 +103,71 @@ router.post('/revert', async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 });
+ 
+router.get('/branches', async (req: Request, res: Response) => {
+    try {
+        // List local branches, marking current with *
+        const output = await runGit('git branch --list');
+        const branches = output.split('\n').filter(Boolean).map(line => {
+             const isCurrent = line.startsWith('*');
+             const name = line.replace('*', '').trim();
+             return { name, isCurrent };
+        });
+        res.json({ branches });
+    } catch (error: any) {
+        console.error("Git Branches Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/branch/checkout', async (req: Request, res: Response) => {
+    try {
+        const { branch } = req.body;
+        if (!branch) return res.status(400).json({ error: "Branch name is required" });
+        await runGit(`git checkout ${branch}`);
+        res.json({ success: true, message: `Switched to branch ${branch}` });
+    } catch (error: any) {
+        console.error("Git Checkout Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/branch/create', async (req: Request, res: Response) => {
+    try {
+        const { branch } = req.body;
+        if (!branch) return res.status(400).json({ error: "Branch name is required" });
+        await runGit(`git checkout -b ${branch}`);
+        res.json({ success: true, message: `Created and switched to branch ${branch}` });
+    } catch (error: any) {
+        console.error("Git Create Branch Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/branch/delete', async (req: Request, res: Response) => {
+    try {
+        const { branch } = req.body;
+        if (!branch) return res.status(400).json({ error: "Branch name is required" });
+        // -D force delete
+        await runGit(`git branch -D ${branch}`);
+        res.json({ success: true, message: `Deleted branch ${branch}` });
+    } catch (error: any) {
+        console.error("Git Delete Branch Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/branch/merge', async (req: Request, res: Response) => {
+    try {
+        const { branch } = req.body;
+        if (!branch) return res.status(400).json({ error: "Branch name is required" });
+        await runGit(`git merge ${branch}`);
+        res.json({ success: true, message: `Merged branch ${branch}` });
+    } catch (error: any) {
+        console.error("Git Merge Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 router.post('/push', async (req: Request, res: Response) => {
     try {

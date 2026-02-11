@@ -18,7 +18,7 @@ import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
 import OpenCode from './components/app_contents/OpenCode';
-import GitControl from './components/GitControl/GitControl';
+import GitPanel from './components/GitControl/GitPanel';
 
 declare global {
     interface Window {
@@ -39,9 +39,14 @@ export default function App() {
 
     useEffect(() => {   
         const handleKeyDown = (e: KeyboardEvent) => {
-            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-                e.preventDefault();
-                setShowGit(true);
+            if ((e.ctrlKey || e.metaKey)) {
+                if (e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    setShowGit(true);
+                } else if (e.key.toLowerCase() === 'x') {
+                    e.preventDefault();
+                    setShowGit(true);
+                }
             }
         }   
         window.addEventListener('keydown', handleKeyDown, { capture: true });
@@ -155,7 +160,7 @@ export default function App() {
             <Modal />
             <RootTerminal />
             <AboutModal isOpen={showAboutModal} setIsOpen={() => setShowAboutModal(false)} />
-            <GitControl />                
+            <GitPanel />                
         </div>
     )
 }
