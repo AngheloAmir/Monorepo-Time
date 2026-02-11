@@ -30,6 +30,10 @@ interface Props {
     wrapperClassName?: string;
     transparent?: boolean;
     diffMarkers?: DiffMarkers;
+
+    onSave?: () => void;
+    rightClickMenu?: (line: number, column: number, selectedText: string, selection?: { startLine: number; endLine: number }) => void;
+    contextMenuComponent?: React.ReactNode;
 }
 
 export default function CustomAceEditor({
@@ -44,11 +48,29 @@ export default function CustomAceEditor({
     wrapperClassName,
     transparent = false,
     diffMarkers,
+
+    onSave,
+    rightClickMenu,
+    contextMenuComponent,
 }: Props) {
     const [focused, setFocused] = useState(false);
     const [editorId] = useState(() => `ace-editor-${Math.random()}`);
     const editorRef = useRef<AceEditor | null>(null);
     const markerIdsRef = useRef<number[]>([]);
+    const [contextMenuPos, setContextMenuPos] = useState<{ x: number; y: number } | null>(null);
+    const contextMenuRef = useRef<HTMLDivElement>(null);
+
+    // Close context menu on click outside
+    useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+            if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as Node)) {
+                setContextMenuPos(null);
+            }
+        };
+        // Use mousedown to capture clicks before other components can stop propagation
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, []);
 
     // Apply diff markers when they change
     useEffect(() => {
@@ -80,6 +102,41 @@ export default function CustomAceEditor({
         });
     }, [diffMarkers]);
 
+
+    // Handle Right Click Menu
+    useEffect(() => {
+        if (!editorRef.current || (!rightClickMenu && !contextMenuComponent)) return;
+
+        const editor = editorRef.current.editor;
+        const container = editor.container;
+
+        const handleContextMenu = (e: MouseEvent) => {
+            e.preventDefault();
+            const { clientX, clientY } = e;
+            const pos = editor.renderer.screenToTextCoordinates(clientX, clientY);
+            
+            if (rightClickMenu) {
+                const selectedText = editor.getSelectedText();
+                const selectionRange = editor.getSelectionRange();
+                const selection = selectedText ? {
+                    startLine: selectionRange.start.row + 1,
+                    endLine: selectionRange.end.row + 1
+                } : undefined;
+                
+                rightClickMenu(pos.row + 1, pos.column, selectedText, selection);
+            }
+            
+            if (contextMenuComponent) {
+                setContextMenuPos({ x: clientX, y: clientY });
+            }
+        };
+
+        container.addEventListener("contextmenu", handleContextMenu);
+
+        return () => {
+            container.removeEventListener("contextmenu", handleContextMenu);
+        };
+    }, [rightClickMenu, contextMenuComponent]);
     return (
         <div className={`h-full w-full ${wrapperClassName || ""}`}>
             {/* Diff marker styles */}
@@ -119,6 +176,19 @@ export default function CustomAceEditor({
                     `}
                 </style>
             )}
+            {contextMenuComponent && contextMenuPos && (
+                <div
+                    ref={contextMenuRef}
+                    style={{
+                        position: "fixed",
+                        top: contextMenuPos.y,
+                        left: contextMenuPos.x,
+                        zIndex: 9999,
+                    }}
+                >
+                    {contextMenuComponent}
+                </div>
+            )}
             <AceEditor
                 ref={editorRef}
                 mode={mode}
@@ -126,6 +196,15 @@ export default function CustomAceEditor({
                 onChange={onChange}
                 value={value}
                 name={editorId}
+                commands={[
+                    {
+                        name: "save",
+                        bindKey: { win: "Ctrl-S", mac: "Command-S" },
+                        exec: () => {
+                            if (onSave) onSave();
+                        },
+                    },
+                ]}
                 editorProps={{ $blockScrolling: true }}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}

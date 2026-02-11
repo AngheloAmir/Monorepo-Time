@@ -42,7 +42,7 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     }}
                     draggable
                     onDragStart={(e) => {
-                        e.dataTransfer.setData("text/plain", "@" + folder.path);
+                        e.dataTransfer.setData("text/plain", `@${folder.path} \n`);
                         e.dataTransfer.effectAllowed = "copy";
                     }}
                 >
@@ -91,7 +91,7 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                 style={{ paddingLeft: `${paddingLeft}px` }}
                 draggable
                 onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", "@" + file.path);
+                    e.dataTransfer.setData("text/plain", `@${file.path} \n`);
                     e.dataTransfer.effectAllowed = "copy";
                 }}
                 onClick={(e) => {

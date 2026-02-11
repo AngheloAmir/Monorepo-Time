@@ -374,7 +374,26 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
         };
     }, []);
 
+    useEffect(() => {
+        const handleCustomType = (e: CustomEvent) => {
+            const text = e.detail;
+            if (typeof text === 'string' && onDataRef.current) {
+                onDataRef.current(text);
+                xtermRef.current?.focus();
+            }
+        };
+
+        window.addEventListener('opencode:terminal:type', handleCustomType as EventListener);
+        return () => {
+            window.removeEventListener('opencode:terminal:type', handleCustomType as EventListener);
+        };
+    }, []);
+
     return (
-        <div className="h-full w-full overflow-hidden bg-transparent box-border [&_.xterm-viewport::-webkit-scrollbar]:hidden" ref={divRef} />
+        <div
+            id="opencode-terminal"
+            className="h-full w-full overflow-hidden bg-transparent box-border [&_.xterm-viewport::-webkit-scrollbar]:hidden"
+            ref={divRef}
+        />
     );
 });

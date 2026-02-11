@@ -1,5 +1,5 @@
 import useCrudState from "../../appstates/crud";
-import CustomAceEditor from "./CustomAceEditor";
+import CustomAceEditor from "../CustomAceEditor";
 
 interface CodeExampleProps {
     isOpen: boolean;

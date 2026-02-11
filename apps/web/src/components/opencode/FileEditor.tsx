@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useProjectState from "../../appstates/project";
-import CustomAceEditor from "../crud/CustomAceEditor";
+import CustomAceEditor from "../CustomAceEditor";
 import Button3 from "../ui/Button3";
 import ButtonDefault from "../ui/ButtonDefault";
 import ModalBody from "../ui/ModalBody";
@@ -23,6 +23,7 @@ export default function FileEditor() {
     const getFileDiff      = useProjectState.use.getFileDiff();
     const [textContent, setTextContent] = useState('');
     const [diffMarkers, setDiffMarkers] = useState<DiffMarkers | undefined>(undefined);
+    const [selectedLines, setSelectedLines] = useState<{ start: number; end: number } | undefined>(undefined);
 
     useEffect(() => {
         if(isFileEditorOpen && currentFilePath) {
@@ -71,20 +72,57 @@ export default function FileEditor() {
                         setTextContent(value);
                     }}
                     diffMarkers={diffMarkers}
+                    onSave={() => {
+                        if (!currentFilePath) return;
+                        saveFile(currentFilePath, textContent);
+                        closeFileEditor();
+                        loadProjectTree();
+                    }}
+                    rightClickMenu={(_line :any, _column :any, _selectedText :any, selection :any) => {
+                        if (selection) {
+                            setSelectedLines({
+                                start: selection.startLine,
+                                end:   selection.endLine
+                            });
+                        }
+                    }}
+                    contextMenuComponent={
+                        <div className="bg-gray-800 w-[200px] p-2 rounded-md">
+                            <button className="flex gap-2 w-full text-left p-2 rounded-md hover:bg-gray-700"
+                                onClick={() => {
+                                    if (!currentFilePath) return;
+                                    const event = new CustomEvent('opencode:terminal:type', {
+                                        detail: "@" + 
+                                                currentFilePath + 
+                                                " Lines: " + 
+                                                selectedLines?.start + 
+                                                " - " + 
+                                                selectedLines?.end
+                                                + "\n"
+                                    });
+                                    window.dispatchEvent(event);
+                                    closeFileEditor();
+                                }}
+                            >
+                                <i className="fa-solid fa-code"></i>
+                                <span className="text-sm">Chat About This</span>
+                            </button>
+                        </div>
+                    }
                 />
             </div>
 
             <div className="flex justify-end gap-2 p-3">
                 <ButtonDefault onClick={() => closeFileEditor()} text="Close" />
                 <Button3 
-                    className="w-[150px]"
+                    className="w-[200px]"
                     onClick={() => {
                         if (!currentFilePath) return;
                         saveFile(currentFilePath, textContent);
                         closeFileEditor();
                         loadProjectTree();
                     }}
-                    text="Save"
+                    text="Save (Ctrl + S)"
                     icon="fa-solid fa-floppy-disk"
                 />
             </div>
