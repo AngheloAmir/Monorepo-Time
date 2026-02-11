@@ -13,6 +13,7 @@ export default function GitPanel() {
     const selectedCommit = useGitControlContext.use.selectedCommit();
     const showGit        = useAppState.use.showGit();
     const setShowGit     = useAppState.use.setShowGit();
+    const commitLoading  = useGitControlContext.use.commitLoading();
 
     useEffect(() => {
         if(showGit) fetchData();
@@ -28,7 +29,9 @@ export default function GitPanel() {
                 close={() => setShowGit(false)}
             />
             
-            <div className="flex bg-[#0c0c0c] h-[500px] divide-x divide-white/10">
+            <div className="flex bg-[#0c0c0c] h-[500px] divide-x divide-white/10"
+                aria-disabled={commitLoading}
+            >
                 <div className="w-[280px] flex-shrink-0 bg-black/20">
                     <GitBranches />
                 </div>
