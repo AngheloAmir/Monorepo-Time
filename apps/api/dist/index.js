@@ -95072,14 +95072,11 @@ router23.get("/", async (req, res) => {
   res.send("Interactive Terminal Route");
 });
 var opencodeTerminal_default = router23;
-var activeOpencodeTerminal = null;
-function stopOpencodeTerminalProcess(socketId) {
+var activeTerminals2 = /* @__PURE__ */ new Map();
+function stopTerminalSession(socketId) {
   var _a2, _b2;
-  const session = activeOpencodeTerminal;
+  const session = activeTerminals2.get(socketId);
   if (session) {
-    if (socketId && session.socket.id !== socketId) {
-      return false;
-    }
     const { child, ptyProcess, socket } = session;
     if (socket.connected) {
       socket.emit("opencode:log", "\r\n\x1B[33m[System] Stopping interactive terminal process...\x1B[0m\r\n");
@@ -95093,7 +95090,7 @@ function stopOpencodeTerminalProcess(socketId) {
     if (ptyProcess) {
       ptyProcess.kill();
     }
-    activeOpencodeTerminal = null;
+    activeTerminals2.delete(socketId);
     return true;
   }
   return false;
@@ -95103,7 +95100,7 @@ function opencodeTerminalSocket(io3) {
     socket.on("opencode:start", (data) => {
       var _a2, _b2;
       const { path: path39, command: command2, workspaceName } = data;
-      stopOpencodeTerminalProcess();
+      stopTerminalSession(socket.id);
       try {
         const env = { ...process.env };
         delete env.CI;
@@ -95121,7 +95118,7 @@ function opencodeTerminalSocket(io3) {
             cwd: path39,
             env
           });
-          activeOpencodeTerminal = { ptyProcess, workspaceName, socket };
+          activeTerminals2.set(socket.id, { ptyProcess, workspaceName, socket });
           ptyProcess.onData((data2) => {
             socket.emit("opencode:log", data2);
           });
@@ -95131,7 +95128,7 @@ function opencodeTerminalSocket(io3) {
 Process exited with code ${exitCode}`);
             }
             socket.emit("opencode:exit", exitCode || 0);
-            cleanup();
+            cleanup(socket.id);
           });
         } else {
           env.CMD = command2;
@@ -95229,7 +95226,7 @@ except Exception as e:
           if (child.stdio[3]) {
             controlPipe = child.stdio[3];
           }
-          activeOpencodeTerminal = { child, workspaceName, socket, controlPipe };
+          activeTerminals2.set(socket.id, { child, workspaceName, socket, controlPipe });
           (_a2 = child.stdout) == null ? void 0 : _a2.on("data", (chunk) => {
             socket.emit("opencode:log", chunk.toString());
           });
@@ -95242,7 +95239,7 @@ except Exception as e:
             } else {
               socket.emit("opencode:error", `Failed to start command: ${err.message}`);
             }
-            cleanup();
+            cleanup(socket.id);
           });
           child.on("exit", (code) => {
             if (code === 127 && process.platform !== "win32") {
@@ -95252,18 +95249,18 @@ except Exception as e:
 Process exited with code ${code}`);
             }
             socket.emit("opencode:exit", code || 0);
-            cleanup();
+            cleanup(socket.id);
           });
         }
       } catch (error) {
         socket.emit("opencode:error", `Error handling command: ${error.message}`);
         socket.emit("opencode:error", `Error handling command: ${error.message}`);
-        cleanup();
+        cleanup(socket.id);
       }
     });
     socket.on("opencode:input", (input) => {
-      const session = activeOpencodeTerminal;
-      if (session && session.socket.id === socket.id) {
+      const session = activeTerminals2.get(socket.id);
+      if (session) {
         if (session.child && session.child.stdin) {
           session.child.stdin.write(input);
         } else if (session.ptyProcess) {
@@ -95272,8 +95269,8 @@ Process exited with code ${code}`);
       }
     });
     socket.on("opencode:resize", (data) => {
-      const session = activeOpencodeTerminal;
-      if (session && session.socket.id === socket.id) {
+      const session = activeTerminals2.get(socket.id);
+      if (session) {
         if (session.controlPipe) {
           try {
             session.controlPipe.write(`${data.rows} ${data.cols}`);
@@ -95288,14 +95285,10 @@ Process exited with code ${code}`);
       }
     });
     socket.on("disconnect", () => {
-      stopOpencodeTerminalProcess(socket.id);
+      stopTerminalSession(socket.id);
     });
     function cleanup(socketId) {
-      if (activeOpencodeTerminal) {
-        if (!socketId || activeOpencodeTerminal.socket.id === socketId) {
-          activeOpencodeTerminal = null;
-        }
-      }
+      activeTerminals2.delete(socketId);
     }
   });
 }
