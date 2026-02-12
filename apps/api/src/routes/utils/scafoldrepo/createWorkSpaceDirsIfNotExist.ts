@@ -1,23 +1,14 @@
 import fs from "fs-extra";
 import path from "path";
 import { ROOT } from "../rootPath";
-
-const packageJsonPath = path.join(ROOT, "package.json");
 const SCAFFOLD_DIR = path.join(__dirname, '../scaffold');
 
 export default async function CreateWorkSpaceDirsIfNotExist() {
-    if (!fs.existsSync(packageJsonPath)) return;
-
-    const pkg = await fs.readJson(packageJsonPath);
-    const workspaces = Array.isArray(pkg.workspaces) ? pkg.workspaces : [];
-    const shouldCreateApps = workspaces.some((w: string) => w.startsWith("apps/") || w === "apps");
-    const shouldCreatePackages = workspaces.some((w: string) => w.startsWith("packages/") || w === "packages");
-
-    if (shouldCreateApps) {
+    if (!fs.existsSync(path.join(ROOT, 'apps'))) {
         await fs.ensureDir(path.join(ROOT, 'apps'));
     }
 
-    if (shouldCreatePackages) {
+    if (!fs.existsSync(path.join(ROOT, 'packages'))) {
         await fs.ensureDir(path.join(ROOT, 'packages'));
         const typesPackagePath = path.join(ROOT, "packages", "types");
         if (!fs.existsSync(typesPackagePath)) {

@@ -27,11 +27,6 @@ export default async function AddPackageJsonIfNotExist() {
         console.log("[scafoldrepo] Creating package.json");
     }
 
-    if (!pkg.workspaces || (Array.isArray(pkg.workspaces) && pkg.workspaces.length === 0)) {
-        pkg.workspaces = ["apps/*", "packages/*"];
-        save = true;
-    }
-
     if (!pkg.packageManager) {
         const getVersion = async (cmd: string) => {
             return new Promise<string | null>((resolve) => {
