@@ -17,11 +17,11 @@ export default function Orchestrator() {
                 title="Agent Orchestrator"
                 description="Design and execute multi-agent workflows." />
             <div className="flex h-[500px]">
-                <div className="w-[250px] bg-red-500 flex-shrink-0">
+                <div className="w-[250px] flex-shrink-0">
                     <OpencodeAgents />
                 </div>
 
-                <div className="flex-1 bg-green-500 flex flex-col min-w-0">
+                <div className="flex-1 flex flex-col min-w-0">
                     <Workflow />
                 </div>
 
