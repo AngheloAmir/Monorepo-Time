@@ -160,5 +160,5 @@ export interface AvailbleTemplates {
     demo:       ProjectTemplate[],
 }
 
-import { OpenCodeAgentConfig } from "./opencodeagent";
+import type { OpenCodeAgentConfig } from "./opencodeagent";
 export type { OpenCodeAgentConfig };

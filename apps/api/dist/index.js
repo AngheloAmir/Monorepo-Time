@@ -94992,6 +94992,7 @@ router22.get("/check", async (req, res) => {
   }
 });
 router22.get("/install", async (req, res) => {
+  var _a2;
   try {
     const opencodeJsonPath = import_path28.default.join(ROOT3, "opencode.json");
     let isInstalled = false;
@@ -95010,7 +95011,14 @@ router22.get("/install", async (req, res) => {
       }
     }
     if (!isInstalled) {
-      await execa("npm", ["install", "-g", "opencode-ai"]);
+      try {
+        await execa("npm", ["install", "-g", "opencode-ai"]);
+      } catch (error) {
+        if (error.message.includes("EACCES") || error.message.includes("permission denied") || ((_a2 = error.stderr) == null ? void 0 : _a2.includes("EACCES"))) {
+          throw new Error("Installation requires administrative permissions. Please run 'npm install -g opencode-ai' manually in your terminal.");
+        }
+        throw error;
+      }
     }
     if (!await import_fs_extra21.default.pathExists(opencodeJsonPath)) {
       await import_fs_extra21.default.writeFile(opencodeJsonPath, opencodeJson_default.trim(), "utf-8");
