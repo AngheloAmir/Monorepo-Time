@@ -63,14 +63,14 @@ export default function Cloudflare(props: CloudflareProps) {
     }
 
     return (
-        <div className={`h-[92%] w-full p-4 gap-6 ${props.isVisible ? 'flex' : 'hidden'}`}>
+        <div className={`h-full w-full p-2 gap-2 ${props.isVisible ? 'flex' : 'hidden'}`}>
             <div className="w-[360px] lg:w-[440px] xl:w-[480px]  flex-none h-full flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                     <TransparentCard title="Cloudflare" description="Commands" contentClassName="flex flex-col py-2 px-6">
                         <Button2
                             onClick={startTunnel}
                             name="Generate Tunnel"
-                            description="cloudflared tunnel"
+                            description="cloudflared tunnel"    
                             color="blueIndigo"
                             icon="fas fa-cloud"
                             disabled={isRunning}

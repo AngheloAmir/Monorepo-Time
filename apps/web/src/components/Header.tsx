@@ -13,7 +13,7 @@ export default function Header() {
                     <div>
                         <h1 className="text-md font-space tracking-tight text-white font-medium">
                             Monorepo
-                            <span className="font-bold pl-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
+                            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">
                                 Time
                             </span>
                         </h1>

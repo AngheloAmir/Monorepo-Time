@@ -88,7 +88,7 @@ export default function OpenCode(props: CloudflareProps) {
     }, [props.isVisible]);
 
     return (
-        <div className={`h-[92%] w-full p-4 gap-2 ${props.isVisible ? 'flex' : 'hidden'} ${isResizing ? 'select-none cursor-col-resize' : ''}`}>
+        <div className={`h-full w-full p-2 gap-2 ${props.isVisible ? 'flex' : 'hidden'} ${isResizing ? 'select-none cursor-col-resize' : ''}`}>
             <div className="flex flex-col gap-3 h-full min-h-0 overflow-y-auto shrink-0" style={{ width: sidebarWidth }}>
                 <ProjectBrowser />
             </div>

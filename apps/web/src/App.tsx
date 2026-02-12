@@ -77,7 +77,7 @@ export default function App() {
         <div className='w-screen h-screen overflow-hidden bg-[#090909] relative'>
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute -top-[20%]    -left-[10%]  w-[70%] h-[50%] bg-blue-600/8 rounded-full blur-[160px]"></div>
-                {/* <div className="absolute -bottom-[25%] -right-[10%]  w-[70%] h-[50%] bg-blue-500/7 rounded-full blur-[160px]"></div> */}
+                <div className="absolute -bottom-[35%] -right-[25%]  w-[70%] h-[50%] bg-blue-500/7 rounded-full blur-[160px]"></div>
             </div>
 
             <Header />
@@ -140,7 +140,7 @@ export default function App() {
                 />
 
                 <main className="flex-1 relative overflow-hidden">
-                    <div id="app-content" className="w-full max-w-[2100px] mx-auto h-full relative z-10">
+                    <div id="app-content" className="w-full h-full pb-8 relative">
                         <Home isVisible={currentPage === "dashboard"} />
                         <Workspace isVisible={currentPage === "workspace"} />
                         <OpenCode isVisible={currentPage === "open-code"} />

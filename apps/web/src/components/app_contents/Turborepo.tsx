@@ -100,13 +100,11 @@ export default function Turborepo(props: TurborepoProps) {
     }
 
     return (
-        <div className={`h-[92%] w-full p-4 gap-6 ${props.isVisible ? 'flex' : 'hidden'}`}>
-            {/* Left Panel - Commands */}
-            <div className="w-[360px] lg:w-[440px] xl:w-[480px]  flex-none h-full flex flex-col overflow-hidden">
-                {/* Tutorial Button - Top Card */}
+        <div className={`h-full w-full p-2 gap-2 ${props.isVisible ? 'flex' : 'hidden'}`}>
+            <div className="w-[360px] lg:w-[440px] xl:w-[480px] flex-none h-full flex flex-col overflow-hidden">
                 <button
                     onClick={() => setShowTutorial(true)}
-                    className="mb-4 w-full p-3 rounded-lg border border-blue-500/20 
+                    className="mb-4 p-2 w-full rounded-lg border border-blue-500/20 
                                hover:border-blue-500/40 hover:from-blue-500/20 hover:to-purple-500/20
                                transition-all duration-300 group"
                 >

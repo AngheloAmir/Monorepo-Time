@@ -62,7 +62,7 @@ export default function Workspace(props: WorkspaceProps) {
         <>
             {props.isVisible && <WorkspaceTabToggle whichShow={whichShow} setWhichShow={setWhichShow} />}
 
-            <div className={`relative flex flex-col w-full h-[calc(100vh-54px)] ${props.isVisible ? '' : 'hidden'}`}>
+            <div className={`relative flex flex-col w-full h-full ${props.isVisible ? '' : 'hidden'}`}>
                 <div className="flex flex-col h-full min-h-0">
 
                     <div className={`flex-1 min-h-0 flex overflow-hidden p-2 transition-all duration-500 ${isTerminalMaximized ? 'opacity-0 h-0 pointer-events-none' : 'opacity-100'}`}>

@@ -21,7 +21,7 @@ export default function ColorPallette(props: ColorPalletteProps) {
     if (!props.isVisible) return null;
 
     return (
-        <div className="flex flex-col h-full w-full pb-8 px-4 overflow-y-auto gap-8">
+        <div className="flex flex-col h-full w-full px-4 overflow-y-auto gap-8">
             <h1 className="text-2xl font-bold text-gray-200 mb-4">Color Palette Analysis</h1>
             
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
