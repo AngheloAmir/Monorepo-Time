@@ -11,7 +11,7 @@ interface TabTerminalHeaderProps {
 
 export default function TabTerminalHeader({ tabs, activeTabId, setActiveTabId, closeTab, addTab }: TabTerminalHeaderProps) {
     return (
-        <div className="flex items-center overflow-x-auto">
+        <div className="flex items-center">
             {tabs.map(tab => (
                 <div
                     key={tab.id}
@@ -27,13 +27,17 @@ export default function TabTerminalHeader({ tabs, activeTabId, setActiveTabId, c
             `}
                 >
                     <span className="truncate text-sm flex-1">{tab.title}</span>
-                    {tabs.length > 1 && (
+                    {tabs.length > 1 ? (
                         <button
                             onClick={(e) => closeTab(tab.id, e)}
                             className="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity p-0.5 rounded"
                         >
                             <i className="fa-solid fa-times text-xs"></i>
                         </button>
+                    ) : (
+                        <div className="opacity-0 p-0.5">
+                            <i className="fa-solid fa-times text-xs"></i>
+                        </div>
                     )}
                 </div>
             ))}
