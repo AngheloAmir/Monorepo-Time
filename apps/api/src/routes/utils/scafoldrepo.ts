@@ -2,12 +2,27 @@ import { Request, Response, Router } from "express";
 import fs from "fs-extra";
 import path from "path";
 import { exec } from "child_process";
-import { ROOT } from "../utils/rootPath";
+import { ROOT } from "./rootPath";
 
 const router = Router();
 const packageJsonPath = path.join(ROOT, "package.json");
 const turboJsonPath   = path.join(ROOT, "turbo.json");
 const SCAFFOLD_DIR    = path.join(__dirname, 'scaffold');
+
+
+// if (!packageJson.packageManager) {
+//       // Get version of the package manager
+//       try {
+//         const { stdout } = await execa(pm, ['--version'], { shell: true });
+//         const version = stdout.trim();
+//         packageJson.packageManager = `${pm}@${version}`;
+//         console.log(chalk.green(`Added "packageManager": "${pm}@${version}" to package.json`));
+//       } catch (e) {
+//         // If version check fails, default to generic latest or skip
+//         packageJson.packageManager = `${pm}@latest`;
+//         console.log(chalk.yellow(`Could not detect ${pm} version, defaulting to "latest"`));
+//       }
+//     }
 
 router.get("/", async (req: Request, res: Response) => {
     try {
@@ -29,17 +44,64 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 async function AddWorkspaceToPackageJsonIfNotExist() {
-    const pkg = await fs.readJson(packageJsonPath);
-    let changed = false;
+    let pkg: any = {};
+    let save = false;
+
+    if (fs.existsSync(packageJsonPath)) {
+        pkg = await fs.readJson(packageJsonPath);
+    } else {
+        const rootDirName = path.basename(ROOT).replace(/\s+/g, '-');
+        pkg = {
+            name: rootDirName,
+            private: true,
+            scripts: {
+                "build": "turbo run build",
+                "dev": "turbo run dev",
+                "lint": "turbo run lint",
+                "format": "prettier --write \"**/*.{ts,tsx,md}\""
+            }
+        };
+        save = true;
+        console.log("[scafoldrepo] Creating package.json");
+    }
 
     if (!pkg.workspaces || (Array.isArray(pkg.workspaces) && pkg.workspaces.length === 0)) {
         pkg.workspaces = ["apps/*", "packages/*"];
-        changed = true;
+        save = true;
     }
 
-    if (changed) {
+    if (!pkg.packageManager) {
+        const getVersion = async (cmd: string) => {
+            return new Promise<string | null>((resolve) => {
+                exec(`${cmd} --version`, (err, stdout) => {
+                    if (err) resolve(null);
+                    else resolve(stdout.trim());
+                });
+            });
+        };
+
+        const pnpmv = await getVersion('pnpm');
+        const yarnv = await getVersion('yarn');
+        const bunv = await getVersion('bun');
+        const npmv = await getVersion('npm');
+
+        if (pnpmv) {
+            pkg.packageManager = `pnpm@${pnpmv}`;
+        } else if (yarnv) {
+             pkg.packageManager = `yarn@${yarnv}`;
+        } else if (bunv) {
+             pkg.packageManager = `bun@${bunv}`;
+        } else if (npmv) {
+             pkg.packageManager = `npm@${npmv}`;
+        } else {
+            pkg.packageManager = "npm@latest";
+        }
+        save = true;
+    }
+
+    if (save) {
         await fs.writeJson(packageJsonPath, pkg, { spaces: 2 });
-        console.log("[scafoldrepo] Updated package.json workspaces");
+        console.log("[scafoldrepo] Updated package.json");
     }
 }
 

@@ -2,7 +2,7 @@
 import { Request, Response, Router } from "express";
 import fs from "fs-extra";
 import path from "path";
-import { ROOT } from "../utils/rootPath";
+import { ROOT } from "./rootPath";
 
 const router = Router();
 
