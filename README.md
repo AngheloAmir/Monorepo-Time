@@ -163,6 +163,4 @@ monorepotime init
 ![Development Tools](./docs/preview3.jpg)
 
 ## License
-
-ISC License - see LICENSE file for details.
-
+Distributed under the ISC License.

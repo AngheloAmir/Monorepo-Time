@@ -181,7 +181,7 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
                         });
                     }}
                     title="Restart OpenCode"
-                    className="absolute -top-5 right-3 z-200 p-2
+                    className="absolute -top-5 right-3 z-10 p-2
                         bg-gradient-to-br from-blue-600/30 to-blue-400/30 rounded 
                         text-gray-400 hover:text-white text-xs font-medium
                         cursor-pointer"
