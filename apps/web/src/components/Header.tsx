@@ -1,9 +1,11 @@
 import useAppState from "../appstates/app";
 import Logo from "./Logo";
+import useOrchestrator from "../appstates/orchestrator";
 
 export default function Header() {
     const setShowAboutModal = useAppState.use.setShowAboutModal();
     const setShowGit = useAppState.use.setShowGit();
+    const setShowOrchestrator = useOrchestrator.use.setShowOrchestrator();
 
     return (
         <header className="h-7 w-full px-6 py-2 sticky top-0">
@@ -26,9 +28,20 @@ export default function Header() {
                         className="flex items-center gap-2 px-2 rounded text-gray-300 hover:text-white hover:bg-white/10 transition-all group"
                     >
                         <i className="text-2xl fa-brands fa-git-alt text-blue-400 group-hover:text-blue-300"></i>
-                        <span className="text-sm">Press 
+                        <span className="text-sm"> 
                             <span className="font-bold text-white"> Ctrl + S </span> 
-                            to open Git Panel
+                            Git Panel
+                        </span>
+                    </button>
+
+                     <button
+                        onClick={() => setShowOrchestrator(true)}
+                        className="flex items-center gap-2 px-2 rounded text-gray-300 hover:text-white hover:bg-white/10 transition-all group"
+                    >
+                        <i className="text-xl fa-solid fa-terminal text-blue-400 group-hover:text-blue-300"></i>
+                        <span className="text-sm"> 
+                            <span className="font-bold text-white"> Ctrl + X </span> 
+                            Agent Orchestrator
                         </span>
                     </button>
 

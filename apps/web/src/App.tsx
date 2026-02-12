@@ -19,6 +19,8 @@ import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
 import OpenCode from './components/app_contents/OpenCode';
 import GitPanel from './components/GitPanel';
+import Orchestrator from './components/Orchestrator';
+import useOrchestrator from './appstates/orchestrator';
 
 declare global {
     interface Window {
@@ -32,8 +34,11 @@ export default function App() {
     const loadRootDir = useAppState.use.loadRootDir();
     const checkIfFirstTime  = useAppState.use.checkIfFirstTime();
     const showAboutModal    = useAppState.use.showAboutModal();
-    const setShowAboutModal = useAppState.use.setShowAboutModal();
-    const setShowGit        = useAppState.use.setShowGit();
+
+    const setShowAboutModal   = useAppState.use.setShowAboutModal();
+    const setShowGit          = useAppState.use.setShowGit();
+    const setShowOrchestrator = useOrchestrator.use.setShowOrchestrator();
+
     const [isFlashVisible, setIsFlashVisible] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -43,6 +48,10 @@ export default function App() {
                 if (e.key.toLowerCase() === 's') {
                     e.preventDefault();
                     setShowGit(true);
+                }
+                if (e.key.toLowerCase() === 'x') {
+                    e.preventDefault();
+                    setShowOrchestrator(true);
                 }
             }
         }   
@@ -154,7 +163,8 @@ export default function App() {
                 </main>
             </div>
             
-            <GitPanel />   
+            <GitPanel />
+            <Orchestrator />
             <RootTerminal />
             <AboutModal isOpen={showAboutModal} setIsOpen={() => setShowAboutModal(false)} />
             <Modal />
