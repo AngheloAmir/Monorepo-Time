@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import InteractiveTerminal, { type InteractiveTerminalRef } from "../InteractiveTerminal";
+import InteractiveTerminal, { type InteractiveTerminalRef } from "../lib/InteractiveTerminal";
 import Button2 from "../ui/Button2";
 import config from 'config';
 import useAppState from "../../appstates/app";

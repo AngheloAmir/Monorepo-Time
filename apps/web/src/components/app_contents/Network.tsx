@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Button2 from "../ui/Button2";
-import InteractiveTerminal, { type InteractiveTerminalRef } from "../InteractiveTerminal";
+import InteractiveTerminal, { type InteractiveTerminalRef } from "../lib/InteractiveTerminal";
 import useAppState from "../../appstates/app";
 import config from 'config';
 import TransparentCard from "../ui/TransparentCard";

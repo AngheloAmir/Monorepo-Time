@@ -6,7 +6,7 @@ import useNavState from "./appstates/navigation";
 import Workspace from './components/app_contents/Workspace';
 
 import Modal from './modal';
-import RootTerminal from './components/RootTerminal';
+import RootTerminal from './components/workspace/RootTerminal';
 import useAppState from './appstates/app';
 import { useEffect, useState } from 'react';
 import Flash from './components/app_contents/Flash';
@@ -18,7 +18,7 @@ import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
 import OpenCode from './components/app_contents/OpenCode';
-import GitPanel from './components/GitControl/GitPanel';
+import GitPanel from './components/GitPanel';
 
 declare global {
     interface Window {

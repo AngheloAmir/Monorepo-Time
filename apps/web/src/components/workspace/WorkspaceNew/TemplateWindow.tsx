@@ -1,5 +1,5 @@
 import type { WorkspaceInfo } from "types";
-import SelectField from "../../SelectField";
+import SelectField from "../../ui/SelectField";
 import InputField from "../../ui/InputField";
 import ModalBody from "../../ui/ModalBody";
 import ModalHeader from "../../ui/ModalHeader";

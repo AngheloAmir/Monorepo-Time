@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import useWorkspaceState from "../../appstates/workspace";
 import ModalBody from "../ui/ModalBody";
 import ModalHeader from "../ui/ModalHeader";
-import InteractiveTerminal, { type InteractiveTerminalRef } from "../InteractiveTerminal";
+import InteractiveTerminal, { type InteractiveTerminalRef } from "../lib/InteractiveTerminal";
 import config from 'config';
 
 

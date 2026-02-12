@@ -1,10 +1,10 @@
 import {useEffect, useRef } from "react";
-import ModalBody from "./ui/ModalBody";
-import ModalHeader from "./ui/ModalHeader";
-import useAppState from "../appstates/app";
+import ModalBody from "../ui/ModalBody";
+import ModalHeader from "../ui/ModalHeader";
+import useAppState from "../../appstates/app";
 import config from 'config';
 
-import InteractiveTerminal, { type InteractiveTerminalRef } from "./InteractiveTerminal";
+import InteractiveTerminal, { type InteractiveTerminalRef } from "../lib/InteractiveTerminal";
 
 export default function RootTerminal() {
     const showTerminal    = useAppState.use.showTerminal();

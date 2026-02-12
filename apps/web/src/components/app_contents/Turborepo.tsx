@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import Button2 from "../ui/Button2";
-import InteractiveTerminal, { type InteractiveTerminalRef } from "../InteractiveTerminal";
+import InteractiveTerminal, { type InteractiveTerminalRef } from "../lib/InteractiveTerminal";
 import useAppState from "../../appstates/app";
 import useModal from "../../modal/modals";
 import useWorkspaceState from "../../appstates/workspace";
-import CICDTutorial from "../CICDTutorial";
+import CICDTutorial from "./_cicdtutorial";
 import config from 'config';
 import TransparentCard from "../ui/TransparentCard";
 import TerminalHeader from "../ui/TerminalHeader";

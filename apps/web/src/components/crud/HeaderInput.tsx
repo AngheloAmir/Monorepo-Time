@@ -1,5 +1,5 @@
 import useCrudState from "../../appstates/crud";
-import CustomAceEditor from "../CustomAceEditor";
+import CustomAceEditor from "../lib/CustomAceEditor";
 
 export default function HeaderInput() {
     const header   = useCrudState.use.header();

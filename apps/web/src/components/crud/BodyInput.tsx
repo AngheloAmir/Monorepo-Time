@@ -1,4 +1,4 @@
-import CustomAceEditor from "../CustomAceEditor";
+import CustomAceEditor from "../lib/CustomAceEditor";
 import useCrudState from "../../appstates/crud";
 
 export default function BodyInput() {

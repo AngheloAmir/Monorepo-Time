@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import useGitControlContext from "../../appstates/gitcontrol";
-import GitHistory from "./GitHistory";
-import GitInput from "./GitInput";
-import GitBranches from "./GitBranches";
-import RevertModal from "./RevertModal";
-import useAppState from "../../appstates/app";
-import ModalBody from "../ui/ModalBody";
-import ModalHeader from "../ui/ModalHeader";
+import useGitControlContext from "../appstates/gitcontrol";
+import GitHistory from "./GitControl/GitHistory";
+import GitInput from "./GitControl/GitInput";
+import GitBranches from "./GitControl/GitBranches";
+import RevertModal from "./GitControl/RevertModal";
+import useAppState from "../appstates/app";
+import ModalBody from "./ui/ModalBody";
+import ModalHeader from "./ui/ModalHeader";
 
-import GitStash from "./GitStash";
+import GitStash from "./GitControl/GitStash";
 
 export default function GitPanel() {
     const fetchData = useGitControlContext.use.fetchData();

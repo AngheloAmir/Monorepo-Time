@@ -4,7 +4,7 @@ import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { WebLinksAddon } from "xterm-addon-web-links";
 import "xterm/css/xterm.css";
-import useAppState from "../appstates/app";
+import useAppState from "../../appstates/app";
 
 export interface InteractiveTerminalRef {
     /** Writes data directly to the xterm instance */

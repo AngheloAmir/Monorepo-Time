@@ -1,5 +1,5 @@
-import ModalBody from "./ui/ModalBody";
-import ModalHeader from "./ui/ModalHeader";
+import ModalBody from "../ui/ModalBody";
+import ModalHeader from "../ui/ModalHeader";
 
 interface CICDTutorialProps {
     onClose: () => void;
