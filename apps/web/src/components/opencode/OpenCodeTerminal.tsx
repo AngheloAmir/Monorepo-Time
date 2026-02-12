@@ -32,6 +32,8 @@ interface OpenCodeTerminalProps {
     onExit?: () => void;
     /** Callback function called when the process crashes (non-zero exit) */
     onCrash?: (code: number) => void;
+    /** Whether this terminal is currently active (visible tab) */
+    isActive?: boolean;
 }
 
 /** An interactive terminal optimized for Opencode */
@@ -188,6 +190,7 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
                 terminalRef={terminalRef}
                 onData={handleData}
                 onResize={handleResize}
+                isActive={props.isActive}
             />
         </div>
     );
@@ -201,6 +204,7 @@ interface ConsoleProps {
     onData?: (data: string) => void;
     terminalRef?: React.MutableRefObject<Terminal | null>;
     onResize?: (cols: number, rows: number) => void;
+    isActive?: boolean;
 }
 
 export interface ConsoleRef {
@@ -376,6 +380,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
 
     useEffect(() => {
         const handleCustomType = (e: CustomEvent) => {
+            if (props.isActive === false) return;
             const text = e.detail;
             if (typeof text === 'string' && onDataRef.current) {
                 onDataRef.current(text);
@@ -387,7 +392,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
         return () => {
             window.removeEventListener('opencode:terminal:type', handleCustomType as EventListener);
         };
-    }, []);
+    }, [props.isActive]);
 
     return (
         <div

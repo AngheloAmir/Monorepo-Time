@@ -21,8 +21,8 @@ interface TerminalSession {
     controlPipe?: Writable;
 }
 
-// Single active terminal process (Opencode is optimized for one instance)
-export let activeOpencodeTerminal: TerminalSession | null = null;
+// Map of active terminal sessions, keyed by socket.id
+export const activeTerminals = new Map<string, TerminalSession>();
 
 interface StartTerminalPayload {
     path: string;
@@ -31,17 +31,12 @@ interface StartTerminalPayload {
 }
 
 /**
- * Manually stops the active opencode terminal process.
+ * Manually stops the active opencode terminal process for a specific socket.
  * @returns true if a process was found and stopped, false otherwise.
  */
-export function stopOpencodeTerminalProcess(socketId?: string): boolean {
-    const session = activeOpencodeTerminal;
+export function stopTerminalSession(socketId: string): boolean {
+    const session = activeTerminals.get(socketId);
     if (session) {
-        // If socketId is provided, only stop if it matches the session's socket
-        if (socketId && session.socket.id !== socketId) {
-            return false;
-        }
-
         const { child, ptyProcess, socket } = session;
         
         // Emit closing log before killing
@@ -61,7 +56,7 @@ export function stopOpencodeTerminalProcess(socketId?: string): boolean {
             ptyProcess.kill();
         }
 
-        activeOpencodeTerminal = null;
+        activeTerminals.delete(socketId);
         return true;
     }
     return false;
@@ -73,10 +68,14 @@ export function stopOpencodeTerminalProcess(socketId?: string): boolean {
  * @returns true if a process was found and stopped, false otherwise.
  */
 export function stopOpencodeTerminalProcessByName(workspaceName: string): boolean {
-    if (activeOpencodeTerminal && activeOpencodeTerminal.workspaceName === workspaceName) {
-        return stopOpencodeTerminalProcess();
+    let found = false;
+    for (const [socketId, session] of activeTerminals.entries()) {
+        if (session.workspaceName === workspaceName) {
+            stopTerminalSession(socketId);
+            found = true;
+        }
     }
-    return false;
+    return found;
 }
 
 export function opencodeTerminalSocket(io: Server) {
@@ -85,8 +84,8 @@ export function opencodeTerminalSocket(io: Server) {
         socket.on('opencode:start', (data: StartTerminalPayload) => {
             const { path, command, workspaceName } = data;
 
-            // Kill existing process regardless of who owns it, we only want one running
-            stopOpencodeTerminalProcess();
+            // Kill existing process for THIS socket if it exists
+            stopTerminalSession(socket.id);
 
             try {
                 const env: NodeJS.ProcessEnv = { ...process.env };
@@ -113,7 +112,7 @@ export function opencodeTerminalSocket(io: Server) {
                         env: env as any,
                     });
 
-                    activeOpencodeTerminal = { ptyProcess, workspaceName, socket };
+                    activeTerminals.set(socket.id, { ptyProcess, workspaceName, socket });
 
                     ptyProcess.onData((data) => {
                          socket.emit('opencode:log', data);
@@ -124,7 +123,7 @@ export function opencodeTerminalSocket(io: Server) {
                              socket.emit('opencode:error', `\r\nProcess exited with code ${exitCode}`);
                          }
                          socket.emit('opencode:exit', exitCode || 0);
-                         cleanup();
+                         cleanup(socket.id);
                     });
                 } else {
                     // Linux/Mac: Use Python PTY bridge for full interactivity
@@ -225,7 +224,7 @@ except Exception as e:
                         controlPipe = child.stdio[3] as Writable;
                     }
                     
-                    activeOpencodeTerminal = { child, workspaceName, socket, controlPipe };
+                    activeTerminals.set(socket.id, { child, workspaceName, socket, controlPipe });
 
                     child.stdout?.on('data', (chunk) => {
                         // Emit to the current socket that started this process
@@ -242,7 +241,7 @@ except Exception as e:
                         } else {
                              socket.emit('opencode:error', `Failed to start command: ${err.message}`);
                         }
-                        cleanup();
+                        cleanup(socket.id);
                     });
     
                     child.on('exit', (code) => {
@@ -252,21 +251,21 @@ except Exception as e:
                             socket.emit('opencode:error', `\r\nProcess exited with code ${code}`);
                         }
                         socket.emit('opencode:exit', code || 0);
-                        cleanup();
+                        cleanup(socket.id);
                     });
                 }
 
             } catch (error: any) {
                 socket.emit('opencode:error', `Error handling command: ${error.message}`);
                 socket.emit('opencode:error', `Error handling command: ${error.message}`);
-                cleanup();
+                cleanup(socket.id);
             }
         });
 
         socket.on('opencode:input', (input: string) => {
             // Allow input from the socket that owns the terminal
-            const session = activeOpencodeTerminal;
-            if (session && session.socket.id === socket.id) {
+            const session = activeTerminals.get(socket.id);
+            if (session) {
                 if (session.child && session.child.stdin) {
                     session.child.stdin.write(input);
                 } else if (session.ptyProcess) {
@@ -276,8 +275,8 @@ except Exception as e:
         });
 
         socket.on('opencode:resize', (data: { cols: number, rows: number }) => {
-            const session = activeOpencodeTerminal;
-            if (session && session.socket.id === socket.id) {
+            const session = activeTerminals.get(socket.id);
+            if (session) {
                 if (session.controlPipe) {
                     try {
                         // Send "rows cols" to the control pipe
@@ -296,15 +295,11 @@ except Exception as e:
         });
 
         socket.on('disconnect', () => {
-             stopOpencodeTerminalProcess(socket.id);
+             stopTerminalSession(socket.id);
         });
 
-        function cleanup(socketId?: string) {
-             if (activeOpencodeTerminal) {
-                 if (!socketId || activeOpencodeTerminal.socket.id === socketId) {
-                     activeOpencodeTerminal = null;
-                 }
-             }
+        function cleanup(socketId: string) {
+             activeTerminals.delete(socketId);
         }
     });
 }
