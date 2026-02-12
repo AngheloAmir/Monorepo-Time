@@ -68,7 +68,15 @@ router.get("/install", async (req, res) => {
         }
 
         if (!isInstalled) {
-            await execa('npm', ['install', '-g', 'opencode-ai']);
+            try {
+                await execa('npm', ['install', '-g', 'opencode-ai']);
+            } catch (error: any) {
+                // Check for common permission errors
+                if (error.message.includes('EACCES') || error.message.includes('permission denied') || error.stderr?.includes('EACCES')) {
+                     throw new Error("Installation requires administrative permissions. Please run 'npm install -g opencode-ai' manually in your terminal.");
+                }
+                throw error;
+            }
         }
 
         // 2. Create opencode.json if it doesn't already exist

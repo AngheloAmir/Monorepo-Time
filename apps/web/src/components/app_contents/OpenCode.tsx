@@ -1,49 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useAppState from "../../appstates/app";
 import ProjectBrowser from "../opencode/ProjectBrowser";
 import useProjectState from "../../appstates/project";
 import FileEditor from "../opencode/FileEditor";
 import useGitStash from "../../appstates/gitstash";
-import OpenCodeInitMessage from "../opencode/OpenCodeInit";
-import { TerminalTabContent, type TerminalInstance } from "../opencode/TerminalContainer";
-import TabTerminalHeader from "../opencode/TabTerminalHeader";
+import ContentContainer from "../opencode/ContentContainer";
+import useOpenCode from "../../appstates/opencode";
 
 interface OpenCodeProps {
     isVisible: boolean
 }
 
 export default function OpenCode(props: OpenCodeProps) {
-    const isOpenCodeInstalled = useAppState.use.isOpenCodeInstalled();
-    const loadingIfOpenCodeInstalled = useAppState.use.loadingIfOpenCodeInstalled();
-    const checkIfInstalled = useAppState.use.checkIfInstalled();
-    const rootDir = useAppState.use.rootDir();
-    const loadRootDir = useAppState.use.loadRootDir();
-    const loadProjectTree = useProjectState.use.loadProjectTree();
-    const loadGitStashList = useGitStash.use.loadGitStashList();
-
-    const [sidebarWidth, setSidebarWidth]               = useState(285);
-    const [isResizing, setIsResizing]                   = useState(false);
-    const [projectTreeInterval, setProjectTreeInterval] = useState<any>(null);
-    const [tabs, setTabs]                               = useState<TerminalInstance[]>([{ id: '1', title: 'Terminal 1' }]);
-    const [activeTabId, setActiveTabId]                 = useState<string>('1');
-
-    const addTab = () => {
-        const newId = String(Date.now());
-        const newTab = { id: newId, title: `Terminal ${tabs.length + 1}` };
-        setTabs([...tabs, newTab]);
-        setActiveTabId(newId);
-    };
-
-    const closeTab = (id: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (tabs.length === 1) return; // Don't close last tab
-        
-        const newTabs = tabs.filter(t => t.id !== id);
-        setTabs(newTabs);
-        if (activeTabId === id) {
-            setActiveTabId(newTabs[newTabs.length - 1].id);
-        }
-    };
+    const checkIfInstalled           = useAppState.use.checkIfInstalled();
+    const loadRootDir                = useAppState.use.loadRootDir();
+    const loadProjectTree            = useProjectState.use.loadProjectTree();
+    const loadGitStashList           = useGitStash.use.loadGitStashList();
+    
+    const sidebarWidth          = useOpenCode.use.sidebarWidth();
+    const setSidebarWidth       = useOpenCode.use.setSidebarWidth();
+    const isResizing            = useOpenCode.use.isResizing();
+    const setIsResizing         = useOpenCode.use.setIsResizing();
+    const projectTreeInterval   = useOpenCode.use.projectTreeInterval();
+    const setProjectTreeInterval= useOpenCode.use.setProjectTreeInterval();
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -75,6 +54,15 @@ export default function OpenCode(props: OpenCodeProps) {
             loadRootDir();
             loadProjectTree();
             loadGitStashList();
+
+            const intervalId = setInterval(() => {
+                loadProjectTree();
+                loadGitStashList();
+            }, 5000);
+            setProjectTreeInterval(intervalId);
+        }
+        else {
+            if (projectTreeInterval) clearInterval(projectTreeInterval);
         }
     }, [props.isVisible]);
 
@@ -84,21 +72,9 @@ export default function OpenCode(props: OpenCodeProps) {
         loadProjectTree();
         loadGitStashList();
         return () => {
-            clearInterval(projectTreeInterval);
+            if (projectTreeInterval) clearInterval(projectTreeInterval);
         }
     }, []);
-
-    useEffect(() => {
-        if (props.isVisible) {
-            const intervalId = setInterval(() => {
-                loadProjectTree();
-                loadGitStashList();
-            }, 5000);
-            setProjectTreeInterval(intervalId);
-        }
-        else
-            clearInterval(projectTreeInterval);
-    }, [props.isVisible]);
 
     return (
         <div className={`h-full w-full p-2 gap-2 ${props.isVisible ? 'flex' : 'hidden'} ${isResizing ? 'select-none cursor-col-resize' : ''}`}>
@@ -108,38 +84,7 @@ export default function OpenCode(props: OpenCodeProps) {
             <div className="w-1 h-full cursor-col-resize hover:bg-white/20 active:bg-blue-500 transition-colors rounded-full" onMouseDown={() => setIsResizing(true)} />
 
             <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded overflow-hidden">
-                <div className="w-full h-full flex flex-col">
-                    <TabTerminalHeader
-                        tabs={tabs}
-                        activeTabId={activeTabId}
-                        setActiveTabId={setActiveTabId}
-                        closeTab={closeTab}
-                        addTab={addTab}
-                    />
-
-                    <div className="flex-1 min-h-0 relative">
-                        {tabs.map(tab => (
-                            <TerminalTabContent
-                                key={tab.id}
-                                id={tab.id}
-                                isActive={activeTabId === tab.id}
-                                isVisible={props.isVisible}
-                                rootDir={rootDir}
-                                isOpenCodeInstalled={isOpenCodeInstalled}
-                                loadingIfOpenCodeInstalled={loadingIfOpenCodeInstalled}
-                            />
-                        ))}
-                        <OpenCodeInitMessage
-                            isVisible={props.isVisible && !isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
-                            onInstall={() => {
-                                useAppState.getState().installOpenCode();
-                                checkIfInstalled();
-                                loadRootDir();
-                            }}
-                        />
-                    </div>
-                </div>
-
+                <ContentContainer isVisible={props.isVisible} />
                 <FileEditor />
             </div>
         </div>

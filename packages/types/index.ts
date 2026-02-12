@@ -159,3 +159,6 @@ export interface AvailbleTemplates {
     tool:       ProjectTemplate[],
     demo:       ProjectTemplate[],
 }
+
+import { OpenCodeAgentConfig } from "./opencodeagent";
+export type { OpenCodeAgentConfig };
