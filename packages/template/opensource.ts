@@ -6,8 +6,10 @@ import { PeppermintLocal } from "./opensource-app/peppermint";
 import { PenpotLocal } from "./opensource-app/penpot";
 import { DrawDBTool } from "./opensource-app/drawdb";
 import { N8nMcpTool } from "./opensource-app/n8n-mcp";
+import { OdooLocal }  from "./opensource-app/odoo";
 
 const OpenSourceTemplates =  [
+    OdooLocal,
     DrawDBTool,
     PenpotLocal,
     N8nMcpTool,
@@ -15,7 +17,7 @@ const OpenSourceTemplates =  [
     NextcloudLocal,
     MauticLocal,
     EzBookkeepingLocal,
-    PeppermintLocal
+    PeppermintLocal,
 ];
 
 export default OpenSourceTemplates;
