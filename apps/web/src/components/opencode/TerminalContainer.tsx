@@ -12,20 +12,19 @@ export interface TerminalInstance {
 export interface TerminalTabProps {
     id: string;
     isActive: boolean;
-    isVisible: boolean;
     rootDir: string;
     isOpenCodeInstalled: boolean;
     loadingIfOpenCodeInstalled: boolean;
     onClose?: () => void;
 }
 
-export function TerminalTabContent({ isActive, isVisible, rootDir, isOpenCodeInstalled, loadingIfOpenCodeInstalled }: TerminalTabProps) {
+export function TerminalTabContent({ isActive, rootDir, isOpenCodeInstalled, loadingIfOpenCodeInstalled }: TerminalTabProps) {
     const terminalRef               = useRef<OpenCodeTerminalRef>(null);
     const [isRunning, setIsRunning] = useState(false);
     const [opacity, setOpacity]     = useState('opacity-0'); //this prevents flickering on tab switch
     
     useEffect(() => {
-        if (isActive && isVisible && terminalRef.current) {
+        if (isActive && terminalRef.current) {
             setOpacity('opacity-0');
             setTimeout(() => {
                 terminalRef.current?.fit();
@@ -35,7 +34,7 @@ export function TerminalTabContent({ isActive, isVisible, rootDir, isOpenCodeIns
                 setOpacity('opacity-100');
             }, 200);
         }
-    }, [isActive, isVisible]);
+    }, [isActive]);
 
     return (
         <div className={` ${opacity} ${isActive ? '' : 'hidden'} relative w-full h-full flex flex-col `}>
@@ -53,7 +52,7 @@ export function TerminalTabContent({ isActive, isVisible, rootDir, isOpenCodeIns
             />
             
             <ReadyMessage
-                isVisible={isVisible && isActive && !isRunning && isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
+                isVisible={isActive && !isRunning && isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
                 onStart={() => {
                     if (terminalRef.current) {
                         setIsRunning(true);

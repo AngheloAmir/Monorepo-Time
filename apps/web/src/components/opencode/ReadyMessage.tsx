@@ -16,8 +16,9 @@ export default function ReadyMessage({ isVisible, onStart, onStartManual }: { is
         });
     }, []);
 
+    if(!isVisible) return null;
     return (
-        <div className={`h-full w-full flex items-center justify-center p-4 ${isVisible ? 'flex' : 'hidden'}`}>
+        <div className={`h-full w-full flex items-center justify-center p-4`}>
             <div className="w-full h-full max-w-6xl flex flex-col items-center justify-center text-center relative overflow-hidden">
                 <div className="flex flex-col md:flex-row items-center justify-center gap-16 mb-12 w-full">
                     {/* Left Column: Animation */}

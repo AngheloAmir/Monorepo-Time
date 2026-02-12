@@ -101,7 +101,7 @@ export default function App() {
                         },
                         {
                             name: 'open-code',
-                            label: 'OpenCode',
+                            label: 'Opencode Orchestrator',
                             icon: 'fa fa-solid fa-terminal',
                             isSelected: currentPage === 'open-code',
                             onClick: () => navAction.setCurrentPage('open-code')

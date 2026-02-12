@@ -5,11 +5,8 @@ import useOpenCode from "../../appstates/opencode";
 import useAppState from "../../appstates/app";
 import useModal from "../../modal/modals";
 
-interface ContentContainerProps {
-    isVisible: boolean;
-}
 
-export default function ContentContainer({ isVisible }: ContentContainerProps) {
+export default function ContentContainer() {
     const tabs = useOpenCode.use.tabs();
     const activeTabId = useOpenCode.use.activeTabId();
     const setActiveTabId = useOpenCode.use.setActiveTabId();
@@ -40,14 +37,13 @@ export default function ContentContainer({ isVisible }: ContentContainerProps) {
                         key={tab.id}
                         id={tab.id}
                         isActive={activeTabId === tab.id}
-                        isVisible={isVisible}
                         rootDir={rootDir}
                         isOpenCodeInstalled={isOpenCodeInstalled}
                         loadingIfOpenCodeInstalled={loadingIfOpenCodeInstalled}
                     />
                 ))}
                 <OpenCodeInitMessage
-                    isVisible={isVisible && !isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
+                    isVisible={!isOpenCodeInstalled && !loadingIfOpenCodeInstalled}
                     onInstall={() => {
                         try {
                             installOpenCode();
