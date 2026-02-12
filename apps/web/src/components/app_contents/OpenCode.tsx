@@ -108,7 +108,7 @@ export default function OpenCode(props: OpenCodeProps) {
             <div className="w-1 h-full cursor-col-resize hover:bg-white/20 active:bg-blue-500 transition-colors rounded-full" onMouseDown={() => setIsResizing(true)} />
 
             <div className="relative flex-1 h-full min-h-0 min-w-0 flex flex-col rounded overflow-hidden">
-                <div className="w-full h-full flex flex-col bg-black/20">
+                <div className="w-full h-full flex flex-col">
                     <TabTerminalHeader
                         tabs={tabs}
                         activeTabId={activeTabId}

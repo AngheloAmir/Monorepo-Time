@@ -2,6 +2,7 @@ import useGitStash from "../../appstates/gitstash";
 import useProjectState from "../../appstates/project";
 import useAppState from "../../appstates/app";
 import useModal from "../../modal/modals";
+import Button3Mini from "../ui/Button3Mini";
 
 export default function ProjectEdit() {
     const changesCount = useProjectState.use.changes();
@@ -46,42 +47,36 @@ export default function ProjectEdit() {
             </div>
 
             <div className='flex flex-end gap-2'>
-                <button
-                    onClick={() => useAppState.use.setShowGit()(true)}
-                    className={`relative w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
-                    title="Git Stash"
-                >
+                <div className="relative">
+                    <Button3Mini
+                        onClick={() => useAppState.use.setShowGit()(true)}
+                        title="Git Stash"
+                        icon="fa-solid fa-clock-rotate-left text-xs"
+                    />
                     {stashCount > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-red-500/30 pointer-events-none">
                             {stashCount}
                         </span>
                     )}
-                    <i className="fa-solid fa-clock-rotate-left text-xs"></i>
-                </button>
+                </div>
 
-                <button
+                <Button3Mini
                     onClick={onFile}
-                    className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                     title="New File"
-                >
-                    <i className="fas fa-file text-xs"></i>
-                </button>
+                    icon="fas fa-file text-xs"
+                />
 
-                <button
+                <Button3Mini
                     onClick={onFolder}
-                    className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                     title="New Folder"
-                >
-                    <i className="fas fa-folder text-xs"></i>
-                </button>
+                    icon="fas fa-folder text-xs"
+                />
 
-                <button
+                <Button3Mini
                     onClick={onRefresh}
-                    className={`w-6 h-6 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                     title="Refresh"
-                >
-                    <i className="fas fa-sync-alt text-xs"></i>
-                </button>
+                    icon="fas fa-sync-alt text-xs"
+                />
             </div>
 
         </div>

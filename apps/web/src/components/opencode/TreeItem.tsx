@@ -3,6 +3,7 @@ import useAppState from "../../appstates/app";
 import useProjectState, { type ProjectTree, type Folder as FolderType, type File as FileType } from "../../appstates/project";
 import FileIcon from "./_fileIcon";
 import EditDropdown from "./EditDropdown";
+import Button3Mini from "../ui/Button3Mini";
 
 export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level?: number }) {
     const projectTreeFontSize = useAppState.use.projectTreeFontSize();
@@ -50,16 +51,14 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
                     
                     { selectedPath === path && <div className="flex-end ml-auto relative">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
+                        <Button3Mini
+                            onClick={() => {
                                 setShowDropdown(!showDropdown);
                             }}
-                            className={`w-5 h-5 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                             title="Edit"
-                        >
-                            <i className="fas fa-pencil-alt text-xs"></i>
-                        </button>
+                            icon="fas fa-pencil-alt text-xs"
+                            className="!w-5 !h-5"
+                        />
                         {showDropdown && (
                             <EditDropdown 
                                 path={path} 
@@ -111,16 +110,14 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                 </span>
                 <span className={`text-[${projectTreeFontSize}px] truncate ${textColor} group-hover:text-white`}>{name}</span>
                 { selectedPath === path && <div className="flex-end ml-auto relative">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
+                        <Button3Mini
+                            onClick={() => {
                                 setShowDropdown(!showDropdown);
                             }}
-                            className={`w-5 h-5 bg-gradient-to-br from-blue-600/50 to-blue-400/50 rounded flex items-center justify-center text-white`}
                             title="Edit"
-                        >
-                            <i className="fas fa-pencil-alt text-xs"></i>
-                        </button>
+                            icon="fas fa-pencil-alt text-xs"
+                            className="!w-5 !h-5"
+                        />
                         {showDropdown && (
                             <EditDropdown 
                                 path={path} 

@@ -166,7 +166,11 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
     };
 
     return (
-        <div className={`h-full w-full box-border overflow-hidden relative ${props.className || ''}`}>
+        <div className={`h-full w-full box-border relative ${props.className || ''}`}
+            style={{
+                padding: '0px'
+            }}
+        >
             {isConnected && (
                 <button
                     onClick={() => {
@@ -177,7 +181,7 @@ const OpenCodeTerminal = forwardRef<OpenCodeTerminalRef, OpenCodeTerminalProps>(
                         });
                     }}
                     title="Restart OpenCode"
-                    className="absolute top-2 right-3 z-10 p-2
+                    className="absolute -top-5 right-3 z-200 p-2
                         bg-gradient-to-br from-blue-600/30 to-blue-400/30 rounded 
                         text-gray-400 hover:text-white text-xs font-medium
                         cursor-pointer"
@@ -397,8 +401,13 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
     return (
         <div
             id="opencode-terminal"
-            className="h-full w-full overflow-hidden bg-transparent box-border [&_.xterm-viewport::-webkit-scrollbar]:hidden"
+            className="bg-transparent box-border [&_.xterm-viewport::-webkit-scrollbar]:hidden"
             ref={divRef}
+            style={{
+                padding: '0px',
+                height: 'calc(100% + 10px)', //for some reson there is this gap at the bottom
+                width: 'calc(100% + 22px)'   //for some reson there is this gap at the right
+            }}
         />
     );
 });

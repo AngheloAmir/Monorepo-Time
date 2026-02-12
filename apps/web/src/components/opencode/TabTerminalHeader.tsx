@@ -1,3 +1,4 @@
+import Button3Mini from "../ui/Button3Mini";
 import type { TerminalInstance } from "./TerminalContainer";
 
 interface TabTerminalHeaderProps {
@@ -10,18 +11,22 @@ interface TabTerminalHeaderProps {
 
 export default function TabTerminalHeader({ tabs, activeTabId, setActiveTabId, closeTab, addTab }: TabTerminalHeaderProps) {
     return (
-        <div className="flex items-center bg-black/40 border-b border-white/10 overflow-x-auto">
+        <div className="flex items-center overflow-x-auto">
             {tabs.map(tab => (
                 <div
                     key={tab.id}
                     onClick={() => setActiveTabId(tab.id)}
                     className={`
-                                    group flex items-center gap-2 px-3 py-2 text-sm cursor-pointer select-none
-                                    border-r border-white/5 min-w-[120px] max-w-[200px]
-                                    ${activeTabId === tab.id ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'}
-                                `}
+                        group relative flex items-center justify-between rounded-t-md w-36 px-2 py-0.3
+                        cursor-pointer transition-all duration-300 select-none
+                        border-r border-white/5
+                        ${activeTabId === tab.id
+                            ? 'bg-gradient-to-br from-blue-600/40 to-blue-400/40 text-white'
+                            : 'bg-[#0b0b0b] text-gray-500 hover:bg-[#121212] hover:text-gray-300'
+                        }
+            `}
                 >
-                    <span className="truncate flex-1">{tab.title}</span>
+                    <span className="truncate text-sm flex-1">{tab.title}</span>
                     {tabs.length > 1 && (
                         <button
                             onClick={(e) => closeTab(tab.id, e)}
@@ -32,13 +37,12 @@ export default function TabTerminalHeader({ tabs, activeTabId, setActiveTabId, c
                     )}
                 </div>
             ))}
-            <button
+            <Button3Mini
+                icon="fa-solid fa-plus"
                 onClick={addTab}
-                className="px-3 py-2 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
                 title="New Terminal"
-            >
-                <i className="fa-solid fa-plus text-xs"></i>
-            </button>
+                className="mx-2 px-2 opacity-50 hover:opacity-100"
+            />
         </div>
     );
 }
