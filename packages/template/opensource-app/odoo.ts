@@ -11,7 +11,7 @@ export const OdooLocal: ProjectTemplate = {
         {
             action: 'file',
             file: 'docker-compose.yml',
-            filecontent: `version: '3.1'
+            filecontent: `
 services:
   odoo:
     image: odoo:16
@@ -21,16 +21,11 @@ services:
       - "8069:8069"
     volumes:
       - odoo-web-data:/var/lib/odoo
-      - ./config:/etc/odoo
     environment:
       - HOST=db
       - USER=odoo
       - PASSWORD=odoo
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8069"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - PYTHONUNBUFFERED=1
   db:
     image: postgres:15
     environment:
@@ -52,7 +47,6 @@ volumes:
 .runtime.json
 odoo-web-data/
 odoo-db-data/
-config/
 `
         },
         {
@@ -79,9 +73,9 @@ child.on('close', (code) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
             let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
-            const lower = cleanLine.toLowerCase();
-            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
-                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            // Print all logs so user sees startup progress
+            if (cleanLine.trim()) {
+                console.log(cleanLine);
             }
         });
     };
