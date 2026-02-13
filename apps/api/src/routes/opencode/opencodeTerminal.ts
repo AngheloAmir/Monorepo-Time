@@ -224,6 +224,11 @@ except Exception as e:
                         controlPipe = child.stdio[3] as Writable;
                     }
                     
+                    console.log('child', child);
+
+
+
+                    
                     activeTerminals.set(socket.id, { child, workspaceName, socket, controlPipe });
 
                     child.stdout?.on('data', (chunk) => {

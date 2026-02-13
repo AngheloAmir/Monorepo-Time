@@ -21,6 +21,7 @@ import OpenCode from './components/app_contents/OpenCode';
 import GitPanel from './components/GitPanel';
 import Orchestrator from './components/Orchestrator';
 import useOrchestrator from './appstates/orchestrator';
+import OpencodeOrchestartor from './components/opencodex';
 
 declare global {
     interface Window {
@@ -108,6 +109,8 @@ export default function App() {
                             isSelected: currentPage === 'workspace',
                             onClick: () => navAction.setCurrentPage('workspace')
                         },
+
+
                         {
                             name: 'open-code',
                             label: 'Opencode Orchestrator',
@@ -115,6 +118,15 @@ export default function App() {
                             isSelected: currentPage === 'open-code',
                             onClick: () => navAction.setCurrentPage('open-code')
                         },
+                        {
+                            name: 'open-code-2',
+                            label: 'Opencode Orchestrator 2',
+                            icon: 'fa fa-solid fa-terminal',
+                            isSelected: currentPage === 'open-code-2',
+                            onClick: () => navAction.setCurrentPage('open-code-2')
+                        },
+
+
                         {
                             name: 'turborepo',
                             label: 'Turborepo',
@@ -153,6 +165,9 @@ export default function App() {
                         <Home isVisible={currentPage === "dashboard"} />
                         <Workspace isVisible={currentPage === "workspace"} />
                         <OpenCode isVisible={currentPage === "open-code"} />
+
+                        <OpencodeOrchestartor isVisible={currentPage === "open-code-2"} />
+
                         <Turborepo isVisible={currentPage === "turborepo"} />
                         <Cloudflare isVisible={currentPage === "cloudflare"} />
                         <Network isVisible={currentPage === "network"} />

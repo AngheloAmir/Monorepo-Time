@@ -99,8 +99,8 @@ import stopTerminalWorkspace from './routes/terminal/stopTerminalWorkspace';
 import deleteWorkspace from './routes/workspace/deleteWorkspace';
 import opencodeHelper from './routes/opencode/opencodeHelper';
 import opencodeTerminal, { opencodeTerminalSocket } from './routes/opencode/opencodeTerminal';
-import scanProject from './routes/opencode/scanProject';
-import textEditor from './routes/opencode/textEditor';
+import scanProject from './routes/textEditor/projectBrowser';
+import textEditor from './routes/textEditor/textEditor';
 import gitStashHelper from './routes/utils/gitStashHelper';
 
 app.use("/", tester);

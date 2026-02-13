@@ -7,7 +7,7 @@
     "dev": "NODE_ENV=development nodemon --watch 'src/**/*.ts' --watch '../../packages/**/*.ts' --exec 'ts-node' src/index.ts",
     "build": "tsup",
     "start": "node dist/index.js",
-    "stop": "npx -y kill-port 4793",
+    "stop": "npx -y kill-port 4792",
     "predep": "rm -rf public && mkdir -p public && cp -r ../web/dist/* public/",
     "publish": "npm publish --access public",
     "beta": "npm publish --access public --tag beta",
