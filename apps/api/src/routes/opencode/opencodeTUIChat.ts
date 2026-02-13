@@ -6,7 +6,8 @@ const router = Router();
 
 router.post("/newclient", async (req: Request, res: Response) => {
     try {
-        const { instanceId, clientName } = req.body;
+        const { instanceId, clientName, createSession } = req.body;
+        let { sessionId } = req.body;
         const clientId = (req.body.clientId as string)?.trim();
 
         if (!instanceId || !clientId || !clientName)
@@ -26,10 +27,18 @@ router.post("/newclient", async (req: Request, res: Response) => {
             baseUrl: instance.url,
         });
 
+        // Proactively create a session if requested and not provided
+        if (!sessionId && createSession) {
+            console.log(`Proactively creating Opencode session for new client: ${clientId}`);
+            const session = await client.session.create();
+            sessionId = session.data.id;
+        }
+
         // Add the new client instance
         const newClientInstance: OpencodeClientInstance = {
             instanceId: instanceId,
             clientId: clientId,
+            sessionId: sessionId || "", // Actual session ID from Opencode
             client: client,
             clientName: clientName
         };
@@ -38,7 +47,8 @@ router.post("/newclient", async (req: Request, res: Response) => {
         res.json({
             instanceId: instanceId,
             clientId: clientId,
-            clientName: clientName
+            clientName: clientName,
+            sessionId: newClientInstance.sessionId
         });
 
     } catch (error: any) {
@@ -50,7 +60,7 @@ router.post("/newclient", async (req: Request, res: Response) => {
 router.post("/chat", async (req: Request, res: Response) => {
     try {
         const clientId = (req.body.clientId as string)?.trim();
-        const { message, format } = req.body; // Use message and format from body
+        const { message, format, sessionId: reqSessionId } = req.body; // Use optional sessionId from body
 
         const cinstance = clientInstance.get(clientId);
 
@@ -59,18 +69,21 @@ router.post("/chat", async (req: Request, res: Response) => {
             return res.status(404).json({ error: `Client '${clientId}' not found. Check for spaces or use /newclient.` });
         }
 
-        // 1. Resolve Session ID: use as-is if it's a real session ID, otherwise create one
-        if (!cinstance.clientId.startsWith('ses_')) {
+        // 1. Resolve Session ID: use body sessionId if provided, otherwise check stored ID
+        let targetSessionId = reqSessionId || cinstance.sessionId;
+
+        if (!targetSessionId || !targetSessionId.startsWith('ses_')) {
             console.log(`Creating fresh Opencode session for client: ${clientId}`);
             const session = await cinstance.client.session.create();
-            cinstance.clientId = session.data.id;
+            targetSessionId = session.data.id;
+            // Only update stored ID if we're not using a specific one-off body sessionId
+            if (!reqSessionId) cinstance.sessionId = targetSessionId;
         }
 
         const result = await cinstance.client.session.prompt({
-            path: { id: cinstance.clientId },
+            path: { id: targetSessionId },
             body: {
                 parts: [{ type: "text", text: message || "Hello" }],
-                // Only include format if explicitly provided in the request
                 ...(format ? { format } : {})
             },
         });
@@ -79,7 +92,7 @@ router.post("/chat", async (req: Request, res: Response) => {
 
         res.json({
             success: true,
-            sessionId: cinstance.clientId,
+            sessionId: targetSessionId,
             // If it's a structured output request, return that, otherwise return the raw parts
             data: result.data?.info?.structured_output || result.data?.parts || result.data
         });

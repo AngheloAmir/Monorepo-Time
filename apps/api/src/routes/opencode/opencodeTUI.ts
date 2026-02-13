@@ -16,10 +16,22 @@ export interface OpencodeInstance {
     lastSessionId?: string;
 }
 
+/**
+ * @example
+ * ```typescript
+ * export interface OpencodeClientInstance {
+ *     instanceId: string; //OpencodeInstance ID
+ *     clientId:   string; //the frontend predefined sessionId for reference
+ *     sessionId:  string; //the actual sessionId from opencode
+ *     client:     any;    //unknown data type from opencode
+ *     clientName: string;
+}
+ */
 export interface OpencodeClientInstance {
     instanceId: string; //OpencodeInstance ID
-    clientId:   string; //also called the session id
-    client:     any;   //unknown data type from opencode
+    clientId:   string; //the frontend predefined sessionId for reference
+    sessionId:  string; //the actual sessionId from opencode
+    client:     any;    //unknown data type from opencode
     clientName: string;
 }
 

@@ -10,6 +10,7 @@ router.post("/add", async (req: Request, res: Response) => {
     const { createOpencode } = await opencodeSdkPromise;
     const id    = (req.body.id   as string) || Math.random().toString(36).substring(6);
     const name  = (req.body.name as string) || `Instance ${id}`;
+    const model = req.body.model as string; // Optional model from body
     const reset = req.body.reset === true;
 
     // If instance already exists, check if it's actually alive
@@ -53,7 +54,7 @@ router.post("/add", async (req: Request, res: Response) => {
                 hostname: "127.0.0.1",
                 port: port,
                 config: {
-                    model: "opencode/big-pickle",
+                    ...(model ? { model } : {}),
                 },
             });
 
