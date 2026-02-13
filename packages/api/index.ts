@@ -101,8 +101,10 @@ const apiRoute = {
     setWorkspaceTemplate: 'setworkspacetemplate',
 
     deleteWorkspace: 'deleteworkspace',
+
     opencodeHelper: 'opencode',
     opencodeTUI: 'opencodetui',
+    
     scanProject: 'scanproject',
     textEditor: 'texteditor',
 

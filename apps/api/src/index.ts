@@ -101,9 +101,10 @@ import opencodeHelper from './routes/opencode/opencodeHelper';
 import scanProject from './routes/textEditor/projectBrowser';
 import textEditor from './routes/textEditor/textEditor';
 import gitStashHelper from './routes/utils/gitStashHelper';
+
 import opencodeTUI from './routes/opencode/opencodeTUI';
-import opencodeTUIAdd from './routes/opencode/opencodeTUIAdd';
-import opencodeTUIChat from './routes/opencode/opencodeTUIChat';
+import createInstance from './routes/opencode/createInstance';
+import chats from './routes/opencode/chats';
 
 app.use("/", tester);
 
@@ -143,8 +144,8 @@ app.use("/" + apiRoute.deleteWorkspace, deleteWorkspace);
 //opencode
 app.use("/" + apiRoute.opencodeHelper, opencodeHelper);
 app.use("/" + apiRoute.opencodeTUI,    opencodeTUI);
-app.use("/" + apiRoute.opencodeTUI,    opencodeTUIAdd);
-app.use("/" + apiRoute.opencodeTUI,    opencodeTUIChat);
+app.use("/" + apiRoute.opencodeTUI,    createInstance);
+app.use("/" + apiRoute.opencodeTUI,    chats);
 
 //project browser and editor endpoints
 app.use("/" + apiRoute.scanProject, scanProject);
