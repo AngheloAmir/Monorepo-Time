@@ -55,9 +55,9 @@ router.get("/list", (req: Request, res: Response) => {
         url: instance.url,
         port: instance.port,
         name: instance.name,
-        
+
         // 'detached' means we lost the handle but it might still be running
-        status: instance.server ? "active" : "detached", 
+        status: instance.server ? "active" : "detached",
         createdAt: instance.createdAt,
         lastSessionId: instance.lastSessionId
     }));
@@ -177,38 +177,28 @@ router.post("/add", async (req: Request, res: Response) => {
 
 // Route to stop an instance
 router.post("/stop", async (req: Request, res: Response) => {
-    const { id } = req.body;
-
-    if (!id) {
-        return res.status(400).json({ error: "Instance ID is required" });
-    }
-
-    if (opencodeInstances.has(id)) {
-        const instance = opencodeInstances.get(id)!;
-
-        try {
+    try {
+        const { id } = req.body;
+        if (!id) 
+            return res.status(400).json({ error: "Instance ID is required" });
+        
+        if (opencodeInstances.has(id)) {
+            const instance = opencodeInstances.get(id)!;
             if (instance.server) {
                 instance.server.close();
                 await killPort(instance.port);
                 console.log(`Force killed port ${instance.port} for detached instance ${id}`);
             }
-        } catch (e) {
-            console.error(`Error closing instance ${id}:`, e);
-            // Fallback: try to kill port anyway if close fails
-            try {
-                await killPort(instance.port);
-            } catch (kpe) {
-                console.error("Failed to force kill port:", kpe);
-            }
+
+            opencodeInstances.delete(id);
+            await saveInstances();
+            console.log(`Opencode instance ${id} stopped`);
+            res.json({ success: true, message: "Instance stopped" });
+        } else {
+            res.status(404).json({ error: "Instance not found" });
         }
-
-        opencodeInstances.delete(id);
-        await saveInstances();
-
-        console.log(`Opencode instance ${id} stopped`);
-        res.json({ success: true, message: "Instance stopped" });
-    } else {
-        res.status(404).json({ error: "Instance not found" });
+    } catch (e) {
+        res.status(500).json({ error: e });
     }
 });
 
@@ -233,90 +223,7 @@ router.post("/change-name", async (req: Request, res: Response) => {
 
 
 router.post("/chat", async (req: Request, res: Response) => {
-    const {
-        instanceId,
-        message,
-        sessionId: reqSessionId
-    } = req.body;
-
-    if (!instanceId || !message) {
-        return res.status(400).json({ error: "instanceId and message are required" });
-    }
-
-    const instance = opencodeInstances.get(instanceId);
-
-    if (!instance) {
-        return res.status(404).json({ error: "Instance not found" });
-    }
-
-    // 1. Set headers for Server-Sent Events (SSE)
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders();
-
-    try {
-        const { createOpencode } = await opencodeSdkPromise;
-
-        const client = createOpencode({
-            baseUrl: instance.url,
-        });
-
-        // 3. Handle session: reuse existing, use provided, or create new
-        let sessionId = reqSessionId || instance.lastSessionId;
-
-        if (!sessionId) {
-            console.log(`Creating new session for instance ${instanceId}`);
-            const session = await client.session.create();
-            sessionId = session.data.id;
-            instance.lastSessionId = sessionId;
-            await saveInstances(); // Persist the new session ID
-        }
-
-        // 4. Send the prompt and stream the result
-        const stream = await client.session.prompt({
-            path: { id: sessionId },
-            body: {
-                parts: [{ type: "text", text: message }],
-                stream: true
-            }
-        });
-
-        // 5. Pipe the OpenCode stream to the Express response
-        for await (const chunk of stream) {
-            // Some SDKs return an object with a 'data' or 'choices' property
-            // We'll pass the whole chunk as JSON
-            res.write(`data: ${JSON.stringify(chunk)}\n\n`);
-
-            // @ts-ignore - flush exists in some express setups (with compression)
-            if (res.flush) res.flush();
-        }
-
-        res.write('data: [DONE]\n\n');
-        res.end();
-
-    } catch (error: any) {
-        console.error("Streaming error:", error);
-        res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
-        res.end();
-    }
 });
 
-router.post("/chat/reset", async (req: Request, res: Response) => {
-    const { instanceId } = req.body;
-
-    if (!instanceId) {
-        return res.status(400).json({ error: "Instance ID is required" });
-    }
-
-    if (opencodeInstances.has(instanceId)) {
-        const instance = opencodeInstances.get(instanceId)!;
-        instance.lastSessionId = undefined;
-        await saveInstances();
-        res.json({ success: true, message: "Session reset for instance " + instanceId });
-    } else {
-        res.status(404).json({ error: "Instance not found" });
-    }
-});
 
 export default router;
