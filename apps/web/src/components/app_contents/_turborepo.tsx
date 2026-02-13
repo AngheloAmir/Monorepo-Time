@@ -15,11 +15,11 @@ interface Command {
 
 const commandGroups: CommandGroup[] = [
     {
-        title: 'Build & Run',
+        title: 'Build & Deploy',
         commands: [
             { label: 'Install', cmd: 'npm install', icon: 'fa-download', color: 'blueIndigo' },
             { label: 'Build',   cmd: 'npx turbo build', icon: 'fa-hammer',   color: 'emeraldTeal' },
-            { label: 'Force',   cmd: 'npx turbo run build --force', icon: 'fa-sync-alt', color: 'yellowOrange' },
+            { label: 'Deploy',   cmd: 'npx turbo run build --force', icon: 'fa-sync-alt', color: 'yellowOrange' },
         ]
     },
     {

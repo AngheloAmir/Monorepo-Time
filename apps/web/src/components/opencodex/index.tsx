@@ -1,4 +1,4 @@
-import useOpencodeX from "../../appstates/opencodex";
+import useOpencode from "../../appstates/opencode";
 import ResizerBar     from "../ui/ResizerBar";
 import InitMessage from "./InitMessage";
 import ProjectBrowser from "./projectBrowser";
@@ -8,8 +8,8 @@ interface OpenCodeProps {
 }
 
 export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
-    const sidebarWidth    = useOpencodeX.use.sidebarWidth();
-    const setSidebarWidth = useOpencodeX.use.setSidebarWidth();
+    const sidebarWidth    = useOpencode.use.sidebarWidth();
+    const setSidebarWidth = useOpencode.use.setSidebarWidth();
 
     return (
         <div className={`h-full w-full p-2 gap-2 ${isVisible ? 'flex' : 'hidden'} `}>

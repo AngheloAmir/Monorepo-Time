@@ -1,20 +1,6 @@
-import { useEffect, useState } from "react";
-import useAppState from "../../appstates/app";
 
 export default function ReadyMessage({ isVisible, onStart, onStartManual }: { isVisible: boolean, onStart: () => void, onStartManual: () => void }) {
-    const checkForUpdates = useAppState.use.checkForUpdates();
-    const updateOpenCode = useAppState.use.updateOpenCode();
-    const [latest, setLatest] = useState<{ updateAvailable: boolean; current: string; latest: string }>({
-        updateAvailable: false,
-        current: "",
-        latest: ""
-    });
-
-    useEffect(() => {
-        checkForUpdates().then((data) => {
-            setLatest(data);
-        });
-    }, []);
+    
 
     if(!isVisible) return null;
     return (
@@ -123,14 +109,14 @@ export default function ReadyMessage({ isVisible, onStart, onStartManual }: { is
                             Launch
                         </button>
 
-                        {latest?.updateAvailable && (
+                        {/* {latest?.updateAvailable && (
                             <button
                                 onClick={updateOpenCode}
                                 className="w-64 mx-auto items-center justify-center py-4 font-semibold text-white transition-all duration-200 bg-green-600 rounded-lg hover:bg-green-500 hover:shadow-lg hover:shadow-green-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 focus:ring-offset-neutral-900  transform hover:-translate-y-1"
                             >
                                 Update to {latest.latest}
                             </button>
-                        )}
+                        )} */}
                     </div>
 
                     <button

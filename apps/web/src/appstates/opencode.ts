@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 
-interface OpencodeXState {
+interface OpencodeState {
     sidebarWidth: number;
     isResizing: boolean;
 
@@ -9,7 +9,7 @@ interface OpencodeXState {
     setIsResizing: (isResizing: boolean) => void;
 }
 
-const useOpencodeXBase = create<OpencodeXState>((set) => ({
+const useOpencodeBase = create<OpencodeState>((set) => ({
     sidebarWidth: 285,
     isResizing: false,
 
@@ -17,5 +17,5 @@ const useOpencodeXBase = create<OpencodeXState>((set) => ({
     setIsResizing: (isResizing: boolean) => set({ isResizing: isResizing }),
 }));
 
-const useOpencodeX = createSelectors(useOpencodeXBase);
-export default useOpencodeX;
+const useOpencode = createSelectors(useOpencodeBase);
+export default useOpencode;

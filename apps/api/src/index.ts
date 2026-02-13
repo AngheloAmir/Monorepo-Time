@@ -98,39 +98,53 @@ import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/works
 import stopTerminalWorkspace from './routes/terminal/stopTerminalWorkspace';
 import deleteWorkspace from './routes/workspace/deleteWorkspace';
 import opencodeHelper from './routes/opencode/opencodeHelper';
-import opencodeTerminal, { opencodeTerminalSocket } from './routes/opencode/opencodeTerminal';
 import scanProject from './routes/textEditor/projectBrowser';
 import textEditor from './routes/textEditor/textEditor';
 import gitStashHelper from './routes/utils/gitStashHelper';
+import OpenCodeTUISocket from './routes/opencode/opencodeTUI';
 
 app.use("/", tester);
-app.use("/" + apiRoute.scanWorkspace, apiScanWorkspace);
-app.use("/" + apiRoute.stopProcess, stopProcess);
-app.use("/" + apiRoute.listWorkspacesDir, listWorkspacesDir);
-app.use("/" + apiRoute.newWorkspace, newWorkspace);
-app.use("/" + apiRoute.interactvTerminal, interactiveTerminal);
-app.use("/" + apiRoute.stopInteractiveTerminal, stopInteractiveTerm);
-app.use("/" + apiRoute.stopTerminalWorkspace, stopTerminalWorkspace);
-app.use("/" + apiRoute.updateWorkspace, updateWorkspace);
-app.use("/" + apiRoute.hideShowFileFolder, vscodeHideShow);
+
+//inits
 app.use("/" + apiRoute.getRootPath, rootPath);
 app.use("/" + apiRoute.scaffoldRepo, scaffoldRepo);
 app.use("/" + apiRoute.turborepoExist, turborepoExist);
 app.use("/" + apiRoute.firstRun, firstRunRoute);
+app.use("/" + apiRoute.initMonorepoTime, initMonorepoTime);
+
+//dashboard / home endpoints
 app.use("/" + apiRoute.notes, notesRoute);
 app.use("/" + apiRoute.crudTest, crudTestRoute);
-app.use("/" + apiRoute.gitControl, gitControlHelper);
-app.use("/" + apiRoute.initMonorepoTime, initMonorepoTime);
 app.use("/" + apiRoute.processTree, processTree);
 app.use("/" + apiRoute.docker, apiDocker);
+
+//gits
+app.use("/" + apiRoute.gitControl, gitControlHelper);
+app.use("/" + apiRoute.gitStash, gitStashHelper);
+
+//terminal endpoints
+app.use("/" + apiRoute.interactvTerminal, interactiveTerminal);
+app.use("/" + apiRoute.stopInteractiveTerminal, stopInteractiveTerm);
+app.use("/" + apiRoute.stopTerminalWorkspace, stopTerminalWorkspace);
+app.use("/" + apiRoute.stopProcess, stopProcess);
+app.use("/" + apiRoute.updateWorkspace, updateWorkspace);
+app.use("/" + apiRoute.hideShowFileFolder, vscodeHideShow);
+
+//workspace endpoints
+app.use("/" + apiRoute.scanWorkspace, apiScanWorkspace);
+app.use("/" + apiRoute.listWorkspacesDir, listWorkspacesDir);
+app.use("/" + apiRoute.newWorkspace, newWorkspace);
 app.use("/" + apiRoute.availabletemplates, availableTemplates);
 app.use("/" + apiRoute.setWorkspaceTemplate, setWorkspaceTemplate);
 app.use("/" + apiRoute.deleteWorkspace, deleteWorkspace);
+
+//opencode
 app.use("/" + apiRoute.opencodeHelper, opencodeHelper);
-app.use("/" + apiRoute.opencodeTerminal, opencodeTerminal);
+
+//project browser and editor endpoints
 app.use("/" + apiRoute.scanProject, scanProject);
 app.use("/" + apiRoute.textEditor, textEditor);
-app.use("/" + apiRoute.gitStash, gitStashHelper);
+
 
 // Serve frontend static files==================================================
 const frontendPath = path.join(__dirname, '../public');
@@ -167,7 +181,7 @@ const io = new Server(httpServer, {
 runCmdDevSocket(io);
 interactiveTerminalSocket(io);
 setWorkspaceTemplateSocket(io);
-opencodeTerminalSocket(io);
+OpenCodeTUISocket(io);
 
 //=============================================================================
 // Helper to find an available port
