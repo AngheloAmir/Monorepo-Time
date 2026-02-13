@@ -363,12 +363,12 @@
         },
         {
             "category": "Opencode",
-            "devurl": "http://localhost:4792",
-            "produrl": "",
+            "devurl": "http://localhost:4792/opencodetui",
+            "produrl": "/opencodetui",
             "items": [
                 {
                     "label": "List Instances",
-                    "route": "/opencodetui/list",
+                    "route": "/list",
                     "methods": "GET",
                     "description": "List all opencode instances",
                     "sampleInput": "{}",
@@ -377,7 +377,7 @@
                 },
                 {
                     "label": "Add Instance",
-                    "route": "/opencodetui/add",
+                    "route": "/add",
                     "methods": "POST",
                     "description": "Start a new opencode instance",
                     "sampleInput": "{\n \"name\": \"Test Instance\"\n}",
@@ -386,7 +386,7 @@
                 },
                 {
                     "label": "Chat",
-                    "route": "/opencodetui/chat",
+                    "route": "/chat",
                     "methods": "POST",
                     "description": "Chat with an opencode instance",
                     "sampleInput": "{\n \"instanceId\": \"instanceId\",\n \"message\": \"Hello\"\n}",
@@ -395,7 +395,7 @@
                 },
                 {
                     "label": "Stop Instance",
-                    "route": "/opencodetui/stop",
+                    "route": "/stop",
                     "methods": "POST",
                     "description": "Stop an opencode instance",
                     "sampleInput": "{\n \"id\": \"instanceId\"\n}",
@@ -404,10 +404,37 @@
                 },
                 {
                     "label": "Identify Instances",
-                    "route": "/opencodetui/identify",
+                    "route": "/identify",
                     "methods": "POST",
                     "description": "Clean up zombie instances",
                     "sampleInput": "{}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "New Client",
+                    "route": "/newclient",
+                    "methods": "POST",
+                    "description": "",
+                    "sampleInput": "{\n   \"instanceId\": \"wwoqi55\", \n   \"clientId\": \" random-id\",\n   \"clientName\": \" my custom name\"\n} ",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "List Clients",
+                    "route": "/listclient",
+                    "methods": "GET",
+                    "description": "",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "chat",
+                    "route": "/chat",
+                    "methods": "POST",
+                    "description": "",
+                    "sampleInput": "{\n    \"clientId\": \"random id\"\n}",
                     "expectedOutcome": "",
                     "suggested": []
                 }

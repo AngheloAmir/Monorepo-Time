@@ -8,7 +8,7 @@ const router             = Router();
 
 router.post("/add", async (req: Request, res: Response) => {
     const { createOpencode } = await opencodeSdkPromise;
-    const id    = (req.body.id   as string) || Math.random().toString(36).substring(12);
+    const id    = (req.body.id   as string) || Math.random().toString(36).substring(6);
     const name  = (req.body.name as string) || `Instance ${id}`;
     const reset = req.body.reset === true;
 

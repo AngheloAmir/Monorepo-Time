@@ -16,14 +16,15 @@ export interface OpencodeInstance {
     lastSessionId?: string;
 }
 
-export interface OpencodeClient {
+export interface OpencodeClientInstance {
     instanceId: string; //OpencodeInstance ID
-    clientId:   string;
-    
+    clientId:   string; //also called the session id
+    client:     any;   //unknown data type from opencode
+    clientName: string;
 }
 
 export let   opencodeInstances = new Map<string, OpencodeInstance>();
-export const clientInstance    = new Map<string, OpencodeClient>();
+export const clientInstance    = new Map<string, OpencodeClientInstance>();
 loadInstances();
 
 router.get("/checkinstalled", async (req: Request, res: Response) => {
@@ -65,6 +66,15 @@ router.get("/list", (req: Request, res: Response) => {
         lastSessionId: instance.lastSessionId
     }));
     res.json({ instances });
+});
+
+router.get("/listclient", (req: Request, res: Response) => {
+    const clients = Array.from(clientInstance.values()).map(client => ({
+        instanceId: client.instanceId,
+        clientId: client.clientId,
+        clientName: client.clientName
+    }));
+    res.json({ clients });
 });
 
 router.post("/identify", async (req: Request, res: Response) => {
