@@ -52,7 +52,6 @@ router.get("/checkinstalled", async (req: Request, res: Response) => {
     }
 });
 
-
 router.get("/list", (req: Request, res: Response) => {
     const instances = Array.from(opencodeInstances.values()).map(instance => ({
         id: instance.id,

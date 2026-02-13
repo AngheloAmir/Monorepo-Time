@@ -3,7 +3,7 @@
     "crudtest": [
         {
             "category": "Internal CRUD Test",
-            "devurl": "http://localhost:4793",
+            "devurl": "http://localhost:4792",
             "produrl": "",
             "items": [
                 {
@@ -46,51 +46,6 @@
             "devurl": "http://localhost:4792",
             "produrl": "",
             "items": [
-                {
-                    "label": "List Instances",
-                    "route": "/opencodetui/list",
-                    "methods": "GET",
-                    "description": "List all opencode instances",
-                    "sampleInput": "{}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                },
-                {
-                    "label": "Add Instance",
-                    "route": "/opencodetui/add",
-                    "methods": "POST",
-                    "description": "Start a new opencode instance",
-                    "sampleInput": "{\n \"name\": \"Test Instance\"\n}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                },
-                {
-                    "label": "Chat",
-                    "route": "/opencodetui/chat",
-                    "methods": "POST",
-                    "description": "Chat with an opencode instance",
-                    "sampleInput": "{\n \"instanceId\": \"instanceId\",\n \"message\": \"Hello\"\n}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                },
-                {
-                    "label": "Stop Instance",
-                    "route": "/opencodetui/stop",
-                    "methods": "POST",
-                    "description": "Stop an opencode instance",
-                    "sampleInput": "{\n \"id\": \"instanceId\"\n}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                },
-                {
-                    "label": "Identify Instances",
-                    "route": "/opencodetui/identify",
-                    "methods": "POST",
-                    "description": "Clean up zombie instances",
-                    "sampleInput": "{}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                },
                 {
                     "label": "Scan Workspaces",
                     "route": "/scanworkspace",
@@ -401,6 +356,58 @@
                     "methods": "POST",
                     "description": "",
                     "sampleInput": "{\n \"connectionString\": \"http://localhost:7700\",\n \"apiKey\": \"admin\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                }
+            ]
+        },
+        {
+            "category": "Opencode",
+            "devurl": "http://localhost:4792",
+            "produrl": "",
+            "items": [
+                {
+                    "label": "List Instances",
+                    "route": "/opencodetui/list",
+                    "methods": "GET",
+                    "description": "List all opencode instances",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Add Instance",
+                    "route": "/opencodetui/add",
+                    "methods": "POST",
+                    "description": "Start a new opencode instance",
+                    "sampleInput": "{\n \"name\": \"Test Instance\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Chat",
+                    "route": "/opencodetui/chat",
+                    "methods": "POST",
+                    "description": "Chat with an opencode instance",
+                    "sampleInput": "{\n \"instanceId\": \"instanceId\",\n \"message\": \"Hello\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Stop Instance",
+                    "route": "/opencodetui/stop",
+                    "methods": "POST",
+                    "description": "Stop an opencode instance",
+                    "sampleInput": "{\n \"id\": \"instanceId\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Identify Instances",
+                    "route": "/opencodetui/identify",
+                    "methods": "POST",
+                    "description": "Clean up zombie instances",
+                    "sampleInput": "{}",
                     "expectedOutcome": "",
                     "suggested": []
                 }

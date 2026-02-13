@@ -15,7 +15,6 @@ export default function AccordionNav() {
     const setParams = useCrudState.use.setParams();
     const setBody = useCrudState.use.setBody();
     const setExpectedOutput = useCrudState.use.setExpectedOutput();
-    const setOutput = useCrudState.use.setOutput();
 
     const [openCategories, setOpenCategories] = useState<Record<number, boolean>>({ 0: false });
     const [editModal, setEditModal]           = useState({ isOpen: false, categoryIndex: 0, itemIndex: 0 });
@@ -28,14 +27,10 @@ export default function AccordionNav() {
     const handleItemClick = (catIndex: number, itemIndex: number, item: any) => {
         setCurrentCategoryIndex(catIndex);
         setCurrentCrudIndex(itemIndex);
-        
-        // Update context with item data
         setMethod(item.methods);
-        setParams(""); // Reset params or parse if stored
-        // setHeader? Usually stays default but could be custom
+        setParams("");
         setBody(item.sampleInput || "");
         setExpectedOutput(item.expectedOutcome || "");
-        setOutput(""); // Reset output
     };
 
     return (
