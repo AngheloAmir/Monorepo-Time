@@ -73,7 +73,11 @@ export default function ProjectEdit() {
 
                 <Button3Mini
                     onClick={() => setIsPasteProjecTextEnable(!isPasteProjecTextEnable)}
-                    title="Paste Project"
+                    title={
+                        isPasteProjecTextEnable ? 
+                            "Will Paste Project Text" :
+                            "Paste @<path>"
+                    }
                     icon="fas fa-paste text-xs"
                     className={isPasteProjecTextEnable ? 
                         "bg-red-600" :
