@@ -211,10 +211,24 @@ const InteractiveTerminal = forwardRef<InteractiveTerminalRef, InteractiveTermin
 
     // Cleanup on unmount
     useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data?.type === 'PASTE_TEXT' && event.data?.text) {
+                // If this terminal is interactive, paste the text
+                if (props.isInteractive !== false) {
+                    if (socketRef.current && socketRef.current.connected) {
+                        socketRef.current.emit('terminal:input', event.data.text);
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+        
         return () => {
+            window.removeEventListener('message', handleMessage);
             disconnectSocket(); 
         };
-    }, []);
+    }, [props.isInteractive]);
 
     // Handle interactivity changes
     useEffect(() => {
