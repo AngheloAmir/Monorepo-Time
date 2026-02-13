@@ -67,7 +67,10 @@ export default function ButtonFloating(props: ButtonFloatingProps) {
     const dir = directionClasses[spanTo] || directionClasses.toLeft;
     return (
         <button
-            onClick = {props.onClick}
+            onClick = {(e) => {
+                e.stopPropagation();
+                props.onClick();
+            }}
             className ={`group fixed z-50 flex items-center ${dir.btnFlex}`}
             style={{
                 top:   props.top,

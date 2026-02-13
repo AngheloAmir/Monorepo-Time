@@ -5,7 +5,10 @@ export default function ButtonDefault(props: {
 }) {
     return (
         <button
-            onClick={props.onClick}
+            onClick={(e) => {
+                e.stopPropagation();
+                props.onClick();
+            }}
             className="group relative px-6 py-2 rounded-lg font-medium text-sm text-gray-400 hover:text-white transition-colors overflow-hidden"
         >
             <span className="relative z-10">{props.text}</span>

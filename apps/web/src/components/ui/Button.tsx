@@ -46,7 +46,12 @@ function ButtonSkeleton(props: ButtonProps) {
         <button
             key={props.name}
             disabled={props.disabled}
-            onClick={props.disabled ? undefined : () => props.onClick()}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (props.disabled)
+                    return;
+                props.onClick();
+            }}
             className={`
                 group relative w-full rounded p-[1px] transition-all duration-300
                 ${glow}

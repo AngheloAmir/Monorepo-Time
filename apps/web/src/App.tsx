@@ -17,7 +17,6 @@ import AboutModal from './components/AboutModal';
 import config from 'config';
 import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
-import OpenCode from './components/app_contents/OpenCode';
 import GitPanel from './components/GitPanel';
 import Orchestrator from './components/Orchestrator';
 import useOrchestrator from './appstates/orchestrator';
@@ -109,24 +108,13 @@ export default function App() {
                             isSelected: currentPage === 'workspace',
                             onClick: () => navAction.setCurrentPage('workspace')
                         },
-
-
                         {
                             name: 'open-code',
-                            label: 'Opencode Orchestrator',
+                            label: 'Opencode',
                             icon: 'fa fa-solid fa-terminal',
                             isSelected: currentPage === 'open-code',
                             onClick: () => navAction.setCurrentPage('open-code')
                         },
-                        {
-                            name: 'open-code-2',
-                            label: 'Opencode Orchestrator 2',
-                            icon: 'fa fa-solid fa-terminal',
-                            isSelected: currentPage === 'open-code-2',
-                            onClick: () => navAction.setCurrentPage('open-code-2')
-                        },
-
-
                         {
                             name: 'turborepo',
                             label: 'Turborepo',
@@ -164,10 +152,7 @@ export default function App() {
                     <div id="app-content" className="w-full h-full pb-8 relative">
                         <Home isVisible={currentPage === "dashboard"} />
                         <Workspace isVisible={currentPage === "workspace"} />
-                        <OpenCode isVisible={currentPage === "open-code"} />
-
-                        <OpencodeOrchestartor isVisible={currentPage === "open-code-2"} />
-
+                        <OpencodeOrchestartor isVisible={currentPage === "open-code"} />
                         <Turborepo isVisible={currentPage === "turborepo"} />
                         <Cloudflare isVisible={currentPage === "cloudflare"} />
                         <Network isVisible={currentPage === "network"} />
