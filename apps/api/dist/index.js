@@ -81969,7 +81969,7 @@ var require_cpu = __commonJS({
     "use strict";
     var os3 = require("os");
     var fs36 = require("fs");
-    var exec5 = require("child_process").exec;
+    var exec6 = require("child_process").exec;
     var parallel = require_parallel();
     function updateCpu(cpu, next) {
       if (cpu !== null) {
@@ -82023,7 +82023,7 @@ var require_cpu = __commonJS({
         next = options;
         options = { default: "" };
       }
-      exec5("getconf " + keyword, function(error, stdout, stderr) {
+      exec6("getconf " + keyword, function(error, stdout, stderr) {
         if (error !== null) {
           if (!process.env.PIDUSAGE_SILENT) {
             console.error('Error while calling "getconf ' + keyword + '"', error);
@@ -82539,7 +82539,7 @@ var require_tree_kill = __commonJS({
     "use strict";
     var childProcess4 = require("child_process");
     var spawn2 = childProcess4.spawn;
-    var exec5 = childProcess4.exec;
+    var exec6 = childProcess4.exec;
     module2.exports = function(pid, signal, callback) {
       if (typeof signal === "function" && callback === void 0) {
         callback = signal;
@@ -82559,7 +82559,7 @@ var require_tree_kill = __commonJS({
       pidsToProcess[pid] = 1;
       switch (process.platform) {
         case "win32":
-          exec5("taskkill /pid " + pid + " /T /F", callback);
+          exec6("taskkill /pid " + pid + " /T /F", callback);
           break;
         case "darwin":
           buildProcessTree(pid, tree, pidsToProcess, function(parentPid) {
@@ -95511,6 +95511,7 @@ var gitStashHelper_default = router25;
 
 // src/routes/opencode/opencodeTUI.ts
 var import_express30 = __toESM(require_express2());
+var import_child_process5 = require("child_process");
 var import_kill_port = __toESM(require("kill-port"));
 
 // src/routes/opencode/_tui.ts
@@ -95587,6 +95588,29 @@ var findAvailablePort = (startPort) => {
 var router26 = (0, import_express30.Router)();
 var opencodeInstances = /* @__PURE__ */ new Map();
 loadInstances();
+router26.get("/checkinstalled", async (req, res) => {
+  const checkCommand = (cmd) => {
+    return new Promise((resolve) => {
+      (0, import_child_process5.exec)(cmd, (error) => {
+        resolve(!error);
+      });
+    });
+  };
+  try {
+    const [isOpencodeInPath, isNpmPackageInstalled] = await Promise.all([
+      checkCommand("command -v opencode"),
+      checkCommand("npm list -g opencode-ai --depth=0")
+    ]);
+    res.json({
+      installed: isOpencodeInPath || isNpmPackageInstalled,
+      isInPath: isOpencodeInPath,
+      isNpmGlobal: isNpmPackageInstalled
+    });
+  } catch (err) {
+    console.error("Error checking opencode usage:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 router26.get("/list", (req, res) => {
   const instances = Array.from(opencodeInstances.values()).map((instance) => ({
     id: instance.id,
@@ -95639,8 +95663,7 @@ router26.post("/add", async (req, res) => {
   try {
     const port3 = await findAvailablePort(4096);
     const dynamicImport = new Function("specifier", "return import(specifier)");
-    const sdk = await dynamicImport("@opencode-ai/sdk");
-    const { createOpencode } = sdk;
+    const { createOpencode } = await dynamicImport("@opencode-ai/sdk");
     const opencode = await createOpencode({
       hostname: "127.0.0.1",
       port: port3,
@@ -95670,6 +95693,10 @@ router26.post("/add", async (req, res) => {
     });
   } catch (error) {
     console.error("Failed to start opencode instance:", error);
+    if (error.code === "ENOENT") {
+      console.error("Executable 'opencode' not found in PATH. Please ensure the Opencode CLI is installed.");
+      return res.status(500).json({ error: "Opencode CLI not found. Please install it." });
+    }
     res.status(500).json({ error: error.message });
   }
 });

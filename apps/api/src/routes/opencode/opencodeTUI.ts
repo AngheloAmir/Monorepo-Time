@@ -1,7 +1,8 @@
 import { Request, Response, Router } from "express";
+import { exec } from "child_process";
 import killPort from "kill-port";
 import { loadInstances, saveInstances, isPortInUse, findAvailablePort } from "./_tui";
-import { createOpencode } from "@opencode-ai/sdk";
+
 
 const router = Router();
 
@@ -17,6 +18,32 @@ export interface OpencodeInstance {
 
 export let opencodeInstances = new Map<string, OpencodeInstance>();
 loadInstances();
+router.get("/checkinstalled", async (req: Request, res: Response) => {
+    const checkCommand = (cmd: string): Promise<boolean> => {
+        return new Promise((resolve) => {
+            exec(cmd, (error) => {
+                resolve(!error);
+            });
+        });
+    };
+
+    try {
+        const [isOpencodeInPath, isNpmPackageInstalled] = await Promise.all([
+            checkCommand("command -v opencode"),
+            checkCommand("npm list -g opencode-ai --depth=0")
+        ]);
+
+        res.json({
+            installed:   isOpencodeInPath || isNpmPackageInstalled,
+            isInPath:    isOpencodeInPath,
+            isNpmGlobal: isNpmPackageInstalled
+        });
+    } catch (err) {
+        console.error("Error checking opencode usage:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 router.get("/list", (req: Request, res: Response) => {
     const instances = Array.from(opencodeInstances.values()).map(instance => ({
@@ -51,16 +78,16 @@ router.post("/identify", async (req: Request, res: Response) => {
     }
 
     res.json({
-        message:    "Identification complete",
-        active:     activeList.length,
-        removed:    deadList.length,
+        message: "Identification complete",
+        active: activeList.length,
+        removed: deadList.length,
         removedIds: deadList
     });
 });
 
 // Route to start a new Opencode instance
 router.post("/add", async (req: Request, res: Response) => {
-    const id   = (req.body.id as string) || Math.random().toString(36).substring(7);
+    const id = (req.body.id as string) || Math.random().toString(36).substring(7);
     const name = (req.body.name as string) || `Instance ${id}`;
 
     // If instance already exists, return its info
@@ -81,6 +108,9 @@ router.post("/add", async (req: Request, res: Response) => {
         const port = await findAvailablePort(4096);
 
 
+        // Workaround to import ESM-only package in CommonJS/ts-node environment
+        const dynamicImport = new Function('specifier', 'return import(specifier)');
+        const { createOpencode } = await dynamicImport("@opencode-ai/sdk");
 
         const opencode = await createOpencode({
             hostname: "127.0.0.1",
@@ -115,6 +145,10 @@ router.post("/add", async (req: Request, res: Response) => {
 
     } catch (error: any) {
         console.error("Failed to start opencode instance:", error);
+        if (error.code === 'ENOENT') {
+            console.error("Executable 'opencode' not found in PATH. Please ensure the Opencode CLI is installed.");
+            return res.status(500).json({ error: "Opencode CLI not found. Please install it." });
+        }
         res.status(500).json({ error: error.message });
     }
 });
@@ -122,14 +156,14 @@ router.post("/add", async (req: Request, res: Response) => {
 // Route to stop an instance
 router.post("/stop", async (req: Request, res: Response) => {
     const { id } = req.body;
-    
+
     if (!id) {
         return res.status(400).json({ error: "Instance ID is required" });
     }
 
     if (opencodeInstances.has(id)) {
         const instance = opencodeInstances.get(id)!;
-        
+
         try {
             if (instance.server) {
                 // We have the server handle, close it gracefully
@@ -146,16 +180,16 @@ router.post("/stop", async (req: Request, res: Response) => {
         } catch (e) {
             console.error(`Error closing instance ${id}:`, e);
             // Fallback: try to kill port anyway if close fails
-             try {
+            try {
                 await killPort(instance.port);
-             } catch(kpe) {
-                 console.error("Failed to force kill port:", kpe);
-             }
+            } catch (kpe) {
+                console.error("Failed to force kill port:", kpe);
+            }
         }
 
         opencodeInstances.delete(id);
         await saveInstances();
-        
+
         console.log(`Opencode instance ${id} stopped`);
         res.json({ success: true, message: "Instance stopped" });
     } else {
