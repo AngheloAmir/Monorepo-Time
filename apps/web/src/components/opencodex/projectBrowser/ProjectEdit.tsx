@@ -14,6 +14,9 @@ export default function ProjectEdit() {
     const getParentPath = useProjectState.use.getParentPath();
     const stashCount    = useGitStash.use.stashCount();
 
+    const isPasteProjecTextEnable    = useProjectState.use.isPasteProjecTextEnable();
+    const setIsPasteProjecTextEnable = useProjectState.use.setIsPasteProjecTextEnable();
+
     async function onFolder() {
         showModal("prompt", "New Folder", `Create a new folder at ${selectedFolder}`, "success", async (newName: any) => {
             if (newName) {
@@ -34,10 +37,6 @@ export default function ProjectEdit() {
                 loadProjectTree();
             }
         });
-    }
-
-    function onRefresh() {
-        loadProjectTree();
     }
 
     return (
@@ -73,9 +72,13 @@ export default function ProjectEdit() {
                 />
 
                 <Button3Mini
-                    onClick={onRefresh}
-                    title="Refresh"
-                    icon="fas fa-sync-alt text-xs"
+                    onClick={() => setIsPasteProjecTextEnable(!isPasteProjecTextEnable)}
+                    title="Paste Project"
+                    icon="fas fa-paste text-xs"
+                    className={isPasteProjecTextEnable ? 
+                        "bg-red-600" :
+                        ""
+                    }
                 />
             </div>
 

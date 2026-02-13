@@ -26,6 +26,10 @@ interface projectContext {
     loadProjectTree: () => Promise<void>;
     toggleFolder: (path: string) => void;
 
+    //paste project file:
+    isPasteProjecTextEnable: boolean;
+    setIsPasteProjecTextEnable: (value: boolean) => void;
+
     //current file open
     isFileEditorOpen: boolean;
     currentFile: string;
@@ -76,6 +80,11 @@ const projectState = create<projectContext>()((set, get) => ({
         }
     })),
 
+    setIsPasteProjecTextEnable: (value: boolean) => set({
+        isPasteProjecTextEnable: value
+    }),
+    isPasteProjecTextEnable: false,
+    
     selectedPath: "",
     selectedFolder: "",
     setSelectedPath: (path: string) => set(() => {
