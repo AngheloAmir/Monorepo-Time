@@ -1,11 +1,7 @@
 import { Request, Response, Router } from "express";
 import { exec } from "child_process";
-import path from "path";
 import killPort from "kill-port";
-import { loadInstances, saveInstances, isPortInUse, findAvailablePort, clean } from "./_tui";
-
-// Dynamic import for ESM-only package in CommonJS/ts-node environment
-const opencodeSdkPromise = (new Function('specifier', 'return import(specifier)'))("@opencode-ai/sdk");
+import { loadInstances, saveInstances, clean } from "./_tui";
 
 const router = Router();
 
@@ -20,8 +16,16 @@ export interface OpencodeInstance {
     lastSessionId?: string;
 }
 
-export let opencodeInstances = new Map<string, OpencodeInstance>();
+export interface OpencodeClient {
+    instanceId: string; //OpencodeInstance ID
+    clientId:   string;
+    
+}
+
+export let   opencodeInstances = new Map<string, OpencodeInstance>();
+export const clientInstance    = new Map<string, OpencodeClient>();
 loadInstances();
+
 router.get("/checkinstalled", async (req: Request, res: Response) => {
     const checkCommand = (cmd: string): Promise<boolean> => {
         return new Promise((resolve) => {
@@ -89,93 +93,6 @@ router.post("/clean", async (req: Request, res: Response) => {
     res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
 });
 
-// Route to start a new Opencode instance
-router.post("/add", async (req: Request, res: Response) => {
-    const id = (req.body.id as string) || Math.random().toString(36).substring(7);
-    const name = (req.body.name as string) || `Instance ${id}`;
-    const reset = req.body.reset === true;
-
-    // If instance already exists, return its info
-    if (opencodeInstances.has(id)) {
-        const instance = opencodeInstances.get(id)!;
-
-        if (reset) {
-            instance.lastSessionId = undefined;
-            await saveInstances();
-        }
-
-        return res.json({
-            status: "running",
-            url: instance.url,
-            id: instance.id,
-            port: instance.port,
-            name: instance.name,
-            lastSessionId: instance.lastSessionId,
-            message: reset ? "Instance already running, session reset" : "Instance already running"
-        });
-    }
-
-    try {
-        // Find a free port starting from 4096
-        const port = await findAvailablePort(4096);
-
-        // Use the memoized SDK import
-        const { createOpencode } = await opencodeSdkPromise;
-
-        // Change directory to the workspace root temporarily to ensure Opencode starts there
-        // This allows it to pick up local config (opencode.json) and tools correctly
-        const projectRoot = path.resolve(process.cwd(), "../../");
-        const originalCwd = process.cwd();
-
-        console.log(`Starting Opencode in root: ${projectRoot}`);
-        process.chdir(projectRoot);
-
-        try {
-            const opencode = await createOpencode({
-                hostname: "127.0.0.1",
-                port: port,
-                config: {
-                    model: "anthropic/claude-3-5-sonnet-20241022",
-                },
-            });
-
-            const instance: OpencodeInstance = {
-                server: opencode.server,
-                url: opencode.server.url,
-                port,
-                id,
-                name,
-                createdAt: Date.now(),
-                pid: process.pid,
-                lastSessionId: undefined // Fresh start
-            };
-
-            opencodeInstances.set(id, instance);
-            await saveInstances();
-
-            res.json({
-                status: "started",
-                url: opencode.server.url,
-                id,
-                name,
-                port
-            });
-        } finally {
-            // Restore original CWD
-            process.chdir(originalCwd);
-        }
-
-    } catch (error: any) {
-        console.error("Failed to start opencode instance:", error);
-        if (error.code === 'ENOENT') {
-            console.error("Executable 'opencode' not found in PATH. Please ensure the Opencode CLI is installed.");
-            return res.status(500).json({ error: "Opencode CLI not found. Please install it." });
-        }
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Route to stop an instance
 router.post("/stop", async (req: Request, res: Response) => {
     try {
         const { id } = req.body;
@@ -202,7 +119,6 @@ router.post("/stop", async (req: Request, res: Response) => {
     }
 });
 
-// Route to change instance name
 router.post("/change-name", async (req: Request, res: Response) => {
     const { id, name } = req.body;
 
@@ -219,10 +135,6 @@ router.post("/change-name", async (req: Request, res: Response) => {
     } else {
         res.status(404).json({ error: "Instance not found" });
     }
-});
-
-
-router.post("/chat", async (req: Request, res: Response) => {
 });
 
 

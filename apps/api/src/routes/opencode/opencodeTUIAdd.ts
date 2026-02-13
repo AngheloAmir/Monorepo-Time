@@ -1,0 +1,88 @@
+import { Request, Response, Router } from "express";
+import path from "path";
+import { saveInstances, findAvailablePort } from "./_tui";
+import { OpencodeInstance, opencodeInstances } from "./opencodeTUI";
+
+const opencodeSdkPromise = (new Function('specifier', 'return import(specifier)'))("@opencode-ai/sdk");
+const router             = Router();
+
+router.post("/add", async (req: Request, res: Response) => {
+    const { createOpencode } = await opencodeSdkPromise;
+    const id    = (req.body.id   as string) || Math.random().toString(36).substring(12);
+    const name  = (req.body.name as string) || `Instance ${id}`;
+    const reset = req.body.reset === true;
+
+    // If instance already exists, return its info
+    if (opencodeInstances.has(id)) {
+        const instance = opencodeInstances.get(id)!;
+
+        if (reset) {
+            instance.lastSessionId = undefined;
+            await saveInstances();
+        }
+
+        return res.json({
+            status:        "running",
+            url:           instance.url,
+            id:            instance.id,
+            port:          instance.port,
+            name:          instance.name,
+            lastSessionId: instance.lastSessionId,
+            message:       reset ? "Instance already running, session reset" : "Instance already running"
+        });
+    }
+
+    try {
+        const port          = await findAvailablePort(4096);
+        const projectRoot   = path.resolve(process.cwd(), "../../");
+        const originalCwd   = process.cwd();
+
+        console.log(`Starting Opencode in root: ${projectRoot}`);
+        process.chdir(projectRoot);
+
+        try {
+            const opencode = await createOpencode({
+                hostname: "127.0.0.1",
+                port: port,
+                config: {
+                    model: "anthropic/claude-3-5-sonnet-20241022",
+                },
+            });
+
+            const instance: OpencodeInstance = {
+                server: opencode.server,
+                url: opencode.server.url,
+                port,
+                id,
+                name,
+                createdAt: Date.now(),
+                pid: process.pid,
+                lastSessionId: undefined
+            };
+
+            opencodeInstances.set(id, instance);
+            await saveInstances();
+
+            res.json({
+                status: "started",
+                url: opencode.server.url,
+                id,
+                name,
+                port
+            });
+        } finally {
+            // Restore original CWD
+            process.chdir(originalCwd);
+        }
+
+    } catch (error: any) {
+        console.error("Failed to start opencode instance:", error);
+        if (error.code === 'ENOENT') {
+            console.error("Executable 'opencode' not found in PATH. Please ensure the Opencode CLI is installed.");
+            return res.status(500).json({ error: "Opencode CLI not found. Please install it." });
+        }
+        res.status(500).json({ error: error.message });
+    }
+});
+
+export default router;
