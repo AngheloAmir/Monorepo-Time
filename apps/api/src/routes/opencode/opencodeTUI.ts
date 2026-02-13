@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import killPort from "kill-port";
 import { loadInstances, saveInstances, isPortInUse, findAvailablePort } from "./_tui";
+import { createOpencode } from "@opencode-ai/sdk";
 
 const router = Router();
 
@@ -79,10 +80,7 @@ router.post("/add", async (req: Request, res: Response) => {
         // Find a free port starting from 4096
         const port = await findAvailablePort(4096);
 
-        // Dynamic import to bypass CJS/ESM issues with @opencode-ai/sdk
-        const dynamicImport = new Function('specifier', 'return import(specifier)');
-        const sdk = await dynamicImport("@opencode-ai/sdk");
-        const { createOpencode } = sdk;
+
 
         const opencode = await createOpencode({
             hostname: "127.0.0.1",

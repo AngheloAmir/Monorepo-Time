@@ -95511,13 +95511,13 @@ var gitStashHelper_default = router25;
 
 // src/routes/opencode/opencodeTUI.ts
 var import_express30 = __toESM(require_express2());
-var import_net = __toESM(require("net"));
+var import_kill_port = __toESM(require("kill-port"));
+
+// src/routes/opencode/_tui.ts
 var import_fs_extra23 = __toESM(require_lib());
 var import_path31 = __toESM(require("path"));
-var import_kill_port = __toESM(require("kill-port"));
-var router26 = (0, import_express30.Router)();
+var import_net = __toESM(require("net"));
 var OPENCODE_DATA_FILE = import_path31.default.join(process.cwd(), ".opencode.json");
-var opencodeInstances = /* @__PURE__ */ new Map();
 var saveInstances = async () => {
   try {
     const data = Array.from(opencodeInstances.values()).map((instance) => ({
@@ -95582,6 +95582,10 @@ var findAvailablePort = (startPort) => {
     });
   });
 };
+
+// src/routes/opencode/opencodeTUI.ts
+var router26 = (0, import_express30.Router)();
+var opencodeInstances = /* @__PURE__ */ new Map();
 loadInstances();
 router26.get("/list", (req, res) => {
   const instances = Array.from(opencodeInstances.values()).map((instance) => ({
