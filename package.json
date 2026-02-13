@@ -24,5 +24,8 @@
     "turbo": "^2.7.3"
   },
   "fontawesomeIcon": "fas fa-database text-orange-500",
-  "appType": "tool"
+  "appType": "tool",
+  "dependencies": {
+    "@opencode-ai/sdk": "^1.1.65"
+  }
 }

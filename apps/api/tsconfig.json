@@ -2,6 +2,10 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "commonjs",
+    "baseUrl": ".",
+    "paths": {
+      "@opencode-ai/sdk": ["../../node_modules/@opencode-ai/sdk/dist/index.d.ts", "./node_modules/@opencode-ai/sdk/dist/index.d.ts"]
+    },
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,

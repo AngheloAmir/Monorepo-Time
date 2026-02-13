@@ -101,7 +101,7 @@ import opencodeHelper from './routes/opencode/opencodeHelper';
 import scanProject from './routes/textEditor/projectBrowser';
 import textEditor from './routes/textEditor/textEditor';
 import gitStashHelper from './routes/utils/gitStashHelper';
-import OpenCodeTUISocket from './routes/opencode/opencodeTUI';
+import opencodeTUI from './routes/opencode/opencodeTUI';
 
 app.use("/", tester);
 
@@ -140,6 +140,7 @@ app.use("/" + apiRoute.deleteWorkspace, deleteWorkspace);
 
 //opencode
 app.use("/" + apiRoute.opencodeHelper, opencodeHelper);
+app.use("/" + apiRoute.opencodeTUI, opencodeTUI);
 
 //project browser and editor endpoints
 app.use("/" + apiRoute.scanProject, scanProject);
@@ -181,7 +182,6 @@ const io = new Server(httpServer, {
 runCmdDevSocket(io);
 interactiveTerminalSocket(io);
 setWorkspaceTemplateSocket(io);
-OpenCodeTUISocket(io);
 
 //=============================================================================
 // Helper to find an available port

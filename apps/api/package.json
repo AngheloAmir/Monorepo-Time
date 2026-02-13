@@ -14,12 +14,14 @@
     "localtest": "npm run build && npm install -g ."
   },
   "dependencies": {
+    "@opencode-ai/sdk": "^1.1.65",
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "execa": "^9.6.1",
     "express": "^5.2.1",
     "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.3",
+    "kill-port": "^2.0.1",
     "node-pty": "^1.1.0",
     "open": "^11.0.0",
     "pidusage": "^4.0.1",
@@ -43,6 +45,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/fs-extra": "^11.0.4",
+    "@types/kill-port": "^2.0.3",
     "@types/node": "^24.10.9",
     "@types/pidusage": "^2.0.5",
     "apiroute": "*",

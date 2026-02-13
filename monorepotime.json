@@ -43,9 +43,45 @@
         },
         {
             "category": "System API",
-            "devurl": "http://localhost:4793",
+            "devurl": "http://localhost:4792",
             "produrl": "",
             "items": [
+                {
+                    "label": "List Instances",
+                    "route": "/opencodetui/list",
+                    "methods": "GET",
+                    "description": "List all opencode instances",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Add Instance",
+                    "route": "/opencodetui/add",
+                    "methods": "POST",
+                    "description": "Start a new opencode instance",
+                    "sampleInput": "{\n \"name\": \"Test Instance\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Stop Instance",
+                    "route": "/opencodetui/stop",
+                    "methods": "POST",
+                    "description": "Stop an opencode instance",
+                    "sampleInput": "{\n \"id\": \"instance-id\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Identify Instances",
+                    "route": "/opencodetui/identify",
+                    "methods": "POST",
+                    "description": "Clean up zombie instances",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
                 {
                     "label": "Scan Workspaces",
                     "route": "/scanworkspace",
