@@ -385,15 +385,6 @@
                     "suggested": []
                 },
                 {
-                    "label": "Chat",
-                    "route": "/chat",
-                    "methods": "POST",
-                    "description": "Chat with an opencode instance",
-                    "sampleInput": "{\n \"instanceId\": \"instanceId\",\n \"message\": \"Hello\"\n}",
-                    "expectedOutcome": "",
-                    "suggested": []
-                },
-                {
                     "label": "Stop Instance",
                     "route": "/stop",
                     "methods": "POST",
@@ -434,7 +425,7 @@
                     "route": "/chat",
                     "methods": "POST",
                     "description": "",
-                    "sampleInput": "{\n    \"clientId\": \"random id\"\n}",
+                    "sampleInput": "{\n    \"clientId\": \"random-id\"\n}",
                     "expectedOutcome": "",
                     "suggested": []
                 }

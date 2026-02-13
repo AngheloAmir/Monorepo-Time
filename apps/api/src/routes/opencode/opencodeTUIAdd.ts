@@ -12,24 +12,32 @@ router.post("/add", async (req: Request, res: Response) => {
     const name  = (req.body.name as string) || `Instance ${id}`;
     const reset = req.body.reset === true;
 
-    // If instance already exists, return its info
+    // If instance already exists, check if it's actually alive
     if (opencodeInstances.has(id)) {
         const instance = opencodeInstances.get(id)!;
+        const { isPortInUse } = await import("./_tui");
+        const alive = await isPortInUse(instance.port);
 
-        if (reset) {
-            instance.lastSessionId = undefined;
-            await saveInstances();
+        if (alive) {
+            if (reset) {
+                instance.lastSessionId = undefined;
+                await saveInstances();
+            }
+
+            return res.json({
+                status:        "running",
+                url:           instance.url,
+                id:            instance.id,
+                port:          instance.port,
+                name:          instance.name,
+                lastSessionId: instance.lastSessionId,
+                message:       reset ? "Instance already running, session reset" : "Instance already running"
+            });
+        } else {
+            // Port is dead, remove stale record and continue to create a new one
+            console.log(`Instance ${id} found in map but port ${instance.port} is dead. Restarting...`);
+            opencodeInstances.delete(id);
         }
-
-        return res.json({
-            status:        "running",
-            url:           instance.url,
-            id:            instance.id,
-            port:          instance.port,
-            name:          instance.name,
-            lastSessionId: instance.lastSessionId,
-            message:       reset ? "Instance already running, session reset" : "Instance already running"
-        });
     }
 
     try {
