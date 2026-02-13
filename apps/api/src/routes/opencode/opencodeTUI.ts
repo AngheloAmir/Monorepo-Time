@@ -1,8 +1,11 @@
 import { Request, Response, Router } from "express";
 import { exec } from "child_process";
+import path from "path";
 import killPort from "kill-port";
-import { loadInstances, saveInstances, isPortInUse, findAvailablePort } from "./_tui";
+import { loadInstances, saveInstances, isPortInUse, findAvailablePort, clean } from "./_tui";
 
+// Dynamic import for ESM-only package in CommonJS/ts-node environment
+const opencodeSdkPromise = (new Function('specifier', 'return import(specifier)'))("@opencode-ai/sdk");
 
 const router = Router();
 
@@ -14,6 +17,7 @@ export interface OpencodeInstance {
     name: string;
     pid?: number;
     createdAt: number;
+    lastSessionId?: string;
 }
 
 export let opencodeInstances = new Map<string, OpencodeInstance>();
@@ -34,8 +38,8 @@ router.get("/checkinstalled", async (req: Request, res: Response) => {
         ]);
 
         res.json({
-            installed:   isOpencodeInPath || isNpmPackageInstalled,
-            isInPath:    isOpencodeInPath,
+            installed: isOpencodeInPath || isNpmPackageInstalled,
+            isInPath: isOpencodeInPath,
             isNpmGlobal: isNpmPackageInstalled
         });
     } catch (err) {
@@ -51,55 +55,63 @@ router.get("/list", (req: Request, res: Response) => {
         url: instance.url,
         port: instance.port,
         name: instance.name,
-        status: instance.server ? "active" : "detached", // 'detached' means we lost the handle but it might still be running
-        createdAt: instance.createdAt
+        
+        // 'detached' means we lost the handle but it might still be running
+        status: instance.server ? "active" : "detached", 
+        createdAt: instance.createdAt,
+        lastSessionId: instance.lastSessionId
     }));
     res.json({ instances });
 });
 
 router.post("/identify", async (req: Request, res: Response) => {
-    await loadInstances(); // Reload from disk to be sure
+    await loadInstances();
+    await clean(); // Handles port collisions and dead ports for all instances
 
-    const activeList: OpencodeInstance[] = [];
-    const deadList: string[] = [];
-
-    for (const [id, instance] of opencodeInstances.entries()) {
-        const inUse = await isPortInUse(instance.port);
-        if (inUse) {
-            activeList.push(instance);
-        } else {
-            deadList.push(id);
-            opencodeInstances.delete(id);
-        }
-    }
-
-    if (deadList.length > 0) {
-        await saveInstances(); // Update disk
-    }
+    // After clean(), opencodeInstances only contains valid, unique-per-port entries
+    const instances = Array.from(opencodeInstances.values()).map(instance => ({
+        id: instance.id,
+        name: instance.name,
+        port: instance.port,
+        status: instance.server ? "active" : "detached"
+    }));
 
     res.json({
-        message: "Identification complete",
-        active: activeList.length,
-        removed: deadList.length,
-        removedIds: deadList
+        message: "Identification and cleanup complete",
+        instances,
+        count: instances.length
     });
+});
+
+router.post("/clean", async (req: Request, res: Response) => {
+    await loadInstances();
+    await clean();
+    res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
 });
 
 // Route to start a new Opencode instance
 router.post("/add", async (req: Request, res: Response) => {
     const id = (req.body.id as string) || Math.random().toString(36).substring(7);
     const name = (req.body.name as string) || `Instance ${id}`;
+    const reset = req.body.reset === true;
 
     // If instance already exists, return its info
     if (opencodeInstances.has(id)) {
         const instance = opencodeInstances.get(id)!;
+
+        if (reset) {
+            instance.lastSessionId = undefined;
+            await saveInstances();
+        }
+
         return res.json({
             status: "running",
             url: instance.url,
             id: instance.id,
             port: instance.port,
             name: instance.name,
-            message: "Instance already running"
+            lastSessionId: instance.lastSessionId,
+            message: reset ? "Instance already running, session reset" : "Instance already running"
         });
     }
 
@@ -107,41 +119,51 @@ router.post("/add", async (req: Request, res: Response) => {
         // Find a free port starting from 4096
         const port = await findAvailablePort(4096);
 
+        // Use the memoized SDK import
+        const { createOpencode } = await opencodeSdkPromise;
 
-        // Workaround to import ESM-only package in CommonJS/ts-node environment
-        const dynamicImport = new Function('specifier', 'return import(specifier)');
-        const { createOpencode } = await dynamicImport("@opencode-ai/sdk");
+        // Change directory to the workspace root temporarily to ensure Opencode starts there
+        // This allows it to pick up local config (opencode.json) and tools correctly
+        const projectRoot = path.resolve(process.cwd(), "../../");
+        const originalCwd = process.cwd();
 
-        const opencode = await createOpencode({
-            hostname: "127.0.0.1",
-            port: port,
-            config: {
-                model: "anthropic/claude-3-5-sonnet-20241022",
-            },
-        });
+        console.log(`Starting Opencode in root: ${projectRoot}`);
+        process.chdir(projectRoot);
 
-        const instance: OpencodeInstance = {
-            server: opencode.server,
-            url: opencode.server.url,
-            port,
-            id,
-            name,
-            createdAt: Date.now(),
-            pid: process.pid // The SDK runs in the current process
-        };
+        try {
+            const opencode = await createOpencode({
+                hostname: "127.0.0.1",
+                port: port,
+                config: {
+                    model: "anthropic/claude-3-5-sonnet-20241022",
+                },
+            });
 
-        opencodeInstances.set(id, instance);
-        await saveInstances();
+            const instance: OpencodeInstance = {
+                server: opencode.server,
+                url: opencode.server.url,
+                port,
+                id,
+                name,
+                createdAt: Date.now(),
+                pid: process.pid,
+                lastSessionId: undefined // Fresh start
+            };
 
-        console.log(`Opencode instance ${id} (${name}) started at ${opencode.server.url}`);
+            opencodeInstances.set(id, instance);
+            await saveInstances();
 
-        res.json({
-            status: "started",
-            url: opencode.server.url,
-            id,
-            name,
-            port
-        });
+            res.json({
+                status: "started",
+                url: opencode.server.url,
+                id,
+                name,
+                port
+            });
+        } finally {
+            // Restore original CWD
+            process.chdir(originalCwd);
+        }
 
     } catch (error: any) {
         console.error("Failed to start opencode instance:", error);
@@ -166,14 +188,7 @@ router.post("/stop", async (req: Request, res: Response) => {
 
         try {
             if (instance.server) {
-                // We have the server handle, close it gracefully
                 instance.server.close();
-            } else {
-                // We don't have the handle (restored from JSON), but the port might still be in use.
-                // Since it's likely a zombie process or the same process ID, we can't easily "close" it 
-                // without killing the process on that port.
-                // For now, we'll just remove it from our records. 
-                // A more aggressive approach would be to use 'tree-kill' or 'kill-port' here.
                 await killPort(instance.port);
                 console.log(`Force killed port ${instance.port} for detached instance ${id}`);
             }
@@ -211,6 +226,94 @@ router.post("/change-name", async (req: Request, res: Response) => {
         opencodeInstances.set(id, instance); // Update map
         await saveInstances(); // Update disk
         res.json({ success: true, message: "Instance updated", instance: { id, name } });
+    } else {
+        res.status(404).json({ error: "Instance not found" });
+    }
+});
+
+
+router.post("/chat", async (req: Request, res: Response) => {
+    const {
+        instanceId,
+        message,
+        sessionId: reqSessionId
+    } = req.body;
+
+    if (!instanceId || !message) {
+        return res.status(400).json({ error: "instanceId and message are required" });
+    }
+
+    const instance = opencodeInstances.get(instanceId);
+
+    if (!instance) {
+        return res.status(404).json({ error: "Instance not found" });
+    }
+
+    // 1. Set headers for Server-Sent Events (SSE)
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    try {
+        const { createOpencode } = await opencodeSdkPromise;
+
+        const client = createOpencode({
+            baseUrl: instance.url,
+        });
+
+        // 3. Handle session: reuse existing, use provided, or create new
+        let sessionId = reqSessionId || instance.lastSessionId;
+
+        if (!sessionId) {
+            console.log(`Creating new session for instance ${instanceId}`);
+            const session = await client.session.create();
+            sessionId = session.data.id;
+            instance.lastSessionId = sessionId;
+            await saveInstances(); // Persist the new session ID
+        }
+
+        // 4. Send the prompt and stream the result
+        const stream = await client.session.prompt({
+            path: { id: sessionId },
+            body: {
+                parts: [{ type: "text", text: message }],
+                stream: true
+            }
+        });
+
+        // 5. Pipe the OpenCode stream to the Express response
+        for await (const chunk of stream) {
+            // Some SDKs return an object with a 'data' or 'choices' property
+            // We'll pass the whole chunk as JSON
+            res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+
+            // @ts-ignore - flush exists in some express setups (with compression)
+            if (res.flush) res.flush();
+        }
+
+        res.write('data: [DONE]\n\n');
+        res.end();
+
+    } catch (error: any) {
+        console.error("Streaming error:", error);
+        res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+        res.end();
+    }
+});
+
+router.post("/chat/reset", async (req: Request, res: Response) => {
+    const { instanceId } = req.body;
+
+    if (!instanceId) {
+        return res.status(400).json({ error: "Instance ID is required" });
+    }
+
+    if (opencodeInstances.has(instanceId)) {
+        const instance = opencodeInstances.get(instanceId)!;
+        instance.lastSessionId = undefined;
+        await saveInstances();
+        res.json({ success: true, message: "Session reset for instance " + instanceId });
     } else {
         res.status(404).json({ error: "Instance not found" });
     }
