@@ -82643,6 +82643,253 @@ var require_tree_kill = __commonJS({
   }
 });
 
+// src/routes/opencode/_tui.ts
+var tui_exports = {};
+__export(tui_exports, {
+  clean: () => clean,
+  findAvailablePort: () => findAvailablePort,
+  isPortInUse: () => isPortInUse,
+  loadInstances: () => loadInstances,
+  saveInstances: () => saveInstances
+});
+var import_fs_extra23, import_path31, import_net, OPENCODE_DATA_FILE, saveInstances, loadInstances, isPortInUse, findAvailablePort, clean;
+var init_tui = __esm({
+  "src/routes/opencode/_tui.ts"() {
+    "use strict";
+    import_fs_extra23 = __toESM(require_lib());
+    import_path31 = __toESM(require("path"));
+    import_net = __toESM(require("net"));
+    init_opencodeTUI();
+    OPENCODE_DATA_FILE = import_path31.default.join(__dirname, ".opencode.json");
+    saveInstances = async () => {
+      try {
+        const data = Array.from(opencodeInstances.values()).map((instance) => ({
+          id: instance.id,
+          url: instance.url,
+          port: instance.port,
+          name: instance.name,
+          pid: instance.pid,
+          createdAt: instance.createdAt,
+          lastSessionId: instance.lastSessionId
+        }));
+        await import_fs_extra23.default.writeJson(OPENCODE_DATA_FILE, data, { spaces: 2 });
+      } catch (err) {
+        console.error("Failed to save opencode instances:", err);
+      }
+    };
+    loadInstances = async () => {
+      try {
+        if (await import_fs_extra23.default.pathExists(OPENCODE_DATA_FILE)) {
+          const content = await import_fs_extra23.default.readFile(OPENCODE_DATA_FILE, "utf-8");
+          if (!content.trim()) {
+            opencodeInstances.clear();
+            return;
+          }
+          const data = JSON.parse(content);
+          opencodeInstances.clear();
+          if (Array.isArray(data)) {
+            data.forEach((item) => {
+              opencodeInstances.set(item.id, { ...item, server: void 0 });
+            });
+            console.log(`Loaded ${opencodeInstances.size} opencode instances from disk.`);
+          }
+        } else {
+          await import_fs_extra23.default.writeJson(OPENCODE_DATA_FILE, [], { spaces: 2 });
+        }
+      } catch (err) {
+        console.error("Failed to load opencode instances:", err);
+        opencodeInstances.clear();
+      }
+    };
+    isPortInUse = (port3) => {
+      return new Promise((resolve) => {
+        const server = import_net.default.createServer();
+        server.once("error", (err) => {
+          if (err.code === "EADDRINUSE") {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        });
+        server.once("listening", () => {
+          server.close();
+          resolve(false);
+        });
+        server.listen(port3);
+      });
+    };
+    findAvailablePort = (startPort) => {
+      return new Promise((resolve, reject) => {
+        const server = import_net.default.createServer();
+        server.unref();
+        server.on("error", (err) => {
+          if (err.code === "EADDRINUSE") {
+            resolve(findAvailablePort(startPort + 1));
+          } else {
+            reject(err);
+          }
+        });
+        server.listen(startPort, () => {
+          server.close(() => {
+            resolve(startPort);
+          });
+        });
+      });
+    };
+    clean = async () => {
+      const instances = Array.from(opencodeInstances.values());
+      const portsMap = /* @__PURE__ */ new Map();
+      instances.forEach((inst) => {
+        if (!portsMap.has(inst.port)) portsMap.set(inst.port, []);
+        portsMap.get(inst.port).push(inst);
+      });
+      let modified = false;
+      for (const [port3, insts] of portsMap.entries()) {
+        const inUse = await isPortInUse(port3);
+        if (!inUse) {
+          insts.forEach((inst) => {
+            opencodeInstances.delete(inst.id);
+            modified = true;
+          });
+          continue;
+        }
+        if (insts.length > 1) {
+          const toKeep = insts.find((i2) => !!i2.server) || insts.sort((a2, b) => b.createdAt - a2.createdAt)[0];
+          insts.forEach((inst) => {
+            if (inst.id !== toKeep.id) {
+              console.log(`Pruning redundant instance ${inst.id} on port ${port3}`);
+              opencodeInstances.delete(inst.id);
+              modified = true;
+            }
+          });
+        }
+      }
+      if (modified) {
+        await saveInstances();
+      }
+    };
+  }
+});
+
+// src/routes/opencode/opencodeTUI.ts
+var import_express30, import_child_process5, import_kill_port, router26, opencodeInstances, clientInstance, opencodeTUI_default;
+var init_opencodeTUI = __esm({
+  "src/routes/opencode/opencodeTUI.ts"() {
+    "use strict";
+    import_express30 = __toESM(require_express2());
+    import_child_process5 = require("child_process");
+    import_kill_port = __toESM(require("kill-port"));
+    init_tui();
+    router26 = (0, import_express30.Router)();
+    opencodeInstances = /* @__PURE__ */ new Map();
+    clientInstance = /* @__PURE__ */ new Map();
+    loadInstances();
+    router26.get("/checkinstalled", async (req, res) => {
+      const checkCommand = (cmd) => {
+        return new Promise((resolve) => {
+          (0, import_child_process5.exec)(cmd, (error) => {
+            resolve(!error);
+          });
+        });
+      };
+      try {
+        const [isOpencodeInPath, isNpmPackageInstalled] = await Promise.all([
+          checkCommand("command -v opencode"),
+          checkCommand("npm list -g opencode-ai --depth=0")
+        ]);
+        res.json({
+          installed: isOpencodeInPath || isNpmPackageInstalled,
+          isInPath: isOpencodeInPath,
+          isNpmGlobal: isNpmPackageInstalled
+        });
+      } catch (err) {
+        console.error("Error checking opencode usage:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
+    router26.get("/list", (req, res) => {
+      const instances = Array.from(opencodeInstances.values()).map((instance) => ({
+        id: instance.id,
+        url: instance.url,
+        port: instance.port,
+        name: instance.name,
+        // 'detached' means we lost the handle but it might still be running
+        status: instance.server ? "active" : "detached",
+        createdAt: instance.createdAt,
+        lastSessionId: instance.lastSessionId
+      }));
+      res.json({ instances });
+    });
+    router26.get("/listclient", (req, res) => {
+      const clients = Array.from(clientInstance.values()).map((client) => ({
+        instanceId: client.instanceId,
+        clientId: client.clientId,
+        clientName: client.clientName
+      }));
+      res.json({ clients });
+    });
+    router26.post("/identify", async (req, res) => {
+      await loadInstances();
+      await clean();
+      const instances = Array.from(opencodeInstances.values()).map((instance) => ({
+        id: instance.id,
+        name: instance.name,
+        port: instance.port,
+        status: instance.server ? "active" : "detached"
+      }));
+      res.json({
+        message: "Identification and cleanup complete",
+        instances,
+        count: instances.length
+      });
+    });
+    router26.post("/clean", async (req, res) => {
+      await loadInstances();
+      await clean();
+      res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
+    });
+    router26.post("/stop", async (req, res) => {
+      try {
+        const { id } = req.body;
+        if (!id)
+          return res.status(400).json({ error: "Instance ID is required" });
+        if (opencodeInstances.has(id)) {
+          const instance = opencodeInstances.get(id);
+          if (instance.server) {
+            instance.server.close();
+            await (0, import_kill_port.default)(instance.port);
+            console.log(`Force killed port ${instance.port} for detached instance ${id}`);
+          }
+          opencodeInstances.delete(id);
+          await saveInstances();
+          console.log(`Opencode instance ${id} stopped`);
+          res.json({ success: true, message: "Instance stopped" });
+        } else {
+          res.status(404).json({ error: "Instance not found" });
+        }
+      } catch (e) {
+        res.status(500).json({ error: e });
+      }
+    });
+    router26.post("/change-name", async (req, res) => {
+      const { id, name } = req.body;
+      if (!id || !name) {
+        return res.status(400).json({ error: "Instance ID and new Name are required" });
+      }
+      if (opencodeInstances.has(id)) {
+        const instance = opencodeInstances.get(id);
+        instance.name = name;
+        opencodeInstances.set(id, instance);
+        await saveInstances();
+        res.json({ success: true, message: "Instance updated", instance: { id, name } });
+      } else {
+        res.status(404).json({ error: "Instance not found" });
+      }
+    });
+    opencodeTUI_default = router26;
+  }
+});
+
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
@@ -95509,249 +95756,44 @@ router25.get("/clear", async (req, res) => {
 });
 var gitStashHelper_default = router25;
 
-// src/routes/opencode/opencodeTUI.ts
-var import_express30 = __toESM(require_express2());
-var import_child_process5 = require("child_process");
-var import_kill_port = __toESM(require("kill-port"));
+// src/index.ts
+init_opencodeTUI();
 
-// src/routes/opencode/_tui.ts
-var import_fs_extra23 = __toESM(require_lib());
-var import_path31 = __toESM(require("path"));
-var import_net = __toESM(require("net"));
-var OPENCODE_DATA_FILE = import_path31.default.join(__dirname, ".opencode.json");
-var saveInstances = async () => {
-  try {
-    const data = Array.from(opencodeInstances.values()).map((instance) => ({
-      id: instance.id,
-      url: instance.url,
-      port: instance.port,
-      name: instance.name,
-      pid: instance.pid,
-      createdAt: instance.createdAt,
-      lastSessionId: instance.lastSessionId
-    }));
-    await import_fs_extra23.default.writeJson(OPENCODE_DATA_FILE, data, { spaces: 2 });
-  } catch (err) {
-    console.error("Failed to save opencode instances:", err);
-  }
-};
-var loadInstances = async () => {
-  try {
-    if (await import_fs_extra23.default.pathExists(OPENCODE_DATA_FILE)) {
-      const content = await import_fs_extra23.default.readFile(OPENCODE_DATA_FILE, "utf-8");
-      if (!content.trim()) {
-        opencodeInstances.clear();
-        return;
-      }
-      const data = JSON.parse(content);
-      opencodeInstances.clear();
-      if (Array.isArray(data)) {
-        data.forEach((item) => {
-          opencodeInstances.set(item.id, { ...item, server: void 0 });
-        });
-        console.log(`Loaded ${opencodeInstances.size} opencode instances from disk.`);
-      }
-    } else {
-      await import_fs_extra23.default.writeJson(OPENCODE_DATA_FILE, [], { spaces: 2 });
-    }
-  } catch (err) {
-    console.error("Failed to load opencode instances:", err);
-    opencodeInstances.clear();
-  }
-};
-var isPortInUse = (port3) => {
-  return new Promise((resolve) => {
-    const server = import_net.default.createServer();
-    server.once("error", (err) => {
-      if (err.code === "EADDRINUSE") {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
-    server.once("listening", () => {
-      server.close();
-      resolve(false);
-    });
-    server.listen(port3);
-  });
-};
-var findAvailablePort = (startPort) => {
-  return new Promise((resolve, reject) => {
-    const server = import_net.default.createServer();
-    server.unref();
-    server.on("error", (err) => {
-      if (err.code === "EADDRINUSE") {
-        resolve(findAvailablePort(startPort + 1));
-      } else {
-        reject(err);
-      }
-    });
-    server.listen(startPort, () => {
-      server.close(() => {
-        resolve(startPort);
-      });
-    });
-  });
-};
-var clean = async () => {
-  const instances = Array.from(opencodeInstances.values());
-  const portsMap = /* @__PURE__ */ new Map();
-  instances.forEach((inst) => {
-    if (!portsMap.has(inst.port)) portsMap.set(inst.port, []);
-    portsMap.get(inst.port).push(inst);
-  });
-  let modified = false;
-  for (const [port3, insts] of portsMap.entries()) {
-    const inUse = await isPortInUse(port3);
-    if (!inUse) {
-      insts.forEach((inst) => {
-        opencodeInstances.delete(inst.id);
-        modified = true;
-      });
-      continue;
-    }
-    if (insts.length > 1) {
-      const toKeep = insts.find((i2) => !!i2.server) || insts.sort((a2, b) => b.createdAt - a2.createdAt)[0];
-      insts.forEach((inst) => {
-        if (inst.id !== toKeep.id) {
-          console.log(`Pruning redundant instance ${inst.id} on port ${port3}`);
-          opencodeInstances.delete(inst.id);
-          modified = true;
-        }
-      });
-    }
-  }
-  if (modified) {
-    await saveInstances();
-  }
-};
-
-// src/routes/opencode/opencodeTUI.ts
-var router26 = (0, import_express30.Router)();
-var opencodeInstances = /* @__PURE__ */ new Map();
-loadInstances();
-router26.get("/checkinstalled", async (req, res) => {
-  const checkCommand = (cmd) => {
-    return new Promise((resolve) => {
-      (0, import_child_process5.exec)(cmd, (error) => {
-        resolve(!error);
-      });
-    });
-  };
-  try {
-    const [isOpencodeInPath, isNpmPackageInstalled] = await Promise.all([
-      checkCommand("command -v opencode"),
-      checkCommand("npm list -g opencode-ai --depth=0")
-    ]);
-    res.json({
-      installed: isOpencodeInPath || isNpmPackageInstalled,
-      isInPath: isOpencodeInPath,
-      isNpmGlobal: isNpmPackageInstalled
-    });
-  } catch (err) {
-    console.error("Error checking opencode usage:", err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-router26.get("/list", (req, res) => {
-  const instances = Array.from(opencodeInstances.values()).map((instance) => ({
-    id: instance.id,
-    url: instance.url,
-    port: instance.port,
-    name: instance.name,
-    // 'detached' means we lost the handle but it might still be running
-    status: instance.server ? "active" : "detached",
-    createdAt: instance.createdAt,
-    lastSessionId: instance.lastSessionId
-  }));
-  res.json({ instances });
-});
-router26.post("/identify", async (req, res) => {
-  await loadInstances();
-  await clean();
-  const instances = Array.from(opencodeInstances.values()).map((instance) => ({
-    id: instance.id,
-    name: instance.name,
-    port: instance.port,
-    status: instance.server ? "active" : "detached"
-  }));
-  res.json({
-    message: "Identification and cleanup complete",
-    instances,
-    count: instances.length
-  });
-});
-router26.post("/clean", async (req, res) => {
-  await loadInstances();
-  await clean();
-  res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
-});
-router26.post("/stop", async (req, res) => {
-  try {
-    const { id } = req.body;
-    if (!id)
-      return res.status(400).json({ error: "Instance ID is required" });
-    if (opencodeInstances.has(id)) {
-      const instance = opencodeInstances.get(id);
-      if (instance.server) {
-        instance.server.close();
-        await (0, import_kill_port.default)(instance.port);
-        console.log(`Force killed port ${instance.port} for detached instance ${id}`);
-      }
-      opencodeInstances.delete(id);
-      await saveInstances();
-      console.log(`Opencode instance ${id} stopped`);
-      res.json({ success: true, message: "Instance stopped" });
-    } else {
-      res.status(404).json({ error: "Instance not found" });
-    }
-  } catch (e) {
-    res.status(500).json({ error: e });
-  }
-});
-router26.post("/change-name", async (req, res) => {
-  const { id, name } = req.body;
-  if (!id || !name) {
-    return res.status(400).json({ error: "Instance ID and new Name are required" });
-  }
-  if (opencodeInstances.has(id)) {
-    const instance = opencodeInstances.get(id);
-    instance.name = name;
-    opencodeInstances.set(id, instance);
-    await saveInstances();
-    res.json({ success: true, message: "Instance updated", instance: { id, name } });
-  } else {
-    res.status(404).json({ error: "Instance not found" });
-  }
-});
-var opencodeTUI_default = router26;
-
-// src/routes/opencode/opencodeTUIAdd.ts
+// src/routes/opencode/createInstance.ts
 var import_express31 = __toESM(require_express2());
 var import_path32 = __toESM(require("path"));
+init_tui();
+init_opencodeTUI();
 var opencodeSdkPromise = new Function("specifier", "return import(specifier)")("@opencode-ai/sdk");
 var router27 = (0, import_express31.Router)();
 router27.post("/add", async (req, res) => {
   const { createOpencode } = await opencodeSdkPromise;
-  const id = req.body.id || Math.random().toString(36).substring(12);
+  const id = req.body.id || Math.random().toString(36).substring(6);
   const name = req.body.name || `Instance ${id}`;
+  const model = req.body.model;
   const reset2 = req.body.reset === true;
   if (opencodeInstances.has(id)) {
     const instance = opencodeInstances.get(id);
-    if (reset2) {
-      instance.lastSessionId = void 0;
-      await saveInstances();
+    const { isPortInUse: isPortInUse2 } = await Promise.resolve().then(() => (init_tui(), tui_exports));
+    const alive = await isPortInUse2(instance.port);
+    if (alive) {
+      if (reset2) {
+        instance.lastSessionId = void 0;
+        await saveInstances();
+      }
+      return res.json({
+        status: "running",
+        url: instance.url,
+        id: instance.id,
+        port: instance.port,
+        name: instance.name,
+        lastSessionId: instance.lastSessionId,
+        message: reset2 ? "Instance already running, session reset" : "Instance already running"
+      });
+    } else {
+      console.log(`Instance ${id} found in map but port ${instance.port} is dead. Restarting...`);
+      opencodeInstances.delete(id);
     }
-    return res.json({
-      status: "running",
-      url: instance.url,
-      id: instance.id,
-      port: instance.port,
-      name: instance.name,
-      lastSessionId: instance.lastSessionId,
-      message: reset2 ? "Instance already running, session reset" : "Instance already running"
-    });
   }
   try {
     const port3 = await findAvailablePort(4096);
@@ -95764,7 +95806,7 @@ router27.post("/add", async (req, res) => {
         hostname: "127.0.0.1",
         port: port3,
         config: {
-          model: "anthropic/claude-3-5-sonnet-20241022"
+          ...model ? { model } : {}
         }
       });
       const instance = {
@@ -95798,19 +95840,184 @@ router27.post("/add", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-var opencodeTUIAdd_default = router27;
+var createInstance_default = router27;
 
-// src/routes/opencode/opencodeTUIChat.ts
+// src/routes/opencode/chats.ts
 var import_express32 = __toESM(require_express2());
+init_opencodeTUI();
 var opencodeSdkPromise2 = new Function("specifier", "return import(specifier)")("@opencode-ai/sdk");
 var router28 = (0, import_express32.Router)();
-router28.post("/newClient", async (req, res) => {
-  res.send("Hello World");
+router28.post("/newclient", async (req, res) => {
+  var _a2;
+  try {
+    const { instanceId, clientName, createSession } = req.body;
+    let { sessionId } = req.body;
+    const clientId = (_a2 = req.body.clientId) == null ? void 0 : _a2.trim();
+    if (!instanceId || !clientId || !clientName)
+      return res.status(400).json({ error: "Instance ID, Client ID and Client Name are required" });
+    const instance = opencodeInstances.get(instanceId);
+    if (!instance)
+      return res.status(404).json({ error: "Instance not found" });
+    if (clientInstance.has(clientId))
+      return res.status(400).json({ error: "Client already exists" });
+    const { createOpencodeClient } = await opencodeSdkPromise2;
+    const client = createOpencodeClient({
+      baseUrl: instance.url
+    });
+    if (!sessionId && createSession) {
+      console.log(`Proactively creating Opencode session for new client: ${clientId}`);
+      const session = await client.session.create();
+      sessionId = session.data.id;
+    }
+    const newClientInstance = {
+      instanceId,
+      clientId,
+      sessionId: sessionId || "",
+      // Actual session ID from Opencode
+      client,
+      clientName
+    };
+    clientInstance.set(clientId, newClientInstance);
+    res.json({
+      instanceId,
+      clientId,
+      clientName,
+      sessionId: newClientInstance.sessionId
+    });
+  } catch (error) {
+    console.error("Error creating opencode client:", error);
+    res.status(500).json({ error: error.message || error });
+  }
 });
 router28.post("/chat", async (req, res) => {
-  res.send("Hello World");
+  var _a2, _b2, _c2, _d2;
+  try {
+    const clientId = (_a2 = req.body.clientId) == null ? void 0 : _a2.trim();
+    const { message, format: format2, sessionId: reqSessionId } = req.body;
+    const cinstance = clientInstance.get(clientId);
+    if (!cinstance) {
+      console.log("Active Client IDs:", Array.from(clientInstance.keys()));
+      return res.status(404).json({ error: `Client '${clientId}' not found. Check for spaces or use /newclient.` });
+    }
+    let targetSessionId = reqSessionId || cinstance.sessionId;
+    if (!targetSessionId || !targetSessionId.startsWith("ses_")) {
+      console.log(`Creating fresh Opencode session for client: ${clientId}`);
+      const session = await cinstance.client.session.create();
+      targetSessionId = session.data.id;
+      if (!reqSessionId) cinstance.sessionId = targetSessionId;
+    }
+    const result = await cinstance.client.session.prompt({
+      path: { id: targetSessionId },
+      body: {
+        parts: [{ type: "text", text: message || "Hello" }],
+        ...format2 ? { format: format2 } : {}
+      }
+    });
+    console.log("Opencode Response:", JSON.stringify(result, null, 2));
+    res.json({
+      success: true,
+      sessionId: targetSessionId,
+      // If it's a structured output request, return that, otherwise return the raw parts
+      data: ((_c2 = (_b2 = result.data) == null ? void 0 : _b2.info) == null ? void 0 : _c2.structured_output) || ((_d2 = result.data) == null ? void 0 : _d2.parts) || result.data
+    });
+  } catch (error) {
+    console.error("Chat prompt error:", error);
+    res.status(500).json({ error: error.message || error });
+  }
 });
-var opencodeTUIChat_default = router28;
+router28.post("/chatevents", async (req, res) => {
+  var _a2;
+  let targetSessionId = "";
+  let streamRef = null;
+  try {
+    const clientId = (_a2 = req.body.clientId) == null ? void 0 : _a2.trim();
+    const { message, format: format2, sessionId: reqSessionId } = req.body;
+    const cinstance = clientInstance.get(clientId);
+    if (!cinstance) {
+      console.log("Active Client IDs:", Array.from(clientInstance.keys()));
+      return res.status(404).json({ error: `Client '${clientId}' not found. Check for spaces or use /newclient.` });
+    }
+    targetSessionId = reqSessionId || cinstance.sessionId;
+    if (!targetSessionId || !targetSessionId.startsWith("ses_")) {
+      console.log(`Creating fresh Opencode session for client: ${clientId}`);
+      const session = await cinstance.client.session.create();
+      targetSessionId = session.data.id;
+      if (!reqSessionId) cinstance.sessionId = targetSessionId;
+    }
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive"
+    });
+    res.write(`data: ${JSON.stringify({ type: "connected", sessionId: targetSessionId })}
+
+`);
+    const { stream } = await cinstance.client.event.subscribe();
+    streamRef = stream;
+    req.on("close", async () => {
+      console.log(`SSE connection closed for session: ${targetSessionId}`);
+      if (streamRef) streamRef.return(null);
+      try {
+        await cinstance.client.session.abort({ path: { id: targetSessionId } });
+      } catch (e) {
+      }
+    });
+    const promptPromise = cinstance.client.session.prompt({
+      path: { id: targetSessionId },
+      body: {
+        parts: [{ type: "text", text: message || "Hello" }],
+        ...format2 ? { format: format2 } : {}
+      }
+    });
+    (async () => {
+      var _a3, _b2, _c2, _d2, _e, _f;
+      try {
+        for await (const event of stream) {
+          const props = event.properties;
+          const eventSessionId = (props == null ? void 0 : props.sessionID) || ((_a3 = props == null ? void 0 : props.info) == null ? void 0 : _a3.sessionID) || ((_b2 = props == null ? void 0 : props.part) == null ? void 0 : _b2.sessionID);
+          if (eventSessionId === targetSessionId) {
+            res.write(`data: ${JSON.stringify(event)}
+
+`);
+            if (event.type === "session.status" && ((_c2 = props == null ? void 0 : props.status) == null ? void 0 : _c2.type) === "idle") {
+              break;
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Event stream error:", err);
+      } finally {
+        try {
+          const result = await promptPromise;
+          res.write(`data: ${JSON.stringify({
+            type: "completed",
+            success: true,
+            sessionId: targetSessionId,
+            data: ((_e = (_d2 = result.data) == null ? void 0 : _d2.info) == null ? void 0 : _e.structured_output) || ((_f = result.data) == null ? void 0 : _f.parts) || result.data
+          })}
+
+`);
+        } catch (err) {
+          res.write(`data: ${JSON.stringify({ type: "error", error: err.message || err })}
+
+`);
+        }
+        res.end();
+      }
+    })();
+  } catch (error) {
+    console.error("Chat SSE error:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message || error });
+    } else {
+      res.write(`data: ${JSON.stringify({ type: "error", error: error.message || error })}
+
+`);
+      res.end();
+    }
+  }
+});
+var chats_default = router28;
 
 // src/index.ts
 var args = process.argv.slice(2);
@@ -95885,8 +96092,8 @@ app2.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
 app2.use("/" + api_default.deleteWorkspace, deleteWorkspace_default);
 app2.use("/" + api_default.opencodeHelper, opencodeHelper_default);
 app2.use("/" + api_default.opencodeTUI, opencodeTUI_default);
-app2.use("/" + api_default.opencodeTUI, opencodeTUIAdd_default);
-app2.use("/" + api_default.opencodeTUI, opencodeTUIChat_default);
+app2.use("/" + api_default.opencodeTUI, createInstance_default);
+app2.use("/" + api_default.opencodeTUI, chats_default);
 app2.use("/" + api_default.scanProject, projectBrowser_default);
 app2.use("/" + api_default.textEditor, textEditor_default);
 var frontendPath = import_path33.default.join(__dirname, "../public");
