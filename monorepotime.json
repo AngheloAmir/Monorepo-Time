@@ -425,7 +425,7 @@
                     "route": "/chat",
                     "methods": "POST",
                     "description": "",
-                    "sampleInput": "{\n    \"clientId\": \"random-id\"\n}",
+                    "sampleInput": "{\n    \"clientId\": \"random-id\",\n    \"message\": \"Hello, Big Pickle!\"\n}",
                     "expectedOutcome": "",
                     "suggested": []
                 }

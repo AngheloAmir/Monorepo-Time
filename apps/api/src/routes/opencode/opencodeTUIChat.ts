@@ -50,6 +50,8 @@ router.post("/newclient", async (req: Request, res: Response) => {
 router.post("/chat", async (req: Request, res: Response) => {
     try {
         const clientId = (req.body.clientId as string)?.trim();
+        const { message, format } = req.body; // Use message and format from body
+
         const cinstance = clientInstance.get(clientId);
 
         if (!cinstance) {
@@ -62,38 +64,24 @@ router.post("/chat", async (req: Request, res: Response) => {
             console.log(`Creating fresh Opencode session for client: ${clientId}`);
             const session = await cinstance.client.session.create();
             cinstance.clientId = session.data.id;
-            // The mapping now holds the real SID from here on
         }
 
         const result = await cinstance.client.session.prompt({
             path: { id: cinstance.clientId },
             body: {
-                parts: [{ type: "text", text: "Research Anthropic and provide company info" }],
-                format: {
-                    type: "json_schema",
-                    schema: {
-                        type: "object",
-                        properties: {
-                            company: { type: "string", description: "Company name" },
-                            founded: { type: "number", description: "Year founded" },
-                            products: {
-                                type: "array",
-                                items: { type: "string" },
-                                description: "Main products",
-                            },
-                        },
-                        required: ["company", "founded"],
-                    },
-                },
+                parts: [{ type: "text", text: message || "Hello" }],
+                // Only include format if explicitly provided in the request
+                ...(format ? { format } : {})
             },
         });
 
-        console.log( JSON.stringify(result, null, 2));
+        console.log("Opencode Response:", JSON.stringify(result, null, 2));
 
         res.json({
             success: true,
             sessionId: cinstance.clientId,
-            data: result.data?.info?.structured_output || result.data
+            // If it's a structured output request, return that, otherwise return the raw parts
+            data: result.data?.info?.structured_output || result.data?.parts || result.data
         });
     } catch (error: any) {
         console.error("Chat prompt error:", error);

@@ -53,7 +53,7 @@ router.post("/add", async (req: Request, res: Response) => {
                 hostname: "127.0.0.1",
                 port: port,
                 config: {
-                    model: "anthropic/claude-3-5-sonnet-20241022",
+                    model: "opencode/big-pickle",
                 },
             });
 
