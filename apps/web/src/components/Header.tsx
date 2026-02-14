@@ -40,7 +40,7 @@ export default function Header() {
                     >
                         <i className="text-xl fa-solid fa-terminal text-blue-400 group-hover:text-blue-300"></i>
                         <span className="text-sm"> 
-                            <span className="font-bold text-white"> Ctrl + X </span> 
+                            <span className="font-bold text-white"> Ctrl + D </span> 
                             Agent Orchestrator
                         </span>
                     </button>

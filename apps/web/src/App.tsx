@@ -49,7 +49,7 @@ export default function App() {
                     e.preventDefault();
                     setShowGit(true);
                 }
-                if (e.key.toLowerCase() === 'x') {
+                if (e.key.toLowerCase() === 'd') {
                     e.preventDefault();
                     setShowOrchestrator(true);
                 }
