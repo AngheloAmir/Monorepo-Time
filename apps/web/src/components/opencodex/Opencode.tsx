@@ -26,6 +26,7 @@ interface Provider {
   id: string;
   name: string;
   connected: boolean;
+  models?: Model[];
 }
 
 interface Config {
@@ -49,6 +50,7 @@ export default function Opencode() {
   const [showProviderModal, setShowProviderModal] = useState(false);
   const [providerApiKey, setProviderApiKey] = useState("");
   const [selectedProvider, setSelectedProvider] = useState<string>("");
+  const [currentProvider, setCurrentProvider] = useState<string>("");
   const [tokenUsage, setTokenUsage] = useState<number>(0);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -80,7 +82,12 @@ export default function Opencode() {
     try {
       const res = await fetch(`${apiBase}/provider`);
       const data = await res.json();
-      setProviders(data.all || []);
+      const sortedProviders = (data.all || []).sort((a: Provider, b: Provider) => {
+        if (a.id === "opencode") return -1;
+        if (b.id === "opencode") return 1;
+        return a.name.localeCompare(b.name);
+      });
+      setProviders(sortedProviders);
     } catch (err) {
       console.error("Failed to fetch providers:", err);
     }
@@ -100,18 +107,35 @@ export default function Opencode() {
       const providersData = await providersRes.json();
       if (providersData.providers) {
         const allModels: Model[] = [];
+        const providerModelsMap: Record<string, Model[]> = {};
+        
         providersData.providers.forEach((p: any) => {
-          if (p.models) {
-            p.models.forEach((m: any) => {
-              allModels.push({
+          const providerModels: Model[] = [];
+          if (p.models && typeof p.models === 'object') {
+            Object.values(p.models).forEach((m: any) => {
+              const model: Model = {
                 id: `${p.id}/${m.id}`,
                 name: m.name || m.id,
                 provider: p.id,
-              });
+              };
+              allModels.push(model);
+              providerModels.push(model);
             });
           }
+          providerModelsMap[p.id] = providerModels;
         });
+        
         setModels(allModels);
+        setProviders((prev) => 
+          prev.map((provider) => ({
+            ...provider,
+            models: providerModelsMap[provider.id] || [],
+          })).sort((a, b) => {
+            if (a.id === "opencode") return -1;
+            if (b.id === "opencode") return 1;
+            return a.name.localeCompare(b.name);
+          })
+        );
       }
     } catch (err) {
       console.error("Failed to fetch config:", err);
@@ -212,6 +236,26 @@ export default function Opencode() {
     }
   };
 
+  const availableModels = currentProvider
+    ? models.filter((m) => m.provider === currentProvider)
+    : models;
+
+  const getProviderModelCount = (providerId: string) => {
+    const provider = providers.find((p) => p.id === providerId);
+    if (provider?.models) {
+      return provider.models.length;
+    }
+    return models.filter((m) => m.provider === providerId).length;
+  };
+
+  const currentProviderName = providers.find((p) => p.id === currentProvider)?.name || "";
+
+  const setActiveProvider = (providerId: string) => {
+    setCurrentProvider(providerId);
+    setSelectedModel("");
+    setShowProviderModal(false);
+  };
+
   return (
     <div className="flex flex-col h-full w-full bg-[#0A0A0A] rounded-xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border-b border-white/10">
@@ -240,7 +284,10 @@ export default function Opencode() {
             className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 rounded-lg text-gray-300 transition-colors flex items-center gap-2"
           >
             <i className="fas fa-plug"></i>
-            Providers
+            {currentProvider ? currentProviderName : "Providers"}
+            {currentProvider && (
+              <span className="w-2 h-2 rounded-full bg-green-400"></span>
+            )}
           </button>
         </div>
       </div>
@@ -264,14 +311,33 @@ export default function Opencode() {
         </div>
 
         <div className="flex items-center gap-2">
+          <label className="text-xs text-gray-400">Provider:</label>
+          <select
+            value={currentProvider}
+            onChange={(e) => {
+              setCurrentProvider(e.target.value);
+              setSelectedModel("");
+            }}
+            className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500"
+          >
+            <option value="">All Providers</option>
+            {providers.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex items-center gap-2">
           <label className="text-xs text-gray-400">Model:</label>
           <select
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
             className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-blue-500 max-w-[200px]"
           >
-            <option value="">Default</option>
-            {models.map((model) => (
+            {!currentProvider && <option value="">Default</option>}
+            {availableModels.map((model) => (
               <option key={model.id} value={model.id}>
                 {model.name}
               </option>
@@ -371,35 +437,69 @@ export default function Opencode() {
                 <p className="text-sm text-gray-400">Add API key for an LLM provider</p>
               </div>
               <div className="p-6 space-y-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-2">
-                    Provider
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-gray-400">
+                    Available Providers
                   </label>
-                  <select
-                    value={selectedProvider}
-                    onChange={(e) => setSelectedProvider(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="">Select a provider</option>
+                  <div className="space-y-2 max-h-[240px] overflow-y-auto">
                     {providers.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} {p.connected ? "(connected)" : ""}
-                      </option>
+                      <div
+                        key={p.id}
+                        className="flex items-center justify-between p-3 bg-gray-800 rounded-lg border border-gray-700"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${p.connected ? "bg-green-400" : "bg-gray-500"}`}></div>
+                          <div>
+                            <div className="text-sm text-white font-medium">{p.name}</div>
+                            <div className="text-xs text-gray-400">
+                              {getProviderModelCount(p.id)} models available
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          {currentProvider === p.id && (
+                            <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-400 rounded">
+                              Active
+                            </span>
+                          )}
+                          {p.connected && currentProvider !== p.id && (
+                            <button
+                              onClick={() => setActiveProvider(p.id)}
+                              className="px-3 py-1 text-xs bg-white/10 hover:bg-white/20 text-gray-300 rounded transition-colors"
+                            >
+                              Set Active
+                            </button>
+                          )}
+                          {!p.connected && (
+                            <button
+                              onClick={() => {
+                                setSelectedProvider(p.id);
+                              }}
+                              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
+                            >
+                              Connect
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     ))}
-                  </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-2">
-                    API Key
-                  </label>
-                  <input
-                    type="password"
-                    value={providerApiKey}
-                    onChange={(e) => setProviderApiKey(e.target.value)}
-                    placeholder="Enter API key..."
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
+
+                {selectedProvider && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-2">
+                      API Key for {providers.find((p) => p.id === selectedProvider)?.name}
+                    </label>
+                    <input
+                      type="password"
+                      value={providerApiKey}
+                      onChange={(e) => setProviderApiKey(e.target.value)}
+                      placeholder="Enter API key..."
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                )}
               </div>
               <div className="px-6 py-4 bg-black/20 flex justify-end gap-3">
                 <button
