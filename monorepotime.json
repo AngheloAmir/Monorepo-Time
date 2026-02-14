@@ -363,12 +363,12 @@
         },
         {
             "category": "Opencode",
-            "devurl": "http://localhost:4792/opencodetui",
+            "devurl": "http://localhost:4792/opencode",
             "produrl": "/opencodetui",
             "items": [
                 {
                     "label": "List Instances",
-                    "route": "/list",
+                    "route": "/listinstances",
                     "methods": "GET",
                     "description": "List all opencode instances",
                     "sampleInput": "{}",
@@ -377,7 +377,7 @@
                 },
                 {
                     "label": "Add Instance",
-                    "route": "/add",
+                    "route": "/createinstance",
                     "methods": "POST",
                     "description": "Start a new opencode instance",
                     "sampleInput": "{\n \"name\": \"Test Instance\"\n}",
@@ -404,16 +404,16 @@
                 },
                 {
                     "label": "New Client",
-                    "route": "/newclient",
+                    "route": "/createclient",
                     "methods": "POST",
                     "description": "",
-                    "sampleInput": "{\n   \"instanceId\": \"wwoqi55\", \n   \"clientId\": \" random-id\",\n   \"clientName\": \" my custom name\"\n} ",
+                    "sampleInput": "{\n   \"instanceId\": \"wwoqi55\", \n   \"clientId\": \" random-id\",\n   \"clientName\": \" my custom name\",\n   \"sessionId\": null\n} ",
                     "expectedOutcome": "",
                     "suggested": []
                 },
                 {
                     "label": "List Clients",
-                    "route": "/listclient",
+                    "route": "/listclients",
                     "methods": "GET",
                     "description": "",
                     "sampleInput": "{}",
@@ -421,11 +421,20 @@
                     "suggested": []
                 },
                 {
-                    "label": "chat",
-                    "route": "/chat",
+                    "label": "Chat / Prompt",
+                    "route": "/prompt",
                     "methods": "POST",
                     "description": "",
                     "sampleInput": "{\n    \"clientId\": \"random-id\",\n    \"message\": \"Hello, Big Pickle!\"\n}",
+                    "expectedOutcome": "",
+                    "suggested": []
+                },
+                {
+                    "label": "Check Installation",
+                    "route": "/check",
+                    "methods": "GET",
+                    "description": "",
+                    "sampleInput": "{}",
                     "expectedOutcome": "",
                     "suggested": []
                 }

@@ -1,53 +1,5 @@
-import fs from "fs-extra";
-import path from "path";
 import net from "net";
-import { opencodeInstances } from "./opencodeTUI";
-
-const OPENCODE_DATA_FILE = path.join(__dirname, ".opencode.json");
-
-export const saveInstances = async () => {
-    try {
-        const data = Array.from(opencodeInstances.values()).map(instance => ({
-            id: instance.id,
-            url: instance.url,
-            port: instance.port,
-            name: instance.name,
-            pid: instance.pid,
-            createdAt: instance.createdAt,
-            lastSessionId: instance.lastSessionId
-        }));
-        await fs.writeJson(OPENCODE_DATA_FILE, data, { spaces: 2 });
-    } catch (err) {
-        console.error("Failed to save opencode instances:", err);
-    }
-};
-
-export const loadInstances = async () => {
-    try {
-        if (await fs.pathExists(OPENCODE_DATA_FILE)) {
-            const content = await fs.readFile(OPENCODE_DATA_FILE, 'utf-8');
-            if (!content.trim()) {
-                opencodeInstances.clear();
-                return;
-            }
-            const data = JSON.parse(content);
-            opencodeInstances.clear();
-            if (Array.isArray(data)) {
-                data.forEach((item: any) => {
-                    opencodeInstances.set(item.id, { ...item, server: undefined });
-                });
-                console.log(`Loaded ${opencodeInstances.size} opencode instances from disk.`);
-            }
-        } else {
-            // Initialize empty file if it doesn't exist
-            await fs.writeJson(OPENCODE_DATA_FILE, [], { spaces: 2 });
-        }
-    } catch (err) {
-        console.error("Failed to load opencode instances:", err);
-        // Fallback to empty if initialization fails
-        opencodeInstances.clear();
-    }
-};
+import { opencodeInstances } from "./_core";
 
 export const isPortInUse = (port: number): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -95,8 +47,6 @@ export const clean = async () => {
         portsMap.get(inst.port)!.push(inst);
     });
 
-    let modified = false;
-
     for (const [port, insts] of portsMap.entries()) {
         const inUse = await isPortInUse(port);
         
@@ -104,7 +54,6 @@ export const clean = async () => {
             // Port is dead. Purge ALL records for this port (active or detached)
             insts.forEach(inst => {
                 opencodeInstances.delete(inst.id);
-                modified = true;
             });
             continue;
         }
@@ -119,13 +68,25 @@ export const clean = async () => {
                 if (inst.id !== toKeep.id) {
                     console.log(`Pruning redundant instance ${inst.id} on port ${port}`);
                     opencodeInstances.delete(inst.id);
-                    modified = true;
                 }
             });
         }
     }
-
-    if (modified) {
-        await saveInstances();
-    }
 };
+
+export const opencodeJson = `
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "git-stash-build": {
+      "mode": "primary",
+      "prompt": "After completing the task, run this in bash: curl -s -X POST http://localhost:4792/gitstash/add -H 'Content-Type: application/json' -d '{\"stashName\":\"<summary>\"}' replacing <summary> with a short description of the changes. Do not read or display the output of the curl command.",
+      "tools": {
+        "write": true,
+        "edit":  true,
+        "bash":  true
+      }
+    }
+  }
+}
+`;

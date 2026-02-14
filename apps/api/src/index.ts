@@ -31,13 +31,17 @@ if (command === 'init') {
 
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
-import apiRoute from 'apiroute';
 import config from 'config';
 import open from 'open';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import net from 'net';
+
+// Route and Socket Imports
+import SETROUTES from './routes';
+import runCmdDevSocket from './routes/terminal/runcmddev';
+import { interactiveTerminalSocket } from './routes/terminal/interactiveTerminal';
+import { setWorkspaceTemplateSocket } from './routes/workspace/setworkspace';
 
 //routers
 const app  = express();
@@ -69,97 +73,12 @@ app.use(cors({
   },
   credentials: true,
 }));
-app.use(express.static('public'));
 app.use(express.json());
 
 //routes=======================================================================
-import tester from './routes/utils/_tester';
-import apiScanWorkspace from './routes/workspace/scanworkspace';
-import runCmdDevSocket from './routes/terminal/runcmddev';
-import stopProcess from './routes/terminal/stopcmd';
-import listWorkspacesDir from './routes/workspace/listworkspacedirs';
-import newWorkspace from './routes/workspace/newworkspace';
-import interactiveTerminal, { interactiveTerminalSocket } from './routes/terminal/interactiveTerminal';
-import stopInteractiveTerm from './routes/terminal/stopInteractiveTerminal';
-import updateWorkspace from './routes/workspace/updateworkspace';
-import vscodeHideShow from './routes/utils/vscodeHideShow';
-import rootPath from './routes/utils/rootPath';
-import scaffoldRepo from './routes/utils/scafoldrepo';
-import turborepoExist from './routes/home/turborepoexist';
-import firstRunRoute from './routes/utils/firstrun';
-import notesRoute from './routes/home/notes';
-import crudTestRoute from './routes/crud/crudtest';
-import gitControlHelper from './routes/utils/gitControlHelper';
-import initMonorepoTime from './routes/utils/initmonorepotime';
-import processTree from './routes/home/processUsage';
-import apiDocker from './routes/home/apidocker';
-import availableTemplates from './routes/workspace/availabletemplates';
-import setWorkspaceTemplate, { setWorkspaceTemplateSocket } from './routes/workspace/setworkspace';
-import stopTerminalWorkspace from './routes/terminal/stopTerminalWorkspace';
-import deleteWorkspace from './routes/workspace/deleteWorkspace';
-import opencodeHelper from './routes/opencode/opencodeHelper';
-import scanProject from './routes/textEditor/projectBrowser';
-import textEditor from './routes/textEditor/textEditor';
-import gitStashHelper from './routes/utils/gitStashHelper';
-
-import opencodeTUI from './routes/opencode/opencodeTUI';
-import createInstance from './routes/opencode/createInstance';
-import chats from './routes/opencode/chats';
-
-app.use("/", tester);
-
-//inits
-app.use("/" + apiRoute.getRootPath, rootPath);
-app.use("/" + apiRoute.scaffoldRepo, scaffoldRepo);
-app.use("/" + apiRoute.turborepoExist, turborepoExist);
-app.use("/" + apiRoute.firstRun, firstRunRoute);
-app.use("/" + apiRoute.initMonorepoTime, initMonorepoTime);
-
-//dashboard / home endpoints
-app.use("/" + apiRoute.notes, notesRoute);
-app.use("/" + apiRoute.crudTest, crudTestRoute);
-app.use("/" + apiRoute.processTree, processTree);
-app.use("/" + apiRoute.docker, apiDocker);
-
-//gits
-app.use("/" + apiRoute.gitControl, gitControlHelper);
-app.use("/" + apiRoute.gitStash, gitStashHelper);
-
-//terminal endpoints
-app.use("/" + apiRoute.interactvTerminal, interactiveTerminal);
-app.use("/" + apiRoute.stopInteractiveTerminal, stopInteractiveTerm);
-app.use("/" + apiRoute.stopTerminalWorkspace, stopTerminalWorkspace);
-app.use("/" + apiRoute.stopProcess, stopProcess);
-app.use("/" + apiRoute.updateWorkspace, updateWorkspace);
-app.use("/" + apiRoute.hideShowFileFolder, vscodeHideShow);
-
-//workspace endpoints
-app.use("/" + apiRoute.scanWorkspace, apiScanWorkspace);
-app.use("/" + apiRoute.listWorkspacesDir, listWorkspacesDir);
-app.use("/" + apiRoute.newWorkspace, newWorkspace);
-app.use("/" + apiRoute.availabletemplates, availableTemplates);
-app.use("/" + apiRoute.setWorkspaceTemplate, setWorkspaceTemplate);
-app.use("/" + apiRoute.deleteWorkspace, deleteWorkspace);
-
-//opencode
-app.use("/" + apiRoute.opencodeHelper, opencodeHelper);
-app.use("/" + apiRoute.opencodeTUI,    opencodeTUI);
-app.use("/" + apiRoute.opencodeTUI,    createInstance);
-app.use("/" + apiRoute.opencodeTUI,    chats);
-
-//project browser and editor endpoints
-app.use("/" + apiRoute.scanProject, scanProject);
-app.use("/" + apiRoute.textEditor, textEditor);
+SETROUTES(app);
 
 
-// Serve frontend static files==================================================
-const frontendPath = path.join(__dirname, '../public');
-app.use(express.static(frontendPath));
-app.get(/(.*)/, (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
-
-// Socket.IO Setup ============================================================
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -184,6 +103,7 @@ const io = new Server(httpServer, {
   },
   transports: ['websocket', 'polling']
 });
+
 runCmdDevSocket(io);
 interactiveTerminalSocket(io);
 setWorkspaceTemplateSocket(io);

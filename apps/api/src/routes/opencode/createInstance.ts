@@ -1,12 +1,12 @@
 import { Request, Response, Router } from "express";
 import path from "path";
-import { saveInstances, findAvailablePort } from "./_tui";
-import { OpencodeInstance, opencodeInstances } from "./opencodeTUI";
+import { findAvailablePort } from "./_helper";
+import { OpencodeInstance, opencodeInstances } from "./_core";
 
 const opencodeSdkPromise = (new Function('specifier', 'return import(specifier)'))("@opencode-ai/sdk");
 const router             = Router();
 
-router.post("/add", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
     const { createOpencode } = await opencodeSdkPromise;
     const id    = (req.body.id   as string) || Math.random().toString(36).substring(6);
     const name  = (req.body.name as string) || `Instance ${id}`;
@@ -16,13 +16,12 @@ router.post("/add", async (req: Request, res: Response) => {
     // If instance already exists, check if it's actually alive
     if (opencodeInstances.has(id)) {
         const instance = opencodeInstances.get(id)!;
-        const { isPortInUse } = await import("./_tui");
+        const { isPortInUse } = await import("./_helper");
         const alive = await isPortInUse(instance.port);
 
         if (alive) {
             if (reset) {
                 instance.lastSessionId = undefined;
-                await saveInstances();
             }
 
             return res.json({
@@ -59,31 +58,22 @@ router.post("/add", async (req: Request, res: Response) => {
             });
 
             const instance: OpencodeInstance = {
-                server: opencode.server,
-                url: opencode.server.url,
-                port,
-                id,
-                name,
-                createdAt: Date.now(),
-                pid: process.pid,
-                lastSessionId: undefined
+                server:         opencode.server,
+                url:            opencode.server.url,
+                port:           port,
+                id:             id,
+                name:           name,
+                createdAt:      Date.now(),
+                pid:            process.pid,
+                lastSessionId:  undefined
             };
 
             opencodeInstances.set(id, instance);
-            await saveInstances();
-
-            res.json({
-                status: "started",
-                url: opencode.server.url,
-                id,
-                name,
-                port
-            });
+            const { server, ...responseInstance } = instance;
+            res.json(responseInstance);
         } finally {
-            // Restore original CWD
             process.chdir(originalCwd);
         }
-
     } catch (error: any) {
         console.error("Failed to start opencode instance:", error);
         if (error.code === 'ENOENT') {
