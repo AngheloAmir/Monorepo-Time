@@ -14,7 +14,7 @@
     "localtest": "npm run build && npm install -g ."
   },
   "dependencies": {
-    "@opencode-ai/sdk": "^1.1.65",
+    "@opencode-ai/sdk": "^1.2.1",
     "chalk": "^4.1.2",
     "cors": "^2.8.5",
     "execa": "^9.6.1",

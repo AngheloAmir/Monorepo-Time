@@ -437,6 +437,15 @@
                     "sampleInput": "{}",
                     "expectedOutcome": "",
                     "suggested": []
+                },
+                {
+                    "label": "User Defaults",
+                    "route": "/defaults",
+                    "methods": "GET",
+                    "description": "",
+                    "sampleInput": "{}",
+                    "expectedOutcome": "",
+                    "suggested": []
                 }
             ]
         }

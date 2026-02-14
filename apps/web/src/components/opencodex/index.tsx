@@ -1,8 +1,9 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import useOpencode from "../../appstates/opencode";
 import ResizerBar     from "../ui/ResizerBar";
 //import InitMessage from "./InitMessage";
 import ProjectBrowser from "./projectBrowser";
+import Opencode from "./Opencode";
 
 interface OpenCodeProps {
     isVisible: boolean
@@ -12,7 +13,6 @@ export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
     const sidebarWidth    = useOpencode.use.sidebarWidth();
     const setSidebarWidth = useOpencode.use.setSidebarWidth();
     const [isDraggingOver, setIsDraggingOver] = useState(false);
-    const iframeRef = useRef<HTMLIFrameElement>(null);
 
     return (
         <div className={`h-full w-full p-2 gap-2 ${isVisible ? 'flex' : 'hidden'} `}>
@@ -36,11 +36,8 @@ export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
                     onStart={() => {}}
                     onStartManual={() => {}}
                /> */}
-               <iframe 
-                    ref={iframeRef}
-                    className="w-full h-full" 
-                    src="http://localhost:4096" 
-               />
+               <Opencode />
+
             </div>
         </div>
     )
