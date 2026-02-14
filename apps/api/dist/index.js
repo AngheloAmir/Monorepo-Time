@@ -42073,27 +42073,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module2.exports = Router32;
+    module2.exports = Router28;
     module2.exports.Route = Route;
-    function Router32(options) {
-      if (!(this instanceof Router32)) {
-        return new Router32(options);
+    function Router28(options) {
+      if (!(this instanceof Router28)) {
+        return new Router28(options);
       }
       const opts = options || {};
-      function router32(req, res, next) {
-        router32.handle(req, res, next);
+      function router28(req, res, next) {
+        router28.handle(req, res, next);
       }
-      Object.setPrototypeOf(router32, this);
-      router32.caseSensitive = opts.caseSensitive;
-      router32.mergeParams = opts.mergeParams;
-      router32.params = {};
-      router32.strict = opts.strict;
-      router32.stack = [];
-      return router32;
+      Object.setPrototypeOf(router28, this);
+      router28.caseSensitive = opts.caseSensitive;
+      router28.mergeParams = opts.mergeParams;
+      router28.params = {};
+      router28.strict = opts.strict;
+      router28.stack = [];
+      return router28;
     }
-    Router32.prototype = function() {
+    Router28.prototype = function() {
     };
-    Router32.prototype.param = function param(name, fn) {
+    Router28.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -42113,7 +42113,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router32.prototype.handle = function handle(req, res, callback) {
+    Router28.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -42240,7 +42240,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router32.prototype.use = function use(handler) {
+    Router28.prototype.use = function use(handler) {
       let offset = 0;
       let path40 = "/";
       if (typeof handler !== "function") {
@@ -42273,7 +42273,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router32.prototype.route = function route3(path40) {
+    Router28.prototype.route = function route3(path40) {
       const route4 = new Route(path40);
       const layer = new Layer(path40, {
         sensitive: this.caseSensitive,
@@ -42288,7 +42288,7 @@ var require_router = __commonJS({
       return route4;
     };
     methods.concat("all").forEach(function(method) {
-      Router32.prototype[method] = function(path40) {
+      Router28.prototype[method] = function(path40) {
         const route3 = this.route(path40);
         route3[method].apply(route3, slice.call(arguments, 1));
         return this;
@@ -42471,13 +42471,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils5().compileTrust;
     var resolve = require("path").resolve;
     var once9 = require_once();
-    var Router32 = require_router();
+    var Router28 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app3 = exports2 = module2.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app3.init = function init() {
-      var router32 = null;
+      var router28 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -42486,13 +42486,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router32 === null) {
-            router32 = new Router32({
+          if (router28 === null) {
+            router28 = new Router28({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router32;
+          return router28;
         }
       });
     };
@@ -42563,15 +42563,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router32 = this.router;
+      var router28 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router32.use(path40, fn2);
+          return router28.use(path40, fn2);
         }
         debug(".use app under %s", path40);
         fn2.mountpath = path40;
         fn2.parent = this;
-        router32.use(path40, function mounted_app(req, res, next) {
+        router28.use(path40, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -54607,7 +54607,7 @@ var require_express = __commonJS({
     var EventEmitter2 = require("events").EventEmitter;
     var mixin2 = require_merge_descriptors();
     var proto = require_application();
-    var Router32 = require_router();
+    var Router28 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -54629,8 +54629,8 @@ var require_express = __commonJS({
     exports2.application = proto;
     exports2.request = req;
     exports2.response = res;
-    exports2.Route = Router32.Route;
-    exports2.Router = Router32;
+    exports2.Route = Router28.Route;
+    exports2.Router = Router28;
     exports2.json = bodyParser.json;
     exports2.raw = bodyParser.raw;
     exports2.static = require_serve_static();
@@ -82643,13 +82643,12 @@ var require_tree_kill = __commonJS({
   }
 });
 
-// src/routes/opencode/_core.ts
-var opencodeInstances, clientInstance;
+// src/routes/opencode/core.ts
+var opencodeInstances;
 var init_core2 = __esm({
-  "src/routes/opencode/_core.ts"() {
+  "src/routes/opencode/core.ts"() {
     "use strict";
     opencodeInstances = /* @__PURE__ */ new Map();
-    clientInstance = /* @__PURE__ */ new Map();
   }
 });
 
@@ -82873,7 +82872,7 @@ Examples:
 }
 
 // src/index.ts
-var import_express37 = __toESM(require_express2());
+var import_express33 = __toESM(require_express2());
 var import_path33 = __toESM(require("path"));
 var import_cors = __toESM(require_lib4());
 
@@ -83603,17 +83602,12 @@ var apiRoute = {
   //opencode routes
   opencode: "opencode",
   opencodeCreateInstance: "opencode/createinstance",
-  opencodeListInstances: "opencode/listinstances",
-  opencodeCreateClient: "opencode/createclient",
-  opencodeListClients: "opencode/listclients",
-  opencodePrompt: "opencode/prompt",
-  //session based chat
-  opencodeSessionChat: "opencode/sessionchat"
+  opencodeListInstances: "opencode/listinstances"
 };
 var api_default = apiRoute;
 
 // src/routes/index.ts
-var import_express36 = __toESM(require_express2());
+var import_express32 = __toESM(require_express2());
 
 // src/routes/utils/_tester.ts
 var import_express = __toESM(require_express2());
@@ -95702,8 +95696,10 @@ var createInstance_default = router25;
 // src/routes/opencode/listInstance.ts
 var import_express30 = __toESM(require_express2());
 init_core2();
+init_helper();
 var router26 = (0, import_express30.Router)();
-router26.get("/", (req, res) => {
+router26.get("/", async (req, res) => {
+  await clean();
   const instances = Array.from(opencodeInstances.values()).map((instance) => ({
     id: instance.id,
     url: instance.url,
@@ -95721,7 +95717,6 @@ var listInstance_default = router26;
 // src/routes/opencode/opencode.ts
 var import_express31 = __toESM(require_express2());
 var import_kill_port = __toESM(require("kill-port"));
-init_helper();
 init_core2();
 var import_child_process5 = require("child_process");
 var router27 = (0, import_express31.Router)();
@@ -95747,24 +95742,6 @@ router27.get("/check", async (req, res) => {
     console.error("Error checking opencode usage:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
-});
-router27.post("/identify", async (req, res) => {
-  await clean();
-  const instances = Array.from(opencodeInstances.values()).map((instance) => ({
-    id: instance.id,
-    name: instance.name,
-    port: instance.port,
-    status: instance.server ? "active" : "detached"
-  }));
-  res.json({
-    message: "Identification and cleanup complete",
-    instances,
-    count: instances.length
-  });
-});
-router27.post("/clean", async (req, res) => {
-  await clean();
-  res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
 });
 router27.post("/stop", async (req, res) => {
   try {
@@ -95804,207 +95781,6 @@ router27.post("/change-name", async (req, res) => {
 });
 var opencode_default = router27;
 
-// src/routes/opencode/createClient.ts
-var import_express32 = __toESM(require_express2());
-init_core2();
-var opencodeSdkPromise2 = new Function("specifier", "return import(specifier)")("@opencode-ai/sdk");
-var router28 = (0, import_express32.Router)();
-router28.post("/", async (req, res) => {
-  var _a2;
-  try {
-    const { instanceId, clientName, createSession } = req.body;
-    let { sessionId } = req.body;
-    const clientId = (_a2 = req.body.clientId) == null ? void 0 : _a2.trim();
-    if (!instanceId || !clientId || !clientName)
-      return res.status(400).json({ error: "Instance ID, Client ID and Client Name are required" });
-    const instance = opencodeInstances.get(instanceId);
-    if (!instance)
-      return res.status(404).json({ error: "Instance not found" });
-    if (clientInstance.has(clientId))
-      return res.status(400).json({ error: "Client already exists" });
-    const { createOpencodeClient } = await opencodeSdkPromise2;
-    const client = createOpencodeClient({
-      baseUrl: instance.url
-    });
-    if (!sessionId && createSession) {
-      console.log(`Proactively creating Opencode session for new client: ${clientId}`);
-      const session = await client.session.create();
-      sessionId = session.data.id;
-    }
-    const newClientInstance = {
-      instanceId,
-      clientId,
-      sessionId: sessionId || "",
-      // Actual session ID from Opencode
-      client,
-      clientName
-    };
-    clientInstance.set(clientId, newClientInstance);
-    res.json({
-      instanceId,
-      clientId,
-      clientName,
-      sessionId: newClientInstance.sessionId
-    });
-  } catch (error) {
-    console.error("Error creating opencode client:", error);
-    res.status(500).json({ error: error.message || error });
-  }
-});
-var createClient_default = router28;
-
-// src/routes/opencode/listClients.ts
-var import_express33 = __toESM(require_express2());
-init_core2();
-var router29 = (0, import_express33.Router)();
-router29.get("/", (req, res) => {
-  const clients = Array.from(opencodeInstances.values()).map((instance) => ({
-    ...instance
-  }));
-  res.json({ clients });
-});
-var listClients_default = router29;
-
-// src/routes/opencode/prompt.ts
-var import_express34 = __toESM(require_express2());
-init_core2();
-var router30 = (0, import_express34.Router)();
-router30.post("/", async (req, res) => {
-  var _a2, _b2, _c2, _d2;
-  try {
-    const clientId = (_a2 = req.body.clientId) == null ? void 0 : _a2.trim();
-    const { message, format: format2, sessionId: reqSessionId } = req.body;
-    const cinstance = clientInstance.get(clientId);
-    if (!cinstance) {
-      console.log("Active Client IDs:", Array.from(clientInstance.keys()));
-      return res.status(404).json({ error: `Client '${clientId}' not found. Check for spaces or use /newclient.` });
-    }
-    let targetSessionId = reqSessionId || cinstance.sessionId;
-    if (!targetSessionId || !targetSessionId.startsWith("ses_")) {
-      console.log(`Creating fresh Opencode session for client: ${clientId}`);
-      const session = await cinstance.client.session.create();
-      targetSessionId = session.data.id;
-      if (!reqSessionId) cinstance.sessionId = targetSessionId;
-    }
-    const result = await cinstance.client.session.prompt({
-      path: { id: targetSessionId },
-      body: {
-        parts: [{ type: "text", text: message || "Hello" }],
-        ...format2 ? { format: format2 } : {}
-      }
-    });
-    console.log("Opencode Response:", JSON.stringify(result, null, 2));
-    res.json({
-      success: true,
-      sessionId: targetSessionId,
-      // If it's a structured output request, return that, otherwise return the raw parts
-      data: ((_c2 = (_b2 = result.data) == null ? void 0 : _b2.info) == null ? void 0 : _c2.structured_output) || ((_d2 = result.data) == null ? void 0 : _d2.parts) || result.data
-    });
-  } catch (error) {
-    console.error("Chat prompt error:", error);
-    res.status(500).json({ error: error.message || error });
-  }
-});
-var prompt_default = router30;
-
-// src/routes/opencode/sessionChats.ts
-var import_express35 = __toESM(require_express2());
-init_core2();
-var router31 = (0, import_express35.Router)();
-router31.post("/", async (req, res) => {
-  var _a2;
-  let targetSessionId = "";
-  let streamRef = null;
-  try {
-    const clientId = (_a2 = req.body.clientId) == null ? void 0 : _a2.trim();
-    const { message, format: format2, sessionId: reqSessionId } = req.body;
-    const cinstance = clientInstance.get(clientId);
-    if (!cinstance) {
-      console.log("Active Client IDs:", Array.from(clientInstance.keys()));
-      return res.status(404).json({ error: `Client '${clientId}' not found. Check for spaces or use /newclient.` });
-    }
-    targetSessionId = reqSessionId || cinstance.sessionId;
-    if (!targetSessionId || !targetSessionId.startsWith("ses_")) {
-      console.log(`Creating fresh Opencode session for client: ${clientId}`);
-      const session = await cinstance.client.session.create();
-      targetSessionId = session.data.id;
-      if (!reqSessionId) cinstance.sessionId = targetSessionId;
-    }
-    res.writeHead(200, {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      "Connection": "keep-alive"
-    });
-    res.write(`data: ${JSON.stringify({ type: "connected", sessionId: targetSessionId })}
-
-`);
-    const { stream } = await cinstance.client.event.subscribe();
-    streamRef = stream;
-    req.on("close", async () => {
-      console.log(`SSE connection closed for session: ${targetSessionId}`);
-      if (streamRef) streamRef.return(null);
-      try {
-        await cinstance.client.session.abort({ path: { id: targetSessionId } });
-      } catch (e) {
-      }
-    });
-    const promptPromise = cinstance.client.session.prompt({
-      path: { id: targetSessionId },
-      body: {
-        parts: [{ type: "text", text: message || "Hello" }],
-        ...format2 ? { format: format2 } : {}
-      }
-    });
-    (async () => {
-      var _a3, _b2, _c2, _d2, _e, _f;
-      try {
-        for await (const event of stream) {
-          const props = event.properties;
-          const eventSessionId = (props == null ? void 0 : props.sessionID) || ((_a3 = props == null ? void 0 : props.info) == null ? void 0 : _a3.sessionID) || ((_b2 = props == null ? void 0 : props.part) == null ? void 0 : _b2.sessionID);
-          if (eventSessionId === targetSessionId) {
-            res.write(`data: ${JSON.stringify(event)}
-
-`);
-            if (event.type === "session.status" && ((_c2 = props == null ? void 0 : props.status) == null ? void 0 : _c2.type) === "idle") {
-              break;
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Event stream error:", err);
-      } finally {
-        try {
-          const result = await promptPromise;
-          res.write(`data: ${JSON.stringify({
-            type: "completed",
-            success: true,
-            sessionId: targetSessionId,
-            data: ((_e = (_d2 = result.data) == null ? void 0 : _d2.info) == null ? void 0 : _e.structured_output) || ((_f = result.data) == null ? void 0 : _f.parts) || result.data
-          })}
-
-`);
-        } catch (err) {
-          res.write(`data: ${JSON.stringify({ type: "error", error: err.message || err })}
-
-`);
-        }
-        res.end();
-      }
-    })();
-  } catch (error) {
-    console.error("Chat SSE error:", error);
-    if (!res.headersSent) {
-      res.status(500).json({ error: error.message || error });
-    } else {
-      res.write(`data: ${JSON.stringify({ type: "error", error: error.message || error })}
-
-`);
-      res.end();
-    }
-  }
-});
-var sessionChats_default = router31;
-
 // src/routes/index.ts
 function SETROUTES(app3, frontendPath2) {
   app3.use("/", tester_default);
@@ -96034,13 +95810,9 @@ function SETROUTES(app3, frontendPath2) {
   app3.use("/" + api_default.opencodeCreateInstance, createInstance_default);
   app3.use("/" + api_default.opencodeListInstances, listInstance_default);
   app3.use("/" + api_default.opencode, opencode_default);
-  app3.use("/" + api_default.opencodeCreateClient, createClient_default);
-  app3.use("/" + api_default.opencodeListClients, listClients_default);
-  app3.use("/" + api_default.opencodePrompt, prompt_default);
-  app3.use("/" + api_default.opencodeSessionChat, sessionChats_default);
   app3.use("/" + api_default.scanProject, projectBrowser_default);
   app3.use("/" + api_default.textEditor, textEditor_default);
-  app3.use(import_express36.default.static(frontendPath2));
+  app3.use(import_express32.default.static(frontendPath2));
   app3.get(/(.*)/, (req, res) => {
     res.sendFile(import_path32.default.join(frontendPath2, "index.html"));
   });
@@ -96065,7 +95837,7 @@ if (command === "init") {
     process.exit(1);
   });
 }
-var app2 = (0, import_express37.default)();
+var app2 = (0, import_express33.default)();
 var port2 = config_default.apiPort;
 var isDevelopment = process.env.NODE_ENV === "development";
 var actualPort = port2;
@@ -96091,7 +95863,7 @@ app2.use((0, import_cors.default)({
   },
   credentials: true
 }));
-app2.use(import_express37.default.json());
+app2.use(import_express33.default.json());
 var frontendPath = import_path33.default.join(__dirname, "../public");
 SETROUTES(app2, frontendPath);
 var httpServer = (0, import_http.createServer)(app2);

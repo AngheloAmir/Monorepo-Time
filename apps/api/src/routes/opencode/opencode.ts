@@ -1,7 +1,6 @@
 import { Request, Response, Router } from "express";
 import killPort from "kill-port";
-import { clean } from "./_helper";
-import { opencodeInstances } from "./_core";
+import { opencodeInstances } from "./core";
 import { exec } from "child_process";
 
 const router = Router();
@@ -32,29 +31,6 @@ router.get("/check", async (req: Request, res: Response) => {
     }
 });
 
-router.post("/identify", async (req: Request, res: Response) => {
-    await clean(); // Handles port collisions and dead ports for all instances
-
-    // After clean(), opencodeInstances only contains valid, unique-per-port entries
-    const instances = Array.from(opencodeInstances.values()).map(instance => ({
-        id: instance.id,
-        name: instance.name,
-        port: instance.port,
-        status: instance.server ? "active" : "detached"
-    }));
-
-    res.json({
-        message: "Identification and cleanup complete",
-        instances,
-        count: instances.length
-    });
-});
-
-router.post("/clean", async (req: Request, res: Response) => {
-    await clean();
-    res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
-});
-
 router.post("/stop", async (req: Request, res: Response) => {
     try {
         const { id } = req.body;
@@ -80,7 +56,7 @@ router.post("/stop", async (req: Request, res: Response) => {
     }
 });
 
-router.post("/change-name", async (req: Request, res: Response) => {
+router.post("/setname", async (req: Request, res: Response) => {
     const { id, name } = req.body;
 
     if (!id || !name) {

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import path from "path";
 import { findAvailablePort } from "./_helper";
-import { OpencodeInstance, opencodeInstances } from "./_core";
+import { OpencodeInstance, opencodeInstances } from "./core";
 
 const opencodeSdkPromise = (new Function('specifier', 'return import(specifier)'))("@opencode-ai/sdk");
 const router             = Router();

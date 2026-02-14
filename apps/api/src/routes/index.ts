@@ -34,10 +34,6 @@ import gitStashHelper from './utils/gitStashHelper';
 import createInstance from './opencode/createInstance';
 import listInstance from "./opencode/listInstance";
 import opencode from "./opencode/opencode";
-import createClient from "./opencode/createClient";
-import listClients from "./opencode/listClients";
-import opencodePrompt from "./opencode/prompt";
-import sessionChats from "./opencode/sessionChats";
 
 export default function SETROUTES(app: Express, frontendPath: string) {
     app.use("/", tester);
@@ -78,10 +74,6 @@ export default function SETROUTES(app: Express, frontendPath: string) {
     app.use("/" + apiRoute.opencodeCreateInstance,   createInstance);
     app.use("/" + apiRoute.opencodeListInstances,    listInstance);
     app.use("/" + apiRoute.opencode,                 opencode);
-    app.use("/" + apiRoute.opencodeCreateClient,     createClient);
-    app.use("/" + apiRoute.opencodeListClients,      listClients);
-    app.use("/" + apiRoute.opencodePrompt,           opencodePrompt);
-    app.use("/" + apiRoute.opencodeSessionChat,      sessionChats);
 
     //project browser and editor endpoints
     app.use("/" + apiRoute.scanProject, scanProject);

@@ -111,12 +111,6 @@ const apiRoute = {
     opencode:                 'opencode',
     opencodeCreateInstance:   'opencode/createinstance',
     opencodeListInstances:    'opencode/listinstances',
-    opencodeCreateClient:     'opencode/createclient',
-    opencodeListClients:      'opencode/listclients',
-    opencodePrompt:           'opencode/prompt',
-    
-    //session based chat
-    opencodeSessionChat:      'opencode/sessionchat',
 }
 
 export default apiRoute;

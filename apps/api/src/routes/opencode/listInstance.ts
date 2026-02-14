@@ -1,18 +1,13 @@
 import { Request, Response, Router } from "express";
-import { opencodeInstances } from "./_core";
+import { opencodeInstances } from "./core";
+import { clean } from "./_helper";
 
 const router = Router();
-router.get("/", (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
+    await clean();
+    
     const instances = Array.from(opencodeInstances.values()).map(instance => ({
-        id: instance.id,
-        url: instance.url,
-        port: instance.port,
-        name: instance.name,
-
-        // 'detached' means we lost the handle but it might still be running
-        status: instance.server ? "active" : "detached",
-        createdAt: instance.createdAt,
-        lastSessionId: instance.lastSessionId
+       ...instance
     }));
     res.json({ instances });
 });

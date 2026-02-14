@@ -1,5 +1,5 @@
 import net from "net";
-import { opencodeInstances } from "./_core";
+import { opencodeInstances } from "./core";
 
 export const isPortInUse = (port: number): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -40,7 +40,7 @@ export const findAvailablePort = (startPort: number): Promise<number> => {
 
 export const clean = async () => {
     const instances = Array.from(opencodeInstances.values());
-    const portsMap = new Map<number, any[]>();
+    const portsMap  = new Map<number, any[]>();
 
     instances.forEach(inst => {
         if (!portsMap.has(inst.port)) portsMap.set(inst.port, []);
