@@ -30,6 +30,7 @@ if (command === 'init') {
 }
 
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import config from 'config';
 import open from 'open';
@@ -75,8 +76,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
+
 //routes=======================================================================
-SETROUTES(app);
+const frontendPath = path.join(__dirname, '../public');
+SETROUTES(app, frontendPath);
 
 
 const httpServer = createServer(app);

@@ -89,54 +89,54 @@ var require_polyfills = __commonJS({
     }
     var chdir;
     module2.exports = patch;
-    function patch(fs36) {
+    function patch(fs35) {
       if (constants4.hasOwnProperty("O_SYMLINK") && process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
-        patchLchmod(fs36);
+        patchLchmod(fs35);
       }
-      if (!fs36.lutimes) {
-        patchLutimes(fs36);
+      if (!fs35.lutimes) {
+        patchLutimes(fs35);
       }
-      fs36.chown = chownFix(fs36.chown);
-      fs36.fchown = chownFix(fs36.fchown);
-      fs36.lchown = chownFix(fs36.lchown);
-      fs36.chmod = chmodFix(fs36.chmod);
-      fs36.fchmod = chmodFix(fs36.fchmod);
-      fs36.lchmod = chmodFix(fs36.lchmod);
-      fs36.chownSync = chownFixSync(fs36.chownSync);
-      fs36.fchownSync = chownFixSync(fs36.fchownSync);
-      fs36.lchownSync = chownFixSync(fs36.lchownSync);
-      fs36.chmodSync = chmodFixSync(fs36.chmodSync);
-      fs36.fchmodSync = chmodFixSync(fs36.fchmodSync);
-      fs36.lchmodSync = chmodFixSync(fs36.lchmodSync);
-      fs36.stat = statFix(fs36.stat);
-      fs36.fstat = statFix(fs36.fstat);
-      fs36.lstat = statFix(fs36.lstat);
-      fs36.statSync = statFixSync(fs36.statSync);
-      fs36.fstatSync = statFixSync(fs36.fstatSync);
-      fs36.lstatSync = statFixSync(fs36.lstatSync);
-      if (fs36.chmod && !fs36.lchmod) {
-        fs36.lchmod = function(path40, mode, cb) {
+      fs35.chown = chownFix(fs35.chown);
+      fs35.fchown = chownFix(fs35.fchown);
+      fs35.lchown = chownFix(fs35.lchown);
+      fs35.chmod = chmodFix(fs35.chmod);
+      fs35.fchmod = chmodFix(fs35.fchmod);
+      fs35.lchmod = chmodFix(fs35.lchmod);
+      fs35.chownSync = chownFixSync(fs35.chownSync);
+      fs35.fchownSync = chownFixSync(fs35.fchownSync);
+      fs35.lchownSync = chownFixSync(fs35.lchownSync);
+      fs35.chmodSync = chmodFixSync(fs35.chmodSync);
+      fs35.fchmodSync = chmodFixSync(fs35.fchmodSync);
+      fs35.lchmodSync = chmodFixSync(fs35.lchmodSync);
+      fs35.stat = statFix(fs35.stat);
+      fs35.fstat = statFix(fs35.fstat);
+      fs35.lstat = statFix(fs35.lstat);
+      fs35.statSync = statFixSync(fs35.statSync);
+      fs35.fstatSync = statFixSync(fs35.fstatSync);
+      fs35.lstatSync = statFixSync(fs35.lstatSync);
+      if (fs35.chmod && !fs35.lchmod) {
+        fs35.lchmod = function(path40, mode, cb) {
           if (cb) process.nextTick(cb);
         };
-        fs36.lchmodSync = function() {
+        fs35.lchmodSync = function() {
         };
       }
-      if (fs36.chown && !fs36.lchown) {
-        fs36.lchown = function(path40, uid, gid, cb) {
+      if (fs35.chown && !fs35.lchown) {
+        fs35.lchown = function(path40, uid, gid, cb) {
           if (cb) process.nextTick(cb);
         };
-        fs36.lchownSync = function() {
+        fs35.lchownSync = function() {
         };
       }
       if (platform3 === "win32") {
-        fs36.rename = typeof fs36.rename !== "function" ? fs36.rename : (function(fs$rename) {
+        fs35.rename = typeof fs35.rename !== "function" ? fs35.rename : (function(fs$rename) {
           function rename(from, to, cb) {
             var start = Date.now();
             var backoff = 0;
             fs$rename(from, to, function CB(er) {
               if (er && (er.code === "EACCES" || er.code === "EPERM" || er.code === "EBUSY") && Date.now() - start < 6e4) {
                 setTimeout(function() {
-                  fs36.stat(to, function(stater, st) {
+                  fs35.stat(to, function(stater, st) {
                     if (stater && stater.code === "ENOENT")
                       fs$rename(from, to, CB);
                     else
@@ -152,9 +152,9 @@ var require_polyfills = __commonJS({
           }
           if (Object.setPrototypeOf) Object.setPrototypeOf(rename, fs$rename);
           return rename;
-        })(fs36.rename);
+        })(fs35.rename);
       }
-      fs36.read = typeof fs36.read !== "function" ? fs36.read : (function(fs$read) {
+      fs35.read = typeof fs35.read !== "function" ? fs35.read : (function(fs$read) {
         function read(fd, buffer, offset, length, position, callback_) {
           var callback;
           if (callback_ && typeof callback_ === "function") {
@@ -162,22 +162,22 @@ var require_polyfills = __commonJS({
             callback = function(er, _, __) {
               if (er && er.code === "EAGAIN" && eagCounter < 10) {
                 eagCounter++;
-                return fs$read.call(fs36, fd, buffer, offset, length, position, callback);
+                return fs$read.call(fs35, fd, buffer, offset, length, position, callback);
               }
               callback_.apply(this, arguments);
             };
           }
-          return fs$read.call(fs36, fd, buffer, offset, length, position, callback);
+          return fs$read.call(fs35, fd, buffer, offset, length, position, callback);
         }
         if (Object.setPrototypeOf) Object.setPrototypeOf(read, fs$read);
         return read;
-      })(fs36.read);
-      fs36.readSync = typeof fs36.readSync !== "function" ? fs36.readSync : /* @__PURE__ */ (function(fs$readSync) {
+      })(fs35.read);
+      fs35.readSync = typeof fs35.readSync !== "function" ? fs35.readSync : /* @__PURE__ */ (function(fs$readSync) {
         return function(fd, buffer, offset, length, position) {
           var eagCounter = 0;
           while (true) {
             try {
-              return fs$readSync.call(fs36, fd, buffer, offset, length, position);
+              return fs$readSync.call(fs35, fd, buffer, offset, length, position);
             } catch (er) {
               if (er.code === "EAGAIN" && eagCounter < 10) {
                 eagCounter++;
@@ -187,10 +187,10 @@ var require_polyfills = __commonJS({
             }
           }
         };
-      })(fs36.readSync);
-      function patchLchmod(fs37) {
-        fs37.lchmod = function(path40, mode, callback) {
-          fs37.open(
+      })(fs35.readSync);
+      function patchLchmod(fs36) {
+        fs36.lchmod = function(path40, mode, callback) {
+          fs36.open(
             path40,
             constants4.O_WRONLY | constants4.O_SYMLINK,
             mode,
@@ -199,80 +199,80 @@ var require_polyfills = __commonJS({
                 if (callback) callback(err);
                 return;
               }
-              fs37.fchmod(fd, mode, function(err2) {
-                fs37.close(fd, function(err22) {
+              fs36.fchmod(fd, mode, function(err2) {
+                fs36.close(fd, function(err22) {
                   if (callback) callback(err2 || err22);
                 });
               });
             }
           );
         };
-        fs37.lchmodSync = function(path40, mode) {
-          var fd = fs37.openSync(path40, constants4.O_WRONLY | constants4.O_SYMLINK, mode);
+        fs36.lchmodSync = function(path40, mode) {
+          var fd = fs36.openSync(path40, constants4.O_WRONLY | constants4.O_SYMLINK, mode);
           var threw = true;
           var ret;
           try {
-            ret = fs37.fchmodSync(fd, mode);
+            ret = fs36.fchmodSync(fd, mode);
             threw = false;
           } finally {
             if (threw) {
               try {
-                fs37.closeSync(fd);
+                fs36.closeSync(fd);
               } catch (er) {
               }
             } else {
-              fs37.closeSync(fd);
+              fs36.closeSync(fd);
             }
           }
           return ret;
         };
       }
-      function patchLutimes(fs37) {
-        if (constants4.hasOwnProperty("O_SYMLINK") && fs37.futimes) {
-          fs37.lutimes = function(path40, at, mt, cb) {
-            fs37.open(path40, constants4.O_SYMLINK, function(er, fd) {
+      function patchLutimes(fs36) {
+        if (constants4.hasOwnProperty("O_SYMLINK") && fs36.futimes) {
+          fs36.lutimes = function(path40, at, mt, cb) {
+            fs36.open(path40, constants4.O_SYMLINK, function(er, fd) {
               if (er) {
                 if (cb) cb(er);
                 return;
               }
-              fs37.futimes(fd, at, mt, function(er2) {
-                fs37.close(fd, function(er22) {
+              fs36.futimes(fd, at, mt, function(er2) {
+                fs36.close(fd, function(er22) {
                   if (cb) cb(er2 || er22);
                 });
               });
             });
           };
-          fs37.lutimesSync = function(path40, at, mt) {
-            var fd = fs37.openSync(path40, constants4.O_SYMLINK);
+          fs36.lutimesSync = function(path40, at, mt) {
+            var fd = fs36.openSync(path40, constants4.O_SYMLINK);
             var ret;
             var threw = true;
             try {
-              ret = fs37.futimesSync(fd, at, mt);
+              ret = fs36.futimesSync(fd, at, mt);
               threw = false;
             } finally {
               if (threw) {
                 try {
-                  fs37.closeSync(fd);
+                  fs36.closeSync(fd);
                 } catch (er) {
                 }
               } else {
-                fs37.closeSync(fd);
+                fs36.closeSync(fd);
               }
             }
             return ret;
           };
-        } else if (fs37.futimes) {
-          fs37.lutimes = function(_a2, _b2, _c2, cb) {
+        } else if (fs36.futimes) {
+          fs36.lutimes = function(_a2, _b2, _c2, cb) {
             if (cb) process.nextTick(cb);
           };
-          fs37.lutimesSync = function() {
+          fs36.lutimesSync = function() {
           };
         }
       }
       function chmodFix(orig) {
         if (!orig) return orig;
         return function(target, mode, cb) {
-          return orig.call(fs36, target, mode, function(er) {
+          return orig.call(fs35, target, mode, function(er) {
             if (chownErOk(er)) er = null;
             if (cb) cb.apply(this, arguments);
           });
@@ -282,7 +282,7 @@ var require_polyfills = __commonJS({
         if (!orig) return orig;
         return function(target, mode) {
           try {
-            return orig.call(fs36, target, mode);
+            return orig.call(fs35, target, mode);
           } catch (er) {
             if (!chownErOk(er)) throw er;
           }
@@ -291,7 +291,7 @@ var require_polyfills = __commonJS({
       function chownFix(orig) {
         if (!orig) return orig;
         return function(target, uid, gid, cb) {
-          return orig.call(fs36, target, uid, gid, function(er) {
+          return orig.call(fs35, target, uid, gid, function(er) {
             if (chownErOk(er)) er = null;
             if (cb) cb.apply(this, arguments);
           });
@@ -301,7 +301,7 @@ var require_polyfills = __commonJS({
         if (!orig) return orig;
         return function(target, uid, gid) {
           try {
-            return orig.call(fs36, target, uid, gid);
+            return orig.call(fs35, target, uid, gid);
           } catch (er) {
             if (!chownErOk(er)) throw er;
           }
@@ -321,13 +321,13 @@ var require_polyfills = __commonJS({
             }
             if (cb) cb.apply(this, arguments);
           }
-          return options ? orig.call(fs36, target, options, callback) : orig.call(fs36, target, callback);
+          return options ? orig.call(fs35, target, options, callback) : orig.call(fs35, target, callback);
         };
       }
       function statFixSync(orig) {
         if (!orig) return orig;
         return function(target, options) {
-          var stats = options ? orig.call(fs36, target, options) : orig.call(fs36, target);
+          var stats = options ? orig.call(fs35, target, options) : orig.call(fs35, target);
           if (stats) {
             if (stats.uid < 0) stats.uid += 4294967296;
             if (stats.gid < 0) stats.gid += 4294967296;
@@ -357,7 +357,7 @@ var require_legacy_streams = __commonJS({
     "use strict";
     var Stream = require("stream").Stream;
     module2.exports = legacy;
-    function legacy(fs36) {
+    function legacy(fs35) {
       return {
         ReadStream,
         WriteStream
@@ -400,7 +400,7 @@ var require_legacy_streams = __commonJS({
           });
           return;
         }
-        fs36.open(this.path, this.flags, this.mode, function(err, fd) {
+        fs35.open(this.path, this.flags, this.mode, function(err, fd) {
           if (err) {
             self.emit("error", err);
             self.readable = false;
@@ -439,7 +439,7 @@ var require_legacy_streams = __commonJS({
         this.busy = false;
         this._queue = [];
         if (this.fd === null) {
-          this._open = fs36.open;
+          this._open = fs35.open;
           this._queue.push([this._open, this.path, this.flags, this.mode, void 0]);
           this.flush();
         }
@@ -475,7 +475,7 @@ var require_clone = __commonJS({
 var require_graceful_fs = __commonJS({
   "../../node_modules/graceful-fs/graceful-fs.js"(exports2, module2) {
     "use strict";
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var polyfills = require_polyfills();
     var legacy = require_legacy_streams();
     var clone = require_clone();
@@ -507,12 +507,12 @@ var require_graceful_fs = __commonJS({
         m = "GFS4: " + m.split(/\n/).join("\nGFS4: ");
         console.error(m);
       };
-    if (!fs36[gracefulQueue]) {
+    if (!fs35[gracefulQueue]) {
       queue = global[gracefulQueue] || [];
-      publishQueue(fs36, queue);
-      fs36.close = (function(fs$close) {
+      publishQueue(fs35, queue);
+      fs35.close = (function(fs$close) {
         function close(fd, cb) {
-          return fs$close.call(fs36, fd, function(err) {
+          return fs$close.call(fs35, fd, function(err) {
             if (!err) {
               resetQueue();
             }
@@ -524,40 +524,40 @@ var require_graceful_fs = __commonJS({
           value: fs$close
         });
         return close;
-      })(fs36.close);
-      fs36.closeSync = (function(fs$closeSync) {
+      })(fs35.close);
+      fs35.closeSync = (function(fs$closeSync) {
         function closeSync(fd) {
-          fs$closeSync.apply(fs36, arguments);
+          fs$closeSync.apply(fs35, arguments);
           resetQueue();
         }
         Object.defineProperty(closeSync, previousSymbol, {
           value: fs$closeSync
         });
         return closeSync;
-      })(fs36.closeSync);
+      })(fs35.closeSync);
       if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || "")) {
         process.on("exit", function() {
-          debug(fs36[gracefulQueue]);
-          require("assert").equal(fs36[gracefulQueue].length, 0);
+          debug(fs35[gracefulQueue]);
+          require("assert").equal(fs35[gracefulQueue].length, 0);
         });
       }
     }
     var queue;
     if (!global[gracefulQueue]) {
-      publishQueue(global, fs36[gracefulQueue]);
+      publishQueue(global, fs35[gracefulQueue]);
     }
-    module2.exports = patch(clone(fs36));
-    if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs36.__patched) {
-      module2.exports = patch(fs36);
-      fs36.__patched = true;
+    module2.exports = patch(clone(fs35));
+    if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs35.__patched) {
+      module2.exports = patch(fs35);
+      fs35.__patched = true;
     }
-    function patch(fs37) {
-      polyfills(fs37);
-      fs37.gracefulify = patch;
-      fs37.createReadStream = createReadStream2;
-      fs37.createWriteStream = createWriteStream2;
-      var fs$readFile = fs37.readFile;
-      fs37.readFile = readFile;
+    function patch(fs36) {
+      polyfills(fs36);
+      fs36.gracefulify = patch;
+      fs36.createReadStream = createReadStream2;
+      fs36.createWriteStream = createWriteStream2;
+      var fs$readFile = fs36.readFile;
+      fs36.readFile = readFile;
       function readFile(path40, options, cb) {
         if (typeof options === "function")
           cb = options, options = null;
@@ -573,8 +573,8 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$writeFile = fs37.writeFile;
-      fs37.writeFile = writeFile2;
+      var fs$writeFile = fs36.writeFile;
+      fs36.writeFile = writeFile2;
       function writeFile2(path40, data, options, cb) {
         if (typeof options === "function")
           cb = options, options = null;
@@ -590,9 +590,9 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$appendFile = fs37.appendFile;
+      var fs$appendFile = fs36.appendFile;
       if (fs$appendFile)
-        fs37.appendFile = appendFile;
+        fs36.appendFile = appendFile;
       function appendFile(path40, data, options, cb) {
         if (typeof options === "function")
           cb = options, options = null;
@@ -608,9 +608,9 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$copyFile = fs37.copyFile;
+      var fs$copyFile = fs36.copyFile;
       if (fs$copyFile)
-        fs37.copyFile = copyFile;
+        fs36.copyFile = copyFile;
       function copyFile(src, dest, flags, cb) {
         if (typeof flags === "function") {
           cb = flags;
@@ -628,8 +628,8 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      var fs$readdir = fs37.readdir;
-      fs37.readdir = readdir;
+      var fs$readdir = fs36.readdir;
+      fs36.readdir = readdir;
       var noReaddirOptionVersions = /^v[0-5]\./;
       function readdir(path40, options, cb) {
         if (typeof options === "function")
@@ -670,21 +670,21 @@ var require_graceful_fs = __commonJS({
         }
       }
       if (process.version.substr(0, 4) === "v0.8") {
-        var legStreams = legacy(fs37);
+        var legStreams = legacy(fs36);
         ReadStream = legStreams.ReadStream;
         WriteStream = legStreams.WriteStream;
       }
-      var fs$ReadStream = fs37.ReadStream;
+      var fs$ReadStream = fs36.ReadStream;
       if (fs$ReadStream) {
         ReadStream.prototype = Object.create(fs$ReadStream.prototype);
         ReadStream.prototype.open = ReadStream$open;
       }
-      var fs$WriteStream = fs37.WriteStream;
+      var fs$WriteStream = fs36.WriteStream;
       if (fs$WriteStream) {
         WriteStream.prototype = Object.create(fs$WriteStream.prototype);
         WriteStream.prototype.open = WriteStream$open;
       }
-      Object.defineProperty(fs37, "ReadStream", {
+      Object.defineProperty(fs36, "ReadStream", {
         get: function() {
           return ReadStream;
         },
@@ -694,7 +694,7 @@ var require_graceful_fs = __commonJS({
         enumerable: true,
         configurable: true
       });
-      Object.defineProperty(fs37, "WriteStream", {
+      Object.defineProperty(fs36, "WriteStream", {
         get: function() {
           return WriteStream;
         },
@@ -705,7 +705,7 @@ var require_graceful_fs = __commonJS({
         configurable: true
       });
       var FileReadStream = ReadStream;
-      Object.defineProperty(fs37, "FileReadStream", {
+      Object.defineProperty(fs36, "FileReadStream", {
         get: function() {
           return FileReadStream;
         },
@@ -716,7 +716,7 @@ var require_graceful_fs = __commonJS({
         configurable: true
       });
       var FileWriteStream = WriteStream;
-      Object.defineProperty(fs37, "FileWriteStream", {
+      Object.defineProperty(fs36, "FileWriteStream", {
         get: function() {
           return FileWriteStream;
         },
@@ -765,13 +765,13 @@ var require_graceful_fs = __commonJS({
         });
       }
       function createReadStream2(path40, options) {
-        return new fs37.ReadStream(path40, options);
+        return new fs36.ReadStream(path40, options);
       }
       function createWriteStream2(path40, options) {
-        return new fs37.WriteStream(path40, options);
+        return new fs36.WriteStream(path40, options);
       }
-      var fs$open = fs37.open;
-      fs37.open = open2;
+      var fs$open = fs36.open;
+      fs36.open = open2;
       function open2(path40, flags, mode, cb) {
         if (typeof mode === "function")
           cb = mode, mode = null;
@@ -787,20 +787,20 @@ var require_graceful_fs = __commonJS({
           });
         }
       }
-      return fs37;
+      return fs36;
     }
     function enqueue(elem) {
       debug("ENQUEUE", elem[0].name, elem[1]);
-      fs36[gracefulQueue].push(elem);
+      fs35[gracefulQueue].push(elem);
       retry();
     }
     var retryTimer;
     function resetQueue() {
       var now = Date.now();
-      for (var i2 = 0; i2 < fs36[gracefulQueue].length; ++i2) {
-        if (fs36[gracefulQueue][i2].length > 2) {
-          fs36[gracefulQueue][i2][3] = now;
-          fs36[gracefulQueue][i2][4] = now;
+      for (var i2 = 0; i2 < fs35[gracefulQueue].length; ++i2) {
+        if (fs35[gracefulQueue][i2].length > 2) {
+          fs35[gracefulQueue][i2][3] = now;
+          fs35[gracefulQueue][i2][4] = now;
         }
       }
       retry();
@@ -808,9 +808,9 @@ var require_graceful_fs = __commonJS({
     function retry() {
       clearTimeout(retryTimer);
       retryTimer = void 0;
-      if (fs36[gracefulQueue].length === 0)
+      if (fs35[gracefulQueue].length === 0)
         return;
-      var elem = fs36[gracefulQueue].shift();
+      var elem = fs35[gracefulQueue].shift();
       var fn = elem[0];
       var args2 = elem[1];
       var err = elem[2];
@@ -832,7 +832,7 @@ var require_graceful_fs = __commonJS({
           debug("RETRY", fn.name, args2);
           fn.apply(null, args2.concat([startTime]));
         } else {
-          fs36[gracefulQueue].push(elem);
+          fs35[gracefulQueue].push(elem);
         }
       }
       if (retryTimer === void 0) {
@@ -847,7 +847,7 @@ var require_fs = __commonJS({
   "../../node_modules/fs-extra/lib/fs/index.js"(exports2) {
     "use strict";
     var u2 = require_universalify().fromCallback;
-    var fs36 = require_graceful_fs();
+    var fs35 = require_graceful_fs();
     var api = [
       "access",
       "appendFile",
@@ -888,26 +888,26 @@ var require_fs = __commonJS({
       "utimes",
       "writeFile"
     ].filter((key) => {
-      return typeof fs36[key] === "function";
+      return typeof fs35[key] === "function";
     });
-    Object.assign(exports2, fs36);
+    Object.assign(exports2, fs35);
     api.forEach((method) => {
-      exports2[method] = u2(fs36[method]);
+      exports2[method] = u2(fs35[method]);
     });
     exports2.exists = function(filename, callback) {
       if (typeof callback === "function") {
-        return fs36.exists(filename, callback);
+        return fs35.exists(filename, callback);
       }
       return new Promise((resolve) => {
-        return fs36.exists(filename, resolve);
+        return fs35.exists(filename, resolve);
       });
     };
     exports2.read = function(fd, buffer, offset, length, position, callback) {
       if (typeof callback === "function") {
-        return fs36.read(fd, buffer, offset, length, position, callback);
+        return fs35.read(fd, buffer, offset, length, position, callback);
       }
       return new Promise((resolve, reject) => {
-        fs36.read(fd, buffer, offset, length, position, (err, bytesRead, buffer2) => {
+        fs35.read(fd, buffer, offset, length, position, (err, bytesRead, buffer2) => {
           if (err) return reject(err);
           resolve({ bytesRead, buffer: buffer2 });
         });
@@ -915,10 +915,10 @@ var require_fs = __commonJS({
     };
     exports2.write = function(fd, buffer, ...args2) {
       if (typeof args2[args2.length - 1] === "function") {
-        return fs36.write(fd, buffer, ...args2);
+        return fs35.write(fd, buffer, ...args2);
       }
       return new Promise((resolve, reject) => {
-        fs36.write(fd, buffer, ...args2, (err, bytesWritten, buffer2) => {
+        fs35.write(fd, buffer, ...args2, (err, bytesWritten, buffer2) => {
           if (err) return reject(err);
           resolve({ bytesWritten, buffer: buffer2 });
         });
@@ -926,10 +926,10 @@ var require_fs = __commonJS({
     };
     exports2.readv = function(fd, buffers, ...args2) {
       if (typeof args2[args2.length - 1] === "function") {
-        return fs36.readv(fd, buffers, ...args2);
+        return fs35.readv(fd, buffers, ...args2);
       }
       return new Promise((resolve, reject) => {
-        fs36.readv(fd, buffers, ...args2, (err, bytesRead, buffers2) => {
+        fs35.readv(fd, buffers, ...args2, (err, bytesRead, buffers2) => {
           if (err) return reject(err);
           resolve({ bytesRead, buffers: buffers2 });
         });
@@ -937,17 +937,17 @@ var require_fs = __commonJS({
     };
     exports2.writev = function(fd, buffers, ...args2) {
       if (typeof args2[args2.length - 1] === "function") {
-        return fs36.writev(fd, buffers, ...args2);
+        return fs35.writev(fd, buffers, ...args2);
       }
       return new Promise((resolve, reject) => {
-        fs36.writev(fd, buffers, ...args2, (err, bytesWritten, buffers2) => {
+        fs35.writev(fd, buffers, ...args2, (err, bytesWritten, buffers2) => {
           if (err) return reject(err);
           resolve({ bytesWritten, buffers: buffers2 });
         });
       });
     };
-    if (typeof fs36.realpath.native === "function") {
-      exports2.realpath.native = u2(fs36.realpath.native);
+    if (typeof fs35.realpath.native === "function") {
+      exports2.realpath.native = u2(fs35.realpath.native);
     } else {
       process.emitWarning(
         "fs.realpath.native is not a function. Is fs being monkey-patched?",
@@ -980,7 +980,7 @@ var require_utils = __commonJS({
 var require_make_dir = __commonJS({
   "../../node_modules/fs-extra/lib/mkdirs/make-dir.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var { checkPath } = require_utils();
     var getMode = (options) => {
       const defaults = { mode: 511 };
@@ -989,14 +989,14 @@ var require_make_dir = __commonJS({
     };
     module2.exports.makeDir = async (dir, options) => {
       checkPath(dir);
-      return fs36.mkdir(dir, {
+      return fs35.mkdir(dir, {
         mode: getMode(options),
         recursive: true
       });
     };
     module2.exports.makeDirSync = (dir, options) => {
       checkPath(dir);
-      return fs36.mkdirSync(dir, {
+      return fs35.mkdirSync(dir, {
         mode: getMode(options),
         recursive: true
       });
@@ -1028,13 +1028,13 @@ var require_path_exists = __commonJS({
   "../../node_modules/fs-extra/lib/path-exists/index.js"(exports2, module2) {
     "use strict";
     var u2 = require_universalify().fromPromise;
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     function pathExists(path40) {
-      return fs36.access(path40).then(() => true).catch(() => false);
+      return fs35.access(path40).then(() => true).catch(() => false);
     }
     module2.exports = {
       pathExists: u2(pathExists),
-      pathExistsSync: fs36.existsSync
+      pathExistsSync: fs35.existsSync
     };
   }
 });
@@ -1043,16 +1043,16 @@ var require_path_exists = __commonJS({
 var require_utimes = __commonJS({
   "../../node_modules/fs-extra/lib/util/utimes.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var u2 = require_universalify().fromPromise;
     async function utimesMillis(path40, atime, mtime) {
-      const fd = await fs36.open(path40, "r+");
+      const fd = await fs35.open(path40, "r+");
       let closeErr = null;
       try {
-        await fs36.futimes(fd, atime, mtime);
+        await fs35.futimes(fd, atime, mtime);
       } finally {
         try {
-          await fs36.close(fd);
+          await fs35.close(fd);
         } catch (e) {
           closeErr = e;
         }
@@ -1062,9 +1062,9 @@ var require_utimes = __commonJS({
       }
     }
     function utimesMillisSync(path40, atime, mtime) {
-      const fd = fs36.openSync(path40, "r+");
-      fs36.futimesSync(fd, atime, mtime);
-      return fs36.closeSync(fd);
+      const fd = fs35.openSync(path40, "r+");
+      fs35.futimesSync(fd, atime, mtime);
+      return fs35.closeSync(fd);
     }
     module2.exports = {
       utimesMillis: u2(utimesMillis),
@@ -1077,11 +1077,11 @@ var require_utimes = __commonJS({
 var require_stat = __commonJS({
   "../../node_modules/fs-extra/lib/util/stat.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var path40 = require("path");
     var u2 = require_universalify().fromPromise;
     function getStats2(src, dest, opts) {
-      const statFunc = opts.dereference ? (file2) => fs36.stat(file2, { bigint: true }) : (file2) => fs36.lstat(file2, { bigint: true });
+      const statFunc = opts.dereference ? (file2) => fs35.stat(file2, { bigint: true }) : (file2) => fs35.lstat(file2, { bigint: true });
       return Promise.all([
         statFunc(src),
         statFunc(dest).catch((err) => {
@@ -1092,7 +1092,7 @@ var require_stat = __commonJS({
     }
     function getStatsSync(src, dest, opts) {
       let destStat;
-      const statFunc = opts.dereference ? (file2) => fs36.statSync(file2, { bigint: true }) : (file2) => fs36.lstatSync(file2, { bigint: true });
+      const statFunc = opts.dereference ? (file2) => fs35.statSync(file2, { bigint: true }) : (file2) => fs35.lstatSync(file2, { bigint: true });
       const srcStat = statFunc(src);
       try {
         destStat = statFunc(dest);
@@ -1154,7 +1154,7 @@ var require_stat = __commonJS({
       if (destParent === srcParent || destParent === path40.parse(destParent).root) return;
       let destStat;
       try {
-        destStat = await fs36.stat(destParent, { bigint: true });
+        destStat = await fs35.stat(destParent, { bigint: true });
       } catch (err) {
         if (err.code === "ENOENT") return;
         throw err;
@@ -1170,7 +1170,7 @@ var require_stat = __commonJS({
       if (destParent === srcParent || destParent === path40.parse(destParent).root) return;
       let destStat;
       try {
-        destStat = fs36.statSync(destParent, { bigint: true });
+        destStat = fs35.statSync(destParent, { bigint: true });
       } catch (err) {
         if (err.code === "ENOENT") return;
         throw err;
@@ -1237,7 +1237,7 @@ var require_async = __commonJS({
 var require_copy = __commonJS({
   "../../node_modules/fs-extra/lib/copy/copy.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var path40 = require("path");
     var { mkdirs } = require_mkdirs();
     var { pathExists } = require_path_exists();
@@ -1273,7 +1273,7 @@ var require_copy = __commonJS({
       return opts.filter(src, dest);
     }
     async function getStatsAndPerformCopy(destStat, src, dest, opts) {
-      const statFn = opts.dereference ? fs36.stat : fs36.lstat;
+      const statFn = opts.dereference ? fs35.stat : fs35.lstat;
       const srcStat = await statFn(src);
       if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts);
       if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts);
@@ -1285,7 +1285,7 @@ var require_copy = __commonJS({
     async function onFile(srcStat, destStat, src, dest, opts) {
       if (!destStat) return copyFile(srcStat, src, dest, opts);
       if (opts.overwrite) {
-        await fs36.unlink(dest);
+        await fs35.unlink(dest);
         return copyFile(srcStat, src, dest, opts);
       }
       if (opts.errorOnExist) {
@@ -1293,27 +1293,27 @@ var require_copy = __commonJS({
       }
     }
     async function copyFile(srcStat, src, dest, opts) {
-      await fs36.copyFile(src, dest);
+      await fs35.copyFile(src, dest);
       if (opts.preserveTimestamps) {
         if (fileIsNotWritable(srcStat.mode)) {
           await makeFileWritable(dest, srcStat.mode);
         }
-        const updatedSrcStat = await fs36.stat(src);
+        const updatedSrcStat = await fs35.stat(src);
         await utimesMillis(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
       }
-      return fs36.chmod(dest, srcStat.mode);
+      return fs35.chmod(dest, srcStat.mode);
     }
     function fileIsNotWritable(srcMode) {
       return (srcMode & 128) === 0;
     }
     function makeFileWritable(dest, srcMode) {
-      return fs36.chmod(dest, srcMode | 128);
+      return fs35.chmod(dest, srcMode | 128);
     }
     async function onDir(srcStat, destStat, src, dest, opts) {
       if (!destStat) {
-        await fs36.mkdir(dest);
+        await fs35.mkdir(dest);
       }
-      await asyncIteratorConcurrentProcess(await fs36.opendir(src), async (item) => {
+      await asyncIteratorConcurrentProcess(await fs35.opendir(src), async (item) => {
         const srcItem = path40.join(src, item.name);
         const destItem = path40.join(dest, item.name);
         const include = await runFilter(srcItem, destItem, opts);
@@ -1323,22 +1323,22 @@ var require_copy = __commonJS({
         }
       });
       if (!destStat) {
-        await fs36.chmod(dest, srcStat.mode);
+        await fs35.chmod(dest, srcStat.mode);
       }
     }
     async function onLink(destStat, src, dest, opts) {
-      let resolvedSrc = await fs36.readlink(src);
+      let resolvedSrc = await fs35.readlink(src);
       if (opts.dereference) {
         resolvedSrc = path40.resolve(process.cwd(), resolvedSrc);
       }
       if (!destStat) {
-        return fs36.symlink(resolvedSrc, dest);
+        return fs35.symlink(resolvedSrc, dest);
       }
       let resolvedDest = null;
       try {
-        resolvedDest = await fs36.readlink(dest);
+        resolvedDest = await fs35.readlink(dest);
       } catch (e) {
-        if (e.code === "EINVAL" || e.code === "UNKNOWN") return fs36.symlink(resolvedSrc, dest);
+        if (e.code === "EINVAL" || e.code === "UNKNOWN") return fs35.symlink(resolvedSrc, dest);
         throw e;
       }
       if (opts.dereference) {
@@ -1352,8 +1352,8 @@ var require_copy = __commonJS({
           throw new Error(`Cannot overwrite '${resolvedDest}' with '${resolvedSrc}'.`);
         }
       }
-      await fs36.unlink(dest);
-      return fs36.symlink(resolvedSrc, dest);
+      await fs35.unlink(dest);
+      return fs35.symlink(resolvedSrc, dest);
     }
     module2.exports = copy;
   }
@@ -1363,7 +1363,7 @@ var require_copy = __commonJS({
 var require_copy_sync = __commonJS({
   "../../node_modules/fs-extra/lib/copy/copy-sync.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_graceful_fs();
+    var fs35 = require_graceful_fs();
     var path40 = require("path");
     var mkdirsSync = require_mkdirs().mkdirsSync;
     var utimesMillisSync = require_utimes().utimesMillisSync;
@@ -1386,11 +1386,11 @@ var require_copy_sync = __commonJS({
       stat.checkParentPathsSync(src, srcStat, dest, "copy");
       if (opts.filter && !opts.filter(src, dest)) return;
       const destParent = path40.dirname(dest);
-      if (!fs36.existsSync(destParent)) mkdirsSync(destParent);
+      if (!fs35.existsSync(destParent)) mkdirsSync(destParent);
       return getStats2(destStat, src, dest, opts);
     }
     function getStats2(destStat, src, dest, opts) {
-      const statSync2 = opts.dereference ? fs36.statSync : fs36.lstatSync;
+      const statSync2 = opts.dereference ? fs35.statSync : fs35.lstatSync;
       const srcStat = statSync2(src);
       if (srcStat.isDirectory()) return onDir(srcStat, destStat, src, dest, opts);
       else if (srcStat.isFile() || srcStat.isCharacterDevice() || srcStat.isBlockDevice()) return onFile(srcStat, destStat, src, dest, opts);
@@ -1405,14 +1405,14 @@ var require_copy_sync = __commonJS({
     }
     function mayCopyFile(srcStat, src, dest, opts) {
       if (opts.overwrite) {
-        fs36.unlinkSync(dest);
+        fs35.unlinkSync(dest);
         return copyFile(srcStat, src, dest, opts);
       } else if (opts.errorOnExist) {
         throw new Error(`'${dest}' already exists`);
       }
     }
     function copyFile(srcStat, src, dest, opts) {
-      fs36.copyFileSync(src, dest);
+      fs35.copyFileSync(src, dest);
       if (opts.preserveTimestamps) handleTimestamps(srcStat.mode, src, dest);
       return setDestMode(dest, srcStat.mode);
     }
@@ -1427,10 +1427,10 @@ var require_copy_sync = __commonJS({
       return setDestMode(dest, srcMode | 128);
     }
     function setDestMode(dest, srcMode) {
-      return fs36.chmodSync(dest, srcMode);
+      return fs35.chmodSync(dest, srcMode);
     }
     function setDestTimestamps(src, dest) {
-      const updatedSrcStat = fs36.statSync(src);
+      const updatedSrcStat = fs35.statSync(src);
       return utimesMillisSync(dest, updatedSrcStat.atime, updatedSrcStat.mtime);
     }
     function onDir(srcStat, destStat, src, dest, opts) {
@@ -1438,12 +1438,12 @@ var require_copy_sync = __commonJS({
       return copyDir(src, dest, opts);
     }
     function mkDirAndCopy(srcMode, src, dest, opts) {
-      fs36.mkdirSync(dest);
+      fs35.mkdirSync(dest);
       copyDir(src, dest, opts);
       return setDestMode(dest, srcMode);
     }
     function copyDir(src, dest, opts) {
-      const dir = fs36.opendirSync(src);
+      const dir = fs35.opendirSync(src);
       try {
         let dirent;
         while ((dirent = dir.readSync()) !== null) {
@@ -1461,18 +1461,18 @@ var require_copy_sync = __commonJS({
       return getStats2(destStat, srcItem, destItem, opts);
     }
     function onLink(destStat, src, dest, opts) {
-      let resolvedSrc = fs36.readlinkSync(src);
+      let resolvedSrc = fs35.readlinkSync(src);
       if (opts.dereference) {
         resolvedSrc = path40.resolve(process.cwd(), resolvedSrc);
       }
       if (!destStat) {
-        return fs36.symlinkSync(resolvedSrc, dest);
+        return fs35.symlinkSync(resolvedSrc, dest);
       } else {
         let resolvedDest;
         try {
-          resolvedDest = fs36.readlinkSync(dest);
+          resolvedDest = fs35.readlinkSync(dest);
         } catch (err) {
-          if (err.code === "EINVAL" || err.code === "UNKNOWN") return fs36.symlinkSync(resolvedSrc, dest);
+          if (err.code === "EINVAL" || err.code === "UNKNOWN") return fs35.symlinkSync(resolvedSrc, dest);
           throw err;
         }
         if (opts.dereference) {
@@ -1490,8 +1490,8 @@ var require_copy_sync = __commonJS({
       }
     }
     function copyLink(resolvedSrc, dest) {
-      fs36.unlinkSync(dest);
-      return fs36.symlinkSync(resolvedSrc, dest);
+      fs35.unlinkSync(dest);
+      return fs35.symlinkSync(resolvedSrc, dest);
     }
     module2.exports = copySync;
   }
@@ -1513,13 +1513,13 @@ var require_copy2 = __commonJS({
 var require_remove = __commonJS({
   "../../node_modules/fs-extra/lib/remove/index.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_graceful_fs();
+    var fs35 = require_graceful_fs();
     var u2 = require_universalify().fromCallback;
     function remove(path40, callback) {
-      fs36.rm(path40, { recursive: true, force: true }, callback);
+      fs35.rm(path40, { recursive: true, force: true }, callback);
     }
     function removeSync(path40) {
-      fs36.rmSync(path40, { recursive: true, force: true });
+      fs35.rmSync(path40, { recursive: true, force: true });
     }
     module2.exports = {
       remove: u2(remove),
@@ -1533,14 +1533,14 @@ var require_empty = __commonJS({
   "../../node_modules/fs-extra/lib/empty/index.js"(exports2, module2) {
     "use strict";
     var u2 = require_universalify().fromPromise;
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var path40 = require("path");
     var mkdir = require_mkdirs();
     var remove = require_remove();
     var emptyDir = u2(async function emptyDir2(dir) {
       let items;
       try {
-        items = await fs36.readdir(dir);
+        items = await fs35.readdir(dir);
       } catch {
         return mkdir.mkdirs(dir);
       }
@@ -1549,7 +1549,7 @@ var require_empty = __commonJS({
     function emptyDirSync(dir) {
       let items;
       try {
-        items = fs36.readdirSync(dir);
+        items = fs35.readdirSync(dir);
       } catch {
         return mkdir.mkdirsSync(dir);
       }
@@ -1573,51 +1573,51 @@ var require_file = __commonJS({
     "use strict";
     var u2 = require_universalify().fromPromise;
     var path40 = require("path");
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var mkdir = require_mkdirs();
     async function createFile(file2) {
       let stats;
       try {
-        stats = await fs36.stat(file2);
+        stats = await fs35.stat(file2);
       } catch {
       }
       if (stats && stats.isFile()) return;
       const dir = path40.dirname(file2);
       let dirStats = null;
       try {
-        dirStats = await fs36.stat(dir);
+        dirStats = await fs35.stat(dir);
       } catch (err) {
         if (err.code === "ENOENT") {
           await mkdir.mkdirs(dir);
-          await fs36.writeFile(file2, "");
+          await fs35.writeFile(file2, "");
           return;
         } else {
           throw err;
         }
       }
       if (dirStats.isDirectory()) {
-        await fs36.writeFile(file2, "");
+        await fs35.writeFile(file2, "");
       } else {
-        await fs36.readdir(dir);
+        await fs35.readdir(dir);
       }
     }
     function createFileSync(file2) {
       let stats;
       try {
-        stats = fs36.statSync(file2);
+        stats = fs35.statSync(file2);
       } catch {
       }
       if (stats && stats.isFile()) return;
       const dir = path40.dirname(file2);
       try {
-        if (!fs36.statSync(dir).isDirectory()) {
-          fs36.readdirSync(dir);
+        if (!fs35.statSync(dir).isDirectory()) {
+          fs35.readdirSync(dir);
         }
       } catch (err) {
         if (err && err.code === "ENOENT") mkdir.mkdirsSync(dir);
         else throw err;
       }
-      fs36.writeFileSync(file2, "");
+      fs35.writeFileSync(file2, "");
     }
     module2.exports = {
       createFile: u2(createFile),
@@ -1632,19 +1632,19 @@ var require_link = __commonJS({
     "use strict";
     var u2 = require_universalify().fromPromise;
     var path40 = require("path");
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var mkdir = require_mkdirs();
     var { pathExists } = require_path_exists();
     var { areIdentical } = require_stat();
     async function createLink(srcpath, dstpath) {
       let dstStat;
       try {
-        dstStat = await fs36.lstat(dstpath);
+        dstStat = await fs35.lstat(dstpath);
       } catch {
       }
       let srcStat;
       try {
-        srcStat = await fs36.lstat(srcpath);
+        srcStat = await fs35.lstat(srcpath);
       } catch (err) {
         err.message = err.message.replace("lstat", "ensureLink");
         throw err;
@@ -1655,26 +1655,26 @@ var require_link = __commonJS({
       if (!dirExists) {
         await mkdir.mkdirs(dir);
       }
-      await fs36.link(srcpath, dstpath);
+      await fs35.link(srcpath, dstpath);
     }
     function createLinkSync(srcpath, dstpath) {
       let dstStat;
       try {
-        dstStat = fs36.lstatSync(dstpath);
+        dstStat = fs35.lstatSync(dstpath);
       } catch {
       }
       try {
-        const srcStat = fs36.lstatSync(srcpath);
+        const srcStat = fs35.lstatSync(srcpath);
         if (dstStat && areIdentical(srcStat, dstStat)) return;
       } catch (err) {
         err.message = err.message.replace("lstat", "ensureLink");
         throw err;
       }
       const dir = path40.dirname(dstpath);
-      const dirExists = fs36.existsSync(dir);
-      if (dirExists) return fs36.linkSync(srcpath, dstpath);
+      const dirExists = fs35.existsSync(dir);
+      if (dirExists) return fs35.linkSync(srcpath, dstpath);
       mkdir.mkdirsSync(dir);
-      return fs36.linkSync(srcpath, dstpath);
+      return fs35.linkSync(srcpath, dstpath);
     }
     module2.exports = {
       createLink: u2(createLink),
@@ -1688,13 +1688,13 @@ var require_symlink_paths = __commonJS({
   "../../node_modules/fs-extra/lib/ensure/symlink-paths.js"(exports2, module2) {
     "use strict";
     var path40 = require("path");
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var { pathExists } = require_path_exists();
     var u2 = require_universalify().fromPromise;
     async function symlinkPaths(srcpath, dstpath) {
       if (path40.isAbsolute(srcpath)) {
         try {
-          await fs36.lstat(srcpath);
+          await fs35.lstat(srcpath);
         } catch (err) {
           err.message = err.message.replace("lstat", "ensureSymlink");
           throw err;
@@ -1714,7 +1714,7 @@ var require_symlink_paths = __commonJS({
         };
       }
       try {
-        await fs36.lstat(srcpath);
+        await fs35.lstat(srcpath);
       } catch (err) {
         err.message = err.message.replace("lstat", "ensureSymlink");
         throw err;
@@ -1726,7 +1726,7 @@ var require_symlink_paths = __commonJS({
     }
     function symlinkPathsSync(srcpath, dstpath) {
       if (path40.isAbsolute(srcpath)) {
-        const exists2 = fs36.existsSync(srcpath);
+        const exists2 = fs35.existsSync(srcpath);
         if (!exists2) throw new Error("absolute srcpath does not exist");
         return {
           toCwd: srcpath,
@@ -1735,14 +1735,14 @@ var require_symlink_paths = __commonJS({
       }
       const dstdir = path40.dirname(dstpath);
       const relativeToDst = path40.join(dstdir, srcpath);
-      const exists = fs36.existsSync(relativeToDst);
+      const exists = fs35.existsSync(relativeToDst);
       if (exists) {
         return {
           toCwd: relativeToDst,
           toDst: srcpath
         };
       }
-      const srcExists = fs36.existsSync(srcpath);
+      const srcExists = fs35.existsSync(srcpath);
       if (!srcExists) throw new Error("relative srcpath does not exist");
       return {
         toCwd: srcpath,
@@ -1760,13 +1760,13 @@ var require_symlink_paths = __commonJS({
 var require_symlink_type = __commonJS({
   "../../node_modules/fs-extra/lib/ensure/symlink-type.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var u2 = require_universalify().fromPromise;
     async function symlinkType(srcpath, type) {
       if (type) return type;
       let stats;
       try {
-        stats = await fs36.lstat(srcpath);
+        stats = await fs35.lstat(srcpath);
       } catch {
         return "file";
       }
@@ -1776,7 +1776,7 @@ var require_symlink_type = __commonJS({
       if (type) return type;
       let stats;
       try {
-        stats = fs36.lstatSync(srcpath);
+        stats = fs35.lstatSync(srcpath);
       } catch {
         return "file";
       }
@@ -1795,7 +1795,7 @@ var require_symlink = __commonJS({
     "use strict";
     var u2 = require_universalify().fromPromise;
     var path40 = require("path");
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var { mkdirs, mkdirsSync } = require_mkdirs();
     var { symlinkPaths, symlinkPathsSync } = require_symlink_paths();
     var { symlinkType, symlinkTypeSync } = require_symlink_type();
@@ -1804,13 +1804,13 @@ var require_symlink = __commonJS({
     async function createSymlink(srcpath, dstpath, type) {
       let stats;
       try {
-        stats = await fs36.lstat(dstpath);
+        stats = await fs35.lstat(dstpath);
       } catch {
       }
       if (stats && stats.isSymbolicLink()) {
         const [srcStat, dstStat] = await Promise.all([
-          fs36.stat(srcpath),
-          fs36.stat(dstpath)
+          fs35.stat(srcpath),
+          fs35.stat(dstpath)
         ]);
         if (areIdentical(srcStat, dstStat)) return;
       }
@@ -1821,27 +1821,27 @@ var require_symlink = __commonJS({
       if (!await pathExists(dir)) {
         await mkdirs(dir);
       }
-      return fs36.symlink(srcpath, dstpath, toType);
+      return fs35.symlink(srcpath, dstpath, toType);
     }
     function createSymlinkSync(srcpath, dstpath, type) {
       let stats;
       try {
-        stats = fs36.lstatSync(dstpath);
+        stats = fs35.lstatSync(dstpath);
       } catch {
       }
       if (stats && stats.isSymbolicLink()) {
-        const srcStat = fs36.statSync(srcpath);
-        const dstStat = fs36.statSync(dstpath);
+        const srcStat = fs35.statSync(srcpath);
+        const dstStat = fs35.statSync(dstpath);
         if (areIdentical(srcStat, dstStat)) return;
       }
       const relative = symlinkPathsSync(srcpath, dstpath);
       srcpath = relative.toDst;
       type = symlinkTypeSync(relative.toCwd, type);
       const dir = path40.dirname(dstpath);
-      const exists = fs36.existsSync(dir);
-      if (exists) return fs36.symlinkSync(srcpath, dstpath, type);
+      const exists = fs35.existsSync(dir);
+      if (exists) return fs35.symlinkSync(srcpath, dstpath, type);
       mkdirsSync(dir);
-      return fs36.symlinkSync(srcpath, dstpath, type);
+      return fs35.symlinkSync(srcpath, dstpath, type);
     }
     module2.exports = {
       createSymlink: u2(createSymlink),
@@ -1910,9 +1910,9 @@ var require_jsonfile = __commonJS({
       if (typeof options === "string") {
         options = { encoding: options };
       }
-      const fs36 = options.fs || _fs;
+      const fs35 = options.fs || _fs;
       const shouldThrow = "throws" in options ? options.throws : true;
-      let data = await universalify.fromCallback(fs36.readFile)(file2, options);
+      let data = await universalify.fromCallback(fs35.readFile)(file2, options);
       data = stripBom(data);
       let obj;
       try {
@@ -1932,10 +1932,10 @@ var require_jsonfile = __commonJS({
       if (typeof options === "string") {
         options = { encoding: options };
       }
-      const fs36 = options.fs || _fs;
+      const fs35 = options.fs || _fs;
       const shouldThrow = "throws" in options ? options.throws : true;
       try {
-        let content = fs36.readFileSync(file2, options);
+        let content = fs35.readFileSync(file2, options);
         content = stripBom(content);
         return JSON.parse(content, options.reviver);
       } catch (err) {
@@ -1948,15 +1948,15 @@ var require_jsonfile = __commonJS({
       }
     }
     async function _writeFile(file2, obj, options = {}) {
-      const fs36 = options.fs || _fs;
+      const fs35 = options.fs || _fs;
       const str = stringify(obj, options);
-      await universalify.fromCallback(fs36.writeFile)(file2, str, options);
+      await universalify.fromCallback(fs35.writeFile)(file2, str, options);
     }
     var writeFile2 = universalify.fromPromise(_writeFile);
     function writeFileSync2(file2, obj, options = {}) {
-      const fs36 = options.fs || _fs;
+      const fs35 = options.fs || _fs;
       const str = stringify(obj, options);
-      return fs36.writeFileSync(file2, str, options);
+      return fs35.writeFileSync(file2, str, options);
     }
     module2.exports = {
       readFile,
@@ -1987,7 +1987,7 @@ var require_output_file = __commonJS({
   "../../node_modules/fs-extra/lib/output-file/index.js"(exports2, module2) {
     "use strict";
     var u2 = require_universalify().fromPromise;
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var path40 = require("path");
     var mkdir = require_mkdirs();
     var pathExists = require_path_exists().pathExists;
@@ -1996,14 +1996,14 @@ var require_output_file = __commonJS({
       if (!await pathExists(dir)) {
         await mkdir.mkdirs(dir);
       }
-      return fs36.writeFile(file2, data, encoding);
+      return fs35.writeFile(file2, data, encoding);
     }
     function outputFileSync(file2, ...args2) {
       const dir = path40.dirname(file2);
-      if (!fs36.existsSync(dir)) {
+      if (!fs35.existsSync(dir)) {
         mkdir.mkdirsSync(dir);
       }
-      fs36.writeFileSync(file2, ...args2);
+      fs35.writeFileSync(file2, ...args2);
     }
     module2.exports = {
       outputFile: u2(outputFile),
@@ -2062,7 +2062,7 @@ var require_json = __commonJS({
 var require_move = __commonJS({
   "../../node_modules/fs-extra/lib/move/move.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_fs();
+    var fs35 = require_fs();
     var path40 = require("path");
     var { copy } = require_copy2();
     var { remove } = require_remove();
@@ -2089,7 +2089,7 @@ var require_move = __commonJS({
         }
       }
       try {
-        await fs36.rename(src, dest);
+        await fs35.rename(src, dest);
       } catch (err) {
         if (err.code !== "EXDEV") {
           throw err;
@@ -2114,7 +2114,7 @@ var require_move = __commonJS({
 var require_move_sync = __commonJS({
   "../../node_modules/fs-extra/lib/move/move-sync.js"(exports2, module2) {
     "use strict";
-    var fs36 = require_graceful_fs();
+    var fs35 = require_graceful_fs();
     var path40 = require("path");
     var copySync = require_copy2().copySync;
     var removeSync = require_remove().removeSync;
@@ -2139,12 +2139,12 @@ var require_move_sync = __commonJS({
         removeSync(dest);
         return rename(src, dest, overwrite);
       }
-      if (fs36.existsSync(dest)) throw new Error("dest already exists.");
+      if (fs35.existsSync(dest)) throw new Error("dest already exists.");
       return rename(src, dest, overwrite);
     }
     function rename(src, dest, overwrite) {
       try {
-        fs36.renameSync(src, dest);
+        fs35.renameSync(src, dest);
       } catch (err) {
         if (err.code !== "EXDEV") throw err;
         return moveAcrossDevice(src, dest, overwrite);
@@ -4730,7 +4730,7 @@ var require_windows = __commonJS({
     "use strict";
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     function checkPathExt(path40, options) {
       var pathext = options.pathExt !== void 0 ? options.pathExt : process.env.PATHEXT;
       if (!pathext) {
@@ -4755,12 +4755,12 @@ var require_windows = __commonJS({
       return checkPathExt(path40, options);
     }
     function isexe(path40, options, cb) {
-      fs36.stat(path40, function(er, stat) {
+      fs35.stat(path40, function(er, stat) {
         cb(er, er ? false : checkStat(stat, path40, options));
       });
     }
     function sync(path40, options) {
-      return checkStat(fs36.statSync(path40), path40, options);
+      return checkStat(fs35.statSync(path40), path40, options);
     }
   }
 });
@@ -4771,14 +4771,14 @@ var require_mode = __commonJS({
     "use strict";
     module2.exports = isexe;
     isexe.sync = sync;
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     function isexe(path40, options, cb) {
-      fs36.stat(path40, function(er, stat) {
+      fs35.stat(path40, function(er, stat) {
         cb(er, er ? false : checkStat(stat, options));
       });
     }
     function sync(path40, options) {
-      return checkStat(fs36.statSync(path40), options);
+      return checkStat(fs35.statSync(path40), options);
     }
     function checkStat(stat, options) {
       return stat.isFile() && checkMode(stat, options);
@@ -4803,7 +4803,7 @@ var require_mode = __commonJS({
 var require_isexe = __commonJS({
   "../../node_modules/isexe/index.js"(exports2, module2) {
     "use strict";
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var core;
     if (process.platform === "win32" || global.TESTING_WINDOWS) {
       core = require_windows();
@@ -5068,16 +5068,16 @@ var require_shebang_command = __commonJS({
 var require_readShebang = __commonJS({
   "../../node_modules/cross-spawn/lib/util/readShebang.js"(exports2, module2) {
     "use strict";
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var shebangCommand = require_shebang_command();
     function readShebang(command2) {
       const size = 150;
       const buffer = Buffer.alloc(size);
       let fd;
       try {
-        fd = fs36.openSync(command2, "r");
-        fs36.readSync(fd, buffer, 0, size, 0);
-        fs36.closeSync(fd);
+        fd = fs35.openSync(command2, "r");
+        fs35.readSync(fd, buffer, 0, size, 0);
+        fs35.closeSync(fd);
       } catch (e) {
       }
       return shebangCommand(buffer.toString());
@@ -30752,7 +30752,7 @@ var require_view = __commonJS({
     "use strict";
     var debug = require_src()("express:view");
     var path40 = require("path");
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var dirname = path40.dirname;
     var basename = path40.basename;
     var extname = path40.extname;
@@ -30832,7 +30832,7 @@ var require_view = __commonJS({
     function tryStat(path41) {
       debug('stat "%s"', path41);
       try {
-        return fs36.statSync(path41);
+        return fs35.statSync(path41);
       } catch (e) {
         return void 0;
       }
@@ -42073,27 +42073,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module2.exports = Router29;
+    module2.exports = Router32;
     module2.exports.Route = Route;
-    function Router29(options) {
-      if (!(this instanceof Router29)) {
-        return new Router29(options);
+    function Router32(options) {
+      if (!(this instanceof Router32)) {
+        return new Router32(options);
       }
       const opts = options || {};
-      function router29(req, res, next) {
-        router29.handle(req, res, next);
+      function router32(req, res, next) {
+        router32.handle(req, res, next);
       }
-      Object.setPrototypeOf(router29, this);
-      router29.caseSensitive = opts.caseSensitive;
-      router29.mergeParams = opts.mergeParams;
-      router29.params = {};
-      router29.strict = opts.strict;
-      router29.stack = [];
-      return router29;
+      Object.setPrototypeOf(router32, this);
+      router32.caseSensitive = opts.caseSensitive;
+      router32.mergeParams = opts.mergeParams;
+      router32.params = {};
+      router32.strict = opts.strict;
+      router32.stack = [];
+      return router32;
     }
-    Router29.prototype = function() {
+    Router32.prototype = function() {
     };
-    Router29.prototype.param = function param(name, fn) {
+    Router32.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -42113,7 +42113,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router29.prototype.handle = function handle(req, res, callback) {
+    Router32.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -42240,7 +42240,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router29.prototype.use = function use(handler) {
+    Router32.prototype.use = function use(handler) {
       let offset = 0;
       let path40 = "/";
       if (typeof handler !== "function") {
@@ -42273,7 +42273,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router29.prototype.route = function route3(path40) {
+    Router32.prototype.route = function route3(path40) {
       const route4 = new Route(path40);
       const layer = new Layer(path40, {
         sensitive: this.caseSensitive,
@@ -42288,7 +42288,7 @@ var require_router = __commonJS({
       return route4;
     };
     methods.concat("all").forEach(function(method) {
-      Router29.prototype[method] = function(path40) {
+      Router32.prototype[method] = function(path40) {
         const route3 = this.route(path40);
         route3[method].apply(route3, slice.call(arguments, 1));
         return this;
@@ -42471,13 +42471,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils5().compileTrust;
     var resolve = require("path").resolve;
     var once9 = require_once();
-    var Router29 = require_router();
+    var Router32 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app3 = exports2 = module2.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app3.init = function init() {
-      var router29 = null;
+      var router32 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -42486,13 +42486,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router29 === null) {
-            router29 = new Router29({
+          if (router32 === null) {
+            router32 = new Router32({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router29;
+          return router32;
         }
       });
     };
@@ -42563,15 +42563,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router29 = this.router;
+      var router32 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router29.use(path40, fn2);
+          return router32.use(path40, fn2);
         }
         debug(".use app under %s", path40);
         fn2.mountpath = path40;
         fn2.parent = this;
-        router29.use(path40, function mounted_app(req, res, next) {
+        router32.use(path40, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -53479,7 +53479,7 @@ var require_send = __commonJS({
     var escapeHtml = require_escape_html();
     var etag = require_etag();
     var fresh = require_fresh();
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var mime = require_mime_types3();
     var ms = require_ms();
     var onFinished = require_on_finished();
@@ -53761,7 +53761,7 @@ var require_send = __commonJS({
       var i2 = 0;
       var self = this;
       debug('stat "%s"', path41);
-      fs36.stat(path41, function onstat(err, stat) {
+      fs35.stat(path41, function onstat(err, stat) {
         var pathEndsWithSep = path41[path41.length - 1] === sep;
         if (err && err.code === "ENOENT" && !extname(path41) && !pathEndsWithSep) {
           return next(err);
@@ -53778,7 +53778,7 @@ var require_send = __commonJS({
         }
         var p = path41 + "." + self._extensions[i2++];
         debug('stat "%s"', p);
-        fs36.stat(p, function(err2, stat) {
+        fs35.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -53796,7 +53796,7 @@ var require_send = __commonJS({
         }
         var p = join(path41, self._index[i2]);
         debug('stat "%s"', p);
-        fs36.stat(p, function(err2, stat) {
+        fs35.stat(p, function(err2, stat) {
           if (err2) return next(err2);
           if (stat.isDirectory()) return next();
           self.emit("file", p, stat);
@@ -53808,7 +53808,7 @@ var require_send = __commonJS({
     SendStream.prototype.stream = function stream(path41, options) {
       var self = this;
       var res = this.res;
-      var stream2 = fs36.createReadStream(path41, options);
+      var stream2 = fs35.createReadStream(path41, options);
       this.emit("stream", stream2);
       stream2.pipe(res);
       function cleanup() {
@@ -54607,7 +54607,7 @@ var require_express = __commonJS({
     var EventEmitter2 = require("events").EventEmitter;
     var mixin2 = require_merge_descriptors();
     var proto = require_application();
-    var Router29 = require_router();
+    var Router32 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -54629,8 +54629,8 @@ var require_express = __commonJS({
     exports2.application = proto;
     exports2.request = req;
     exports2.response = res;
-    exports2.Route = Router29.Route;
-    exports2.Router = Router29;
+    exports2.Route = Router32.Route;
+    exports2.Router = Router32;
     exports2.json = bodyParser.json;
     exports2.raw = bodyParser.raw;
     exports2.static = require_serve_static();
@@ -79577,8 +79577,8 @@ var require_utils8 = __commonJS({
     exports2.array = array;
     var errno = require_errno();
     exports2.errno = errno;
-    var fs36 = require_fs2();
-    exports2.fs = fs36;
+    var fs35 = require_fs2();
+    exports2.fs = fs35;
     var path40 = require_path();
     exports2.path = path40;
     var pattern = require_pattern();
@@ -79762,12 +79762,12 @@ var require_fs3 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createFileSystemAdapter = exports2.FILE_SYSTEM_ADAPTER = void 0;
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     exports2.FILE_SYSTEM_ADAPTER = {
-      lstat: fs36.lstat,
-      stat: fs36.stat,
-      lstatSync: fs36.lstatSync,
-      statSync: fs36.statSync
+      lstat: fs35.lstat,
+      stat: fs35.stat,
+      lstatSync: fs35.lstatSync,
+      statSync: fs35.statSync
     };
     function createFileSystemAdapter(fsMethods) {
       if (fsMethods === void 0) {
@@ -79784,12 +79784,12 @@ var require_settings = __commonJS({
   "../../node_modules/@nodelib/fs.stat/out/settings.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    var fs36 = require_fs3();
+    var fs35 = require_fs3();
     var Settings = class {
       constructor(_options = {}) {
         this._options = _options;
         this.followSymbolicLink = this._getValue(this._options.followSymbolicLink, true);
-        this.fs = fs36.createFileSystemAdapter(this._options.fs);
+        this.fs = fs35.createFileSystemAdapter(this._options.fs);
         this.markSymbolicLink = this._getValue(this._options.markSymbolicLink, false);
         this.throwErrorOnBrokenSymbolicLink = this._getValue(this._options.throwErrorOnBrokenSymbolicLink, true);
       }
@@ -79946,8 +79946,8 @@ var require_utils9 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.fs = void 0;
-    var fs36 = require_fs4();
-    exports2.fs = fs36;
+    var fs35 = require_fs4();
+    exports2.fs = fs35;
   }
 });
 
@@ -80142,14 +80142,14 @@ var require_fs5 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.createFileSystemAdapter = exports2.FILE_SYSTEM_ADAPTER = void 0;
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     exports2.FILE_SYSTEM_ADAPTER = {
-      lstat: fs36.lstat,
-      stat: fs36.stat,
-      lstatSync: fs36.lstatSync,
-      statSync: fs36.statSync,
-      readdir: fs36.readdir,
-      readdirSync: fs36.readdirSync
+      lstat: fs35.lstat,
+      stat: fs35.stat,
+      lstatSync: fs35.lstatSync,
+      statSync: fs35.statSync,
+      readdir: fs35.readdir,
+      readdirSync: fs35.readdirSync
     };
     function createFileSystemAdapter(fsMethods) {
       if (fsMethods === void 0) {
@@ -80168,12 +80168,12 @@ var require_settings2 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     var path40 = require("path");
     var fsStat = require_out();
-    var fs36 = require_fs5();
+    var fs35 = require_fs5();
     var Settings = class {
       constructor(_options = {}) {
         this._options = _options;
         this.followSymbolicLinks = this._getValue(this._options.followSymbolicLinks, false);
-        this.fs = fs36.createFileSystemAdapter(this._options.fs);
+        this.fs = fs35.createFileSystemAdapter(this._options.fs);
         this.pathSegmentSeparator = this._getValue(this._options.pathSegmentSeparator, path40.sep);
         this.stats = this._getValue(this._options.stats, false);
         this.throwErrorOnBrokenSymbolicLink = this._getValue(this._options.throwErrorOnBrokenSymbolicLink, true);
@@ -81554,16 +81554,16 @@ var require_settings4 = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DEFAULT_FILE_SYSTEM_ADAPTER = void 0;
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var os3 = require("os");
     var CPU_COUNT = Math.max(os3.cpus().length, 1);
     exports2.DEFAULT_FILE_SYSTEM_ADAPTER = {
-      lstat: fs36.lstat,
-      lstatSync: fs36.lstatSync,
-      stat: fs36.stat,
-      statSync: fs36.statSync,
-      readdir: fs36.readdir,
-      readdirSync: fs36.readdirSync
+      lstat: fs35.lstat,
+      lstatSync: fs35.lstatSync,
+      stat: fs35.stat,
+      statSync: fs35.statSync,
+      readdir: fs35.readdir,
+      readdirSync: fs35.readdirSync
     };
     var Settings = class {
       constructor(_options = {}) {
@@ -81968,7 +81968,7 @@ var require_cpu = __commonJS({
   "../../node_modules/pidusage/lib/helpers/cpu.js"(exports2, module2) {
     "use strict";
     var os3 = require("os");
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var exec6 = require("child_process").exec;
     var parallel = require_parallel();
     function updateCpu(cpu, next) {
@@ -81995,7 +81995,7 @@ var require_cpu = __commonJS({
     }
     module2.exports = updateCpu;
     function getRealUptime(next) {
-      fs36.readFile("/proc/uptime", "utf8", function(err, uptime) {
+      fs35.readFile("/proc/uptime", "utf8", function(err, uptime) {
         if (err || uptime === void 0) {
           if (!process.env.PIDUSAGE_SILENT) {
             console.warn("[pidusage] We couldn't find uptime from /proc/uptime, using os.uptime() value");
@@ -82103,7 +82103,7 @@ var require_safe_buffer = __commonJS({
 var require_procfile = __commonJS({
   "../../node_modules/pidusage/lib/procfile.js"(exports2, module2) {
     "use strict";
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var path40 = require("path");
     var updateCpu = require_cpu();
     var parallel = require_parallel();
@@ -82117,11 +82117,11 @@ var require_procfile = __commonJS({
       if (history2.fd) {
         return cb(null, history2.fd);
       }
-      fs36.open(path41, "r", cb);
+      fs35.open(path41, "r", cb);
     }
     function close(history2) {
       if (history2.fd) {
-        fs36.close(history2.fd, noop3);
+        fs35.close(history2.fd, noop3);
       }
     }
     function readUntilEnd(fd, buf, cb) {
@@ -82131,7 +82131,7 @@ var require_procfile = __commonJS({
         buf = Buffer6.alloc(SIZE);
         firstRead = true;
       }
-      fs36.read(fd, buf, 0, SIZE, 0, function(err, bytesRead, buffer) {
+      fs35.read(fd, buf, 0, SIZE, 0, function(err, bytesRead, buffer) {
         if (err) {
           cb(err);
           return;
@@ -82414,7 +82414,7 @@ var require_gwmi = __commonJS({
 var require_stats = __commonJS({
   "../../node_modules/pidusage/lib/stats.js"(exports2, module2) {
     "use strict";
-    var fs36 = require("fs");
+    var fs35 = require("fs");
     var os3 = require("os");
     var spawn2 = require("child_process").spawn;
     var requireMap = {
@@ -82438,7 +82438,7 @@ var require_stats = __commonJS({
       win: "wmic"
     };
     var platform3 = os3.platform();
-    if (fs36.existsSync("/etc/alpine-release")) {
+    if (fs35.existsSync("/etc/alpine-release")) {
       platform3 = "alpine";
     }
     if (platform3.match(/^win/)) {
@@ -82643,64 +82643,30 @@ var require_tree_kill = __commonJS({
   }
 });
 
-// src/routes/opencode/_tui.ts
-var tui_exports = {};
-__export(tui_exports, {
+// src/routes/opencode/_core.ts
+var opencodeInstances, clientInstance;
+var init_core2 = __esm({
+  "src/routes/opencode/_core.ts"() {
+    "use strict";
+    opencodeInstances = /* @__PURE__ */ new Map();
+    clientInstance = /* @__PURE__ */ new Map();
+  }
+});
+
+// src/routes/opencode/_helper.ts
+var helper_exports = {};
+__export(helper_exports, {
   clean: () => clean,
   findAvailablePort: () => findAvailablePort,
   isPortInUse: () => isPortInUse,
-  loadInstances: () => loadInstances,
-  saveInstances: () => saveInstances
+  opencodeJson: () => opencodeJson
 });
-var import_fs_extra23, import_path31, import_net, OPENCODE_DATA_FILE, saveInstances, loadInstances, isPortInUse, findAvailablePort, clean;
-var init_tui = __esm({
-  "src/routes/opencode/_tui.ts"() {
+var import_net, isPortInUse, findAvailablePort, clean, opencodeJson;
+var init_helper = __esm({
+  "src/routes/opencode/_helper.ts"() {
     "use strict";
-    import_fs_extra23 = __toESM(require_lib());
-    import_path31 = __toESM(require("path"));
     import_net = __toESM(require("net"));
-    init_opencodeTUI();
-    OPENCODE_DATA_FILE = import_path31.default.join(__dirname, ".opencode.json");
-    saveInstances = async () => {
-      try {
-        const data = Array.from(opencodeInstances.values()).map((instance) => ({
-          id: instance.id,
-          url: instance.url,
-          port: instance.port,
-          name: instance.name,
-          pid: instance.pid,
-          createdAt: instance.createdAt,
-          lastSessionId: instance.lastSessionId
-        }));
-        await import_fs_extra23.default.writeJson(OPENCODE_DATA_FILE, data, { spaces: 2 });
-      } catch (err) {
-        console.error("Failed to save opencode instances:", err);
-      }
-    };
-    loadInstances = async () => {
-      try {
-        if (await import_fs_extra23.default.pathExists(OPENCODE_DATA_FILE)) {
-          const content = await import_fs_extra23.default.readFile(OPENCODE_DATA_FILE, "utf-8");
-          if (!content.trim()) {
-            opencodeInstances.clear();
-            return;
-          }
-          const data = JSON.parse(content);
-          opencodeInstances.clear();
-          if (Array.isArray(data)) {
-            data.forEach((item) => {
-              opencodeInstances.set(item.id, { ...item, server: void 0 });
-            });
-            console.log(`Loaded ${opencodeInstances.size} opencode instances from disk.`);
-          }
-        } else {
-          await import_fs_extra23.default.writeJson(OPENCODE_DATA_FILE, [], { spaces: 2 });
-        }
-      } catch (err) {
-        console.error("Failed to load opencode instances:", err);
-        opencodeInstances.clear();
-      }
-    };
+    init_core2();
     isPortInUse = (port3) => {
       return new Promise((resolve) => {
         const server = import_net.default.createServer();
@@ -82743,13 +82709,11 @@ var init_tui = __esm({
         if (!portsMap.has(inst.port)) portsMap.set(inst.port, []);
         portsMap.get(inst.port).push(inst);
       });
-      let modified = false;
       for (const [port3, insts] of portsMap.entries()) {
         const inUse = await isPortInUse(port3);
         if (!inUse) {
           insts.forEach((inst) => {
             opencodeInstances.delete(inst.id);
-            modified = true;
           });
           continue;
         }
@@ -82759,134 +82723,27 @@ var init_tui = __esm({
             if (inst.id !== toKeep.id) {
               console.log(`Pruning redundant instance ${inst.id} on port ${port3}`);
               opencodeInstances.delete(inst.id);
-              modified = true;
             }
           });
         }
       }
-      if (modified) {
-        await saveInstances();
-      }
     };
+    opencodeJson = `
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "git-stash-build": {
+      "mode": "primary",
+      "prompt": "After completing the task, run this in bash: curl -s -X POST http://localhost:4792/gitstash/add -H 'Content-Type: application/json' -d '{"stashName":"<summary>"}' replacing <summary> with a short description of the changes. Do not read or display the output of the curl command.",
+      "tools": {
+        "write": true,
+        "edit":  true,
+        "bash":  true
+      }
+    }
   }
-});
-
-// src/routes/opencode/opencodeTUI.ts
-var import_express30, import_child_process5, import_kill_port, router26, opencodeInstances, clientInstance, opencodeTUI_default;
-var init_opencodeTUI = __esm({
-  "src/routes/opencode/opencodeTUI.ts"() {
-    "use strict";
-    import_express30 = __toESM(require_express2());
-    import_child_process5 = require("child_process");
-    import_kill_port = __toESM(require("kill-port"));
-    init_tui();
-    router26 = (0, import_express30.Router)();
-    opencodeInstances = /* @__PURE__ */ new Map();
-    clientInstance = /* @__PURE__ */ new Map();
-    loadInstances();
-    router26.get("/checkinstalled", async (req, res) => {
-      const checkCommand = (cmd) => {
-        return new Promise((resolve) => {
-          (0, import_child_process5.exec)(cmd, (error) => {
-            resolve(!error);
-          });
-        });
-      };
-      try {
-        const [isOpencodeInPath, isNpmPackageInstalled] = await Promise.all([
-          checkCommand("command -v opencode"),
-          checkCommand("npm list -g opencode-ai --depth=0")
-        ]);
-        res.json({
-          installed: isOpencodeInPath || isNpmPackageInstalled,
-          isInPath: isOpencodeInPath,
-          isNpmGlobal: isNpmPackageInstalled
-        });
-      } catch (err) {
-        console.error("Error checking opencode usage:", err);
-        res.status(500).json({ error: "Internal Server Error" });
-      }
-    });
-    router26.get("/list", (req, res) => {
-      const instances = Array.from(opencodeInstances.values()).map((instance) => ({
-        id: instance.id,
-        url: instance.url,
-        port: instance.port,
-        name: instance.name,
-        // 'detached' means we lost the handle but it might still be running
-        status: instance.server ? "active" : "detached",
-        createdAt: instance.createdAt,
-        lastSessionId: instance.lastSessionId
-      }));
-      res.json({ instances });
-    });
-    router26.get("/listclient", (req, res) => {
-      const clients = Array.from(clientInstance.values()).map((client) => ({
-        instanceId: client.instanceId,
-        clientId: client.clientId,
-        clientName: client.clientName
-      }));
-      res.json({ clients });
-    });
-    router26.post("/identify", async (req, res) => {
-      await loadInstances();
-      await clean();
-      const instances = Array.from(opencodeInstances.values()).map((instance) => ({
-        id: instance.id,
-        name: instance.name,
-        port: instance.port,
-        status: instance.server ? "active" : "detached"
-      }));
-      res.json({
-        message: "Identification and cleanup complete",
-        instances,
-        count: instances.length
-      });
-    });
-    router26.post("/clean", async (req, res) => {
-      await loadInstances();
-      await clean();
-      res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
-    });
-    router26.post("/stop", async (req, res) => {
-      try {
-        const { id } = req.body;
-        if (!id)
-          return res.status(400).json({ error: "Instance ID is required" });
-        if (opencodeInstances.has(id)) {
-          const instance = opencodeInstances.get(id);
-          if (instance.server) {
-            instance.server.close();
-            await (0, import_kill_port.default)(instance.port);
-            console.log(`Force killed port ${instance.port} for detached instance ${id}`);
-          }
-          opencodeInstances.delete(id);
-          await saveInstances();
-          console.log(`Opencode instance ${id} stopped`);
-          res.json({ success: true, message: "Instance stopped" });
-        } else {
-          res.status(404).json({ error: "Instance not found" });
-        }
-      } catch (e) {
-        res.status(500).json({ error: e });
-      }
-    });
-    router26.post("/change-name", async (req, res) => {
-      const { id, name } = req.body;
-      if (!id || !name) {
-        return res.status(400).json({ error: "Instance ID and new Name are required" });
-      }
-      if (opencodeInstances.has(id)) {
-        const instance = opencodeInstances.get(id);
-        instance.name = name;
-        opencodeInstances.set(id, instance);
-        await saveInstances();
-        res.json({ success: true, message: "Instance updated", instance: { id, name } });
-      } else {
-        res.status(404).json({ error: "Instance not found" });
-      }
-    });
-    opencodeTUI_default = router26;
+}
+`;
   }
 });
 
@@ -83016,99 +82873,9 @@ Examples:
 }
 
 // src/index.ts
-var import_express33 = __toESM(require_express2());
-var import_cors = __toESM(require_lib4());
+var import_express37 = __toESM(require_express2());
 var import_path33 = __toESM(require("path"));
-
-// ../../packages/api/index.ts
-var apiRoute = {
-  /** Scan a workspace 
-   * get request returns  workspace: WorkspaceInfo[]
-  */
-  scanWorkspace: "scanworkspace",
-  /** Run a command in the interactive terminal 
-   * request body: { workspace: WorkspaceInfo; runas: 'dev' | 'start'; }
-  */
-  runCmdDev: "runcmddev",
-  /** Stop a process 
-   * request body: { workspace: WorkspaceInfo }
-  */
-  stopProcess: "stopprocess",
-  /** List all workspaces in the workspace directory 
-   * It is a get request
-   * returns: [{ label: string, path: string }]
-  */
-  listWorkspacesDir: "listworkspacedirs",
-  /** Create a new workspace 
-   * request body: { workspace: WorkspaceInfo }
-  */
-  newWorkspace: "newworkspace",
-  /** Run a command in the interactive terminal 
-   * request body: { path: string, cmd: string }
-  */
-  interactvTerminal: "interactvterminal",
-  stopInteractiveTerminal: "stopinteractiveterminal",
-  stopTerminalWorkspace: "stopTerminalWorkspace",
-  /** Hide or show a file or folder in your IDE (VS Code and variant)
-   * it a get request, return true / false
-  */
-  hideShowFileFolder: "hideshowfilefolder",
-  /** Update a workspace 
-   * request body: { workspace: WorkspaceInfo }
-  */
-  updateWorkspace: "updateworkspace",
-  /** Get the root path of the project
-   * It is a get request
-   * returns: { path: string }
-  */
-  getRootPath: "getrootpath",
-  /** Scaffold a new repo 
-   * get request returns { success: boolean }
-  */
-  scaffoldRepo: "scaffoldrepo",
-  /** Check if a turbo repo exists in the rootdir 
-   * get return { exists: boolean }
-  */
-  turborepoExist: "turborepoexist",
-  /** Check if it is the first run
-   * get return { isFirstTime: boolean }
-  */
-  firstRun: "firstrun",
-  /** Get/Set notes
-   * get returns { notes: string }
-   * post body { notes: string } returns { success: boolean }
-  */
-  notes: "notes",
-  /** Get/Set crudtest
-   * get returns { crudtest: any[] }
-   * post body { crudtest: any[] } returns { success: boolean }
-  */
-  crudTest: "crudtest",
-  /** Git Control
-   * get history
-   * get current branch
-   * post revert
-   * post push
-   */
-  gitControl: "gitcontrol",
-  /** Initialize monorepotime.json
-   * get request returns { success: boolean }
-   */
-  initMonorepoTime: "initmtime",
-  /** Process tree and dockers memory usage */
-  processTree: "processtree",
-  /** Docker API */
-  docker: "docker",
-  availabletemplates: "availabletemplates",
-  setWorkspaceTemplate: "setworkspacetemplate",
-  deleteWorkspace: "deleteworkspace",
-  opencodeHelper: "opencode",
-  opencodeTUI: "opencodetui",
-  scanProject: "scanproject",
-  textEditor: "texteditor",
-  gitStash: "gitstash"
-};
-var api_default = apiRoute;
+var import_cors = __toESM(require_lib4());
 
 // ../../packages/config/index.ts
 var isDev = process.env.NODE_ENV === "development";
@@ -83745,6 +83512,109 @@ var { Server, Namespace, Socket } = import_dist.default;
 // src/index.ts
 var import_net2 = __toESM(require("net"));
 
+// src/routes/index.ts
+var import_path32 = __toESM(require("path"));
+
+// ../../packages/api/index.ts
+var apiRoute = {
+  /** Scan a workspace 
+   * get request returns  workspace: WorkspaceInfo[]
+  */
+  scanWorkspace: "scanworkspace",
+  /** Run a command in the interactive terminal 
+   * request body: { workspace: WorkspaceInfo; runas: 'dev' | 'start'; }
+  */
+  runCmdDev: "runcmddev",
+  /** Stop a process 
+   * request body: { workspace: WorkspaceInfo }
+  */
+  stopProcess: "stopprocess",
+  /** List all workspaces in the workspace directory 
+   * It is a get request
+   * returns: [{ label: string, path: string }]
+  */
+  listWorkspacesDir: "listworkspacedirs",
+  /** Create a new workspace 
+   * request body: { workspace: WorkspaceInfo }
+  */
+  newWorkspace: "newworkspace",
+  /** Run a command in the interactive terminal 
+   * request body: { path: string, cmd: string }
+  */
+  interactvTerminal: "interactvterminal",
+  stopInteractiveTerminal: "stopinteractiveterminal",
+  stopTerminalWorkspace: "stopTerminalWorkspace",
+  /** Hide or show a file or folder in your IDE (VS Code and variant)
+   * it a get request, return true / false
+  */
+  hideShowFileFolder: "hideshowfilefolder",
+  /** Update a workspace 
+   * request body: { workspace: WorkspaceInfo }
+  */
+  updateWorkspace: "updateworkspace",
+  /** Get the root path of the project
+   * It is a get request
+   * returns: { path: string }
+  */
+  getRootPath: "getrootpath",
+  /** Scaffold a new repo 
+   * get request returns { success: boolean }
+  */
+  scaffoldRepo: "scaffoldrepo",
+  /** Check if a turbo repo exists in the rootdir 
+   * get return { exists: boolean }
+  */
+  turborepoExist: "turborepoexist",
+  /** Check if it is the first run
+   * get return { isFirstTime: boolean }
+  */
+  firstRun: "firstrun",
+  /** Get/Set notes
+   * get returns { notes: string }
+   * post body { notes: string } returns { success: boolean }
+  */
+  notes: "notes",
+  /** Get/Set crudtest
+   * get returns { crudtest: any[] }
+   * post body { crudtest: any[] } returns { success: boolean }
+  */
+  crudTest: "crudtest",
+  /** Git Control
+   * get history
+   * get current branch
+   * post revert
+   * post push
+   */
+  gitControl: "gitcontrol",
+  /** Initialize monorepotime.json
+   * get request returns { success: boolean }
+   */
+  initMonorepoTime: "initmtime",
+  /** Process tree and dockers memory usage */
+  processTree: "processtree",
+  /** Docker API */
+  docker: "docker",
+  availabletemplates: "availabletemplates",
+  setWorkspaceTemplate: "setworkspacetemplate",
+  deleteWorkspace: "deleteworkspace",
+  scanProject: "scanproject",
+  textEditor: "texteditor",
+  gitStash: "gitstash",
+  //opencode routes
+  opencode: "opencode",
+  opencodeCreateInstance: "opencode/createinstance",
+  opencodeListInstances: "opencode/listinstances",
+  opencodeCreateClient: "opencode/createclient",
+  opencodeListClients: "opencode/listclients",
+  opencodePrompt: "opencode/prompt",
+  //session based chat
+  opencodeSessionChat: "opencode/sessionchat"
+};
+var api_default = apiRoute;
+
+// src/routes/index.ts
+var import_express36 = __toESM(require_express2());
+
 // src/routes/utils/_tester.ts
 var import_express = __toESM(require_express2());
 var router = (0, import_express.Router)();
@@ -84002,6 +83872,9 @@ route.get("/", async (req, res) => {
 });
 var scanworkspace_default = route;
 
+// src/routes/terminal/stopcmd.ts
+var import_express3 = __toESM(require_express2());
+
 // src/routes/terminal/runcmddev.ts
 var import_chalk2 = __toESM(require_source());
 init_execa();
@@ -84058,7 +83931,6 @@ async function handleOnRun(socket, data) {
 }
 
 // src/routes/terminal/stopcmd.ts
-var import_express3 = __toESM(require_express2());
 var import_chalk3 = __toESM(require_source());
 var import_child_process = require("child_process");
 var router2 = (0, import_express3.Router)();
@@ -95180,18 +95052,13 @@ router21.post("/", async (req, res) => {
 });
 var deleteWorkspace_default = router21;
 
-// src/routes/opencode/opencodeHelper.ts
-var import_express26 = __toESM(require_express2());
-var router22 = (0, import_express26.Router)();
-var opencodeHelper_default = router22;
-
 // src/routes/textEditor/projectBrowser.ts
-var import_express27 = __toESM(require_express2());
+var import_express26 = __toESM(require_express2());
 var import_fs_extra21 = __toESM(require_lib());
 var import_path28 = __toESM(require("path"));
 var import_fast_glob2 = __toESM(require_out4());
 init_execa();
-var router23 = (0, import_express27.Router)();
+var router22 = (0, import_express26.Router)();
 var ROOT4 = process.cwd();
 function findMonorepoRoot5(startDir) {
   let dir = startDir;
@@ -95226,7 +95093,7 @@ var DEFAULT_IGNORES = [
   "**/build",
   "**/coverage"
 ];
-router23.get("/", async (req, res) => {
+router22.get("/", async (req, res) => {
   try {
     const settingsPath = getSettingsPath2();
     let settings = {};
@@ -95381,14 +95248,14 @@ router23.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to scan project" });
   }
 });
-var projectBrowser_default = router23;
+var projectBrowser_default = router22;
 
 // src/routes/textEditor/textEditor.ts
-var import_express28 = __toESM(require_express2());
+var import_express27 = __toESM(require_express2());
 var import_fs_extra22 = __toESM(require_lib());
 var import_path29 = __toESM(require("path"));
 init_execa();
-var router24 = (0, import_express28.Router)();
+var router23 = (0, import_express27.Router)();
 function resolvePath(itemPath) {
   if (itemPath.startsWith(ROOT3)) {
     return itemPath;
@@ -95396,7 +95263,7 @@ function resolvePath(itemPath) {
   const relativePath = itemPath.replace(/^\/+/, "");
   return import_path29.default.join(ROOT3, relativePath);
 }
-router24.post("/get", async (req, res) => {
+router23.post("/get", async (req, res) => {
   try {
     let { path: filePath } = req.body;
     if (!filePath) {
@@ -95420,7 +95287,7 @@ router24.post("/get", async (req, res) => {
     res.status(500).json({ error: "Failed to read file", details: error.message });
   }
 });
-router24.post("/set", async (req, res) => {
+router23.post("/set", async (req, res) => {
   try {
     let { path: filePath, content } = req.body;
     if (!filePath) {
@@ -95439,7 +95306,7 @@ router24.post("/set", async (req, res) => {
     res.status(500).json({ error: "Failed to write file", details: error.message });
   }
 });
-router24.post("/edit", async (req, res) => {
+router23.post("/edit", async (req, res) => {
   try {
     let { path: itemPath, newname } = req.body;
     if (!itemPath) {
@@ -95474,7 +95341,7 @@ router24.post("/edit", async (req, res) => {
     res.status(500).json({ error: "Failed to rename", details: error.message });
   }
 });
-router24.post("/delete", async (req, res) => {
+router23.post("/delete", async (req, res) => {
   try {
     let { path: itemPath } = req.body;
     if (!itemPath) {
@@ -95493,7 +95360,7 @@ router24.post("/delete", async (req, res) => {
     res.status(500).json({ error: "Failed to delete", details: error.message });
   }
 });
-router24.post("/newfile", async (req, res) => {
+router23.post("/newfile", async (req, res) => {
   try {
     let { path: itemPath } = req.body;
     if (!itemPath) {
@@ -95515,7 +95382,7 @@ router24.post("/newfile", async (req, res) => {
     res.status(500).json({ error: "Failed to create file", details: error.message });
   }
 });
-router24.post("/newfolder", async (req, res) => {
+router23.post("/newfolder", async (req, res) => {
   try {
     let { path: itemPath } = req.body;
     if (!itemPath) {
@@ -95539,7 +95406,7 @@ router24.post("/newfolder", async (req, res) => {
     res.status(500).json({ error: "Failed to create folder", details: error.message });
   }
 });
-router24.post("/diff", async (req, res) => {
+router23.post("/diff", async (req, res) => {
   try {
     let { path: filePath } = req.body;
     if (!filePath) {
@@ -95607,14 +95474,14 @@ router24.post("/diff", async (req, res) => {
     res.status(500).json({ error: "Failed to get diff", details: error.message });
   }
 });
-var textEditor_default = router24;
+var textEditor_default = router23;
 
 // src/routes/utils/gitStashHelper.ts
-var import_express29 = __toESM(require_express2());
+var import_express28 = __toESM(require_express2());
 init_execa();
 var import_fs7 = __toESM(require("fs"));
 var import_path30 = __toESM(require("path"));
-var router25 = (0, import_express29.Router)();
+var router24 = (0, import_express28.Router)();
 async function runGit2(args2) {
   const { stdout } = await execa("git", args2, { cwd: ROOT3 });
   return stdout.trim();
@@ -95646,7 +95513,7 @@ async function getStashList() {
     return [];
   }
 }
-router25.get("/list", async (req, res) => {
+router24.get("/list", async (req, res) => {
   try {
     await cleanStaleLocks2();
     const list = await getStashList();
@@ -95656,7 +95523,7 @@ router25.get("/list", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-router25.post("/add", async (req, res) => {
+router24.post("/add", async (req, res) => {
   var _a2, _b2;
   try {
     const { stashName } = req.body;
@@ -95689,7 +95556,7 @@ router25.post("/add", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-router25.post("/revert", async (req, res) => {
+router24.post("/revert", async (req, res) => {
   try {
     const { stashName } = req.body;
     if (!stashName) {
@@ -95744,7 +95611,7 @@ router25.post("/revert", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-router25.get("/clear", async (req, res) => {
+router24.get("/clear", async (req, res) => {
   try {
     await cleanStaleLocks2();
     await runGit2(["stash", "clear"]);
@@ -95754,19 +95621,16 @@ router25.get("/clear", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-var gitStashHelper_default = router25;
-
-// src/index.ts
-init_opencodeTUI();
+var gitStashHelper_default = router24;
 
 // src/routes/opencode/createInstance.ts
-var import_express31 = __toESM(require_express2());
-var import_path32 = __toESM(require("path"));
-init_tui();
-init_opencodeTUI();
+var import_express29 = __toESM(require_express2());
+var import_path31 = __toESM(require("path"));
+init_helper();
+init_core2();
 var opencodeSdkPromise = new Function("specifier", "return import(specifier)")("@opencode-ai/sdk");
-var router27 = (0, import_express31.Router)();
-router27.post("/add", async (req, res) => {
+var router25 = (0, import_express29.Router)();
+router25.post("/", async (req, res) => {
   const { createOpencode } = await opencodeSdkPromise;
   const id = req.body.id || Math.random().toString(36).substring(6);
   const name = req.body.name || `Instance ${id}`;
@@ -95774,12 +95638,11 @@ router27.post("/add", async (req, res) => {
   const reset2 = req.body.reset === true;
   if (opencodeInstances.has(id)) {
     const instance = opencodeInstances.get(id);
-    const { isPortInUse: isPortInUse2 } = await Promise.resolve().then(() => (init_tui(), tui_exports));
+    const { isPortInUse: isPortInUse2 } = await Promise.resolve().then(() => (init_helper(), helper_exports));
     const alive = await isPortInUse2(instance.port);
     if (alive) {
       if (reset2) {
         instance.lastSessionId = void 0;
-        await saveInstances();
       }
       return res.json({
         status: "running",
@@ -95797,7 +95660,7 @@ router27.post("/add", async (req, res) => {
   }
   try {
     const port3 = await findAvailablePort(4096);
-    const projectRoot = import_path32.default.resolve(process.cwd(), "../../");
+    const projectRoot = import_path31.default.resolve(process.cwd(), "../../");
     const originalCwd = process.cwd();
     console.log(`Starting Opencode in root: ${projectRoot}`);
     process.chdir(projectRoot);
@@ -95820,14 +95683,8 @@ router27.post("/add", async (req, res) => {
         lastSessionId: void 0
       };
       opencodeInstances.set(id, instance);
-      await saveInstances();
-      res.json({
-        status: "started",
-        url: opencode.server.url,
-        id,
-        name,
-        port: port3
-      });
+      const { server, ...responseInstance } = instance;
+      res.json(responseInstance);
     } finally {
       process.chdir(originalCwd);
     }
@@ -95840,14 +95697,119 @@ router27.post("/add", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-var createInstance_default = router27;
+var createInstance_default = router25;
 
-// src/routes/opencode/chats.ts
+// src/routes/opencode/listInstance.ts
+var import_express30 = __toESM(require_express2());
+init_core2();
+var router26 = (0, import_express30.Router)();
+router26.get("/", (req, res) => {
+  const instances = Array.from(opencodeInstances.values()).map((instance) => ({
+    id: instance.id,
+    url: instance.url,
+    port: instance.port,
+    name: instance.name,
+    // 'detached' means we lost the handle but it might still be running
+    status: instance.server ? "active" : "detached",
+    createdAt: instance.createdAt,
+    lastSessionId: instance.lastSessionId
+  }));
+  res.json({ instances });
+});
+var listInstance_default = router26;
+
+// src/routes/opencode/opencode.ts
+var import_express31 = __toESM(require_express2());
+var import_kill_port = __toESM(require("kill-port"));
+init_helper();
+init_core2();
+var import_child_process5 = require("child_process");
+var router27 = (0, import_express31.Router)();
+router27.get("/check", async (req, res) => {
+  const checkCommand = (cmd) => {
+    return new Promise((resolve) => {
+      (0, import_child_process5.exec)(cmd, (error) => {
+        resolve(!error);
+      });
+    });
+  };
+  try {
+    const [isOpencodeInPath, isNpmPackageInstalled] = await Promise.all([
+      checkCommand("command -v opencode"),
+      checkCommand("npm list -g opencode-ai --depth=0")
+    ]);
+    res.json({
+      installed: isOpencodeInPath || isNpmPackageInstalled,
+      isInPath: isOpencodeInPath,
+      isNpmGlobal: isNpmPackageInstalled
+    });
+  } catch (err) {
+    console.error("Error checking opencode usage:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+router27.post("/identify", async (req, res) => {
+  await clean();
+  const instances = Array.from(opencodeInstances.values()).map((instance) => ({
+    id: instance.id,
+    name: instance.name,
+    port: instance.port,
+    status: instance.server ? "active" : "detached"
+  }));
+  res.json({
+    message: "Identification and cleanup complete",
+    instances,
+    count: instances.length
+  });
+});
+router27.post("/clean", async (req, res) => {
+  await clean();
+  res.json({ success: true, message: "Cleanup completed", currentCount: opencodeInstances.size });
+});
+router27.post("/stop", async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id)
+      return res.status(400).json({ error: "Instance ID is required" });
+    if (opencodeInstances.has(id)) {
+      const instance = opencodeInstances.get(id);
+      if (instance.server) {
+        instance.server.close();
+        await (0, import_kill_port.default)(instance.port);
+        console.log(`Force killed port ${instance.port} for detached instance ${id}`);
+      }
+      opencodeInstances.delete(id);
+      console.log(`Opencode instance ${id} stopped`);
+      res.json({ success: true, message: "Instance stopped" });
+    } else {
+      res.status(404).json({ error: "Instance not found" });
+    }
+  } catch (e) {
+    res.status(500).json({ error: e });
+  }
+});
+router27.post("/change-name", async (req, res) => {
+  const { id, name } = req.body;
+  if (!id || !name) {
+    return res.status(400).json({ error: "Instance ID and new Name are required" });
+  }
+  if (opencodeInstances.has(id)) {
+    const instance = opencodeInstances.get(id);
+    instance.name = name;
+    opencodeInstances.set(id, instance);
+    res.json({ success: true, message: "Instance updated", instance: { id, name } });
+  } else {
+    res.status(404).json({ error: "Instance not found" });
+  }
+});
+var opencode_default = router27;
+
+// src/routes/opencode/createClient.ts
 var import_express32 = __toESM(require_express2());
-init_opencodeTUI();
+init_core2();
 var opencodeSdkPromise2 = new Function("specifier", "return import(specifier)")("@opencode-ai/sdk");
 var router28 = (0, import_express32.Router)();
-router28.post("/newclient", async (req, res) => {
+router28.post("/", async (req, res) => {
   var _a2;
   try {
     const { instanceId, clientName, createSession } = req.body;
@@ -95889,7 +95851,25 @@ router28.post("/newclient", async (req, res) => {
     res.status(500).json({ error: error.message || error });
   }
 });
-router28.post("/chat", async (req, res) => {
+var createClient_default = router28;
+
+// src/routes/opencode/listClients.ts
+var import_express33 = __toESM(require_express2());
+init_core2();
+var router29 = (0, import_express33.Router)();
+router29.get("/", (req, res) => {
+  const clients = Array.from(opencodeInstances.values()).map((instance) => ({
+    ...instance
+  }));
+  res.json({ clients });
+});
+var listClients_default = router29;
+
+// src/routes/opencode/prompt.ts
+var import_express34 = __toESM(require_express2());
+init_core2();
+var router30 = (0, import_express34.Router)();
+router30.post("/", async (req, res) => {
   var _a2, _b2, _c2, _d2;
   try {
     const clientId = (_a2 = req.body.clientId) == null ? void 0 : _a2.trim();
@@ -95925,7 +95905,13 @@ router28.post("/chat", async (req, res) => {
     res.status(500).json({ error: error.message || error });
   }
 });
-router28.post("/chatevents", async (req, res) => {
+var prompt_default = router30;
+
+// src/routes/opencode/sessionChats.ts
+var import_express35 = __toESM(require_express2());
+init_core2();
+var router31 = (0, import_express35.Router)();
+router31.post("/", async (req, res) => {
   var _a2;
   let targetSessionId = "";
   let streamRef = null;
@@ -96017,7 +96003,48 @@ router28.post("/chatevents", async (req, res) => {
     }
   }
 });
-var chats_default = router28;
+var sessionChats_default = router31;
+
+// src/routes/index.ts
+function SETROUTES(app3, frontendPath2) {
+  app3.use("/", tester_default);
+  app3.use("/" + api_default.getRootPath, rootPath_default);
+  app3.use("/" + api_default.scaffoldRepo, scafoldrepo_default);
+  app3.use("/" + api_default.turborepoExist, turborepoexist_default);
+  app3.use("/" + api_default.firstRun, firstrun_default);
+  app3.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
+  app3.use("/" + api_default.notes, notes_default);
+  app3.use("/" + api_default.crudTest, crudtest_default);
+  app3.use("/" + api_default.processTree, processUsage_default);
+  app3.use("/" + api_default.docker, apidocker_default);
+  app3.use("/" + api_default.gitControl, gitControlHelper_default);
+  app3.use("/" + api_default.gitStash, gitStashHelper_default);
+  app3.use("/" + api_default.interactvTerminal, interactiveTerminal_default);
+  app3.use("/" + api_default.stopInteractiveTerminal, stopInteractiveTerminal_default);
+  app3.use("/" + api_default.stopTerminalWorkspace, stopTerminalWorkspace_default);
+  app3.use("/" + api_default.stopProcess, stopcmd_default);
+  app3.use("/" + api_default.updateWorkspace, updateworkspace_default);
+  app3.use("/" + api_default.hideShowFileFolder, vscodeHideShow_default);
+  app3.use("/" + api_default.scanWorkspace, scanworkspace_default);
+  app3.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
+  app3.use("/" + api_default.newWorkspace, newworkspace_default);
+  app3.use("/" + api_default.availabletemplates, availabletemplates_default);
+  app3.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
+  app3.use("/" + api_default.deleteWorkspace, deleteWorkspace_default);
+  app3.use("/" + api_default.opencodeCreateInstance, createInstance_default);
+  app3.use("/" + api_default.opencodeListInstances, listInstance_default);
+  app3.use("/" + api_default.opencode, opencode_default);
+  app3.use("/" + api_default.opencodeCreateClient, createClient_default);
+  app3.use("/" + api_default.opencodeListClients, listClients_default);
+  app3.use("/" + api_default.opencodePrompt, prompt_default);
+  app3.use("/" + api_default.opencodeSessionChat, sessionChats_default);
+  app3.use("/" + api_default.scanProject, projectBrowser_default);
+  app3.use("/" + api_default.textEditor, textEditor_default);
+  app3.use(import_express36.default.static(frontendPath2));
+  app3.get(/(.*)/, (req, res) => {
+    res.sendFile(import_path32.default.join(frontendPath2, "index.html"));
+  });
+}
 
 // src/index.ts
 var args = process.argv.slice(2);
@@ -96038,7 +96065,7 @@ if (command === "init") {
     process.exit(1);
   });
 }
-var app2 = (0, import_express33.default)();
+var app2 = (0, import_express37.default)();
 var port2 = config_default.apiPort;
 var isDevelopment = process.env.NODE_ENV === "development";
 var actualPort = port2;
@@ -96064,43 +96091,9 @@ app2.use((0, import_cors.default)({
   },
   credentials: true
 }));
-app2.use(import_express33.default.static("public"));
-app2.use(import_express33.default.json());
-app2.use("/", tester_default);
-app2.use("/" + api_default.getRootPath, rootPath_default);
-app2.use("/" + api_default.scaffoldRepo, scafoldrepo_default);
-app2.use("/" + api_default.turborepoExist, turborepoexist_default);
-app2.use("/" + api_default.firstRun, firstrun_default);
-app2.use("/" + api_default.initMonorepoTime, initmonorepotime_default);
-app2.use("/" + api_default.notes, notes_default);
-app2.use("/" + api_default.crudTest, crudtest_default);
-app2.use("/" + api_default.processTree, processUsage_default);
-app2.use("/" + api_default.docker, apidocker_default);
-app2.use("/" + api_default.gitControl, gitControlHelper_default);
-app2.use("/" + api_default.gitStash, gitStashHelper_default);
-app2.use("/" + api_default.interactvTerminal, interactiveTerminal_default);
-app2.use("/" + api_default.stopInteractiveTerminal, stopInteractiveTerminal_default);
-app2.use("/" + api_default.stopTerminalWorkspace, stopTerminalWorkspace_default);
-app2.use("/" + api_default.stopProcess, stopcmd_default);
-app2.use("/" + api_default.updateWorkspace, updateworkspace_default);
-app2.use("/" + api_default.hideShowFileFolder, vscodeHideShow_default);
-app2.use("/" + api_default.scanWorkspace, scanworkspace_default);
-app2.use("/" + api_default.listWorkspacesDir, listworkspacedirs_default);
-app2.use("/" + api_default.newWorkspace, newworkspace_default);
-app2.use("/" + api_default.availabletemplates, availabletemplates_default);
-app2.use("/" + api_default.setWorkspaceTemplate, setworkspace_default);
-app2.use("/" + api_default.deleteWorkspace, deleteWorkspace_default);
-app2.use("/" + api_default.opencodeHelper, opencodeHelper_default);
-app2.use("/" + api_default.opencodeTUI, opencodeTUI_default);
-app2.use("/" + api_default.opencodeTUI, createInstance_default);
-app2.use("/" + api_default.opencodeTUI, chats_default);
-app2.use("/" + api_default.scanProject, projectBrowser_default);
-app2.use("/" + api_default.textEditor, textEditor_default);
+app2.use(import_express37.default.json());
 var frontendPath = import_path33.default.join(__dirname, "../public");
-app2.use(import_express33.default.static(frontendPath));
-app2.get(/(.*)/, (req, res) => {
-  res.sendFile(import_path33.default.join(frontendPath, "index.html"));
-});
+SETROUTES(app2, frontendPath);
 var httpServer = (0, import_http.createServer)(app2);
 var io2 = new Server(httpServer, {
   cors: {

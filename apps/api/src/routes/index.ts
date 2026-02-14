@@ -39,7 +39,7 @@ import listClients from "./opencode/listClients";
 import opencodePrompt from "./opencode/prompt";
 import sessionChats from "./opencode/sessionChats";
 
-export default function SETROUTES(app: Express) {
+export default function SETROUTES(app: Express, frontendPath: string) {
     app.use("/", tester);
 
     app.use("/" + apiRoute.getRootPath,        rootPath);
@@ -89,7 +89,6 @@ export default function SETROUTES(app: Express) {
 
 
     // Serve frontend static files==================================================
-    const frontendPath = path.join(__dirname, '../../public');
     app.use(express.static(frontendPath));
     app.get(/(.*)/, (req, res) => {
         res.sendFile(path.join(frontendPath, 'index.html'));
