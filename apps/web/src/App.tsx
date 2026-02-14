@@ -149,7 +149,7 @@ export default function App() {
                 />
 
                 <main className="flex-1 relative overflow-hidden">
-                    <div id="app-content" className="w-full h-full pb-8 relative">
+                    <div className="w-full h-full pb-8">
                         <Home isVisible={currentPage === "dashboard"} />
                         <Workspace isVisible={currentPage === "workspace"} />
                         <OpencodeOrchestartor isVisible={currentPage === "open-code"} />
