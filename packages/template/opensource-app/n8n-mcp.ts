@@ -2,8 +2,8 @@ import type { ProjectTemplate } from "../../types";
 
 export const N8nMcpTool: ProjectTemplate = {
     name: "n8n MCP Server",
-    description: "Model Context Protocol server for n8n. Allows AI agents to understand and build n8n workflows.",
-    notes: "Requires Docker. Use this with an MCP client (like Claude Desktop or Cursor).",
+    description: "Model Context Protocol server for n8n.",
+    notes: "Requires Docker. Use this with an MCP client.",
     type: "tool",
     category: "Tool",
     icon: "fas fa-robot text-orange-500",

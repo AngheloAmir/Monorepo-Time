@@ -42,7 +42,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
 
     if (!props.show) return null;
     return (
-        <ModalBody width="900px">
+        <ModalBody width="1200px">
             <ModalHeader
                 close={() => props.onClose()}
                 title="Select Template or Open-source App"
@@ -64,7 +64,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                     <TabItem name="Demo" icon="fas fa-cube" activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
 
-                <div className="flex-1 w-full h-[500px] grid grid-cols-2 gap-2 overflow-y-auto content-start">
+                <div className="flex-1 w-full h-[60vh] grid grid-cols-2 lg:grid-cols-3 gap-2 overflow-y-auto content-start">
                         <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={(name, type) => {
                             props.onSelect(name, type);
                         }}/>
@@ -122,7 +122,7 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
                     <div className="flex-1 min-w-0"> 
                         <div className="flex gap-2">
                             <i className={`${project.icon} text-xl`}></i> 
-                            <span className="text-xl font-bold text-gray-200 group-hover:text-blue-400 text-base truncate">{project.name}</span>
+                            <span className="text-md font-bold text-gray-200 group-hover:text-blue-400 text-base truncate">{project.name}</span>
                         </div>
                         <div className="text-sm text-white mt-1 leading-relaxed">
                             {project.description}

@@ -3,7 +3,7 @@ import files from "./files/_serverless";
 
 export const ServerlessExpressTS: ProjectTemplate = {
     name: "Serverless Express TS",
-    description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
+    description: "Serverless Express TS template optimized for Serverless",
     notes: "Node.js and NPM must be installed.",
     type: "app",
     category: "Project",

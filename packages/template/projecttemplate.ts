@@ -9,18 +9,20 @@ import { Laravel } from "./projects/laravel";
 import { PythonConsole } from "./projects/python";
 import { DotNetConsole } from "./projects/dotnet";
 import { StrapiLocal } from "./projects/strapi";
+import { GoApp } from "./projects/go";
 
 const templates: ProjectTemplate[] = [
     ViteReact,
     NextJS,
     ExpoReactNative,
+    GoApp,
     StrapiLocal,
     ExpressTS,
     ServerlessExpressTS,
     PHP,
     Laravel,
     PythonConsole,
-    DotNetConsole
+    DotNetConsole,
 ];
 
 export default templates;
