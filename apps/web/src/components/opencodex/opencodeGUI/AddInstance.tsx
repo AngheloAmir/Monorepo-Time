@@ -17,7 +17,9 @@ export default function AddInstance() {
             "Enter the name of the new instance",
             "success",
             (value: string) => {
-                createInstance( value );
+                if(value && value.trim() !== '') {
+                    createInstance( value.trim() );
+                }
             }
         )
     }

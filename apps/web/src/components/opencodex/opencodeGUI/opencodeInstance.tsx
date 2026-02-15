@@ -1,16 +1,10 @@
-import type { OpencodeInstance } from 'types';
+import type { OpencodeGUIInstance } from '../../../appstates/opencode';
+import ChatContainer from './ChatContainer';
 
-interface OpencodeInstanceProps {
-    instance:  OpencodeInstance;
-    isVisible: boolean;
-}
-
-export default function OpencodeInstance(props: OpencodeInstanceProps) {
+export default function OpencodeInstance(props: OpencodeGUIInstance) {
     return (
-        <div className={`w-full h-full ${props.isVisible ? 'block' : 'hidden'}`}>
-            {
-                props.instance.name
-            }
+        <div className={`w-full h-full ${props.isActive ? 'block' : 'hidden'}`}>
+            <ChatContainer />
         </div>
     )
 }

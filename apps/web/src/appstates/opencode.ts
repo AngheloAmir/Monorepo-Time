@@ -5,8 +5,9 @@ import apiRoute from 'apiroute';
 import config from 'config';
 
 export interface OpencodeGUIInstance {
-    instance: OpencodeInstance;
-    isActive: boolean;
+    instance:     OpencodeInstance;
+    isActive:     boolean;
+    conversation: any[];
 }
 
 interface OpencodeState {
@@ -15,13 +16,15 @@ interface OpencodeState {
     setSidebarWidth: (width: number) => void;
     setIsResizing: (isResizing: boolean) => void;
 
+    isOpencodeInstalled: boolean;
+    checkOpencodeInstalled: () => Promise<void>;
+
     //Opencode GUIS
     isCreatingInstance: boolean;
     opencodeInstances: OpencodeGUIInstance[];
     setInstanceActive: (instanceId: string) => void;  //make this active and close others
-    createInstance: (name :string) => Promise<string>;
-    closeInstance:  (instanceId: string) => Promise<void>;
-
+    createInstance: (name: string)      => Promise<void>;
+    closeInstance: (instanceId: string) => Promise<void>;
     loadInstances: () => Promise<void>;
 
 }
@@ -32,13 +35,34 @@ const useOpencodeBase = create<OpencodeState>((set, get) => ({
     setSidebarWidth: (width: number) => set({ sidebarWidth: width }),
     setIsResizing: (isResizing: boolean) => set({ isResizing: isResizing }),
 
+    isOpencodeInstalled:    true,
+    checkOpencodeInstalled: async () => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.opencode}/check`);
+            if (!response.ok) return;
+            const data = await response.json() as {
+                installed: boolean;
+                isInPath: boolean;
+                isNpmGlobal: boolean;
+            };
+            
+            if(data.installed && data.isInPath && data.isNpmGlobal) {
+                set({ isOpencodeInstalled: true });
+            } else {
+                set({ isOpencodeInstalled: false });
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    },
+
     //Opencode GUIS
     isCreatingInstance: false,
     opencodeInstances: [],
 
     setInstanceActive: (instanceId: string) => {
         const currentInstance = get().opencodeInstances.find((instance) => instance.instance.id === instanceId);
-        if (!currentInstance)         return;
+        if (!currentInstance) return;
         if (currentInstance.isActive) return;
         if (get().isCreatingInstance) return;
 
@@ -53,53 +77,111 @@ const useOpencodeBase = create<OpencodeState>((set, get) => ({
     },
 
     closeInstance: async (instanceId: string) => {
+        const instanceRes = await fetch(`${config.serverPath}${apiRoute.opencode}/stop`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id: instanceId,
+            })
+        });
+        if (!instanceRes.ok) {
+            alert("Failed to close opencode terminal");
+            return;
+        }
+
         set((state) => ({
             opencodeInstances: state.opencodeInstances.filter((instance) => instance.instance.id !== instanceId),
         }))
     },
 
-    createInstance: async ( name :string) => {
+    createInstance: async (name: string) => {
         set({ isCreatingInstance: true });
-        const id = Math.random().toString(36).substring(6);
 
-        set((state) => ({
-            opencodeInstances: [...state.opencodeInstances, {
-                instance: {
-                    id:            id,
-                    name:          name,
-                    url:           `http://localhost:${3000 + state.opencodeInstances.length}`,
-                    port:          3000 + state.opencodeInstances.length,
-                    createdAt:     Date.now(),
-                    lastSessionId: id,
-                },
+        //make sure the ID is uquine
+        let availableID = "";
+        while (true) {
+            const tempID = Math.random().toString(36).substring(6);
+            const instance = get().opencodeInstances.find((instance) => instance.instance.id === tempID);
+            if (!instance) {
+                availableID = tempID;
+                break;
+            }
+        }
+
+        //do the fetch to create an intance
+        const instanceRes = await fetch(`${config.serverPath}${apiRoute.opencodeCreateInstance}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                name,
+                id: availableID,
+            })
+        });
+        if (!instanceRes.ok) {
+            alert("Failed to create new opencode terminal");
+            set({ isCreatingInstance: false });
+            return;
+        }
+        const instanceData     = await instanceRes.json() as OpencodeInstance;
+        const opencodeInstance = [{
+            instance: {
+                id:             instanceData.id,
+                name:           instanceData.name,
+                url:            instanceData.url,
+                port:           instanceData.port,
+                createdAt:      instanceData.createdAt,
+                lastSessionId:  instanceData.id,
+            },
+            isActive: true,
+            conversation: [],
+        }];
+
+        //close all other instances and make the new one active
+        const allInstanceTemp = get().opencodeInstances.map((instance) => {
+            return {
+                ...instance,
                 isActive: false,
-            }],
-        }));
+            }
+        });
+        set({
+            opencodeInstances: [
+                ...allInstanceTemp,
+                ...opencodeInstance
+            ]
+        });
 
         set({ isCreatingInstance: false });
-        return id;
     },
 
     loadInstances: async () => {
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.opencodeListInstances}`);
             if (!response.ok) return;
-            const data     = await response.json();
-            const opencodeInstances = data.instances.map((instance: OpencodeInstance) => {
+            const data              = await response.json();
+            const tempInstance      = data.instances.map((dataInstance: OpencodeInstance) => {
+                const instanceState = get().opencodeInstances.find((stateInstance) => stateInstance.instance.id === dataInstance.id);
+                if (instanceState) {
+                    return instanceState;
+                }
                 return {
                     instance: {
-                        server:        null,
-                        url:           instance.url,
-                        port:          instance.port,
-                        id:            instance.id,
-                        name:          instance.name,
-                        createdAt:     instance.createdAt,
-                        pid:           instance.pid,
+                        server:    null,
+                        url:       dataInstance.url,
+                        port:      dataInstance.port,
+                        id:        dataInstance.id,
+                        name:      dataInstance.name,
+                        createdAt: dataInstance.createdAt,
+                        pid:       dataInstance.pid,
                     },
-                    isActive: false,
+                    isActive:     false,
+                    conversation: [],
                 }
             });
-            set({ opencodeInstances: opencodeInstances });
+            set({ opencodeInstances: tempInstance });
         } catch (e) {
             console.error(e);
         }

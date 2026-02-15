@@ -15,6 +15,12 @@ export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
     const setSidebarWidth   = useOpencode.use.setSidebarWidth();
     const loadInstances     = useOpencode.use.loadInstances();
     const [isDraggingOver, setIsDraggingOver] = useState(false);
+    const checkOpencodeInstalled = useOpencode.use.checkOpencodeInstalled();
+
+    useEffect(() => {
+        checkOpencodeInstalled();
+        loadInstances();
+    }, []);
 
     useEffect(() => {
         if( isVisible ) loadInstances();

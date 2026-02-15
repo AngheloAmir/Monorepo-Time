@@ -1,8 +1,9 @@
+import useOpencode from "../../appstates/opencode";
 
 export default function ReadyMessage({ isVisible, onStart }: { isVisible: boolean, onStart: () => void }) {
-    
+    const isOpencodeInstalled = useOpencode.use.isOpencodeInstalled();
 
-    if(!isVisible) return null;
+    if (!isVisible) return null;
     return (
         <div className={`h-full w-full flex items-center justify-center p-4`}>
             <div className="w-full h-full max-w-6xl flex flex-col items-center justify-center text-center relative overflow-hidden">
@@ -101,24 +102,27 @@ export default function ReadyMessage({ isVisible, onStart }: { isVisible: boolea
 
                 <div className="mb-8 w-full flex flex-col gap-4">
                     <div className="w-120 mx-auto flex items-center gap-4">
-                        <button
-                            onClick={onStart}
-                            className="w-64 mx-auto items-center justify-center py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900  transform hover:-translate-y-1"
-                        >
-                            <i className="fas fa-terminal mr-3"></i>
-                            Launch
-                        </button>
-
-                        {/* {latest?.updateAvailable && (
-                            <button
-                                onClick={updateOpenCode}
-                                className="w-64 mx-auto items-center justify-center py-4 font-semibold text-white transition-all duration-200 bg-green-600 rounded-lg hover:bg-green-500 hover:shadow-lg hover:shadow-green-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 focus:ring-offset-neutral-900  transform hover:-translate-y-1"
-                            >
-                                Update to {latest.latest}
-                            </button>
-                        )} */}
+                        {
+                            isOpencodeInstalled ?
+                                <button
+                                    onClick={onStart}
+                                    className="w-64 mx-auto items-center justify-center py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900  transform hover:-translate-y-1"
+                                >
+                                    <i className="fas fa-terminal mr-3"></i>
+                                    Launch
+                                </button>
+                                :
+                                <button
+                                    onClick={onStart}
+                                    className="w-64 mx-auto items-center justify-center py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 focus:ring-offset-neutral-900  transform hover:-translate-y-1"
+                                >
+                                    <i className="fas fa-terminal mr-3"></i>
+                                    Launch
+                                </button>
+                        }
                     </div>
-{/* 
+
+                    {/* 
                     <button
                         onClick={onStartManual}
                         className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors duration-200 focus:outline-none underline decoration-neutral-700 hover:decoration-neutral-400"

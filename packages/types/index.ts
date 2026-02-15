@@ -183,3 +183,4 @@ export interface OpencodeInstance {
     createdAt:      number;
     lastSessionId?: string;
 }
+

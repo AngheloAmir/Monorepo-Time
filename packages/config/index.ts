@@ -6,7 +6,8 @@ const port  = 4792;
 const config = {
     apiPort:    port,
     serverPath: isDev ? `http://localhost:${port}/` : "/",
-    useDemo:    false
+    useDemo:    false,
+    isDev:      isDev,
 }
 
 export default config;
