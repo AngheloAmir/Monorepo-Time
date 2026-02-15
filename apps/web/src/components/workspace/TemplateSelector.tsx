@@ -49,7 +49,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                 description="Choose a template or bundle an open-source app"
             />
             <div className="flex-1 flex flex-row gap-2 overflow-hidden p-2">
-                <div className="w-48">
+                <div className="w-52">
                     <TabItem name="Project" icon="fas fa-code" activeTab={activeTab} setActiveTab={setActiveTab} />
 
                     <h2 className="text-sm font-bold text-gray-600 my-2 ml-2 flex gap-2">
@@ -64,7 +64,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                     <TabItem name="Demo" icon="fas fa-cube" activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
 
-                <div className="flex-1 w-full h-[500px] grid grid-cols-3 gap-2 overflow-y-auto content-start">
+                <div className="flex-1 w-full h-[500px] grid grid-cols-2 gap-2 overflow-y-auto content-start">
                         <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={(name, type) => {
                             props.onSelect(name, type);
                         }}/>
@@ -95,7 +95,7 @@ function TabItem({ name, icon, activeTab, setActiveTab }: { name: string, icon: 
     return (
         <button
             onClick={() => setActiveTab(name)}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 w-full text-left
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-md font-medium transition-all duration-200 w-full text-left
                     ${activeTab === name
                     ? 'bg-gradient-to-br from-blue-600 to-blue-400'
                     : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
@@ -117,18 +117,18 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
                 <button
                     key={index}
                     onClick={() => onClick(project.name, project.type)}
-                    className="h-[200px] rounded-lg flex p-2 hover:bg-gradient-to-br hover:from-blue-600/50 hover:to-blue-400/50 text-left w-full"
+                    className="border border-white/10 min-h-[150px] rounded-lg flex p-4 hover:bg-gradient-to-br hover:from-blue-600/50 hover:to-blue-400/50 text-left w-full"
                 >
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0"> 
                         <div className="flex gap-2">
                             <i className={`${project.icon} text-xl`}></i> 
-                            <span className="font-bold text-gray-200 group-hover:text-blue-400 text-base truncate">{project.name}</span>
+                            <span className="text-xl font-bold text-gray-200 group-hover:text-blue-400 text-base truncate">{project.name}</span>
                         </div>
-                        <div className="text-xs text-white mt-1 leading-relaxed">
+                        <div className="text-sm text-white mt-1 leading-relaxed">
                             {project.description}
                         </div>
                         {project.notes && (
-                            <div className="flex items-start gap-1.5 text-[11px] text-amber-400/90  w-fit">
+                            <div className="flex items-start gap-1.5 text-xs text-amber-400/90  w-fit">
                                 <i className="fas fa-info-circle mt-0.5"></i>
                                 <span className="font-medium opacity-90">{project.notes}</span>
                             </div>
