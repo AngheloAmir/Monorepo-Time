@@ -6,7 +6,7 @@ export const dockerCompose = `services:
     hostname: metabase
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3100:3000"
     environment:
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: metabaseappdb
@@ -24,7 +24,7 @@ export const dockerCompose = `services:
       test: curl --fail -I http://localhost:3000/api/health || exit 1
       interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 20
 
   postgres:
     image: postgres:14
@@ -40,7 +40,7 @@ export const dockerCompose = `services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U metabase"]
+      test: ["CMD-SHELL", "pg_isready -U metabase -d metabaseappdb"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -24,7 +24,8 @@ const logSub = (msg) => console.log(\`  \${ANSI.WHITE}- \${msg}\${ANSI.RESET}\`)
 logHeader('\\nStarting Metabase Stack... Data Analytics Learning Environment');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+exec('docker compose down --remove-orphans', () => {
+    const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
@@ -46,6 +47,7 @@ child.on('close', (code) => {
     logs.stdout.on('data', printImportant);
     logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
+    });
 });
 
 // Setup Control Server
@@ -104,7 +106,7 @@ const checkStatus = () => {
                     logTitle('LEARNING PATH: Data Analyst');
                     logSub('Key Skills: SQL, Data Visualization, Business Logic, Dashboards');
                     logSub('Typical Role: Analyze company data to provide insights for decision making.');
-                    logSub('Career Goal: Senior Data Analyst / BI Developer ($80k - $130k+)');
+                    logSub('Career Goal: Senior Data Analyst / BI Developer');
                     log('--------------------------------------------------');
                     
                     logTitle('EDUCATIONAL TASKS:');

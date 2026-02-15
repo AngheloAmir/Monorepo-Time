@@ -66,7 +66,7 @@ export default function Cloudflare(props: CloudflareProps) {
         <div className={`h-full w-full p-2 gap-2 ${props.isVisible ? 'flex' : 'hidden'}`}>
             <div className="w-[360px] lg:w-[440px] xl:w-[480px]  flex-none h-full flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-y-auto pr-1 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                    <TransparentCard title="Cloudflare" description="Commands" contentClassName="flex flex-col py-2 px-6">
+                    <TransparentCard title="Tunnel (via Cloudflare)" description="Commands" contentClassName="flex flex-col py-2 px-6">
                         <Button2
                             onClick={startTunnel}
                             name="Generate Tunnel"
@@ -81,7 +81,9 @@ export default function Cloudflare(props: CloudflareProps) {
                             ** Closing the browser, refeshing the page, or starting a new tunnel
                             will close the previous tunnel.
                             <br />
-                            *** Not affiliated with Cloudflare.  Use only for testing purposes. I am not responsible for any
+                            *** <b className="text-white">Not affiliated with Cloudflare</b>. 
+                            Use only for <b className="text-white">testing purposes</b>.
+                            I am not responsible for any
                             issues caused by using this feature. It is a bad idea to use this
                             feature in production as Cloudflare can close the tunnel at any time
                             without any warning.

@@ -24,7 +24,8 @@ const logSub = (msg) => console.log(\`  \${ANSI.WHITE}- \${msg}\${ANSI.RESET}\`)
 logHeader('\\nStarting Observability Stack... DevOps & SRE Learning Environment');
 
 // Start Docker Compose
-const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+exec('docker compose down --remove-orphans', () => {
+    const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans', '--force-recreate'], { stdio: 'inherit' });
 
 child.on('close', (code) => {
     if (code !== 0) process.exit(code);
@@ -39,6 +40,7 @@ child.on('close', (code) => {
     logs.stdout.on('data', printImportant);
     logs.stderr.on('data', printImportant);
     logs.on('close', (c) => process.exit(c || 0));
+    });
 });
 
 // Setup Control Server
@@ -98,7 +100,7 @@ const checkStatus = () => {
                         logTitle('🎓 LEARNING PATH: Site Reliability Engineer (SRE)');
                         logSub('Key Skills: Metrics, Alerting, System Performance, Dashboards');
                         logSub('Typical Role: Ensure production systems are healthy and reliable.');
-                        logSub('Career Goal: Senior DevOps Engineer / SRE ($100k - $160k+)');
+                        logSub('Career Goal: Senior DevOps Engineer / SRE');
                         log('--------------------------------------------------');
                         
                         logTitle('EDUCATIONAL TASKS:');

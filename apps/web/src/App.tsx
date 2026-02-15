@@ -140,7 +140,7 @@ export default function App() {
                         },
                         {
                             name: 'cloudflare',
-                            label: 'Cloudflare Tunnel',
+                            label: 'Tunnel (via Cloudflare)',
                             icon: 'fa fa-solid fa-cloud',
                             isSelected: currentPage === 'cloudflare',
                             onClick: () => navAction.setCurrentPage('cloudflare')

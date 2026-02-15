@@ -4,7 +4,7 @@ export const dockerCompose = `services:
     container_name: prometheus
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - "0:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -22,7 +22,7 @@ export const dockerCompose = `services:
     container_name: node-exporter
     restart: unless-stopped
     ports:
-      - "9100:9100"
+      - "0:9100"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -40,7 +40,7 @@ export const dockerCompose = `services:
     container_name: grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "0:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
