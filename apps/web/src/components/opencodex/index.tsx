@@ -1,18 +1,24 @@
-import { useState } from "react";
-import useOpencode from "../../appstates/opencode";
+import { useEffect, useState }   from "react";
+import useOpencode    from "../../appstates/opencode";
 import ResizerBar     from "../ui/ResizerBar";
-//import InitMessage from "./InitMessage";
+import InitMessage    from "./InitMessage";
 import ProjectBrowser from "./projectBrowser";
-import OpencodeGUI from "./opencodeGUI";
+import OpencodeGUI    from "./opencodeGUI";
 
 interface OpenCodeProps {
     isVisible: boolean
 }
 
 export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
-    const sidebarWidth    = useOpencode.use.sidebarWidth();
-    const setSidebarWidth = useOpencode.use.setSidebarWidth();
+    const opencodeInstances = useOpencode.use.opencodeInstances();
+    const sidebarWidth      = useOpencode.use.sidebarWidth();
+    const setSidebarWidth   = useOpencode.use.setSidebarWidth();
+    const loadInstances     = useOpencode.use.loadInstances();
     const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+    useEffect(() => {
+        if( isVisible ) loadInstances();
+    }, [isVisible]);
 
     return (
         <div className={`h-full w-full p-2 gap-2 ${isVisible ? 'flex' : 'hidden'} `}>
@@ -31,13 +37,17 @@ export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
                     if (!isDraggingOver) setIsDraggingOver(true);
                 }}
             >
-               {/* <InitMessage
-                    isVisible={isVisible}
-                    onStart={() => {}}
-                    onStartManual={() => {}}
-               /> */}
-
-                <OpencodeGUI />
+                {
+                    opencodeInstances.length === 0 ? (
+                        <InitMessage
+                            isVisible={isVisible}
+                            onStart={() => {}}
+                            // onStartManual={() => {}}
+                        />
+                    ) : (
+                        <OpencodeGUI />
+                    )
+                }
             </div>
         </div>
     )

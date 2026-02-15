@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import type { OpencodeInstance } from 'types';
+import apiRoute from 'apiroute';
+import config from 'config';
 
 export interface OpencodeGUIInstance {
     instance: OpencodeInstance;
@@ -20,6 +22,8 @@ interface OpencodeState {
     createInstance: (name :string) => Promise<string>;
     closeInstance:  (instanceId: string) => Promise<void>;
 
+    loadInstances: () => Promise<void>;
+
 }
 
 const useOpencodeBase = create<OpencodeState>((set, get) => ({
@@ -30,17 +34,7 @@ const useOpencodeBase = create<OpencodeState>((set, get) => ({
 
     //Opencode GUIS
     isCreatingInstance: false,
-    opencodeInstances: [{
-        instance: {
-            id:            'opencode-main',
-            name:          'Opencode',
-            url:           'http://localhost:3000',
-            port:          3000,
-            createdAt:     Date.now(),
-            lastSessionId: '1',
-        },
-        isActive: false,
-    }],
+    opencodeInstances: [],
 
     setInstanceActive: (instanceId: string) => {
         const currentInstance = get().opencodeInstances.find((instance) => instance.instance.id === instanceId);
@@ -85,6 +79,31 @@ const useOpencodeBase = create<OpencodeState>((set, get) => ({
         set({ isCreatingInstance: false });
         return id;
     },
+
+    loadInstances: async () => {
+        try {
+            const response = await fetch(`${config.serverPath}${apiRoute.opencodeListInstances}`);
+            if (!response.ok) return;
+            const data     = await response.json();
+            const opencodeInstances = data.instances.map((instance: OpencodeInstance) => {
+                return {
+                    instance: {
+                        server:        null,
+                        url:           instance.url,
+                        port:          instance.port,
+                        id:            instance.id,
+                        name:          instance.name,
+                        createdAt:     instance.createdAt,
+                        pid:           instance.pid,
+                    },
+                    isActive: false,
+                }
+            });
+            set({ opencodeInstances: opencodeInstances });
+        } catch (e) {
+            console.error(e);
+        }
+    }
 }))
 
 const useOpencode = createSelectors(useOpencodeBase);

@@ -1,5 +1,5 @@
 
-export default function ReadyMessage({ isVisible, onStart, onStartManual }: { isVisible: boolean, onStart: () => void, onStartManual: () => void }) {
+export default function ReadyMessage({ isVisible, onStart }: { isVisible: boolean, onStart: () => void }) {
     
 
     if(!isVisible) return null;
@@ -118,13 +118,13 @@ export default function ReadyMessage({ isVisible, onStart, onStartManual }: { is
                             </button>
                         )} */}
                     </div>
-
+{/* 
                     <button
                         onClick={onStartManual}
                         className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors duration-200 focus:outline-none underline decoration-neutral-700 hover:decoration-neutral-400"
                     >
                         Let me manually open OpenCode CLI
-                    </button>
+                    </button> */}
                 </div>
 
                 <div className="absolute bottom-6 left-0 right-0 text-center">
