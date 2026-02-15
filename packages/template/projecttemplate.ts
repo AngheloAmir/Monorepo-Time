@@ -10,12 +10,16 @@ import { PythonConsole } from "./projects/python";
 import { DotNetConsole } from "./projects/dotnet";
 import { StrapiLocal } from "./projects/strapi";
 import { GoApp } from "./projects/go";
+import { GoGinApp } from "./projects/go-gin";
+import { JavaSpringBoot } from "./projects/java";
 
 const templates: ProjectTemplate[] = [
     ViteReact,
     NextJS,
     ExpoReactNative,
     GoApp,
+    GoGinApp,
+    JavaSpringBoot,
     StrapiLocal,
     ExpressTS,
     ServerlessExpressTS,

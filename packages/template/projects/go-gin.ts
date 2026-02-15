@@ -1,18 +1,28 @@
 import type { ProjectTemplate } from "../../types";
-import files from "./files/_go";
+import files from "./files/_go_gin";
 
-export const GoApp: ProjectTemplate = {
-    name: "Go Application",
-    description: "Simple Go Backend Application",
+export const GoGinApp: ProjectTemplate = {
+    name: "Go (Gin) Application",
+    description: "High-performance Go Backend with Gin Framework",
     notes: "Go must be installed in your system.",
     type: "app",
     category: "Project",
-    icon: "fab fa-golang text-blue-500",
+    icon: "fas fa-cocktail text-cyan-500",
     templating: [
         {
             action: 'command',
             cmd: 'go',
             args: ['mod', 'init', 'app']
+        },
+        {
+            action: 'command',
+            cmd: 'go',
+            args: ['get', '-u', 'github.com/gin-gonic/gin']
+        },
+        {
+            action: 'command',
+            cmd: 'go',
+            args: ['get', '-u', 'github.com/gin-contrib/cors']
         },
         {
             action: 'file',
@@ -47,17 +57,17 @@ export const GoApp: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'description=Go Backend Application']
+            args: ['pkg', 'set', 'description=Go (Gin) Backend Application']
         },
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.stop=npx kill-port 4000']
+            args: ['pkg', 'set', 'scripts.stop=npx kill-port 4200']
         },
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'fontawesomeIcon=fab fa-golang text-blue-500']
+            args: ['pkg', 'set', 'fontawesomeIcon=fas fa-cocktail text-cyan-500']
         }
     ]
 };

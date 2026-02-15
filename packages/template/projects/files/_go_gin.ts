@@ -4,46 +4,42 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
-func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-}
-
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	fmt.Fprintf(w, "hello world")
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	enableCors(&w)
-	if r.Method == "OPTIONS" {
-		return
-	}
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	http.ServeFile(w, r, "index.html")
-}
-
 func main() {
-	http.HandleFunc("/hello", helloHandler)
-	http.HandleFunc("/", indexHandler)
+	r := gin.Default()
+
+	// CORS definition
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
+
+	// Routes
+	r.GET("/hello", func(c *gin.Context) {
+		c.String(http.StatusOK, "hello world")
+	})
+
+	r.GET("/", func(c *gin.Context) {
+		c.File("index.html")
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "4000"
+		port = "4200"
 	}
 
+    fmt.Printf("\\n")
 	fmt.Printf("Server starting on port http://localhost:%s\\n", port)
 	fmt.Printf("Check http://localhost:%s/hello\\n", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+    fmt.Printf("\\n")
+	
+	if err := r.Run(":" + port); err != nil {
 		fmt.Printf("Error starting server: %s\\n", err)
 	}
 }
@@ -54,7 +50,7 @@ export const indexHtmlFile = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Go Backend</title>
+    <title>Gin Backend</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -79,9 +75,9 @@ export const indexHtmlFile = `<!DOCTYPE html>
         <div class="glass rounded-2xl p-8 md:p-12 shadow-2xl border border-white/5 transform transition-all hover:scale-[1.01]">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center space-x-3">
-                    <span class="text-4xl">🐹</span>
+                    <span class="text-4xl">🍸</span>
                     <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400">
-                        welcome to Go
+                        welcome to Gin
                     </h1>
                 </div>
                 <div class="flex items-center space-x-2">
@@ -92,12 +88,12 @@ export const indexHtmlFile = `<!DOCTYPE html>
 
             <div class="space-y-6">
                 <p class="text-xl text-gray-300 leading-relaxed font-light">
-                    Your Go backend is running and ready to handle requests.
+                    Your Go (Gin) backend is running wildly fast.
                 </p>
                 
                 <div class="p-4 rounded-lg bg-black/30 border border-white/10 font-mono text-sm text-gray-400">
                     <p>$ go run main.go</p>
-                    <p class="text-cyan-400">>> Server started at http://localhost:4000</p>
+                    <p class="text-cyan-400">>> Server started at http://localhost:4200</p>
                 </div>
 
                 <div class="pt-4 flex flex-col sm:flex-row gap-4">
@@ -110,15 +106,15 @@ export const indexHtmlFile = `<!DOCTYPE html>
                         </span>
                     </a>
                     
-                    <a href="https://go.dev/doc/" target="_blank" class="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/5 rounded-lg font-bold text-gray-300 transition-colors text-center">
-                        Go Docs
+                    <a href="https://gin-gonic.com/docs/" target="_blank" class="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/5 rounded-lg font-bold text-gray-300 transition-colors text-center">
+                        Gin Docs
                     </a>
                 </div>
             </div>
         </div>
         
         <div class="mt-8 text-center text-sm text-gray-500">
-            <p>Powered by Go Standard Library & Tailwind CSS</p>
+            <p>Powered by Gin Framework & Tailwind CSS</p>
         </div>
     </div>
 </body>
