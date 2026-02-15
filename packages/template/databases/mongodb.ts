@@ -133,6 +133,8 @@ const checkStatus = () => {
             process.stdout.write('\\x1Bc');
             console.log('\\n==================================================');
             console.log('MongoDB is running!');
+            console.log('Official Site:     https://www.mongodb.com');
+            console.log('Docker Image:      https://hub.docker.com/_/mongo');
             console.log('--------------------------------------------------');
             console.log(\`Connection String: mongodb://admin:admin@localhost:\${port}/db\`);
             console.log('Username:          admin');

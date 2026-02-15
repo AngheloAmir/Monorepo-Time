@@ -56,6 +56,9 @@ async function main() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║       🚀 K3d + Headlamp Learning Environment               ║');
     console.log('╚══════════════════════════════════════════════════════════════╝');
+    console.log('Official Sites: https://k3d.io/ & https://headlamp.dev/');
+    console.log('Docker Images:  rancher/k3s & headlamp-k8s/headlamp');
+    console.log('Licenses:       MIT (k3d) & Apache-2.0 (Headlamp)');
     console.log('');
     console.log('Note: if you having errors, try to run: ');
     console.log('k3d cluster delete learning-cluster');

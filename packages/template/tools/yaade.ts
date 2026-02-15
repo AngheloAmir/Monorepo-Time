@@ -128,8 +128,11 @@ const checkStatus = () => {
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('Yaade is running!');
+                console.log('Official Site:     https://yaade.io');
+                console.log('GitHub:            https://github.com/EsperoTech/yaade');
+                console.log('Docker Image:      https://hub.docker.com/r/esperotech/yaade');
                 console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`URL:              http://localhost:\${port}\`);
                 console.log('Admin Username:    admin');
                 console.log('Admin Password:    password');
                 console.log('--------------------------------------------------');

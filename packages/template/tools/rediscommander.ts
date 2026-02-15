@@ -142,9 +142,11 @@ const checkStatus = () => {
 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('🔴 Redis Commander - Redis Web GUI');
+                console.log('Redis Commander - Redis Web GUI');
+                console.log('GitHub:          https://github.com/joeferner/redis-commander');
+                console.log('Docker Image:    https://hub.docker.com/r/rediscommander/redis-commander');
                 console.log('==================================================');
-                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`URL:              http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('==================================================\\n');

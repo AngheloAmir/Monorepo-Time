@@ -82,10 +82,11 @@ const checkStatus = () => {
                 console.log('\\n==================================================');
                 console.log('Nextcloud - A Safe Home for All Your Data');
                 console.log('Official Site:   https://nextcloud.com');
+                console.log('Docker Image:    https://hub.docker.com/_/nextcloud');
                 console.log('References:      https://github.com/docker-library/docs/blob/master/nextcloud/README.md');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${ncPort}\`);
-                console.log(\`WebDAV:            http://localhost:\${ncPort}/remote.php/dav\`);
+                console.log(\`Web UI:         http://localhost:\${ncPort}\`);
+                console.log(\`WebDAV:         http://localhost:\${ncPort}/remote.php/dav\`);
                 console.log('--------------------------------------------------');
                 console.log('First Time Setup:');
                 console.log('   Create admin account on first visit');

@@ -126,18 +126,20 @@ const checkStatus = () => {
 
                     process.stdout.write('\\x1Bc');
                     console.log('\\n==================================================');
-                    console.log('📧 Mailpit - Local Email Testing Server');
+                    console.log('Mailpit - Local Email Testing Server');
+                    console.log('GitHub:        https://github.com/axllent/mailpit');
+                    console.log('Docker Image:  https://hub.docker.com/r/axllent/mailpit');
                     console.log('==================================================');
                     console.log(\`Web UI:            http://localhost:\${webPort}\`);
                     console.log(\`SMTP Server:       localhost:\${smtpPort}\`);
                     console.log('--------------------------------------------------');
-                    console.log('📌 GENERAL SMTP CONFIG:');
+                    console.log('GENERAL SMTP CONFIG:');
                     console.log('   SMTP_HOST=localhost');
                     console.log(\`   SMTP_PORT=\${smtpPort}\`);
                     console.log('   SMTP_USER=        (leave empty)');
                     console.log('   SMTP_PASS=        (leave empty)');
                     console.log('--------------------------------------------------');
-                    console.log('🔐 SUPABASE AUTH (.env):');
+                    console.log('SUPABASE AUTH (.env):');
                     console.log('   SMTP_HOST=localhost');
                     console.log(\`   SMTP_PORT=\${smtpPort}\`);
                     console.log('   SMTP_USER=');

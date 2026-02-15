@@ -122,7 +122,9 @@ const checkStatus = () => {
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('CloudBeaver is running!');
-                console.log('--------------------------------------------------');
+                console.log('Official Site:     https://cloudbeaver.io');
+                console.log('Docker Image:      https://hub.docker.com/r/dbeaver/cloudbeaver');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log(\`Note: After opening the URL, please RELOAD THE PAGE to ensure proper functionality.\`);
                 console.log('--------------------------------------------------');

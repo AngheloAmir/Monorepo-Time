@@ -142,9 +142,11 @@ const checkStatus = () => {
 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('🍃 Mongo Express - MongoDB Web GUI');
+                console.log('Mongo Express - MongoDB Web GUI');
+                console.log('GitHub:        https://github.com/mongo-express/mongo-express');
+                console.log('Docker Image:  https://hub.docker.com/_/mongo-express');
                 console.log('==================================================');
-                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`URL:              http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('==================================================\\n');

@@ -95,6 +95,8 @@ const checkStatus = () => {
                     
                     logHeader('==================================================');
                     logTitle('Metabase - Business Intelligence for Everyone');
+                    log(\`\${ANSI.GREEN}Official Site:\${ANSI.RESET}     https://www.metabase.com\`);
+                    log(\`\${ANSI.GREEN}Docker Image:\${ANSI.RESET}      https://hub.docker.com/r/metabase/metabase\`);
                     logHeader('==================================================');
                     log(\`\${ANSI.GREEN}Web UI:\${ANSI.RESET}            http://localhost:\${publicPort}\`);
                     log('--------------------------------------------------');

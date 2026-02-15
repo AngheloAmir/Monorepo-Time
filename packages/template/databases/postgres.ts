@@ -139,6 +139,8 @@ const checkStatus = () => {
              process.stdout.write('\\x1Bc');
              console.log('\\n==================================================');
              console.log('PostgreSQL is running!');
+             console.log('Official Site:     https://www.postgresql.org');
+             console.log('Docker Image:      https://hub.docker.com/_/postgres');
              console.log('--------------------------------------------------');
              console.log(\`Local Connection: postgres://admin:admin@localhost:\${port}/db\`);
              console.log('--------------------------------------------------');

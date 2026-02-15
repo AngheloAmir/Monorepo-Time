@@ -89,6 +89,7 @@ const checkStatus = () => {
                         
                         logHeader('==================================================');
                         logTitle('Monitoring Stack - Prometheus & Grafana');
+                        log(\`\${ANSI.GREEN}Official Sites:\${ANSI.RESET}   https://grafana.com & https://prometheus.io\`);
                         logHeader('==================================================');
                         log(\`\${ANSI.GREEN}Grafana UI:\${ANSI.RESET}      http://localhost:\${grafanaPort} (admin/admin)\`);
                         log(\`\${ANSI.MAGENTA}Prometheus UI:\${ANSI.RESET}   http://localhost:\${promPort}\`);

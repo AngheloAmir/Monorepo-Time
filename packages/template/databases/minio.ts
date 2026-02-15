@@ -145,6 +145,9 @@ const checkStatus = () => {
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('MinIO Object Storage is running!');
+                console.log('Official Site:     https://min.io');
+                console.log('Docker Image:      https://hub.docker.com/r/minio/minio');
+                console.log('License:           AGPL-3.0');
                 console.log('--------------------------------------------------');
                 console.log(\`Console URL:       http://localhost:\${consolePort}\`);
                 console.log(\`API URL:           http://localhost:\${apiPort}\`);

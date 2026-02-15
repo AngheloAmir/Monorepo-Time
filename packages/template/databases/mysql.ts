@@ -183,7 +183,9 @@ async function main() {
 
             process.stdout.write("\\x1Bc"); 
             console.log("\\n==================================================");
-            console.log("MySQL is running!");
+            console.log("MySQL (MariaDB) is running!");
+            console.log("Official Site:     https://mariadb.org");
+            console.log("Docker Image:      https://hub.docker.com/_/mariadb");
             console.log("--------------------------------------------------");
             console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${DB_PORT}/db\`);
             console.log("--------------------------------------------------");

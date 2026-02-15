@@ -94,10 +94,11 @@ const checkStatus = () => {
                 console.log('\\n==================================================');
                 console.log('Penpot - Open Source Design & Prototyping');
                 console.log('Official Site:   https://penpot.app');
+                console.log('Docker Image:    https://hub.docker.com/r/penpotapp/frontend');
                 console.log('References:      https://github.com/penpot/penpot');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${penpotPort}\`);
-                console.log(\`MailCatcher:       http://localhost:9002\`);
+                console.log(\`Web UI:         http://localhost:\${penpotPort}\`);
+                console.log(\`MailCatcher:    http://localhost:9002\`);
                 console.log('--------------------------------------------------');
                 console.log('Setup Account:');
                 console.log('   Open the Web UI and create a new account.');

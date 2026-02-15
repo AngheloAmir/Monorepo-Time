@@ -165,4 +165,4 @@ monorepotime init
 ![Development Tools](./docs/preview3.jpg)
 
 ## License
-Distributed under the ISC License.
+Distributed under the MIT License.

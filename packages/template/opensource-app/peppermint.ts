@@ -154,6 +154,7 @@ const checkStatus = () => {
                 console.log('\\n==================================================');
                 console.log('Peppermint Ticketing System');
                 console.log('Official Site:   https://peppermint.sh');
+                console.log('Docker Image:    https://hub.docker.com/r/pepperlabs/peppermint');
                 console.log('==================================================');
                 console.log(\`Web UI:      http://localhost:\${port}\`);
                 console.log('API:          http://localhost:5003');

@@ -134,6 +134,8 @@ const checkStatus = () => {
             process.stdout.write('\\x1Bc');
             console.log('\\n==================================================');
             console.log('Redis is running!');
+            console.log('Official Site:     https://redis.io');
+            console.log('Docker Image:      https://hub.docker.com/_/redis');
             console.log('--------------------------------------------------');
             console.log(\`Connection String: redis://localhost:\${port}\`);
             console.log(\`Port:              \${port}\`);

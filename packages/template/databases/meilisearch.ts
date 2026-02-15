@@ -131,6 +131,8 @@ const checkStatus = () => {
             process.stdout.write('\\x1Bc');
             console.log('\\n==================================================');
             console.log('Meilisearch is running!');
+            console.log('Official Site:     https://www.meilisearch.com');
+            console.log('Docker Image:      https://hub.docker.com/r/getmeili/meilisearch');
             console.log('--------------------------------------------------');
             console.log(\`URL:               http://localhost:\${port}\`);
             console.log('Master Key:        admin');

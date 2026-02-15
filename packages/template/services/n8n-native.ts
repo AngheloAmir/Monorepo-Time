@@ -131,6 +131,16 @@ const script = isWindows ? process.argv[2] + '.ps1' : process.argv[2] + '.sh';
 const cmd = isWindows ? 'powershell' : 'bash';
 const args = isWindows ? ['-ExecutionPolicy', 'Bypass', '-File', script] : [script];
 
+if (process.argv[2] === 'start') {
+    process.stdout.write('\\x1Bc');
+    console.log('\\n==================================================');
+    console.log('Official site: https://n8n.io');
+    console.log('Note: N8N is fair-code licensed. Free for internal use, but commercial redistribution has restrictions.');
+    console.log('==================================================\\n');
+    console.log('N8N is running at http://localhost:5678');
+    console.log('Official docker image: https://hub.docker.com/r/n8nio/n8n');
+}
+
 const child = spawn(cmd, args, { stdio: 'inherit' });
 
 child.on('close', (code) => {

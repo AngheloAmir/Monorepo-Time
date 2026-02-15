@@ -94,9 +94,11 @@ const onRunning = (containerInfo) => {
         }));
     } catch(e) {}
 
-    console.log('\\n==================================================');
+    console.log('\n==================================================');
     console.log('n8n MCP Server Image is Ready!');
-    console.log('--------------------------------------------------');
+    console.log('GitHub:        https://github.com/czlonkowski/n8n-mcp');
+    console.log('Docker Image:  ghcr.io/czlonkowski/n8n-mcp');
+    console.log('\n==================================================');
     console.log('This MCP server runs in STDIO mode (not HTTP).');
     console.log('To use it, add this to your MCP Client config (e.g., Claude Desktop, Cursor):');
     console.log('');
@@ -128,7 +130,6 @@ const onRunning = (containerInfo) => {
     console.log('');
     console.log('Note: This server provides knowledge about n8n nodes and templates.');
     console.log('\n==================================================');
-    console.log('GitHub: https://github.com/czlonkowski/n8n-mcp');
     console.log('==================================================\n');
 };
 

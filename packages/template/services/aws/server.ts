@@ -98,8 +98,10 @@ function displayCredentials() {
         process.stdout.write('\\x1Bc');
         console.log('\\n==================================================');
         console.log('🚀 AWS LocalStack is running!');
+        console.log('Official Site:     https://localstack.cloud');
+        console.log('Docker Image:      https://hub.docker.com/r/localstack/localstack');
+        console.log('License:           Apache-2.0');
         console.log('==================================================');
-        console.log('');
         console.log('📌 AWS Credentials (use these everywhere):');
         console.log('   Access Key ID:     test');
         console.log('   Secret Access Key: test');

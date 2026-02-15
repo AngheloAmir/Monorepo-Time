@@ -81,6 +81,7 @@ const checkStatus = () => {
                 console.log('\\n==================================================');
                 console.log('GNS3 - Graphical Network Simulator-3');
                 console.log('Official Site: https://gns3.com');
+                console.log('Docker Image:  https://hub.docker.com/r/gns3/gns3-server');
                 console.log('==================================================');
                 console.log(\`Web UI:            http://localhost:\${gns3Port}/static/web-ui/index.html\`);
                 console.log(\`API Version:       http://localhost:\${gns3Port}/v2/version\`);

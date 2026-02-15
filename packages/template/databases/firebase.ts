@@ -104,6 +104,10 @@ child.on('close', (code) => {
 // Print Environment Variables for the user
 setTimeout(() => {
     console.log('\\n\\x1b[32m%s\\x1b[0m', '==================================================');
+    console.log('🔥 Firebase Emulator Suite');
+    console.log('Official Site: https://firebase.google.com/docs/emulator-suite');
+    console.log('License:       Apache-2.0');
+    console.log('\\x1b[32m%s\\x1b[0m', '--------------------------------------------------');
     console.log('\\x1b[32m%s\\x1b[0m', 'COPY THESE TO YOUR SERVER APP .env FILE:');
     console.log('\\x1b[32m%s\\x1b[0m', '--------------------------------------------------');
     console.log('API_KEY="demo-key-for-local-development"');

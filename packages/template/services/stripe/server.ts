@@ -39,6 +39,9 @@ function displayCredentials() {
         process.stdout.write('\\x1Bc');
         console.log('\\n==================================================');
         console.log('💳 Stripe Mock Server is running!');
+        console.log('GitHub:            https://github.com/stripe/stripe-mock');
+        console.log('Docker Image:      https://hub.docker.com/r/stripe/stripe-mock');
+        console.log('License:           MIT');
         console.log('--------------------------------------------------');
         console.log('📌 Connection Details:');
         console.log('   API Key:           sk_test_mock_123 (any key works)');

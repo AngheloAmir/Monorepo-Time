@@ -85,6 +85,7 @@ const checkStatus = () => {
                 console.log('\\n==================================================');
                 console.log('Mattermost Team Communication');
                 console.log('Official Site:   https://mattermost.com');
+                console.log('Docker Image:    https://hub.docker.com/r/mattermost/mattermost-team-edition');
                 console.log('References:      https://docs.mattermost.com/deployment-guide/server/deploy-containers.html');
                 console.log('==================================================');
                 console.log(\`Web UI:            http://localhost:\${mmPort}\`);

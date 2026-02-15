@@ -81,10 +81,11 @@ const checkStatus = () => {
                 console.log('\\n==================================================');
                 console.log('Mautic - Open Source Marketing Automation');
                 console.log('Official Site:   https://mautic.org');
+                console.log('Docker Image:    https://hub.docker.com/r/mautic/mautic');
                 console.log('References:      https://docs.mautic.org/');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${mauticPort}\`);
-                console.log(\`API:               http://localhost:\${mauticPort}/api\`);
+                console.log(\`Web UI:         http://localhost:\${mauticPort}\`);
+                console.log(\`API:            http://localhost:\${mauticPort}/api\`);
                 console.log('--------------------------------------------------');
                 console.log('Default Credentials:');
                 console.log('   User: admin');

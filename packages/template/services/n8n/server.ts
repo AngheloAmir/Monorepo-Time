@@ -86,8 +86,13 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
+                console.log('\n==================================================');
+                console.log('Official Site:     https://n8n.io');
+                console.log('Docker Image:      https://hub.docker.com/r/n8nio/n8n');
+                console.log('Note: N8N is fair-code licensed. Free for internal use, but commercial redistribution has restrictions.')
+                console.log('==================================================\n');
                 console.log('N8N is running at http://localhost:' + n8nPort);
-                console.log('Official docker image: https://hub.docker.com/r/n8nio/n8n');
+               
             });
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry

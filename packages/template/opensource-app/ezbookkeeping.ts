@@ -126,13 +126,15 @@ const checkStatus = () => {
                 console.error('Failed to write runtime file:', e);
              }
 
-             process.stdout.write('\\\\x1Bc');
+             process.stdout.write('\\x1Bc');
              console.log('\\n==================================================');
              console.log('EzBookkeeping - Personal Finance Manager');
-             console.log('Official Repo:   https://github.com/mayswind/ezbookkeeping');
+             console.log('Official Site:   https://ezbookkeeping.mayswind.net/');
+             console.log('GitHub:          https://github.com/mayswind/ezbookkeeping');
+             console.log('Docker Image:    https://hub.docker.com/r/mayswind/ezbookkeeping');
              console.log('==================================================');
-             console.log(\`Web UI:            http://localhost:\${port}\`);
-             console.log(\`API:               http://localhost:\${port}/api\`);
+             console.log(\`Web UI:         http://localhost:\${port}\`);
+             console.log(\`API:            http://localhost:\${port}/api\`);
              console.log('\n==================================================');
              console.log('First Time Setup:');
              console.log('   Create account on first visit');
