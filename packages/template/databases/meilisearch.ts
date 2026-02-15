@@ -36,6 +36,9 @@ export const Meilisearch: ProjectTemplate = {
             filecontent: `# Search engine data folder
 meili-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `

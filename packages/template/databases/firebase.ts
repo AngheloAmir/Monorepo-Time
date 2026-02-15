@@ -65,6 +65,20 @@ FIREBASE_DATABASE_EMULATOR_HOST="127.0.0.1:3803"`
         },
         {
             action: 'file',
+            file: '.gitignore',
+            filecontent: `# Firebase Emulator logs
+*-debug.log
+.firebase/
+
+# Dependencies
+node_modules/
+
+# Runtime file
+.runtime.json
+`
+        },
+        {
+            action: 'file',
             file: 'index.js',
             filecontent: `const { spawn, execSync } = require('child_process');
 const fs = require('fs');

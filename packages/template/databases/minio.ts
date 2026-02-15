@@ -38,6 +38,9 @@ export const MinIO: ProjectTemplate = {
             filecontent: `# Object storage data folder
 minio-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `

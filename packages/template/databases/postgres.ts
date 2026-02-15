@@ -38,6 +38,9 @@ services:
             filecontent: `# Database data folder
 postgres-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `

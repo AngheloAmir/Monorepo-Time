@@ -9,6 +9,16 @@ export const Supabase: ProjectTemplate = {
     icon: "fas fa-bolt text-green-400",
     templating: [
         {
+            action: 'file',
+            file: '.gitignore',
+            filecontent: `# Dependencies
+node_modules/
+
+# Runtime file
+.runtime.json
+`
+        },
+        {
             action: 'command',
             cmd: 'npm',
             args: ['install', 'supabase', '--save-dev']

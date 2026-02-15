@@ -40,6 +40,9 @@ services:
             filecontent: `# Database data folder
 redis-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `

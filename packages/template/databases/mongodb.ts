@@ -37,6 +37,9 @@ export const MongoDB: ProjectTemplate = {
             filecontent: `# Database data folder
 mongo-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `
