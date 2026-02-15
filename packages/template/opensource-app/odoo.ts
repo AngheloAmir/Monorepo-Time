@@ -130,11 +130,11 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
-                console.log('\\n==================================================');
+                console.log('\n==================================================');
                 console.log('Odoo is running!');
-                console.log('--------------------------------------------------');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
-                console.log('--------------------------------------------------');
+                console.log('==================================================');
                 console.log('Open Source ERP and CRM.');
                 console.log('Official: https://www.odoo.com/');
                 console.log('==================================================\\n');

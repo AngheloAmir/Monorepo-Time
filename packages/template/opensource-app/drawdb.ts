@@ -113,13 +113,13 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
-                console.log('\\n==================================================');
+                console.log('\n==================================================');
                 console.log('DrawDB is running!');
-                console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${port}\`);
-                console.log('--------------------------------------------------');
+                console.log('Official Site:   https://drawdb.io');
+                console.log('References:      https://github.com/drawdb-io/drawdb');
+                console.log('\n==================================================');
+                console.log(\`URL:            http://localhost:\${port}\`);
                 console.log('Free, simple, and intuitive database design tool.');
-                console.log('Github: https://github.com/drawdb-io/drawdb');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {

@@ -79,16 +79,18 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('📢 Mautic - Open Source Marketing Automation');
+                console.log('Mautic - Open Source Marketing Automation');
+                console.log('Official Site:   https://mautic.org');
+                console.log('References:      https://docs.mautic.org/');
                 console.log('==================================================');
                 console.log(\`Web UI:            http://localhost:\${mauticPort}\`);
                 console.log(\`API:               http://localhost:\${mauticPort}/api\`);
                 console.log('--------------------------------------------------');
-                console.log('📧 Default Credentials:');
+                console.log('Default Credentials:');
                 console.log('   User: admin');
                 console.log('   Pass: mautic');
                 console.log('--------------------------------------------------');
-                console.log('🔗 n8n Integration:');
+                console.log('n8n Integration:');
                 console.log('   n8n has a native Mautic node!');
                 console.log(\`   API URL: http://localhost:\${mauticPort}/api\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mautic/');

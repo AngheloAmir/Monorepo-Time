@@ -42,7 +42,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
 
     if (!props.show) return null;
     return (
-        <ModalBody width="700px">
+        <ModalBody width="900px">
             <ModalHeader
                 close={() => props.onClose()}
                 title="Select Template or Open-source App"
@@ -64,8 +64,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                     <TabItem name="Demo" icon="fas fa-cube" activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
 
-                <div className="flex-1 w-full h-[500px] overflow-y-auto">
-                    <div className="flex flex-col gap-2">
+                <div className="flex-1 w-full h-[500px] grid grid-cols-3 gap-2 overflow-y-auto content-start">
                         <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={(name, type) => {
                             props.onSelect(name, type);
                         }}/>
@@ -84,7 +83,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                         <ProjectItem show={activeTab === 'Demo'} project={templates.demo} onClick={(name, type) => {
                             props.onSelect(name, type);
                         }}/>
-                    </div>
+
                 </div>
             </div>
         </ModalBody>
@@ -118,10 +117,10 @@ function ProjectItem({ project, onClick, show }: { project: ProjectTemplate[], o
                 <button
                     key={index}
                     onClick={() => onClick(project.name, project.type)}
-                    className="rounded-lg flex items-center p-2 hover:bg-gradient-to-br hover:from-blue-600/50 hover:to-blue-400/50 text-left w-full"
+                    className="h-[200px] rounded-lg flex p-2 hover:bg-gradient-to-br hover:from-blue-600/50 hover:to-blue-400/50 text-left w-full"
                 >
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex gap-2">
                             <i className={`${project.icon} text-xl`}></i> 
                             <span className="font-bold text-gray-200 group-hover:text-blue-400 text-base truncate">{project.name}</span>
                         </div>

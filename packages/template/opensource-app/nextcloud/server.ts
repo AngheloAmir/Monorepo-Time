@@ -80,21 +80,23 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('☁️  Nextcloud - A Safe Home for All Your Data');
+                console.log('Nextcloud - A Safe Home for All Your Data');
+                console.log('Official Site:   https://nextcloud.com');
+                console.log('References:      https://github.com/docker-library/docs/blob/master/nextcloud/README.md');
                 console.log('==================================================');
                 console.log(\`Web UI:            http://localhost:\${ncPort}\`);
                 console.log(\`WebDAV:            http://localhost:\${ncPort}/remote.php/dav\`);
                 console.log('--------------------------------------------------');
-                console.log('📝 First Time Setup:');
+                console.log('First Time Setup:');
                 console.log('   Create admin account on first visit');
                 console.log('   If it takes too much time to load, refresh the page');
                 console.log('--------------------------------------------------');
-                console.log('🔗 n8n Integration:');
+                console.log('n8n Integration:');
                 console.log('   n8n has a native Nextcloud node!');
                 console.log(\`   Host: http://localhost:\${ncPort}\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.nextcloud/');
                 console.log('==================================================\\n');
-            });
+            }); 
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry
             setTimeout(checkStatus, 2000);

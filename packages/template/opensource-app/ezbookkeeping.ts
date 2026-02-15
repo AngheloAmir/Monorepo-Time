@@ -128,19 +128,19 @@ const checkStatus = () => {
 
              process.stdout.write('\\\\x1Bc');
              console.log('\\n==================================================');
-             console.log('💰 EzBookkeeping - Personal Finance Manager');
+             console.log('EzBookkeeping - Personal Finance Manager');
+             console.log('Official Repo:   https://github.com/mayswind/ezbookkeeping');
              console.log('==================================================');
              console.log(\`Web UI:            http://localhost:\${port}\`);
              console.log(\`API:               http://localhost:\${port}/api\`);
-             console.log('--------------------------------------------------');
-             console.log('📝 First Time Setup:');
+             console.log('\n==================================================');
+             console.log('First Time Setup:');
              console.log('   Create account on first visit');
              console.log('Note: If it takes too much time to load or error, refresh the page');
-             console.log('--------------------------------------------------');
-             console.log('🔗 n8n Integration:');
+             console.log('\\n==================================================');
+             console.log('n8n Integration:');
              console.log('   Use HTTP Request node with the API');
              console.log(\`   API URL: http://localhost:\${port}/api\`);
-             console.log('   Docs: https://github.com/mayswind/ezbookkeeping');
              console.log('==================================================\\n');
         });
     });

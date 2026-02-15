@@ -83,15 +83,17 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('💬 Mattermost Team Communication');
+                console.log('Mattermost Team Communication');
+                console.log('Official Site:   https://mattermost.com');
+                console.log('References:      https://docs.mattermost.com/deployment-guide/server/deploy-containers.html');
                 console.log('==================================================');
                 console.log(\`Web UI:            http://localhost:\${mmPort}\`);
                 console.log(\`API:               http://localhost:\${mmPort}/api/v4\`);
                 console.log('--------------------------------------------------');
-                console.log('📝 First Time Setup:');
+                console.log('First Time Setup:');
                 console.log('   Create admin account on first visit');
                 console.log('--------------------------------------------------');
-                console.log('🔗 n8n Integration:');
+                console.log('n8n Integration:');
                 console.log('   n8n has a native Mattermost node!');
                 console.log(\`   API URL: http://localhost:\${mmPort}/api/v4\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mattermost/');

@@ -36,7 +36,7 @@ export default function RootTerminal() {
         }
     }, [showTerminal, rootDir]);
 
-    if (!showTerminal) return null;
+    if (!showTerminal) return null; 
     return (
        <ModalBody width="800px">
              <ModalHeader

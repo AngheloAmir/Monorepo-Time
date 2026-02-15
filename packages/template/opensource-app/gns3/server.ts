@@ -5,7 +5,7 @@ const path = require('path');
 
 const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
 
-console.log('Starting Penpot Design Tool...');
+console.log('Starting GNS3 Server...');
 
 // Start Docker Compose
 const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
@@ -19,14 +19,8 @@ child.on('close', (code) => {
     const printImportant = (data) => {
         const lines = data.toString().split('\\n');
         lines.forEach(line => {
-            let cleanLine = line.replace(/^[^|]+\||\s+/, '');
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
             const lower = cleanLine.toLowerCase();
-
-            // Filter out specific "expected" errors during startup
-            if (lower.includes('connect() failed') || lower.includes('connection refused')) {
-                return;
-            }
-
             if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
                 process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
             }
@@ -51,32 +45,25 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(0, () => {
-    const port = server.address().port;
+    // Port is dynamic
 });
 
 // Check status loop
 const checkStatus = () => {
-    exec('docker compose port penpot-frontend 8080', (err, stdout, stderr) => {
+    exec('docker compose port gns3-server 3080', (err, stdout, stderr) => {
         if (err || stderr || !stdout) {
             setTimeout(checkStatus, 2000);
             return;
         }
-        const penpotPort = stdout.trim().split(':')[1];
-        if (!penpotPort) {
+        const gns3Port = stdout.trim().split(':')[1];
+        if (!gns3Port) {
             setTimeout(checkStatus, 2000);
             return;
         }
 
-        // Verify Penpot Backend is actually responding
-        // We check an API endpoint because the frontend might be up while backend is initializing (returning 502)
-        http.get(\`http://localhost:\${penpotPort}/api/main/methods/get-profile\`, (res) => {
-            if (res.statusCode >= 500) {
-                // Backend likely down (502 Bad Gateway)
-                setTimeout(checkStatus, 2000);
-                return;
-            }
-
-             // Capture Container IDs
+        // Verify GNS3 is actually responding to HTTP
+        http.get(\`http://localhost:\${gns3Port}/v2/version\`, (res) => {
+            // Capture Container IDs
             exec('docker compose ps -q', (err2, stdout2) => {
                 const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
                 
@@ -92,33 +79,26 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('Penpot - Open Source Design & Prototyping');
-                console.log('Official Site:   https://penpot.app');
-                console.log('References:      https://github.com/penpot/penpot');
+                console.log('GNS3 - Graphical Network Simulator-3');
+                console.log('Official Site: https://gns3.com');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${penpotPort}\`);
-                console.log(\`MailCatcher:       http://localhost:9002\`);
-                console.log('--------------------------------------------------');
-                console.log('Setup Account:');
-                console.log('   Open the Web UI and create a new account.');
-                console.log('   Verify email using MailCatcher (port 9002).');
-                console.log('--------------------------------------------------');
-                console.log('Resources:');
-                console.log('   Docs: https://help.penpot.app/');
-                console.log('   GitHub: https://github.com/penpot/penpot');
+                console.log(\`Web UI:            http://localhost:\${gns3Port}/static/web-ui/index.html\`);
+                console.log(\`API Version:       http://localhost:\${gns3Port}/v2/version\`);
+                console.log('Training Notes:');
+                console.log('   Use the Web UI to build your network topology.');
+                console.log('   Nodes will run within the Docker container.');
                 console.log('==================================================\\n');
             });
         }).on('error', (e) => {
-            // Connection failed (ECONNREFUSED usually), retry
             setTimeout(checkStatus, 2000);
         });
     });
 };
 
-setTimeout(checkStatus, 5000);
+setTimeout(checkStatus, 3000);
 
 const cleanup = () => {
-    console.log('Stopping Penpot...');
+    console.log('Stopping GNS3...');
     exec('docker compose down', (err, stdout, stderr) => {
         try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
         process.exit(0);

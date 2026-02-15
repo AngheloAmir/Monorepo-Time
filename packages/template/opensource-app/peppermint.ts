@@ -152,18 +152,11 @@ const checkStatus = () => {
 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('🌿 Peppermint Ticketing System');
+                console.log('Peppermint Ticketing System');
+                console.log('Official Site:   https://peppermint.sh');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${port}\`);
-                console.log('API:               http://localhost:5003');
-                console.log('--------------------------------------------------');
-                console.log('📧 Default Login:');
-                console.log('   Email:    admin@admin.com');
-                console.log('   Password: 1234');
-                console.log('--------------------------------------------------');
-                console.log('🔗 n8n Integration:');
-                console.log('   Use the API at http://localhost:5003');
-                console.log('   Docs: https://docs.peppermint.sh');
+                console.log(\`Web UI:      http://localhost:\${port}\`);
+                console.log('API:          http://localhost:5003');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {

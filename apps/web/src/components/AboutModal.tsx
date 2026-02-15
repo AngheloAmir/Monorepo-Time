@@ -65,11 +65,21 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                         <h3 className="text-xs text-green-400 uppercase tracking-widest font-bold mb-3">
                             Integrated Templates
                         </h3>
-                        <AppLink name="n8n" url="https://n8n.io" />
-                        <AppLink name="LocalStack" url="https://localstack.cloud" />
-                        <AppLink name="DrawDB" url="https://drawdb.vercel.app" />
-                        <AppLink name="Penpot" url="https://penpot.app" />
-                        <AppLink name="Mattermost" url="https://mattermost.com" />
+                        <div className="grid grid-cols-2 gap-2">
+                            <AppLink name="n8n" url="https://n8n.io" />
+                            <AppLink name="LocalStack" url="https://localstack.cloud" />
+                            <AppLink name="DrawDB" url="https://drawdb.vercel.app" />
+                            <AppLink name="Penpot" url="https://penpot.app" />
+                            <AppLink name="Mattermost" url="https://mattermost.com" />
+                            <AppLink name="Nextcloud" url="https://nextcloud.com" />
+                            <AppLink name="Mautic" url="https://www.mautic.org" />
+                            <AppLink name="Odoo" url="https://www.odoo.com" />
+                            <AppLink name="GNS3" url="https://www.gns3.com" />
+                            <AppLink name="Metabase" url="https://www.metabase.com" />
+                            <AppLink name="EzBookkeeping" url="https://github.com/mayswind/ezbookkeeping" />
+                            <AppLink name="Peppermint" url="https://peppermint.sh" />
+                            <AppLink name="Prometheus & Grafana" url="https://grafana.com" />
+                        </div>
                     </div>
                 </div>
             </div>
