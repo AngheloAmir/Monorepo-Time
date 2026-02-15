@@ -7,6 +7,7 @@ import { Redis } from "./databases/redis";
 import { MongoDB } from "./databases/mongodb";
 import { Meilisearch } from "./databases/meilisearch";
 import { MinIO } from "./databases/minio";
+import { Milvus } from "./databases/milvus";
 
 const templates: ProjectTemplate[] = [
     MySQL,
@@ -16,7 +17,8 @@ const templates: ProjectTemplate[] = [
     Redis,
     MongoDB,
     Meilisearch,
-    MinIO
+    MinIO,
+    Milvus
 ];
 
 export default templates;

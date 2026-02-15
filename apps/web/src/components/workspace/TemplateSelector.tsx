@@ -64,7 +64,7 @@ export default function TemplateSelector(props: TemplateSelectorProps) {
                     <TabItem name="Demo" icon="fas fa-cube" activeTab={activeTab} setActiveTab={setActiveTab} />
                 </div>
 
-                <div className="flex-1 w-full h-[60vh] grid grid-cols-2 lg:grid-cols-3 gap-2 overflow-y-auto content-start">
+                <div className="flex-1 w-full h-[70vh] grid grid-cols-2 lg:grid-cols-3 gap-2 overflow-y-auto content-start">
                         <ProjectItem show={activeTab === 'Project'} project={templates.project} onClick={(name, type) => {
                             props.onSelect(name, type);
                         }}/>
