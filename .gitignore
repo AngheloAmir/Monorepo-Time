@@ -32,3 +32,5 @@ out
 
 .agent
 .test-local
+
+.package-lock.json
