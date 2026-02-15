@@ -3,7 +3,7 @@ import useOpencode from "../../appstates/opencode";
 import ResizerBar     from "../ui/ResizerBar";
 //import InitMessage from "./InitMessage";
 import ProjectBrowser from "./projectBrowser";
-import Opencode from "./Opencode";
+import OpencodeGUI from "./opencodeGUI";
 
 interface OpenCodeProps {
     isVisible: boolean
@@ -36,8 +36,8 @@ export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
                     onStart={() => {}}
                     onStartManual={() => {}}
                /> */}
-               <Opencode />
 
+                <OpencodeGUI />
             </div>
         </div>
     )

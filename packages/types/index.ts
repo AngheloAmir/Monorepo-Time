@@ -160,5 +160,26 @@ export interface AvailbleTemplates {
     demo:       ProjectTemplate[],
 }
 
-import type { OpenCodeAgentConfig } from "./opencodeagent";
-export type { OpenCodeAgentConfig };
+/**
+ * @example
+ * export interface OpencodeInstance {
+    server?: { close: () => void; url: string };
+    url: string;
+    port: number;
+    id: string;
+    name: string;
+    pid?:           number;
+    createdAt:      number;
+    lastSessionId?: string;
+}
+ */
+export interface OpencodeInstance {
+    server?: { close: () => void; url: string };
+    url: string;
+    port: number;
+    id: string;
+    name: string;
+    pid?:           number;
+    createdAt:      number;
+    lastSessionId?: string;
+}

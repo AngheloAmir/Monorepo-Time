@@ -94820,7 +94820,9 @@ function setWorkspaceTemplateSocket(io3) {
         workspacePath = import_path26.default.join(root, "opensource", toolFolderName);
         try {
           await import_fs6.promises.access(workspacePath);
-          socket.emit("template:error", { error: `Tool '${template.name}' is already installed at ${workspacePath}.` });
+          socket.emit("template:error", {
+            error: `Tool '${template.name}' is already installed at ${workspacePath}.`
+          });
           return;
         } catch {
         }
@@ -95701,14 +95703,7 @@ var router26 = (0, import_express30.Router)();
 router26.get("/", async (req, res) => {
   await clean();
   const instances = Array.from(opencodeInstances.values()).map((instance) => ({
-    id: instance.id,
-    url: instance.url,
-    port: instance.port,
-    name: instance.name,
-    // 'detached' means we lost the handle but it might still be running
-    status: instance.server ? "active" : "detached",
-    createdAt: instance.createdAt,
-    lastSessionId: instance.lastSessionId
+    ...instance
   }));
   res.json({ instances });
 });
@@ -95765,7 +95760,7 @@ router27.post("/stop", async (req, res) => {
     res.status(500).json({ error: e });
   }
 });
-router27.post("/change-name", async (req, res) => {
+router27.post("/setname", async (req, res) => {
   const { id, name } = req.body;
   if (!id || !name) {
     return res.status(400).json({ error: "Instance ID and new Name are required" });
