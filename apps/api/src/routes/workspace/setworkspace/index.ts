@@ -38,13 +38,15 @@ export function setWorkspaceTemplateSocket(io: Server) {
             }
 
             if (template.type === 'tool' || template.type === 'opensource-app') {
-                const root = await findMonorepoRoot(workspacePath);
+                const root           = await findMonorepoRoot(workspacePath);
                 const toolFolderName = template.name.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-                workspacePath = path.join(root, 'opensource', toolFolderName);
+                workspacePath        = path.join(root, 'opensource', toolFolderName);
 
                 try {
                     await fs.access(workspacePath);
-                    socket.emit('template:error', { error: `Tool '${template.name}' is already installed at ${workspacePath}.` });
+                    socket.emit('template:error', {
+                        error: `Tool '${template.name}' is already installed at ${workspacePath}.`
+                    });
                     return;
                 } catch { }
 
