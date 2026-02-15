@@ -41,8 +41,8 @@ export default function RootTerminal() {
        <ModalBody width="800px">
              <ModalHeader
                 close={close}
-                title={"Root Terminal"}
-                description={"Execute commands in the project root"}
+                title="Project Terminal"
+                description="Note: Do not lunch TUI based applications like Opencode in this terminal"
                 icon="fas fa-terminal text-blue-500 text-xl"
             />
             <div className="flex-1 overflow-hidden p-2">

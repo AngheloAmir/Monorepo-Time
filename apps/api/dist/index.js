@@ -82882,7 +82882,8 @@ var port = 4792;
 var config = {
   apiPort: port,
   serverPath: isDev ? `http://localhost:${port}/` : "/",
-  useDemo: false
+  useDemo: false,
+  isDev
 };
 var config_default = config;
 
