@@ -46,41 +46,13 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                 {/* Right Column: Acknowledgments/Inspirations */}
                 <div className="w-full md:w-80 bg-white/5 p-8 flex flex-col justify-center border-t md:border-t-0 md:border-l border-white/10">
                     <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                        <span className="text-white font-medium">Disclaimer:</span> Not affiliated with the projects below.
-                        We simply love these tools and provide templates to help you use them.
+                        <span className="text-white font-medium">Disclaimer:</span> Not affiliated with the projects and templates used in this app.
+                        We respect their respective licenses and terms of use. We simply love these tools and provide templates to help you use them.
                     </p>
 
-                    {/* Section 1: Core Stack */}
-                    <div className="mb-6">
-                        <h3 className="text-xs text-blue-400 uppercase tracking-widest font-bold mb-3">
-                            Powered By
-                        </h3>
-                        <AppLink name="OpenCode" url="https://opencode.ai" />
-                        <AppLink name="Turborepo" url="https://turbo.build/repo" />
-                        <AppLink name="Cloudflare" url="https://www.cloudflare.com" />
-                    </div>
-
-                    {/* Section 2: Templates */}
-                    <div>
-                        <h3 className="text-xs text-green-400 uppercase tracking-widest font-bold mb-3">
-                            Integrated Templates
-                        </h3>
-                        <div className="grid grid-cols-2 gap-2">
-                            <AppLink name="n8n" url="https://n8n.io" />
-                            <AppLink name="LocalStack" url="https://localstack.cloud" />
-                            <AppLink name="DrawDB" url="https://drawdb.vercel.app" />
-                            <AppLink name="Penpot" url="https://penpot.app" />
-                            <AppLink name="Mattermost" url="https://mattermost.com" />
-                            <AppLink name="Nextcloud" url="https://nextcloud.com" />
-                            <AppLink name="Mautic" url="https://www.mautic.org" />
-                            <AppLink name="Odoo" url="https://www.odoo.com" />
-                            <AppLink name="GNS3" url="https://www.gns3.com" />
-                            <AppLink name="Metabase" url="https://www.metabase.com" />
-                            <AppLink name="EzBookkeeping" url="https://github.com/mayswind/ezbookkeeping" />
-                            <AppLink name="Peppermint" url="https://peppermint.sh" />
-                            <AppLink name="Prometheus & Grafana" url="https://grafana.com" />
-                        </div>
-                    </div>
+                    <p>
+                        Licensed under MIT
+                    </p>
                 </div>
             </div>
 
@@ -92,19 +64,5 @@ export default function AboutModal({ isOpen, setIsOpen }: AboutModalProps) {
                 .animate-scaleIn { animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
             `}</style>
         </div>
-    );
-}
-
-function AppLink({ name, url }: { name: string; url: string }) {
-    return (
-        <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between group p-2 rounded-lg hover:bg-white/5 transition-colors"
-        >
-            <span className="text-sm text-gray-400 group-hover:text-white transition-colors">{name}</span>
-            <i className="fas fa-external-link-alt text-xs text-gray-600 group-hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100" />
-        </a>
     );
 }
