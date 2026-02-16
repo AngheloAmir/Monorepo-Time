@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import useGitControlContext from "../appstates/gitcontrol";
 import GitHistory from "./GitControl/GitHistory";
 import GitInput from "./GitControl/GitInput";
-//import GitBranches from "./GitControl/GitBranches";
+import GitBranches from "./GitControl/GitBranches";
 import RevertModal from "./GitControl/RevertModal";
 import useAppState from "../appstates/app";
 import ModalBody from "./ui/ModalBody";
@@ -24,16 +24,16 @@ export default function GitPanel() {
 
     if (!showGit) return null;
     return (
-        <ModalBody width="900px">
+        <ModalBody width="1000px">
             <ModalHeader
                 title="Git Panel"
                 description="Manage your repository, branches, and commits."
                 close={() => setShowGit(false)}
             />
             <div className="flex h-[500px]" aria-disabled={commitLoading}>
-                {/* <div className="w-[250px] flex-shrink-0">
+                <div className="w-[250px] flex-shrink-0">
                     <GitBranches />
-                </div> */}
+                </div>
 
                 <div className="flex-1 flex flex-col min-w-0">
                     <div className="h-12 p-3 border-b border-white/10 flex items-center justify-between">

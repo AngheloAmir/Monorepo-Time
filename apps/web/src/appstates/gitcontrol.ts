@@ -34,7 +34,7 @@ interface gitControlContext {
     checkoutBranch: (name: string) => Promise<null | any>;
     createBranch: (name: string) => Promise<void>;
     deleteBranch: (name: string) => Promise<void>;
-    mergeBranch: (name: string) => Promise<void>;
+    mergeBranch: (name: string) => Promise<boolean>;
 }
 
 const gitControlContext = create<gitControlContext>()((set, get) => ({
@@ -147,9 +147,8 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
     },
 
     mergeBranch: async (branchName: string) => {
-        if(config.useDemo) return;
-        if(!confirm(`Are you sure you want to merge ${branchName} into current branch?`)) return;
-        
+        if(config.useDemo) return true;
+
         set({ loading: true });
         try {
             await fetch(`${config.serverPath}${apiRoute.gitControl}/branch/merge`, {
@@ -157,11 +156,13 @@ const gitControlContext = create<gitControlContext>()((set, get) => ({
                 body: JSON.stringify({ branch: branchName })
             });
             await get().fetchData();
+            set({ loading: false });
+            return true;
         } catch (e) {
             console.error(e);
-            alert("Failed to merge branch");
-        } finally {
+            alert("Failed to merge branch. " + e);
             set({ loading: false });
+            return false;
         }
     },
 

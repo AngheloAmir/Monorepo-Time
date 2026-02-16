@@ -9,6 +9,7 @@ export default function GitBranches() {
     const createBranch = useGitControlContext.use.createBranch();
     const deleteBranch = useGitControlContext.use.deleteBranch();
     const showModal    = useModal.use.showModal();
+    const mergeBranch  = useGitControlContext.use.mergeBranch();
 
     const [newBranchName, setNewBranchName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
@@ -42,7 +43,6 @@ export default function GitBranches() {
             )
     };
 
-
     const handleCheckout = async (branchName: string) => {
         showModal(
             "confirm",
@@ -57,6 +57,28 @@ export default function GitBranches() {
                             "alert",
                             "Error",
                             r,
+                            "error",
+                        )
+                    }
+                }
+            }
+        )
+    };
+
+    const handleMergeReset = async (branchName: string) => {
+        showModal(
+            "confirm",
+            `Merge to ${branchName}`,
+            `Merge to branch ${branchName}? This current branch will have the code from ${branchName}.`,
+            "warning",
+            async (result: any) => {
+                if (result) {
+                    const r = await mergeBranch(branchName);
+                    if (r) {
+                        showModal(
+                            "alert",
+                            "Error",
+                            "Failed to merge branch, it could be because of conflicts. Please use a merge tool to resolve conflicts.",
                             "error",
                         )
                     }
@@ -126,6 +148,18 @@ export default function GitBranches() {
 
                         {!branch.isCurrent && (
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    disabled={commitLoading}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleMergeReset(branch.name);
+                                    }}
+                                    className="w-5 h-5 flex items-center justify-center rounded hover:bg-blue-500/20 text-gray-500 hover:text-blue-400"
+                                    title="Merge branch"
+                                >
+                                    <i className="fas fa-redo text-[10px]"></i>
+                                </button>
+                                
                                 <button
                                     disabled={commitLoading}
                                     onClick={(e) => {
