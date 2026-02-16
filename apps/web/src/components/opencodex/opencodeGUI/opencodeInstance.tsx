@@ -1,5 +1,5 @@
 import type { OpencodeGUIInstance } from '../../../appstates/opencode';
-import ChatContainer from './ChatContainer';
+import ChatContainer from './Chat/ChatContainer';
 
 export default function OpencodeInstance(props: OpencodeGUIInstance) {
     return (

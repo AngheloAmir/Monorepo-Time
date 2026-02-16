@@ -1,7 +1,14 @@
 import useOpencode from "../../appstates/opencode";
 
-export default function ReadyMessage({ isVisible, onStart }: { isVisible: boolean, onStart: () => void }) {
+export default function ReadyMessage({ isVisible }: { isVisible: boolean }) {
     const isOpencodeInstalled = useOpencode.use.isOpencodeInstalled();
+    const createInstance      = useOpencode.use.createInstance();
+
+    function onStart() {
+        if(isOpencodeInstalled) {
+            createInstance("Opencode");
+        }
+    }
 
     if (!isVisible) return null;
     return (

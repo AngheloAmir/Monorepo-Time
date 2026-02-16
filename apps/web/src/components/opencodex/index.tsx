@@ -47,8 +47,6 @@ export default function OpencodeOrchestartor({ isVisible }: OpenCodeProps) {
                     opencodeInstances.length === 0 ? (
                         <InitMessage
                             isVisible={isVisible}
-                            onStart={() => {}}
-                            // onStartManual={() => {}}
                         />
                     ) : (
                         <OpencodeGUI />
