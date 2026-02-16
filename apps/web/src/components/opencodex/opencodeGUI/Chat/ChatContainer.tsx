@@ -11,20 +11,18 @@ interface ChatContainerProps {
 }
 
 export default function ChatContainer({ instanceId, apiBase }: ChatContainerProps) {
-    const createSession  = useOpencodeChat.use.createSession();
-    const fetchProviders = useOpencodeChat.use.fetchProviders();
-    const fetchConfig    = useOpencodeChat.use.fetchConfig();
-    const fetchAgents    = useOpencodeChat.use.fetchAgents();
-    const sessionId      = useOpencodeChat.use.instanceSessions();
+    const createSession     = useOpencodeChat.use.createSession();
+    const syncWithInstance  = useOpencodeChat.use.syncWithInstance();
+    const sessionId         = useOpencodeChat.use.instanceSessions();
 
-    // Initialize session and fetch config on mount
+    // Initialize: create session + sync config/providers/model from the OpenCode instance
     useEffect(() => {
         if (!sessionId[instanceId]) {
             createSession(instanceId, apiBase);
         }
-        fetchProviders(apiBase);
-        fetchConfig(apiBase);
-        fetchAgents(apiBase);
+        // Sync provider, model, and agent from the instance's global config
+        // If the user set Copilot + Claude in the real OpenCode web, we'll pick that up
+        syncWithInstance(apiBase);
     }, [instanceId, apiBase]);
 
     return (

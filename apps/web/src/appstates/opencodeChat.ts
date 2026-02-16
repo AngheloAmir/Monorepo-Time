@@ -72,6 +72,9 @@ interface OpencodeChatState {
     currentProvider: string;
     reasoningEffort: string;
 
+    // Sync tracking — prevents overwriting user's manual selections
+    configSynced:    boolean;
+
     // UI state
     isLoading:          boolean;
     showProviderModal:  boolean;
@@ -92,10 +95,11 @@ interface OpencodeChatState {
     createSession:      (instanceId: string, apiBase: string) => Promise<void>;
     getSessionId:       (instanceId: string) => string | null;
 
-    // Fetch data
+    // Fetch data & sync
     fetchProviders:     (apiBase: string) => Promise<void>;
     fetchConfig:        (apiBase: string) => Promise<void>;
     fetchAgents:        (apiBase: string) => Promise<void>;
+    syncWithInstance:   (apiBase: string) => Promise<void>;
 
     // Provider auth
     connectProvider:    (apiBase: string) => Promise<void>;
@@ -133,6 +137,8 @@ const useOpencodeChatBase = create<OpencodeChatState>((set, get) => ({
     selectedAgent:   'build',
     currentProvider: '',
     reasoningEffort: 'medium',
+
+    configSynced:       false,
 
     isLoading:          false,
     showProviderModal:  false,
@@ -229,6 +235,18 @@ const useOpencodeChatBase = create<OpencodeChatState>((set, get) => ({
                 return a.name.localeCompare(b.name);
             });
             set({ providers: sortedProviders });
+
+            // Auto-select active provider from connected providers
+            // (only on first load, before user manually changes)
+            if (!get().configSynced && !get().currentProvider) {
+                const connected = sortedProviders.filter((p: Provider) => p.connected);
+                if (connected.length > 0) {
+                    // Prefer the first connected non-opencode provider, otherwise opencode
+                    const nonZen = connected.find((p: Provider) => p.id !== 'opencode');
+                    const active = nonZen || connected[0];
+                    set({ currentProvider: active.id });
+                }
+            }
         } catch (err) {
             console.error('Failed to fetch providers:', err);
         }
@@ -238,13 +256,35 @@ const useOpencodeChatBase = create<OpencodeChatState>((set, get) => ({
         try {
             const res = await fetch(`${apiBase}/config?directory=$PWD`);
             const data = await res.json();
-            if (data.model) {
-                set({ selectedModel: data.model });
-            }
-            if (data.agent?.build?.model) {
-                set({ selectedModel: data.agent.build.model });
+
+            // Only apply instance config on initial sync (not after user manually changes)
+            const isInitialSync = !get().configSynced;
+
+            if (isInitialSync) {
+                // Sync selected model from the instance's global config
+                if (data.model) {
+                    set({ selectedModel: data.model });
+                    // Extract provider from model ID (e.g. "copilot/claude-3.5-sonnet" → "copilot")
+                    const providerFromModel = data.model.includes('/') ? data.model.split('/')[0] : '';
+                    if (providerFromModel) {
+                        set({ currentProvider: providerFromModel });
+                    }
+                }
+                // Agent-specific model overrides
+                const currentAgent = get().selectedAgent;
+                if (data.agent?.[currentAgent]?.model) {
+                    set({ selectedModel: data.agent[currentAgent].model });
+                } else if (data.agent?.build?.model) {
+                    set({ selectedModel: data.agent.build.model });
+                }
+
+                // Sync reasoning effort if available
+                if (data.reasoningEffort) {
+                    set({ reasoningEffort: data.reasoningEffort });
+                }
             }
 
+            // Always fetch provider models (these are static data, not selections)
             const providersRes = await fetch(`${apiBase}/config/providers?directory=$PWD`);
             const providersData = await providersRes.json();
             if (providersData.providers) {
@@ -279,6 +319,11 @@ const useOpencodeChatBase = create<OpencodeChatState>((set, get) => ({
                     }),
                 }));
             }
+
+            // Mark as synced after initial load
+            if (isInitialSync) {
+                set({ configSynced: true });
+            }
         } catch (err) {
             console.error('Failed to fetch config:', err);
         }
@@ -292,6 +337,15 @@ const useOpencodeChatBase = create<OpencodeChatState>((set, get) => ({
         } catch (err) {
             console.error('Failed to fetch agents:', err);
         }
+    },
+
+    // Full sync: fetch everything from the instance and apply as defaults
+    syncWithInstance: async (apiBase: string) => {
+        // Reset sync flag so fetchConfig applies instance values
+        set({ configSynced: false });
+        await get().fetchProviders(apiBase);
+        await get().fetchConfig(apiBase);
+        await get().fetchAgents(apiBase);
     },
 
     // ── Provider Auth ────────────────────────────────────────────────

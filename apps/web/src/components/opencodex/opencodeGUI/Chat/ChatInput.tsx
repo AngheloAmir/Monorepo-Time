@@ -11,7 +11,7 @@ export default function ChatInput({ instanceId, apiBase }: ChatInputProps) {
     const sendMessage     = useOpencodeChat.use.sendMessage();
     const agents          = useOpencodeChat.use.agents();
     const models          = useOpencodeChat.use.models();
-    const providers       = useOpencodeChat.use.providers();
+
     const selectedModel   = useOpencodeChat.use.selectedModel();
     const selectedAgent   = useOpencodeChat.use.selectedAgent();
     const currentProvider = useOpencodeChat.use.currentProvider();
