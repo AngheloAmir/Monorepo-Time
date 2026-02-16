@@ -35,7 +35,7 @@ export const N8NLocal: ProjectTemplate = {
         {
             action: 'root-command',
             cmd: 'node',
-            args: ['-e', `require('fs').writeFileSync('n8nAgent.ts', 'export const N8NAgent = ' + JSON.stringify(${JSON.stringify(N8NAgent)}) + ';')`]
+            args: ['-e', `require('fs').writeFileSync('n8nAgent.md', ${JSON.stringify(N8NAgent)})`]
         },
         {
             action: 'command',

@@ -1,7 +1,7 @@
-import InstancesTab     from "./InstancesTab";
-import OpencodeInstance from "./opencodeInstance";
-import useOpencode from "../../../appstates/opencode";
-import AddInstance from "./AddInstance";
+import InstancesTab      from "./InstancesTab";
+import InstanceContainer from "./InstanceContainer";
+import useOpencode       from "../../../appstates/opencode";
+import AddInstance       from "./AddInstance";
 
 export default function OpencodeGUI() {
     const opencodeInstances = useOpencode.use.opencodeInstances();
@@ -20,7 +20,7 @@ export default function OpencodeGUI() {
 
             <div className="w-full h-full">
                 {opencodeInstances.map((instance) => (
-                    <OpencodeInstance
+                    <InstanceContainer
                         key={instance.instance.id}
                         {...instance}
                     />
