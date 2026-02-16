@@ -32,14 +32,14 @@
 // ══════════════════════════════════════════════════════════════════════
 import { create } from 'zustand';
 import { createSelectors } from '../../../../appstates/zustandSelector';
-import type { ChatStoreState } from './_store/types';
+import type { ChatStoreState } from './_opencode/types';
 import {
     createConfigActions,
     createProviderActions,
     createSessionActions,
     createChatActions,
     createAgentActions,
-} from './_store/index';
+} from './_opencode/index';
 
 // ── Create the store ─────────────────────────────────────────────────
 const useChatStoreBase = create<ChatStoreState>((set, get) => ({
