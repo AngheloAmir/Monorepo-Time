@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Ollama Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for Webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 p-4 shadow-md z-10">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                Local AI Chat
+            </h1>
+            <div class="text-sm text-gray-400">
+                Model: <span class="font-mono text-blue-400">llama3</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chat Container -->
+    <main class="flex-1 overflow-hidden relative flex flex-col">
+        <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 max-w-4xl mx-auto w-full scroll-smooth">
+            <!-- Welcome Message -->
+            <div class="flex justify-start">
+                <div class="max-w-[80%] rounded-2xl p-4 bg-gray-800 border border-gray-700 shadow-sm">
+                    <p class="text-gray-200">Hello! I'm connected to your local Ollama instance. How can I help you today?</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Input Area -->
+    <footer class="bg-gray-800 border-t border-gray-700 p-4">
+        <div class="max-w-4xl mx-auto flex gap-4">
+            <input 
+                type="text" 
+                id="userInput" 
+                class="flex-1 bg-gray-700 border border-gray-600 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition-all shadow-inner"
+                placeholder="Type your message here..."
+                autocomplete="off"
+            >
+            <button 
+                id="sendButton"
+                class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-6 rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+                <span>Send</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
+        </div>
+        <div class="max-w-4xl mx-auto mt-2 text-center text-xs text-gray-500">
+            Powered by Ollama • Running Locally
+        </div>
+    </footer>
+
+    <script>
+        const messagesContainer = document.getElementById('messagesContainer');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        let chatHistory = [];
+        let isGenerating = false;
+
+        // Auto-focus input on load
+        userInput.focus();
+
+        sendButton.addEventListener('click', handleSend);
+
+        // Optional: Allow Enter key? User said "manually click send". 
+        // I will strictly follow "manually click send" but commonly users expect Enter.
+        // The prompt "make sure that no use of form, user has to manually click send"
+        // could imply disabling implicit submission, or strictly forcing a click.
+        // I'll stick to click only to be safe, but typically Enter key binding is JS, not Form.
+        // Let's strictly follow "manually click send".
+
+        async function handleSend() {
+            const text = userInput.value.trim();
+            if (!text || isGenerating) return;
+
+            // Clear input
+            userInput.value = '';
+            
+            // Add User Message
+            appendMessage('user', text);
+            chatHistory.push({ role: 'user', content: text });
+
+            // Prepare Assistant Message Placeholder
+            isGenerating = true;
+            sendButton.disabled = true;
+            sendButton.classList.add('opacity-50');
+            
+            const assistantMessageDiv = appendMessage('assistant', '');
+            const contentSpan = assistantMessageDiv.querySelector('.message-content');
+            const loadingIndicator = document.createElement('span');
+            loadingIndicator.className = 'inline-block w-2 h-4 bg-blue-400 animate-pulse ml-1 align-middle';
+            contentSpan.appendChild(loadingIndicator);
+
+            let fullResponse = '';
+
+            try {
+                const response = await fetch('http://localhost:11434/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'llama3',
+                        messages: chatHistory,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to connect to Ollama');
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                let buffer = '';
+                
+                // Remove loading indicator once we start receiving data
+                let firstChunk = true;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep the last incomplete part
+
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const json = JSON.parse(line);
+                            if (json.message && json.message.content) {
+                                if (firstChunk) {
+                                    if (contentSpan.contains(loadingIndicator)) {
+                                        contentSpan.removeChild(loadingIndicator);
+                                    }
+                                    firstChunk = false;
+                                }
+                                const content = json.message.content;
+                                fullResponse += content;
+                                contentSpan.textContent = fullResponse;
+                                scrollToBottom(); 
+                            }
+                            if (json.done) {
+                                isGenerating = false; // Mark as done here
+                                chatHistory.push({ role: 'assistant', content: fullResponse });
+                            }
+                        } catch (e) {
+                            console.error('Error parsing JSON chunk', e);
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                contentSpan.textContent = 'Error: Could not connect to local Ollama instance. Make sure it is running on port 11434.';
+                contentSpan.classList.add('text-red-400');
+            } finally {
+                isGenerating = false;
+                sendButton.disabled = false;
+                sendButton.classList.remove('opacity-50');
+                if (contentSpan.contains(loadingIndicator)) {
+                    contentSpan.removeChild(loadingIndicator);
+                }
+                userInput.focus();
+            }
+        }
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = `max-w-[80%] rounded-2xl p-4 shadow-sm ${
+                role === 'user' 
+                    ? 'bg-blue-600 text-white rounded-br-none' 
+                    : 'bg-gray-800 border border-gray-700 text-gray-200 rounded-bl-none'
+            }`;
+
+            const content = document.createElement('div');
+            content.className = 'message-content whitespace-pre-wrap leading-relaxed';
+            content.textContent = text;
+
+            bubble.appendChild(content);
+            div.appendChild(bubble);
+            messagesContainer.appendChild(div);
+            scrollToBottom();
+            
+            return bubble; // Return the bubble so we can update it
+        }
+
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Add some simple animation keyframes
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fade-in-up {
+                animation: fadeInUp 0.3s ease-out forwards;
+            }
+        `;
+        document.head.appendChild(style);
+
+    </script>
+</body>
+</html>

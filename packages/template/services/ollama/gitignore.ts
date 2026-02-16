@@ -1,0 +1,5 @@
+export const gitignoreContent = `
+node_modules
+.runtime.json
+ollama_data/
+`;
