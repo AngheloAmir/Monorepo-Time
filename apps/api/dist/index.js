@@ -651,7 +651,7 @@ var require_graceful_fs = __commonJS({
         };
         return go$readdir(path40, options, cb);
         function fs$readdirCallback(path41, options2, cb2, startTime) {
-          return function(err, files) {
+          return function(err, files3) {
             if (err && (err.code === "EMFILE" || err.code === "ENFILE"))
               enqueue([
                 go$readdir,
@@ -661,10 +661,10 @@ var require_graceful_fs = __commonJS({
                 Date.now()
               ]);
             else {
-              if (files && files.sort)
-                files.sort();
+              if (files3 && files3.sort)
+                files3.sort();
               if (typeof cb2 === "function")
-                cb2.call(this, err, files);
+                cb2.call(this, err, files3);
             }
           };
         }
@@ -85722,7 +85722,9 @@ async function main() {
 
             process.stdout.write("\\x1Bc"); 
             console.log("\\n==================================================");
-            console.log("MySQL is running!");
+            console.log("MySQL (MariaDB) is running!");
+            console.log("Official Site:     https://mariadb.org");
+            console.log("Docker Image:      https://hub.docker.com/_/mariadb");
             console.log("--------------------------------------------------");
             console.log(\`Local Connection URI: mysql://admin:admin@localhost:\${DB_PORT}/db\`);
             console.log("--------------------------------------------------");
@@ -85853,6 +85855,9 @@ services:
       filecontent: `# Database data folder
 postgres-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `
@@ -85954,6 +85959,8 @@ const checkStatus = () => {
              process.stdout.write('\\x1Bc');
              console.log('\\n==================================================');
              console.log('PostgreSQL is running!');
+             console.log('Official Site:     https://www.postgresql.org');
+             console.log('Docker Image:      https://hub.docker.com/_/postgres');
              console.log('--------------------------------------------------');
              console.log(\`Local Connection: postgres://admin:admin@localhost:\${port}/db\`);
              console.log('--------------------------------------------------');
@@ -86047,6 +86054,16 @@ var Supabase = {
   category: "Database",
   icon: "fas fa-bolt text-green-400",
   templating: [
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Dependencies
+node_modules/
+
+# Runtime file
+.runtime.json
+`
+    },
     {
       action: "command",
       cmd: "npm",
@@ -86151,6 +86168,20 @@ FIREBASE_DATABASE_EMULATOR_HOST="127.0.0.1:3803"`
     },
     {
       action: "file",
+      file: ".gitignore",
+      filecontent: `# Firebase Emulator logs
+*-debug.log
+.firebase/
+
+# Dependencies
+node_modules/
+
+# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
       file: "index.js",
       filecontent: `const { spawn, execSync } = require('child_process');
 const fs = require('fs');
@@ -86190,6 +86221,10 @@ child.on('close', (code) => {
 // Print Environment Variables for the user
 setTimeout(() => {
     console.log('\\n\\x1b[32m%s\\x1b[0m', '==================================================');
+    console.log('\u{1F525} Firebase Emulator Suite');
+    console.log('Official Site: https://firebase.google.com/docs/emulator-suite');
+    console.log('License:       Apache-2.0');
+    console.log('\\x1b[32m%s\\x1b[0m', '--------------------------------------------------');
     console.log('\\x1b[32m%s\\x1b[0m', 'COPY THESE TO YOUR SERVER APP .env FILE:');
     console.log('\\x1b[32m%s\\x1b[0m', '--------------------------------------------------');
     console.log('API_KEY="demo-key-for-local-development"');
@@ -86370,6 +86405,9 @@ services:
       filecontent: `# Database data folder
 redis-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `
@@ -86464,6 +86502,8 @@ const checkStatus = () => {
             process.stdout.write('\\x1Bc');
             console.log('\\n==================================================');
             console.log('Redis is running!');
+            console.log('Official Site:     https://redis.io');
+            console.log('Docker Image:      https://hub.docker.com/_/redis');
             console.log('--------------------------------------------------');
             console.log(\`Connection String: redis://localhost:\${port}\`);
             console.log(\`Port:              \${port}\`);
@@ -86559,6 +86599,9 @@ var MongoDB = {
       file: ".gitignore",
       filecontent: `# Database data folder
 mongo-data/
+
+# Dependencies
+node_modules/
 
 # Runtime file
 .runtime.json
@@ -86656,6 +86699,8 @@ const checkStatus = () => {
             process.stdout.write('\\x1Bc');
             console.log('\\n==================================================');
             console.log('MongoDB is running!');
+            console.log('Official Site:     https://www.mongodb.com');
+            console.log('Docker Image:      https://hub.docker.com/_/mongo');
             console.log('--------------------------------------------------');
             console.log(\`Connection String: mongodb://admin:admin@localhost:\${port}/db\`);
             console.log('Username:          admin');
@@ -86752,6 +86797,9 @@ var Meilisearch = {
       filecontent: `# Search engine data folder
 meili-data/
 
+# Dependencies
+node_modules/
+
 # Runtime file
 .runtime.json
 `
@@ -86847,6 +86895,8 @@ const checkStatus = () => {
             process.stdout.write('\\x1Bc');
             console.log('\\n==================================================');
             console.log('Meilisearch is running!');
+            console.log('Official Site:     https://www.meilisearch.com');
+            console.log('Docker Image:      https://hub.docker.com/r/getmeili/meilisearch');
             console.log('--------------------------------------------------');
             console.log(\`URL:               http://localhost:\${port}\`);
             console.log('Master Key:        admin');
@@ -86949,6 +86999,9 @@ var MinIO = {
       file: ".gitignore",
       filecontent: `# Object storage data folder
 minio-data/
+
+# Dependencies
+node_modules/
 
 # Runtime file
 .runtime.json
@@ -87057,6 +87110,9 @@ const checkStatus = () => {
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('MinIO Object Storage is running!');
+                console.log('Official Site:     https://min.io');
+                console.log('Docker Image:      https://hub.docker.com/r/minio/minio');
+                console.log('License:           AGPL-3.0');
                 console.log('--------------------------------------------------');
                 console.log(\`Console URL:       http://localhost:\${consolePort}\`);
                 console.log(\`API URL:           http://localhost:\${apiPort}\`);
@@ -87123,6 +87179,270 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
+// ../../packages/template/databases/milvus.ts
+var Milvus = {
+  name: "Milvus",
+  description: "Milvus Vector Database (Standalone with MinIO & Etcd)",
+  notes: "Requires Docker installed. Data stored in ./milvus-data folder.",
+  type: "database",
+  category: "Database",
+  icon: "fas fa-layer-group text-blue-500",
+  // Using layer-group since it represents vectors/stack
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: `
+services:
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    restart: unless-stopped
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - ./milvus-data/etcd:/etcd
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    restart: unless-stopped
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    volumes:
+      - ./milvus-data/minio:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  milvus:
+    image: milvusdb/milvus:v2.3.13
+    command: ["milvus", "run", "standalone"]
+    restart: unless-stopped
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    volumes:
+      - ./milvus-data/milvus:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      - "etcd"
+      - "minio"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s
+      timeout: 20s
+      retries: 3`
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: `# Database data folder
+milvus-data/
+
+# Dependencies
+node_modules/
+
+# Runtime file
+.runtime.json
+`
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: `const http = require('http');
+const os = require('os');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const DATA_DIR = path.join(__dirname, 'milvus-data');
+
+console.log('Starting Milvus Vector Database...');
+
+// Pre-create data directory to ensure correct permissions
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    console.log('Created milvus-data directory');
+}
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if ((lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) && !lower.includes('database system is starting up')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // We update runtime file later when we get the container ID
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port milvus 19530', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const portInfo = stdout.trim(); // e.g. 0.0.0.0:19530
+        const port = portInfo.split(':')[1];
+        if (!port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Check if actually healthy
+        exec('curl -s http://localhost:9091/healthz', (hErr, hStdout) => {
+            if (hErr || hStdout !== 'OK') {
+                setTimeout(checkStatus, 2000);
+                return;
+            }
+
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                 const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                 
+                 try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                 } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                 }
+
+                 process.stdout.write('\\x1Bc');
+                 console.log('\\n==================================================');
+                 console.log('Milvus Vector Database is running!');
+                 console.log('Official Site:     https://milvus.io');
+                 console.log('Docker Image:      https://hub.docker.com/r/milvusdb/milvus');
+                 console.log('--------------------------------------------------');
+                 console.log(\`gRPC Endpoint:     localhost:\${port}\`);
+                 console.log('HTTP Endpoint:     localhost:9091');
+                 console.log('MinIO Console:     http://localhost:9001 (User/Pass: minioadmin)');
+                 console.log('--------------------------------------------------');
+
+                 // Detect IP for external usage
+                let hostIp = "localhost";
+                if (process.platform === "win32" || process.platform === "darwin") {
+                    hostIp = "host.docker.internal";
+                } else {
+                    try {
+                        const nets = os.networkInterfaces();
+                        for (const name of Object.keys(nets)) {
+                            for (const net of nets[name]) {
+                                // Find IPv4 that is not internal 
+                                if (net.family === "IPv4" && !net.internal) {
+                                    hostIp = net.address;
+                                    break; 
+                                }
+                            }
+                            if (hostIp !== "localhost") break;
+                        }
+                    } catch(e) {}
+                }
+
+                 console.log('External Connection Info:');
+                 console.log(\`  Host:            \${hostIp}\`);
+                 console.log(\`  Port (gRPC):     \${port}\`);
+                 console.log('--------------------------------------------------');
+                 console.log('Attu (GUI Client): https://github.com/zilliztech/attu');
+                 console.log('==================================================\\n');
+            });
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping Milvus Stack...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Milvus Vector DB (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=database"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-layer-group text-blue-500"]
+    }
+  ]
+};
+
 // ../../packages/template/database.ts
 var templates = [
   MySQL,
@@ -87132,7 +87452,8 @@ var templates = [
   Redis,
   MongoDB,
   Meilisearch,
-  MinIO
+  MinIO,
+  Milvus
 ];
 var database_default = templates;
 
@@ -87714,15 +88035,18 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('\u{1F4AC} Mattermost Team Communication');
+                console.log('Mattermost Team Communication');
+                console.log('Official Site:   https://mattermost.com');
+                console.log('Docker Image:    https://hub.docker.com/r/mattermost/mattermost-team-edition');
+                console.log('References:      https://docs.mattermost.com/deployment-guide/server/deploy-containers.html');
                 console.log('==================================================');
                 console.log(\`Web UI:            http://localhost:\${mmPort}\`);
                 console.log(\`API:               http://localhost:\${mmPort}/api/v4\`);
                 console.log('--------------------------------------------------');
-                console.log('\u{1F4DD} First Time Setup:');
+                console.log('First Time Setup:');
                 console.log('   Create admin account on first visit');
                 console.log('--------------------------------------------------');
-                console.log('\u{1F517} n8n Integration:');
+                console.log('n8n Integration:');
                 console.log('   n8n has a native Mattermost node!');
                 console.log(\`   API URL: http://localhost:\${mmPort}/api/v4\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mattermost/');
@@ -87935,21 +88259,24 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('\u2601\uFE0F  Nextcloud - A Safe Home for All Your Data');
+                console.log('Nextcloud - A Safe Home for All Your Data');
+                console.log('Official Site:   https://nextcloud.com');
+                console.log('Docker Image:    https://hub.docker.com/_/nextcloud');
+                console.log('References:      https://github.com/docker-library/docs/blob/master/nextcloud/README.md');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${ncPort}\`);
-                console.log(\`WebDAV:            http://localhost:\${ncPort}/remote.php/dav\`);
+                console.log(\`Web UI:         http://localhost:\${ncPort}\`);
+                console.log(\`WebDAV:         http://localhost:\${ncPort}/remote.php/dav\`);
                 console.log('--------------------------------------------------');
-                console.log('\u{1F4DD} First Time Setup:');
+                console.log('First Time Setup:');
                 console.log('   Create admin account on first visit');
                 console.log('   If it takes too much time to load, refresh the page');
                 console.log('--------------------------------------------------');
-                console.log('\u{1F517} n8n Integration:');
+                console.log('n8n Integration:');
                 console.log('   n8n has a native Nextcloud node!');
                 console.log(\`   Host: http://localhost:\${ncPort}\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.nextcloud/');
                 console.log('==================================================\\n');
-            });
+            }); 
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry
             setTimeout(checkStatus, 2000);
@@ -88163,16 +88490,19 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('\u{1F4E2} Mautic - Open Source Marketing Automation');
+                console.log('Mautic - Open Source Marketing Automation');
+                console.log('Official Site:   https://mautic.org');
+                console.log('Docker Image:    https://hub.docker.com/r/mautic/mautic');
+                console.log('References:      https://docs.mautic.org/');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${mauticPort}\`);
-                console.log(\`API:               http://localhost:\${mauticPort}/api\`);
+                console.log(\`Web UI:         http://localhost:\${mauticPort}\`);
+                console.log(\`API:            http://localhost:\${mauticPort}/api\`);
                 console.log('--------------------------------------------------');
-                console.log('\u{1F4E7} Default Credentials:');
+                console.log('Default Credentials:');
                 console.log('   User: admin');
                 console.log('   Pass: mautic');
                 console.log('--------------------------------------------------');
-                console.log('\u{1F517} n8n Integration:');
+                console.log('n8n Integration:');
                 console.log('   n8n has a native Mautic node!');
                 console.log(\`   API URL: http://localhost:\${mauticPort}/api\`);
                 console.log('   Docs: https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.mautic/');
@@ -88378,21 +88708,24 @@ const checkStatus = () => {
                 console.error('Failed to write runtime file:', e);
              }
 
-             process.stdout.write('\\\\x1Bc');
+             process.stdout.write('\\x1Bc');
              console.log('\\n==================================================');
-             console.log('\u{1F4B0} EzBookkeeping - Personal Finance Manager');
+             console.log('EzBookkeeping - Personal Finance Manager');
+             console.log('Official Site:   https://ezbookkeeping.mayswind.net/');
+             console.log('GitHub:          https://github.com/mayswind/ezbookkeeping');
+             console.log('Docker Image:    https://hub.docker.com/r/mayswind/ezbookkeeping');
              console.log('==================================================');
-             console.log(\`Web UI:            http://localhost:\${port}\`);
-             console.log(\`API:               http://localhost:\${port}/api\`);
-             console.log('--------------------------------------------------');
-             console.log('\u{1F4DD} First Time Setup:');
+             console.log(\`Web UI:         http://localhost:\${port}\`);
+             console.log(\`API:            http://localhost:\${port}/api\`);
+             console.log('
+==================================================');
+             console.log('First Time Setup:');
              console.log('   Create account on first visit');
              console.log('Note: If it takes too much time to load or error, refresh the page');
-             console.log('--------------------------------------------------');
-             console.log('\u{1F517} n8n Integration:');
+             console.log('\\n==================================================');
+             console.log('n8n Integration:');
              console.log('   Use HTTP Request node with the API');
              console.log(\`   API URL: http://localhost:\${port}/api\`);
-             console.log('   Docs: https://github.com/mayswind/ezbookkeeping');
              console.log('==================================================\\n');
         });
     });
@@ -88597,18 +88930,12 @@ const checkStatus = () => {
 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('\u{1F33F} Peppermint Ticketing System');
+                console.log('Peppermint Ticketing System');
+                console.log('Official Site:   https://peppermint.sh');
+                console.log('Docker Image:    https://hub.docker.com/r/pepperlabs/peppermint');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${port}\`);
-                console.log('API:               http://localhost:5003');
-                console.log('--------------------------------------------------');
-                console.log('\u{1F4E7} Default Login:');
-                console.log('   Email:    admin@admin.com');
-                console.log('   Password: 1234');
-                console.log('--------------------------------------------------');
-                console.log('\u{1F517} n8n Integration:');
-                console.log('   Use the API at http://localhost:5003');
-                console.log('   Docs: https://docs.peppermint.sh');
+                console.log(\`Web UI:      http://localhost:\${port}\`);
+                console.log('API:          http://localhost:5003');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -89017,16 +89344,19 @@ const checkStatus = () => {
                 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('\u{1F3A8} Penpot - Open Source Design & Prototyping');
+                console.log('Penpot - Open Source Design & Prototyping');
+                console.log('Official Site:   https://penpot.app');
+                console.log('Docker Image:    https://hub.docker.com/r/penpotapp/frontend');
+                console.log('References:      https://github.com/penpot/penpot');
                 console.log('==================================================');
-                console.log(\`Web UI:            http://localhost:\${penpotPort}\`);
-                console.log(\`MailCatcher:       http://localhost:9002\`);
+                console.log(\`Web UI:         http://localhost:\${penpotPort}\`);
+                console.log(\`MailCatcher:    http://localhost:9002\`);
                 console.log('--------------------------------------------------');
-                console.log('\u{1F464} Setup Account:');
+                console.log('Setup Account:');
                 console.log('   Open the Web UI and create a new account.');
                 console.log('   Verify email using MailCatcher (port 9002).');
                 console.log('--------------------------------------------------');
-                console.log('\u{1F4DA} Resources:');
+                console.log('Resources:');
                 console.log('   Docs: https://help.penpot.app/');
                 console.log('   GitHub: https://github.com/penpot/penpot');
                 console.log('==================================================\\n');
@@ -89217,13 +89547,16 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
-                console.log('\\n==================================================');
+                console.log('
+==================================================');
                 console.log('DrawDB is running!');
-                console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${port}\`);
-                console.log('--------------------------------------------------');
+                console.log('Official Site:   https://www.drawdb.app');
+                console.log('GitHub:          https://github.com/drawdb-io/drawdb');
+                console.log('Docker Image:    ghcr.io/drawdb-io/drawdb');
+                console.log('
+==================================================');
+                console.log(\`URL:            http://localhost:\${port}\`);
                 console.log('Free, simple, and intuitive database design tool.');
-                console.log('Github: https://github.com/drawdb-io/drawdb');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -89276,8 +89609,8 @@ process.on('SIGTERM', cleanup);`
 // ../../packages/template/opensource-app/n8n-mcp.ts
 var N8nMcpTool = {
   name: "n8n MCP Server",
-  description: "Model Context Protocol server for n8n. Allows AI agents to understand and build n8n workflows.",
-  notes: "Requires Docker. Use this with an MCP client (like Claude Desktop or Cursor).",
+  description: "Model Context Protocol server for n8n.",
+  notes: "Requires Docker. Use this with an MCP client.",
   type: "tool",
   category: "Tool",
   icon: "fas fa-robot text-orange-500",
@@ -89368,9 +89701,13 @@ const onRunning = (containerInfo) => {
         }));
     } catch(e) {}
 
-    console.log('\\n==================================================');
+    console.log('
+==================================================');
     console.log('n8n MCP Server Image is Ready!');
-    console.log('--------------------------------------------------');
+    console.log('GitHub:        https://github.com/czlonkowski/n8n-mcp');
+    console.log('Docker Image:  ghcr.io/czlonkowski/n8n-mcp');
+    console.log('
+==================================================');
     console.log('This MCP server runs in STDIO mode (not HTTP).');
     console.log('To use it, add this to your MCP Client config (e.g., Claude Desktop, Cursor):');
     console.log('');
@@ -89393,7 +89730,8 @@ const onRunning = (containerInfo) => {
     console.log('Config paths:');
     console.log('  macOS: ~/Library/Application Support/Claude/claude_desktop_config.json');
     console.log('  Linux: ~/.config/Claude/claude_desktop_config.json');
-    console.log('--------------------------------------------------');
+    console.log('
+==================================================');
     console.log('Usage Instructions:');
     console.log('1. Ask Claude to "Help me build an n8n workflow for..."');
     console.log('2. Claude can search nodes, get documentation, and generate workflow JSON.');
@@ -89401,9 +89739,10 @@ const onRunning = (containerInfo) => {
     console.log('4. Claude can also help debug workflows if you provide error logs.');
     console.log('');
     console.log('Note: This server provides knowledge about n8n nodes and templates.');
-    console.log('--------------------------------------------------');
-    console.log('GitHub: https://github.com/czlonkowski/n8n-mcp');
-    console.log('==================================================\\n');
+    console.log('
+==================================================');
+    console.log('==================================================
+');
 };
 
 setTimeout(checkStatus, 3000);
@@ -89578,13 +89917,15 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
-                console.log('\\n==================================================');
+                console.log('
+==================================================');
                 console.log('Odoo is running!');
-                console.log('--------------------------------------------------');
+                console.log('Official Site:   https://www.odoo.com/');
+                console.log('Docker Image:    https://hub.docker.com/_/odoo');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
-                console.log('--------------------------------------------------');
+                console.log('==================================================');
                 console.log('Open Source ERP and CRM.');
-                console.log('Official: https://www.odoo.com/');
                 console.log('==================================================\\n');
             });
         }).on('error', () => {
@@ -89634,9 +89975,740 @@ process.on('SIGTERM', cleanup);`
   ]
 };
 
+// ../../packages/template/opensource-app/gns3/dockerCompose.ts
+var dockerCompose5 = `services:
+  gns3-server:
+    image: gns3/gns3-server:latest
+    restart: unless-stopped
+    ports:
+      - "3080:3080"
+    volumes:
+      - gns3_data:/data
+    environment:
+      - GNS3_UID=1000
+      - GNS3_GID=1000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3080/v2/version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  gns3_data:`;
+
+// ../../packages/template/opensource-app/gns3/gitignore.ts
+var gitignoreContent5 = `
+.runtime.json
+`;
+
+// ../../packages/template/opensource-app/gns3/server.ts
+var serverJs5 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+
+console.log('Starting GNS3 Server...');
+
+// Start Docker Compose
+const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with filtering
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('error') || lower.includes('fatal') || lower.includes('panic')) {
+                process.stdout.write('\\x1b[31mError:\\x1b[0m ' + cleanLine + '\\n');
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // Port is dynamic
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port gns3-server 3080', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const gns3Port = stdout.trim().split(':')[1];
+        if (!gns3Port) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify GNS3 is actually responding to HTTP
+        http.get(\`http://localhost:\${gns3Port}/v2/version\`, (res) => {
+            // Capture Container IDs
+            exec('docker compose ps -q', (err2, stdout2) => {
+                const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                
+                try {
+                    fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                        port: server.address().port, 
+                        pid: process.pid,
+                        containerIds: containerIds
+                    }));
+                } catch(e) {
+                    console.error('Failed to write runtime file:', e);
+                }
+                
+                process.stdout.write('\\x1Bc');
+                console.log('\\n==================================================');
+                console.log('GNS3 - Graphical Network Simulator-3');
+                console.log('Official Site: https://gns3.com');
+                console.log('Docker Image:  https://hub.docker.com/r/gns3/gns3-server');
+                console.log('==================================================');
+                console.log(\`Web UI:            http://localhost:\${gns3Port}/static/web-ui/index.html\`);
+                console.log(\`API Version:       http://localhost:\${gns3Port}/v2/version\`);
+                console.log('Training Notes:');
+                console.log('   Use the Web UI to build your network topology.');
+                console.log('   Nodes will run within the Docker container.');
+                console.log('==================================================\\n');
+            });
+        }).on('error', (e) => {
+            setTimeout(checkStatus, 2000);
+        });
+    });
+};
+
+setTimeout(checkStatus, 3000);
+
+const cleanup = () => {
+    console.log('Stopping GNS3...');
+    exec('docker compose down', (err, stdout, stderr) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/gns3.ts
+var GNS3Local = {
+  name: "GNS3",
+  description: "Graphical Network Simulator-3",
+  notes: "Ideal for learning networking, certifications (CCNA, CCNP), and testing network topologies.",
+  type: "opensource-app",
+  category: "Open Source",
+  icon: "fas fa-network-wired text-blue-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose5
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent5
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverJs5
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=GNS3 Network Simulator (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-network-wired text-blue-500"]
+    }
+  ]
+};
+
+// ../../packages/template/opensource-app/metabase/dockerCompose.ts
+var dockerCompose6 = `services:
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    hostname: metabase
+    restart: unless-stopped
+    ports:
+      - "3100:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabaseappdb
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS: mysecretpassword
+      MB_DB_HOST: postgres
+    networks:
+      - metabasenet
+    depends_on:
+      - postgres
+    volumes:
+      - /dev/urandom:/dev/random:ro
+    healthcheck:
+      test: curl --fail -I http://localhost:3000/api/health || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 20
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: metabase
+      POSTGRES_DB: metabaseappdb
+      POSTGRES_PASSWORD: mysecretpassword
+    networks:
+      - metabasenet
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U metabase -d metabaseappdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  metabasenet:
+    driver: bridge
+
+volumes:
+  postgres_data:`;
+
+// ../../packages/template/opensource-app/metabase/gitignore.ts
+var gitignoreContent6 = `
+.runtime.json
+`;
+
+// ../../packages/template/opensource-app/metabase/server.ts
+var serverContent = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const ANSI = {
+  RESET: '\\x1b[0m',
+  BRIGHT: '\\x1b[1m',
+  RED: '\\x1b[31m',
+  GREEN: '\\x1b[32m',
+  YELLOW: '\\x1b[33m',
+  BLUE: '\\x1b[34m',
+  MAGENTA: '\\x1b[35m',
+  CYAN: '\\x1b[36m',
+  WHITE: '\\x1b[37m'
+};
+
+const log = (msg) => console.log(msg);
+const logHeader = (msg) => console.log(\`\${ANSI.BRIGHT}\${ANSI.CYAN}\${msg}\${ANSI.RESET}\`);
+const logTitle = (msg) => console.log(\`\${ANSI.BRIGHT}\${ANSI.YELLOW}\${msg}\${ANSI.RESET}\`);
+const logSub = (msg) => console.log(\`  \${ANSI.WHITE}- \${msg}\${ANSI.RESET}\`);
+
+logHeader('\\nStarting Metabase Stack... Data Analytics Learning Environment');
+
+// Start Docker Compose
+exec('docker compose down --remove-orphans', () => {
+    const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    // Follow logs with minimal noise
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    const printImportant = (data) => {
+        const lines = data.toString().split('\\n');
+        lines.forEach(line => {
+            let cleanLine = line.replace(/^[^|]+\\|\\s+/, '');
+            const lower = cleanLine.toLowerCase();
+            if (lower.includes('metabase initialization complete') || lower.includes('started on port')) {
+                 log(\`\${ANSI.GREEN}[Metabase] \${cleanLine}\${ANSI.RESET}\`);
+            }
+        });
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+    });
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // Port assigned dynamically
+});
+
+// Check status loop
+const checkStatus = () => {
+    exec('docker compose port metabase 3000', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const publicPort = stdout.trim().split(':')[1];
+        if (!publicPort) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+
+        // Verify HTTP response
+        http.get(\`http://localhost:\${publicPort}/api/health\`, (res) => {
+            if (res.statusCode === 200) {
+                // Determine container IDs
+                exec('docker compose ps -q', (err2, stdout2) => {
+                    const containerIds = stdout2 ? stdout2.trim().split('\\n') : [];
+                    try {
+                        fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                            port: server.address().port, 
+                            pid: process.pid,
+                            containerIds: containerIds
+                        }));
+                    } catch(e) {}
+                    
+                    process.stdout.write('\\x1Bc'); // Clear screen
+                    
+                    logHeader('==================================================');
+                    logTitle('Metabase - Business Intelligence for Everyone');
+                    log(\`\${ANSI.GREEN}Official Site:\${ANSI.RESET}     https://www.metabase.com\`);
+                    log(\`\${ANSI.GREEN}Docker Image:\${ANSI.RESET}      https://hub.docker.com/r/metabase/metabase\`);
+                    logHeader('==================================================');
+                    log(\`\${ANSI.GREEN}Web UI:\${ANSI.RESET}            http://localhost:\${publicPort}\`);
+                    log('--------------------------------------------------');
+                    
+                    logTitle('LEARNING PATH: Data Analyst');
+                    logSub('Key Skills: SQL, Data Visualization, Business Logic, Dashboards');
+                    logSub('Typical Role: Analyze company data to provide insights for decision making.');
+                    logSub('Career Goal: Senior Data Analyst / BI Developer');
+                    log('--------------------------------------------------');
+                    
+                    logTitle('EDUCATIONAL TASKS:');
+                    logSub('1. Login and connect to the Sample Dataset provided by Metabase.');
+                    logSub('2. Create a "Question" to find: "Total Revenue by Month".');
+                    logSub('3. Turn that answer into a Line Chart.');
+                    logSub('4. Create a Dashboard and add 3 different visualizations to it.');
+                    logSub('5. (Advanced) Connect to an external Postgres/MySQL database.');
+                    
+                    log('--------------------------------------------------');
+                    log(\`\${ANSI.BLUE}Documentation:\${ANSI.RESET}      https://www.metabase.com/docs/latest/\`);
+                    logHeader('==================================================\\n');
+                });
+            } else {
+                setTimeout(checkStatus, 2000);
+            }
+        }).on('error', () => setTimeout(checkStatus, 2000));
+    });
+};
+
+setTimeout(checkStatus, 5000);
+
+const cleanup = () => {
+    log('\\nStopping Metabase Environment...');
+    exec('docker compose down', (err) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/metabase.ts
+var MetabaseLocal = {
+  name: "Metabase",
+  description: "Business Intelligence & Analytics",
+  notes: "Simplest way to let everyone in your company ask questions and learn from data.",
+  type: "opensource-app",
+  category: "Open Source",
+  icon: "fas fa-chart-line text-blue-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose6
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent6
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverContent
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Metabase Analytics Stack"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-chart-line text-blue-500"]
+    }
+  ]
+};
+
+// ../../packages/template/opensource-app/monitoring/dockerCompose.ts
+var dockerCompose7 = `services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "0:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - monitoring
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "0:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "0:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:`;
+
+// ../../packages/template/opensource-app/monitoring/gitignore.ts
+var gitignoreContent7 = `
+.runtime.json
+prometheus_data/
+grafana_data/
+`;
+
+// ../../packages/template/opensource-app/monitoring/server.ts
+var serverContent2 = `const http = require('http');
+const { spawn, exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const RUNTIME_FILE = path.join(__dirname, '.runtime.json');
+const ANSI = {
+  RESET: '\\x1b[0m',
+  BRIGHT: '\\x1b[1m',
+  RED: '\\x1b[31m',
+  GREEN: '\\x1b[32m',
+  YELLOW: '\\x1b[33m',
+  BLUE: '\\x1b[34m',
+  MAGENTA: '\\x1b[35m',
+  CYAN: '\\x1b[36m',
+  WHITE: '\\x1b[37m'
+};
+
+const log = (msg) => console.log(msg);
+const logHeader = (msg) => console.log(\`\${ANSI.BRIGHT}\${ANSI.CYAN}\${msg}\${ANSI.RESET}\`);
+const logTitle = (msg) => console.log(\`\${ANSI.BRIGHT}\${ANSI.YELLOW}\${msg}\${ANSI.RESET}\`);
+const logSub = (msg) => console.log(\`  \${ANSI.WHITE}- \${msg}\${ANSI.RESET}\`);
+
+logHeader('\\nStarting Observability Stack... DevOps & SRE Learning Environment');
+
+// Start Docker Compose
+exec('docker compose down --remove-orphans', () => {
+    const child = spawn('docker', ['compose', 'up', '-d', '--remove-orphans', '--force-recreate'], { stdio: 'inherit' });
+
+child.on('close', (code) => {
+    if (code !== 0) process.exit(code);
+    
+    const logs = spawn('docker', ['compose', 'logs', '-f', '--tail=0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+    
+    // Minimal log output
+    const printImportant = (data) => {
+        // ... filtering could go here
+    };
+
+    logs.stdout.on('data', printImportant);
+    logs.stderr.on('data', printImportant);
+    logs.on('close', (c) => process.exit(c || 0));
+    });
+});
+
+// Setup Control Server
+const server = http.createServer((req, res) => {
+    if (req.url === '/stop') {
+        res.writeHead(200);
+        res.end('Stopping...');
+        cleanup();
+    } else {
+        res.writeHead(404);
+        res.end();
+    }
+});
+
+server.listen(0, () => {
+    // Port assigned dynamically
+});
+
+const checkStatus = () => {
+    exec('docker compose port grafana 3000', (err, stdout, stderr) => {
+        if (err || stderr || !stdout) {
+            setTimeout(checkStatus, 2000);
+            return;
+        }
+        const grafanaPort = stdout.trim().split(':')[1];
+        
+        exec('docker compose port prometheus 9090', (err2, stdout2) => {
+             const promPort = stdout2 ? stdout2.trim().split(':')[1] : null;
+
+             if (!grafanaPort || !promPort) {
+                setTimeout(checkStatus, 2000);
+                 return;
+             }
+
+             http.get(\`http://localhost:\${grafanaPort}/api/health\`, (res) => {
+                if (res.statusCode === 200) {
+                     exec('docker compose ps -q', (err3, stdout3) => {
+                        const containerIds = stdout3 ? stdout3.trim().split('\\n') : [];
+                        try {
+                            fs.writeFileSync(RUNTIME_FILE, JSON.stringify({ 
+                                port: server.address().port, 
+                                pid: process.pid,
+                                containerIds: containerIds
+                            }));
+                        } catch(e) {}
+                        
+                        process.stdout.write('\\x1Bc');
+                        
+                        logHeader('==================================================');
+                        logTitle('Monitoring Stack - Prometheus & Grafana');
+                        log(\`\${ANSI.GREEN}Official Sites:\${ANSI.RESET}   https://grafana.com & https://prometheus.io\`);
+                        logHeader('==================================================');
+                        log(\`\${ANSI.GREEN}Grafana UI:\${ANSI.RESET}      http://localhost:\${grafanaPort} (admin/admin)\`);
+                        log(\`\${ANSI.MAGENTA}Prometheus UI:\${ANSI.RESET}   http://localhost:\${promPort}\`);
+                        log('--------------------------------------------------');
+                        
+                        logTitle('\u{1F393} LEARNING PATH: Site Reliability Engineer (SRE)');
+                        logSub('Key Skills: Metrics, Alerting, System Performance, Dashboards');
+                        logSub('Typical Role: Ensure production systems are healthy and reliable.');
+                        logSub('Career Goal: Senior DevOps Engineer / SRE');
+                        log('--------------------------------------------------');
+                        
+                        logTitle('EDUCATIONAL TASKS:');
+                        logSub('1. Login to Grafana (admin/admin).');
+                        logSub('2. Add Prometheus as a "Data Source" (URL: http://prometheus:9090).');
+                        logSub('3. Create a Dashboard and visualize "node_memory_MemFree_bytes".');
+                        logSub('4. Import a pre-made Grafana Dashboard for "Node Exporter" (ID: 1860).');
+                        logSub('5. (Advanced) Set up an Alert Rule for high CPU usage.');
+                        
+                        log('--------------------------------------------------');
+                        log(\`\${ANSI.BLUE}Grafana Docs:\${ANSI.RESET}     https://grafana.com/docs/\`);
+                        log(\`\${ANSI.BLUE}Prometheus Docs:\${ANSI.RESET}  https://prometheus.io/docs/\`);
+                        logHeader('==================================================\\n');
+                     });
+                } else {
+                    setTimeout(checkStatus, 2000);
+                }
+             }).on('error', () => setTimeout(checkStatus, 2000));
+        });
+    });
+};
+
+setTimeout(checkStatus, 5000);
+
+const cleanup = () => {
+    log('\\nStopping Monitoring Stack...');
+    exec('docker compose down', (err) => {
+        try { fs.unlinkSync(RUNTIME_FILE); } catch(e) {}
+        process.exit(0);
+    });
+};
+
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);`;
+
+// ../../packages/template/opensource-app/monitoring/prometheusConfig.ts
+var prometheusConfig = `global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'grafana'
+    static_configs:
+      - targets: ['grafana:3000']
+`;
+
+// ../../packages/template/opensource-app/monitoring.ts
+var MonitoringStack = {
+  name: "Monitoring Stack",
+  description: "Prometheus, Grafana, Node Exporter",
+  notes: "The industry standard for server monitoring and observability.",
+  type: "opensource-app",
+  category: "Open Source",
+  icon: "fas fa-tachometer-alt text-orange-500",
+  templating: [
+    {
+      action: "file",
+      file: "docker-compose.yml",
+      filecontent: dockerCompose7
+    },
+    {
+      action: "file",
+      file: "prometheus.yml",
+      filecontent: prometheusConfig
+    },
+    {
+      action: "file",
+      file: ".gitignore",
+      filecontent: gitignoreContent7
+    },
+    {
+      action: "file",
+      file: "index.js",
+      filecontent: serverContent2
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=node index.js"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", `scripts.stop=node -e 'const fs=require("fs"); try{const p=JSON.parse(fs.readFileSync(".runtime.json")).port; fetch("http://localhost:"+p+"/stop").catch(e=>{})}catch(e){}'`]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Prometheus & Grafana (Docker)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "appType=tool"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-tachometer-alt text-orange-500"]
+    }
+  ]
+};
+
 // ../../packages/template/opensource.ts
 var OpenSourceTemplates = [
   OdooLocal,
+  GNS3Local,
+  MetabaseLocal,
+  MonitoringStack,
   DrawDBTool,
   PenpotLocal,
   N8nMcpTool,
@@ -90332,7 +91404,7 @@ var htmlFile = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monorepo Time - Express Service</title>
+    <title>Express Service</title>
     <style>
         body {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -90548,14 +91620,14 @@ var htmlFile2 = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monorepo Time - Universal Express Service</title>
+    <title>Serverless Express Service</title>
     <style>
         body {
             background: linear-gradient(135deg, #2d2a4e 0%, #1c1c38 100%);
             color: #ffffff;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: center;    
             height: 100vh;
             margin: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -90734,7 +91806,7 @@ var serverless_default = {
 // ../../packages/template/projects/serverless-express.ts
 var ServerlessExpressTS = {
   name: "Serverless Express TS",
-  description: "Serverless Express TS template optimized for Serverless (Netlify, Vercel, AWS) & Containers (Docker, Render, Fly.io)",
+  description: "Serverless Express TS template optimized for Serverless",
   notes: "Node.js and NPM must be installed.",
   type: "app",
   category: "Project",
@@ -90912,7 +91984,7 @@ file_put_contents($file, $count);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Monorepo Time</title>
+    <title>PHP Backend</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
@@ -90931,7 +92003,7 @@ file_put_contents($file, $count);
             <span class="text-4xl">\u{1F680}</span>
         </div>
         <h1 class="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-            Monorepo Time
+            PHP Backend
         </h1>
         <p class="text-gray-300 text-lg mb-6">
             Your PHP application is up and running.
@@ -91111,7 +92183,7 @@ var indexHtml2 = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monorepo Time - Python Backend</title>
+    <title>Python Backend</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
@@ -91343,11 +92415,691 @@ var StrapiLocal = {
   ]
 };
 
+// ../../packages/template/projects/files/_go.ts
+var mainGoFile = `package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+)
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+	if r.Method == "OPTIONS" {
+		return
+	}
+	fmt.Fprintf(w, "hello world")
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+	if r.Method == "OPTIONS" {
+		return
+	}
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+	http.ServeFile(w, r, "index.html")
+}
+
+func main() {
+	http.HandleFunc("/hello", helloHandler)
+	http.HandleFunc("/", indexHandler)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "4000"
+	}
+
+	fmt.Printf("Server starting on port http://localhost:%s\\n", port)
+	fmt.Printf("Check http://localhost:%s/hello\\n", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		fmt.Printf("Error starting server: %s\\n", err)
+	}
+}
+`;
+var indexHtmlFile = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Backend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        body { font-family: 'JetBrains Mono', monospace; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-gray-200 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Background Decor -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="z-10 w-full max-w-2xl px-4">
+        <div class="glass rounded-2xl p-8 md:p-12 shadow-2xl border border-white/5 transform transition-all hover:scale-[1.01]">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <span class="text-4xl">\u{1F439}</span>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400">
+                        welcome to Go
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-cyan-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-mono text-cyan-400 uppercase tracking-widest">Online</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <p class="text-xl text-gray-300 leading-relaxed font-light">
+                    Your Go backend is running and ready to handle requests.
+                </p>
+                
+                <div class="p-4 rounded-lg bg-black/30 border border-white/10 font-mono text-sm text-gray-400">
+                    <p>$ go run main.go</p>
+                    <p class="text-cyan-400">>> Server started at http://localhost:4000</p>
+                </div>
+
+                <div class="pt-4 flex flex-col sm:flex-row gap-4">
+                    <a href="/hello" class="group relative px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-bold text-white transition-all shadow-[0_0_20px_rgba(8,145,178,0.3)] hover:shadow-[0_0_30px_rgba(8,145,178,0.5)] overflow-hidden">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            Hello Endpoint
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </span>
+                    </a>
+                    
+                    <a href="https://go.dev/doc/" target="_blank" class="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/5 rounded-lg font-bold text-gray-300 transition-colors text-center">
+                        Go Docs
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p>Powered by Go Standard Library & Tailwind CSS</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+var files = {
+  mainGoFile,
+  indexHtmlFile
+};
+var go_default = files;
+
+// ../../packages/template/projects/go.ts
+var GoApp = {
+  name: "Go Application",
+  description: "Simple Go Backend Application",
+  notes: "Go must be installed in your system.",
+  type: "app",
+  category: "Project",
+  icon: "fab fa-golang text-blue-500",
+  templating: [
+    {
+      action: "command",
+      cmd: "go",
+      args: ["mod", "init", "app"]
+    },
+    {
+      action: "file",
+      file: "main.go",
+      filecontent: go_default.mainGoFile
+    },
+    {
+      action: "file",
+      file: "index.html",
+      filecontent: go_default.indexHtmlFile
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "nodemon"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", 'scripts.dev=nodemon --watch . --ext go,html --exec "go run main.go"']
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=go run main.go"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.build=go build -o app main.go"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Go Backend Application"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx kill-port 4000"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fab fa-golang text-blue-500"]
+    }
+  ]
+};
+
+// ../../packages/template/projects/files/_go_gin.ts
+var mainGoFile2 = `package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+)
+
+func main() {
+	r := gin.Default()
+
+	// CORS definition
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
+
+	// Routes
+	r.GET("/hello", func(c *gin.Context) {
+		c.String(http.StatusOK, "hello world")
+	})
+
+	r.GET("/", func(c *gin.Context) {
+		c.File("index.html")
+	})
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "4200"
+	}
+
+    fmt.Printf("\\n")
+	fmt.Printf("Server starting on port http://localhost:%s\\n", port)
+	fmt.Printf("Check http://localhost:%s/hello\\n", port)
+    fmt.Printf("\\n")
+	
+	if err := r.Run(":" + port); err != nil {
+		fmt.Printf("Error starting server: %s\\n", err)
+	}
+}
+`;
+var indexHtmlFile2 = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gin Backend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        body { font-family: 'JetBrains Mono', monospace; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-gray-200 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Background Decor -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="z-10 w-full max-w-2xl px-4">
+        <div class="glass rounded-2xl p-8 md:p-12 shadow-2xl border border-white/5 transform transition-all hover:scale-[1.01]">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <span class="text-4xl">\u{1F378}</span>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400">
+                        welcome to Gin
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-cyan-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-mono text-cyan-400 uppercase tracking-widest">Online</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <p class="text-xl text-gray-300 leading-relaxed font-light">
+                    Your Go (Gin) backend is running wildly fast.
+                </p>
+                
+                <div class="p-4 rounded-lg bg-black/30 border border-white/10 font-mono text-sm text-gray-400">
+                    <p>$ go run main.go</p>
+                    <p class="text-cyan-400">>> Server started at http://localhost:4200</p>
+                </div>
+
+                <div class="pt-4 flex flex-col sm:flex-row gap-4">
+                    <a href="/hello" class="group relative px-8 py-3 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-bold text-white transition-all shadow-[0_0_20px_rgba(8,145,178,0.3)] hover:shadow-[0_0_30px_rgba(8,145,178,0.5)] overflow-hidden">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            Hello Endpoint
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </span>
+                    </a>
+                    
+                    <a href="https://gin-gonic.com/docs/" target="_blank" class="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/5 rounded-lg font-bold text-gray-300 transition-colors text-center">
+                        Gin Docs
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p>Powered by Gin Framework & Tailwind CSS</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+var files2 = {
+  mainGoFile: mainGoFile2,
+  indexHtmlFile: indexHtmlFile2
+};
+var go_gin_default = files2;
+
+// ../../packages/template/projects/go-gin.ts
+var GoGinApp = {
+  name: "Go (Gin) Application",
+  description: "High-performance Go Backend with Gin Framework",
+  notes: "Go must be installed in your system.",
+  type: "app",
+  category: "Project",
+  icon: "fas fa-cocktail text-cyan-500",
+  templating: [
+    {
+      action: "command",
+      cmd: "go",
+      args: ["mod", "init", "app"]
+    },
+    {
+      action: "command",
+      cmd: "go",
+      args: ["get", "-u", "github.com/gin-gonic/gin"]
+    },
+    {
+      action: "command",
+      cmd: "go",
+      args: ["get", "-u", "github.com/gin-contrib/cors"]
+    },
+    {
+      action: "file",
+      file: "main.go",
+      filecontent: go_gin_default.mainGoFile
+    },
+    {
+      action: "file",
+      file: "index.html",
+      filecontent: go_gin_default.indexHtmlFile
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "nodemon"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", 'scripts.dev=nodemon --watch . --ext go,html --exec "go run main.go"']
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=go run main.go"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.build=go build -o app main.go"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Go (Gin) Backend Application"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx kill-port 4200"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-cocktail text-cyan-500"]
+    }
+  ]
+};
+
+// ../../packages/template/projects/files/_java.ts
+var pomXml = `<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.2</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>demo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>demo</name>
+	<description>Demo project for Spring Boot</description>
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+`;
+var applicationJava = `package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**")
+						.allowedOrigins("*")
+						.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+						.allowedHeaders("*");
+			}
+		};
+	}
+}
+`;
+var controllerJava = `package com.example.demo;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello world";
+    }
+}
+`;
+var indexHtmlFile3 = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot Backend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+        body { font-family: 'Outfit', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#0c0c1d] text-gray-200 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Background Decor -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="z-10 w-full max-w-2xl px-4">
+        <div class="glass rounded-2xl p-8 md:p-12 shadow-2xl border border-white/5 transform transition-all hover:scale-[1.01]">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <span class="text-4xl">\u{1F343}</span>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500">
+                        welcome to Spring Boot
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-mono text-green-400 uppercase tracking-widest">Running</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <p class="text-xl text-gray-300 leading-relaxed font-light">
+                    Your Java backend is powered by Spring Boot and ready to serve.
+                </p>
+                
+                <div class="p-4 rounded-lg bg-black/30 border border-white/10 font-mono text-sm text-gray-400">
+                    <p>$ ./mvnw spring-boot:run</p>
+                    <p class="text-green-400">>> JVM started at http://localhost:4500</p>
+                </div>
+
+                <div class="pt-4 flex flex-col sm:flex-row gap-4">
+                    <a href="/hello" class="group relative px-8 py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold text-white transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] overflow-hidden">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            Hello Endpoint
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </span>
+                    </a>
+                    
+                    <a href="https://spring.io/projects/spring-boot" target="_blank" class="px-8 py-3 bg-transparent border border-white/20 hover:bg-white/5 rounded-lg font-bold text-gray-300 transition-colors text-center">
+                        Spring Docs
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p>Powered by Spring Boot & Tailwind CSS</p>
+        </div>
+    </div>
+</body>
+</html>
+`;
+var applicationProperties = `server.port=4500
+`;
+var java_default = {
+  pomXml,
+  applicationJava,
+  controllerJava,
+  indexHtmlFile: indexHtmlFile3,
+  applicationProperties
+};
+
+// ../../packages/template/projects/java.ts
+var JavaSpringBoot = {
+  name: "Spring Boot",
+  description: "Java Backend with Spring Boot Framework",
+  notes: "Java 21 and Maven must be installed in your system.",
+  type: "app",
+  category: "Project",
+  icon: "fas fa-leaf text-green-500",
+  templating: [
+    {
+      action: "file",
+      file: "pom.xml",
+      filecontent: java_default.pomXml
+    },
+    {
+      action: "file",
+      file: "src/main/java/com/example/demo/DemoApplication.java",
+      filecontent: java_default.applicationJava
+    },
+    {
+      action: "file",
+      file: "src/main/java/com/example/demo/HelloController.java",
+      filecontent: java_default.controllerJava
+    },
+    {
+      action: "file",
+      file: "src/main/resources/static/index.html",
+      filecontent: java_default.indexHtmlFile
+    },
+    {
+      action: "file",
+      file: "src/main/resources/application.properties",
+      filecontent: java_default.applicationProperties
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["install", "-D", "nodemon"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", 'scripts.dev=nodemon --watch src --ext java,xml --exec "mvn spring-boot:run"']
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.start=mvn spring-boot:run"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.build=mvn clean package"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Spring Boot Application"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "scripts.stop=npx kill-port 4500"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-leaf text-green-500"]
+    }
+  ]
+};
+
+// ../../packages/template/projects/remix.ts
+var Remix = {
+  name: "Remix",
+  description: "Full stack web framework that lets you focus on the user interface",
+  notes: "Node.js and NPM must be installed.",
+  type: "app",
+  category: "Project",
+  icon: "fas fa-record-vinyl text-blue-500",
+  // Generic icon, adjust if needed
+  templating: [
+    {
+      action: "command",
+      cmd: "rm -rf ./* ./.[!.]*",
+      // Clean directory
+      args: []
+    },
+    {
+      action: "command",
+      cmd: "npx",
+      args: ["-y", "create-react-router@latest", ".", "--yes", "--install", "--no-git-init", "--no-motion"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "name=$(basename $PWD)"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "description=Remix App"]
+    },
+    {
+      action: "command",
+      cmd: "npm",
+      args: ["pkg", "set", "fontawesomeIcon=fas fa-record-vinyl text-blue-500"]
+    }
+  ]
+};
+
 // ../../packages/template/projecttemplate.ts
 var templates3 = [
   ViteReact,
   NextJS,
+  Remix,
   ExpoReactNative,
+  GoApp,
+  GoGinApp,
+  JavaSpringBoot,
   StrapiLocal,
   ExpressTS,
   ServerlessExpressTS,
@@ -91359,7 +93111,7 @@ var templates3 = [
 var projecttemplate_default = templates3;
 
 // ../../packages/template/services/n8n/dockerCompose.ts
-var dockerCompose5 = `services:
+var dockerCompose8 = `services:
   n8n:
     image: n8nio/n8n:2.7.1
     pull_policy: if_not_present
@@ -91387,7 +93139,7 @@ volumes:
   n8n_data:`;
 
 // ../../packages/template/services/n8n/gitignore.ts
-var gitignoreContent5 = `# Runtime file
+var gitignoreContent8 = `# Runtime file
 .runtime.json
 `;
 
@@ -91426,7 +93178,7 @@ Follow these steps **sequentially**. Do not ask for everything at once.
 `;
 
 // ../../packages/template/services/n8n/server.ts
-var serverJs5 = `const http = require('http');
+var serverJs6 = `const http = require('http');
 const { spawn, exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -91514,8 +93266,15 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
+                console.log('
+==================================================');
+                console.log('Official Site:     https://n8n.io');
+                console.log('Docker Image:      https://hub.docker.com/r/n8nio/n8n');
+                console.log('Note: N8N is fair-code licensed. Free for internal use, but commercial redistribution has restrictions.')
+                console.log('==================================================
+');
                 console.log('N8N is running at http://localhost:' + n8nPort);
-                console.log('Official docker image: https://hub.docker.com/r/n8nio/n8n');
+               
             });
         }).on('error', (e) => {
             // Connection failed (ECONNREFUSED usually), retry
@@ -91549,17 +93308,17 @@ var N8NLocal = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose5
+      filecontent: dockerCompose8
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent5
+      filecontent: gitignoreContent8
     },
     {
       action: "file",
       file: "index.js",
-      filecontent: serverJs5
+      filecontent: serverJs6
     },
     {
       action: "command",
@@ -91714,6 +93473,16 @@ const isWindows = os.platform() === 'win32';
 const script = isWindows ? process.argv[2] + '.ps1' : process.argv[2] + '.sh';
 const cmd = isWindows ? 'powershell' : 'bash';
 const args = isWindows ? ['-ExecutionPolicy', 'Bypass', '-File', script] : [script];
+
+if (process.argv[2] === 'start') {
+    process.stdout.write('\\x1Bc');
+    console.log('\\n==================================================');
+    console.log('Official site: https://n8n.io');
+    console.log('Note: N8N is fair-code licensed. Free for internal use, but commercial redistribution has restrictions.');
+    console.log('==================================================\\n');
+    console.log('N8N is running at http://localhost:5678');
+    console.log('Official docker image: https://hub.docker.com/r/n8nio/n8n');
+}
 
 const child = spawn(cmd, args, { stdio: 'inherit' });
 
@@ -91929,7 +93698,7 @@ module.exports = {
 };`;
 
 // ../../packages/template/services/aws/dockerCompose.ts
-var dockerCompose6 = `services:
+var dockerCompose9 = `services:
   localstack:
     image: localstack/localstack:4.0
     pull_policy: if_not_present
@@ -91978,7 +93747,7 @@ networks:
     driver: bridge`;
 
 // ../../packages/template/services/aws/gitignore.ts
-var gitignoreContent6 = `# LocalStack data folder
+var gitignoreContent9 = `# LocalStack data folder
 localstack-data/
 
 # Runtime file
@@ -92195,7 +93964,7 @@ dynamodb.createTable(params, function(err, data) {
 </html>`;
 
 // ../../packages/template/services/aws/server.ts
-var serverJs6 = `const http = require('http');
+var serverJs7 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec, execSync } = require('child_process');
@@ -92295,8 +94064,10 @@ function displayCredentials() {
         process.stdout.write('\\x1Bc');
         console.log('\\n==================================================');
         console.log('\u{1F680} AWS LocalStack is running!');
+        console.log('Official Site:     https://localstack.cloud');
+        console.log('Docker Image:      https://hub.docker.com/r/localstack/localstack');
+        console.log('License:           Apache-2.0');
         console.log('==================================================');
-        console.log('');
         console.log('\u{1F4CC} AWS Credentials (use these everywhere):');
         console.log('   Access Key ID:     test');
         console.log('   Secret Access Key: test');
@@ -92447,12 +94218,12 @@ var AWSTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose6
+      filecontent: dockerCompose9
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent6
+      filecontent: gitignoreContent9
     },
     {
       action: "file",
@@ -92462,7 +94233,7 @@ var AWSTemplate = {
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs6
+      filecontent: serverJs7
     },
     {
       action: "file",
@@ -92523,7 +94294,7 @@ var AWSTemplate = {
 };
 
 // ../../packages/template/services/stripe/dockerCompose.ts
-var dockerCompose7 = `services:
+var dockerCompose10 = `services:
   stripe-mock:
     image: stripe/stripe-mock:latest
     pull_policy: if_not_present
@@ -92539,12 +94310,12 @@ var dockerCompose7 = `services:
 `;
 
 // ../../packages/template/services/stripe/gitignore.ts
-var gitignoreContent7 = `# Runtime file
+var gitignoreContent10 = `# Runtime file
 .runtime.json
 `;
 
 // ../../packages/template/services/stripe/server.ts
-var serverJs7 = `const http = require('http');
+var serverJs8 = `const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn, exec } = require('child_process');
@@ -92585,6 +94356,9 @@ function displayCredentials() {
         process.stdout.write('\\x1Bc');
         console.log('\\n==================================================');
         console.log('\u{1F4B3} Stripe Mock Server is running!');
+        console.log('GitHub:            https://github.com/stripe/stripe-mock');
+        console.log('Docker Image:      https://hub.docker.com/r/stripe/stripe-mock');
+        console.log('License:           MIT');
         console.log('--------------------------------------------------');
         console.log('\u{1F4CC} Connection Details:');
         console.log('   API Key:           sk_test_mock_123 (any key works)');
@@ -92708,17 +94482,17 @@ var StripeTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose7
+      filecontent: dockerCompose10
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent7
+      filecontent: gitignoreContent10
     },
     {
       action: "file",
       file: "server.js",
-      filecontent: serverJs7
+      filecontent: serverJs8
     },
     {
       action: "file",
@@ -92769,7 +94543,7 @@ var StripeTemplate = {
 };
 
 // ../../packages/template/services/k3d-headlamp/dockerCompose.ts
-var dockerCompose8 = `# K3d + Headlamp Docker Compose Configuration
+var dockerCompose11 = `# K3d + Headlamp Docker Compose Configuration
 # This file sets up Headlamp to connect to a k3d cluster
 # Note: k3d cluster is managed separately via k3d CLI
 
@@ -92804,14 +94578,14 @@ volumes:
   headlamp_data:`;
 
 // ../../packages/template/services/k3d-headlamp/gitignore.ts
-var gitignoreContent8 = `.runtime.json
+var gitignoreContent11 = `.runtime.json
 node_modules/
 .env.local
 .kube/
 *.log`;
 
 // ../../packages/template/services/k3d-headlamp/server.ts
-var serverJs8 = `const http = require('http');
+var serverJs9 = `const http = require('http');
 const { spawn, exec, execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -92869,6 +94643,9 @@ async function main() {
     console.log('\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557');
     console.log('\u2551       \u{1F680} K3d + Headlamp Learning Environment               \u2551');
     console.log('\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D');
+    console.log('Official Sites: https://k3d.io/ & https://headlamp.dev/');
+    console.log('Docker Images:  rancher/k3s & headlamp-k8s/headlamp');
+    console.log('Licenses:       MIT (k3d) & Apache-2.0 (Headlamp)');
     console.log('');
     console.log('Note: if you having errors, try to run: ');
     console.log('k3d cluster delete learning-cluster');
@@ -93488,17 +95265,17 @@ var K3dHeadlampTemplate = {
     {
       action: "file",
       file: "docker-compose.yml",
-      filecontent: dockerCompose8
+      filecontent: dockerCompose11
     },
     {
       action: "file",
       file: ".gitignore",
-      filecontent: gitignoreContent8
+      filecontent: gitignoreContent11
     },
     {
       action: "file",
       file: "index.js",
-      filecontent: serverJs8
+      filecontent: serverJs9
     },
     {
       action: "file",
@@ -93711,9 +95488,11 @@ const checkStatus = () => {
 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('\u{1F343} Mongo Express - MongoDB Web GUI');
+                console.log('Mongo Express - MongoDB Web GUI');
+                console.log('GitHub:        https://github.com/mongo-express/mongo-express');
+                console.log('Docker Image:  https://hub.docker.com/_/mongo-express');
                 console.log('==================================================');
-                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`URL:              http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('==================================================\\n');
@@ -93908,9 +95687,11 @@ const checkStatus = () => {
 
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
-                console.log('\u{1F534} Redis Commander - Redis Web GUI');
+                console.log('Redis Commander - Redis Web GUI');
+                console.log('GitHub:          https://github.com/joeferner/redis-commander');
+                console.log('Docker Image:    https://hub.docker.com/r/rediscommander/redis-commander');
                 console.log('==================================================');
-                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`URL:              http://localhost:\${port}\`);
                 console.log('Auth User:         admin');
                 console.log('Auth Password:     admin');
                 console.log('==================================================\\n');
@@ -94091,8 +95872,11 @@ const checkStatus = () => {
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('Yaade is running!');
+                console.log('Official Site:     https://yaade.io');
+                console.log('GitHub:            https://github.com/EsperoTech/yaade');
+                console.log('Docker Image:      https://hub.docker.com/r/esperotech/yaade');
                 console.log('--------------------------------------------------');
-                console.log(\`URL:               http://localhost:\${port}\`);
+                console.log(\`URL:              http://localhost:\${port}\`);
                 console.log('Admin Username:    admin');
                 console.log('Admin Password:    password');
                 console.log('--------------------------------------------------');
@@ -94274,18 +96058,20 @@ const checkStatus = () => {
 
                     process.stdout.write('\\x1Bc');
                     console.log('\\n==================================================');
-                    console.log('\u{1F4E7} Mailpit - Local Email Testing Server');
+                    console.log('Mailpit - Local Email Testing Server');
+                    console.log('GitHub:        https://github.com/axllent/mailpit');
+                    console.log('Docker Image:  https://hub.docker.com/r/axllent/mailpit');
                     console.log('==================================================');
                     console.log(\`Web UI:            http://localhost:\${webPort}\`);
                     console.log(\`SMTP Server:       localhost:\${smtpPort}\`);
                     console.log('--------------------------------------------------');
-                    console.log('\u{1F4CC} GENERAL SMTP CONFIG:');
+                    console.log('GENERAL SMTP CONFIG:');
                     console.log('   SMTP_HOST=localhost');
                     console.log(\`   SMTP_PORT=\${smtpPort}\`);
                     console.log('   SMTP_USER=        (leave empty)');
                     console.log('   SMTP_PASS=        (leave empty)');
                     console.log('--------------------------------------------------');
-                    console.log('\u{1F510} SUPABASE AUTH (.env):');
+                    console.log('SUPABASE AUTH (.env):');
                     console.log('   SMTP_HOST=localhost');
                     console.log(\`   SMTP_PORT=\${smtpPort}\`);
                     console.log('   SMTP_USER=');
@@ -94472,7 +96258,9 @@ const checkStatus = () => {
                 process.stdout.write('\\x1Bc');
                 console.log('\\n==================================================');
                 console.log('CloudBeaver is running!');
-                console.log('--------------------------------------------------');
+                console.log('Official Site:     https://cloudbeaver.io');
+                console.log('Docker Image:      https://hub.docker.com/r/dbeaver/cloudbeaver');
+                console.log('==================================================');
                 console.log(\`URL:               http://localhost:\${port}\`);
                 console.log(\`Note: After opening the URL, please RELOAD THE PAGE to ensure proper functionality.\`);
                 console.log('--------------------------------------------------');
@@ -95115,7 +96903,7 @@ router22.get("/", async (req, res) => {
       ...gitIgnores
     ]);
     const ignorePatterns = Array.from(uniqueIgnores);
-    const files = await (0, import_fast_glob2.default)("**/*", {
+    const files3 = await (0, import_fast_glob2.default)("**/*", {
       cwd: MONOREPO_ROOT,
       ignore: ignorePatterns,
       dot: true,
@@ -95196,7 +96984,7 @@ router22.get("/", async (req, res) => {
         addFileToTree(pathParts.slice(1), folder.content, currentPath, isDirectory);
       }
     };
-    files.forEach((file2) => {
+    files3.forEach((file2) => {
       const isDirectory = file2.endsWith("/");
       const cleanPath = isDirectory ? file2.slice(0, -1) : file2;
       addFileToTree(cleanPath.split("/"), root, "", isDirectory);

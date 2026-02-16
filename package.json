@@ -1,8 +1,8 @@
 {
-  "name": "monorepo_time",
+  "name": "r",
   "version": "1.0.0",
   "packageManager": "npm@11.6.2",
-  "description": "Web based GUI manager for your monorepo",
+  "description": "Remix App",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "turbo": "^2.7.3"
   },
-  "fontawesomeIcon": "fas fa-database text-orange-500",
+  "fontawesomeIcon": "fas fa-record-vinyl text-blue-500",
   "appType": "tool",
   "dependencies": {
     "@opencode-ai/sdk": "^1.1.65"

@@ -12,15 +12,13 @@ import { StrapiLocal } from "./projects/strapi";
 import { GoApp } from "./projects/go";
 import { GoGinApp } from "./projects/go-gin";
 import { JavaSpringBoot } from "./projects/java";
-import { FlutterApp } from "./projects/flutter";
-import { TanStackStart } from "./projects/tanstack-start";
+import { Remix } from "./projects/remix";
 
 const templates: ProjectTemplate[] = [
     ViteReact,
     NextJS,
-    TanStackStart,
+    Remix,
     ExpoReactNative,
-    FlutterApp,
     GoApp,
     GoGinApp,
     JavaSpringBoot,
