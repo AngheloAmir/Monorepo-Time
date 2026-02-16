@@ -9,9 +9,9 @@ import { OllamaTemplate } from "./services/ollama";
 const templates: ProjectTemplate[] = [
     N8NLocal,
     N8NNative,
+    OllamaTemplate,
     AWSTemplate,
     StripeTemplate,
     K3dHeadlampTemplate,
-    OllamaTemplate,
 ];
 export default templates;   

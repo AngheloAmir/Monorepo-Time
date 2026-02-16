@@ -1,5 +1,5 @@
 import type { ProjectTemplate } from "../../types";
-import { scriptContentLlama3, scriptContentPhi3 } from "./ollama/scripts";
+import { scriptContentQwen, scriptContentPhi3 } from "./ollama/scripts";
 import { serverJs } from "./ollama/server";
 import { gitignoreContent } from "./ollama/gitignore";
 import fs from 'fs';
@@ -10,8 +10,7 @@ import path from 'path';
 // For this dev environment, reading it is fine. 
 const indexHtmlContent = fs.readFileSync(path.join(__dirname, 'ollama', 'index.html'), 'utf-8');
 
-const dockerComposeContent = `version: '3.8'
-
+const dockerComposeContent = `
 services:
   ollama:
     image: ollama/ollama:latest
@@ -20,6 +19,8 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=1h
     # GPU Support - uncomment below if you have an NVIDIA GPU
     # deploy:
     #   resources:
@@ -35,9 +36,9 @@ volumes:
 `;
 
 export const OllamaTemplate: ProjectTemplate = {
-    name: "Ollama Service",
-    description: "Run AI Models Locally",
-    notes: "AI Service for n8n. Includes Web UI & Auto-Model Management.",
+    name: "Ollama-Qwen2.5",
+    description: "Run AI Models",
+    notes: "Required 8GB Ram. GPU is optional",
     type: "tool",
     category: "AI",
     icon: "fab fa-docker text-blue-500",
@@ -64,8 +65,8 @@ export const OllamaTemplate: ProjectTemplate = {
         },
         {
             action: 'file',
-            file: 'scripts/pull-llama3.sh',
-            filecontent: scriptContentLlama3
+            file: 'scripts/pull-qwen.sh',
+            filecontent: scriptContentQwen
         },
         {
             action: 'file',
@@ -75,7 +76,7 @@ export const OllamaTemplate: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'chmod',
-            args: ['+x', 'scripts/pull-llama3.sh', 'scripts/pull-phi3.sh']
+            args: ['+x', 'scripts/pull-qwen.sh', 'scripts/pull-phi3.sh']
         },
         {
             action: 'command',
@@ -90,7 +91,7 @@ export const OllamaTemplate: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'scripts.pull:llama3=./scripts/pull-llama3.sh']
+            args: ['pkg', 'set', 'scripts.pull:qwen=./scripts/pull-qwen.sh']
         },
         {
             action: 'command',
@@ -100,7 +101,7 @@ export const OllamaTemplate: ProjectTemplate = {
         {
             action: 'command',
             cmd: 'npm',
-            args: ['pkg', 'set', 'name=ollama-service']
+            args: ['pkg', 'set', 'name=ollama-qwen2.5']
         }
     ]
 };

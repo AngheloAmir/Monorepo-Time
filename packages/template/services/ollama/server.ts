@@ -83,13 +83,13 @@ const ensureModelExists = () => {
         const containerName = lines.length > 0 ? lines[0].trim() : 'ollama-container'; // Fallback
         
         exec(\`docker exec \${containerName} ollama list\`, (err, stdout, stderr) => {
-            if (stdout && stdout.includes('llama3')) {
-                console.log('Default model "llama3" is ready.');
+            if (stdout && stdout.includes('qwen2.5:7b')) {
+                console.log('Default model "qwen2.5:7b" is ready.');
                 finalizeStartup(containerName);
             } else {
-                console.log('Default model "llama3" not found. Pulling now (this may take a while)...');
+                console.log('Default model "qwen2.5:7b" not found locally. Pulling from registry (this may take a while)...');
                 
-                const pull = spawn('docker', ['exec', '-it', containerName, 'ollama', 'pull', 'llama3'], { stdio: 'inherit' });
+                const pull = spawn('docker', ['exec', '-it', containerName, 'ollama', 'pull', 'qwen2.5:7b'], { stdio: 'inherit' });
                 pull.on('close', (code) => {
                     if (code === 0) {
                         console.log('Model pulled successfully.');
@@ -119,18 +119,18 @@ const finalizeStartup = (containerName) => {
         process.stdout.write('\\x1Bc');
         console.log('\\n==================================================');
         console.log('Service:           Ollama (Artificial Intelligence)');
-        console.log('Default Model:     llama3 (8B) - Optimized for n8n & general tasks');
-        console.log('Web Interface:     http://localhost:' + address.port);
+        console.log('Default Model:     qwen2.5:7b (7B) - Optimized for n8n & general tasks');
         console.log('Docker Image:      ollama/ollama:latest');
-        console.log('==================================================\\n');
+        console.log('==================================================');
         console.log(\`Ollama API is running at http://localhost:\${OLLAMA_PORT}\`);
-        console.log('\\n==== Quick Usage ====');
-        console.log(\`CLI:               docker exec -it \${containerName} ollama run llama3 "Hello!"\`);
-        console.log('n8n Config:        Base URL: http://host.docker.internal:11434 (or http://ollama:11434)');
-        console.log('                   Model Name: llama3');
-        console.log('\\n==== Models ====');
-        console.log('Default (Active):  llama3 (Great for logic, reasoning, and JSON output)');
-        console.log('Lightweight:       npm run pull:phi3 (Use for low-memory tasks on laptops)');
+        console.log('Web Interface:            http://localhost:' + address.port);
+        console.log('==== Quick Usage =================================');
+        console.log(\`CLI:          docker exec -it \${containerName} ollama run qwen2.5:7b "Hello!"\`);
+        console.log('n8n Config:    Base URL: http://host.docker.internal:11434 (Windows/Mac)');
+        console.log('                         http://172.17.0.1:11434 (Linux default)');
+        console.log('               Model Name: qwen2.5:7b');
+        console.log('==== Models ======================================');
+        console.log('Default (Active):  qwen2.5:7b (Great for logic, reasoning, and JSON output)');
         
     } catch(e) {
         console.error('Failed to write runtime file:', e);

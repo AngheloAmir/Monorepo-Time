@@ -14,21 +14,22 @@ docker compose up -d
 
 ${waitForOllama}
 
-# Check if llama3 exists
-if ! docker exec $(docker ps -qf "name=ollama") ollama list | grep -q "llama3"; then
-    echo "Default model 'llama3' not found. Pulling now (this may take a while)..."
-    docker exec -it $(docker ps -qf "name=ollama") ollama pull llama3
+# Check if model exists
+if docker exec $(docker ps -qf "name=ollama") ollama list | grep -q "qwen2.5:7b"; then
+    echo "Default model 'qwen2.5:7b' is ready."
 else
-    echo "Default model 'llama3' is ready."
+    echo "Default model 'qwen2.5:7b' not found locally."
+    echo "Pulling from registry (this may take a while, please wait)..."
+    docker exec -it $(docker ps -qf "name=ollama") ollama pull qwen2.5:7b
 fi
 
 echo "Service started successfully."
 `;
 
-export const scriptContentLlama3 = `#!/bin/bash
+export const scriptContentQwen = `#!/bin/bash
 ${waitForOllama}
-echo "Pulling Llama 3 (8B)..."
-docker exec -it $(docker ps -qf "name=ollama") ollama pull llama3
+echo "Pulling Qwen 2.5 (7B)..."
+docker exec -it $(docker ps -qf "name=ollama") ollama pull qwen2.5:7b
 `;
 
 export const scriptContentPhi3 = `#!/bin/bash

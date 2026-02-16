@@ -32,7 +32,7 @@
                 Local AI Chat
             </h1>
             <div class="text-sm text-gray-400">
-                Model: <span class="font-mono text-blue-400">llama3</span>
+                Model: <span class="font-mono text-blue-400">qwen2.5:7b</span>
             </div>
         </div>
     </header>
@@ -43,7 +43,7 @@
             <!-- Welcome Message -->
             <div class="flex justify-start">
                 <div class="max-w-[80%] rounded-2xl p-4 bg-gray-800 border border-gray-700 shadow-sm">
-                    <p class="text-gray-200">Hello! I'm connected to your local Ollama instance. How can I help you today?</p>
+                    <p class="text-gray-200">Note: It can takes about a minute to respond the first time</p>
                 </div>
             </div>
         </div>
@@ -51,6 +51,14 @@
 
     <!-- Input Area -->
     <footer class="bg-gray-800 border-t border-gray-700 p-4">
+        <div class="max-w-4xl mx-auto mb-2 flex gap-2">
+            <button id="quickActionButton" class="bg-gray-700 hover:bg-gray-600 text-xs text-blue-300 px-3 py-1.5 rounded-lg border border-gray-600 transition-colors flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Example Prompt 1
+            </button>
+        </div>
         <div class="max-w-4xl mx-auto flex gap-4">
             <input 
                 type="text" 
@@ -86,6 +94,11 @@
         userInput.focus();
 
         sendButton.addEventListener('click', handleSend);
+        
+        document.getElementById('quickActionButton').addEventListener('click', () => {
+            userInput.value = "Check the current price of Bitcoin and then calculate how much 0.5 BTC is worth in USD.";
+            userInput.focus();
+        });
 
         // Optional: Allow Enter key? User said "manually click send". 
         // I will strictly follow "manually click send" but commonly users expect Enter.
@@ -125,7 +138,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        model: 'llama3',
+                        model: 'qwen2.5:7b',
                         messages: chatHistory,
                         stream: true
                     })
