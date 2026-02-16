@@ -58,6 +58,8 @@ export function createConfigActions(set: SetState, get: GetState) {
                 const res = await fetch(`${apiBase}/config`);
                 if (!res.ok) return null;
                 const config: GlobalConfig = await res.json();
+                
+                set({ globalConfig: config });
 
                 // Apply defaults from the config only on first sync
                 if (!get().configSynced) {
@@ -109,6 +111,7 @@ export function createConfigActions(set: SetState, get: GetState) {
                 });
                 if (!res.ok) return null;
                 const config: GlobalConfig = await res.json();
+                set({ globalConfig: config });
                 return config;
             } catch (err) {
                 console.error('[opencode] Failed to update config:', err);

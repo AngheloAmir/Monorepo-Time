@@ -50,9 +50,21 @@ export interface FlatModel {
 
 // ── Agent ────────────────────────────────────────────────────────────
 export interface Agent {
-    id:           string;
+    id?:          string;
     name:         string;
     description?: string;
+    options?:     Record<string, any>;
+    permission?:  AgentPermission[];
+    mode?:        string;
+    native?:      boolean;
+    hidden?:      boolean;
+    prompt?:      string;
+}
+
+export interface AgentPermission {
+    permission: string;
+    action:     'allow' | 'deny' | 'ask';
+    pattern:    string;
 }
 
 // ── Auth ─────────────────────────────────────────────────────────────

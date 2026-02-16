@@ -181,6 +181,12 @@ const useOpencodeBase = create<OpencodeState>((set, get) => ({
                     conversation: [],
                 }
             });
+
+            //always make the first instance active
+            if (tempInstance.length > 0) {
+                tempInstance[0].isActive = true;
+            }
+            
             set({ opencodeInstances: tempInstance });
         } catch (e) {
             console.error(e);
