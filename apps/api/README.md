@@ -1,7 +1,7 @@
 # MonoTime
 
 [![npm version](https://badge.fury.io/js/monorepotime.svg)](https://badge.fury.io/js/monorepotime)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 **MonoTime** is a powerful monorepo management GUI tool that provides a modern, interactive web interface to manage, visualize, and control your monorepo workspaces. Stop wrestling with endless terminal tabs and get a clear overview of your project structure, scripts, and build tasks.
 
@@ -25,38 +25,7 @@ If you have already using Turborepo, you can install Monorepotime globally:
 ```bash
 npm install -g monorepotime
 ```
-
-OR 
-
-### Initialize in Your Project as Dev Dependency
-
-```bash
-npx monorepotime init
-```
-
-This will automatically:
-1. Add Monorepotime to your `package.json` dependencies
-2. Configure the necessary scripts
-
-Your `package.json` will be updated with:
-
-```json
-{
-  "packageManager": "npm@<your-package-manager-version>",
-  "scripts": {
-    "dev": "monorepotime"
-  },
-  "devDependencies": {
-    "monorepotime": "^<latest-version>"
-  }
-}
-```
-
 ### Running Monorepotime
-
-```bash
-npm run dev
-```
 
 Or if installed globally:
 
