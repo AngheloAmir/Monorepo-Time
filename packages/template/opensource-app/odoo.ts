@@ -130,7 +130,7 @@ const checkStatus = () => {
                 }
 
                 process.stdout.write('\\x1Bc');
-                console.log('\n==================================================');
+                console.log('\\n==================================================');
                 console.log('Odoo is running!');
                 console.log('Official Site:   https://www.odoo.com/');
                 console.log('Docker Image:    https://hub.docker.com/_/odoo');

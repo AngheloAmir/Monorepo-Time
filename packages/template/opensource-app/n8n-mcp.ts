@@ -94,11 +94,11 @@ const onRunning = (containerInfo) => {
         }));
     } catch(e) {}
 
-    console.log('\n==================================================');
+    console.log('\\n==================================================');
     console.log('n8n MCP Server Image is Ready!');
     console.log('GitHub:        https://github.com/czlonkowski/n8n-mcp');
     console.log('Docker Image:  ghcr.io/czlonkowski/n8n-mcp');
-    console.log('\n==================================================');
+    console.log('\\n==================================================');
     console.log('This MCP server runs in STDIO mode (not HTTP).');
     console.log('To use it, add this to your MCP Client config (e.g., Claude Desktop, Cursor):');
     console.log('');
@@ -121,7 +121,7 @@ const onRunning = (containerInfo) => {
     console.log('Config paths:');
     console.log('  macOS: ~/Library/Application Support/Claude/claude_desktop_config.json');
     console.log('  Linux: ~/.config/Claude/claude_desktop_config.json');
-    console.log('\n==================================================');
+    console.log('\\n==================================================');
     console.log('Usage Instructions:');
     console.log('1. Ask Claude to "Help me build an n8n workflow for..."');
     console.log('2. Claude can search nodes, get documentation, and generate workflow JSON.');
@@ -129,8 +129,8 @@ const onRunning = (containerInfo) => {
     console.log('4. Claude can also help debug workflows if you provide error logs.');
     console.log('');
     console.log('Note: This server provides knowledge about n8n nodes and templates.');
-    console.log('\n==================================================');
-    console.log('==================================================\n');
+    console.log('\\n==================================================');
+    console.log('==================================================\\n');
 };
 
 setTimeout(checkStatus, 3000);

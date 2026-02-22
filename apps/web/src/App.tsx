@@ -19,7 +19,7 @@ import Cloudflare from './components/app_contents/Cloudflare';
 import Network from './components/app_contents/Network';
 import GitPanel from './components/GitPanel';
 import Orchestrator from './components/Orchestrator';
-import useOrchestrator from './appstates/orchestrator';
+//import useOrchestrator from './appstates/orchestrator';
 import OpencodeOrchestartor from './components/opencodex';
 
 declare global {
@@ -37,7 +37,7 @@ export default function App() {
 
     const setShowAboutModal   = useAppState.use.setShowAboutModal();
     const setShowGit          = useAppState.use.setShowGit();
-    const setShowOrchestrator = useOrchestrator.use.setShowOrchestrator();
+    //const setShowOrchestrator = useOrchestrator.use.setShowOrchestrator();
 
     const [isFlashVisible, setIsFlashVisible] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -49,10 +49,10 @@ export default function App() {
                     e.preventDefault();
                     setShowGit(true);
                 }
-                if (e.key.toLowerCase() === 'd') {
-                    e.preventDefault();
-                    setShowOrchestrator(true);
-                }
+                // if (e.key.toLowerCase() === 'd') {
+                //     e.preventDefault();
+                //     setShowOrchestrator(true);
+                // }
             }
         }   
         window.addEventListener('keydown', handleKeyDown, { capture: true });
@@ -108,13 +108,13 @@ export default function App() {
                             isSelected: currentPage === 'workspace',
                             onClick: () => navAction.setCurrentPage('workspace')
                         },
-                        {
-                            name: 'open-code',
-                            label: 'Opencode',
-                            icon: 'fa fa-solid fa-terminal',
-                            isSelected: currentPage === 'open-code',
-                            onClick: () => navAction.setCurrentPage('open-code')
-                        },
+                        // {
+                        //     name: 'open-code',
+                        //     label: 'Opencode',
+                        //     icon: 'fa fa-solid fa-terminal',
+                        //     isSelected: currentPage === 'open-code',
+                        //     onClick: () => navAction.setCurrentPage('open-code')
+                        // },
                         {
                             name: 'turborepo',
                             label: 'Turborepo',

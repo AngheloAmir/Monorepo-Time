@@ -1,11 +1,11 @@
 import useAppState from "../appstates/app";
 import Logo from "./Logo";
-import useOrchestrator from "../appstates/orchestrator";
+//import useOrchestrator from "../appstates/orchestrator";
 
 export default function Header() {
     const setShowAboutModal = useAppState.use.setShowAboutModal();
     const setShowGit = useAppState.use.setShowGit();
-    const setShowOrchestrator = useOrchestrator.use.setShowOrchestrator();
+    //const setShowOrchestrator = useOrchestrator.use.setShowOrchestrator();
 
     return (
         <header className="h-7 w-full px-6 py-2 sticky top-0">
@@ -34,7 +34,7 @@ export default function Header() {
                         </span>
                     </button>
 
-                     <button
+                     {/* <button
                         onClick={() => setShowOrchestrator(true)}
                         className="flex items-center gap-2 px-2 rounded text-gray-300 hover:text-white hover:bg-white/10 transition-all group"
                     >
@@ -43,7 +43,7 @@ export default function Header() {
                             <span className="font-bold text-white"> Ctrl + D </span> 
                             Agent Orchestrator
                         </span>
-                    </button>
+                    </button> */}
 
                     <button
                         onClick={() => setShowAboutModal(true)}

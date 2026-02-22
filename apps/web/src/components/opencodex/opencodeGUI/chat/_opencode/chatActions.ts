@@ -191,23 +191,7 @@ export function createChatActions(set: SetState, get: GetState) {
                 set({ isStreaming: false });
                 return;
             }
-
-            // ── 4. Wait for SSE to signal completion ─────────────────
-            // Timeout after 5 minutes to prevent infinite hang
-            const timeout = new Promise<void>((resolve) => {
-                setTimeout(() => {
-                    if (!resolved) {
-                        console.warn('[opencode] Chat timed out after 5 minutes');
-                        sseCleanup.current?.();
-                        resolved = true;
-                    }
-                    resolve();
-                }, 5 * 60 * 1000);
-            });
-
-            await Promise.race([ssePromise, timeout]);
-
-            // Refresh messages after chat completes
+            await Promise.race([ssePromise]);
             if (sessionId) {
                 await get().fetchMessages(sessionId);
             }

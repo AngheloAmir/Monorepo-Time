@@ -135,7 +135,7 @@ const checkStatus = () => {
              console.log('==================================================');
              console.log(\`Web UI:         http://localhost:\${port}\`);
              console.log(\`API:            http://localhost:\${port}/api\`);
-             console.log('\n==================================================');
+             console.log('\\n==================================================');
              console.log('First Time Setup:');
              console.log('   Create account on first visit');
              console.log('Note: If it takes too much time to load or error, refresh the page');
