@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+export const indexHtmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -159,7 +159,7 @@
                     if (done) break;
 
                     buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n');
+                    const lines = buffer.split('\\n');
                     buffer = lines.pop(); // Keep the last incomplete part
 
                     for (const line of lines) {
@@ -205,14 +205,14 @@
 
         function appendMessage(role, text) {
             const div = document.createElement('div');
-            div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`;
+            div.className = \`flex \${role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up\`;
             
             const bubble = document.createElement('div');
-            bubble.className = `max-w-[80%] rounded-2xl p-4 shadow-sm ${
+            bubble.className = \`max-w-[80%] rounded-2xl p-4 shadow-sm \${
                 role === 'user' 
                     ? 'bg-blue-600 text-white rounded-br-none' 
                     : 'bg-gray-800 border border-gray-700 text-gray-200 rounded-bl-none'
-            }`;
+            }\`;
 
             const content = document.createElement('div');
             content.className = 'message-content whitespace-pre-wrap leading-relaxed';
@@ -232,7 +232,7 @@
 
         // Add some simple animation keyframes
         const style = document.createElement('style');
-        style.innerHTML = `
+        style.innerHTML = \`
             @keyframes fadeInUp {
                 from { opacity: 0; transform: translateY(10px); }
                 to { opacity: 1; transform: translateY(0); }
@@ -240,9 +240,9 @@
             .animate-fade-in-up {
                 animation: fadeInUp 0.3s ease-out forwards;
             }
-        `;
+        \`;
         document.head.appendChild(style);
 
     </script>
 </body>
-</html>
+</html>`;

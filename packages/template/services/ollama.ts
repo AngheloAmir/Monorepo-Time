@@ -2,13 +2,7 @@ import type { ProjectTemplate } from "../../types";
 import { scriptContentQwen, scriptContentPhi3 } from "./ollama/scripts";
 import { serverJs } from "./ollama/server";
 import { gitignoreContent } from "./ollama/gitignore";
-import fs from 'fs';
-import path from 'path';
-
-// Read the index.html content directly - we assume the file exists relative to this source file
-// Note: In a built environment, we'd need to ensure this asset is copied or inline it.
-// For this dev environment, reading it is fine. 
-const indexHtmlContent = fs.readFileSync(path.join(__dirname, 'ollama', 'index.html'), 'utf-8');
+import { indexHtmlContent } from "./ollama/index_html";
 
 const dockerComposeContent = `
 services:
