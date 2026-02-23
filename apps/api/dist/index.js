@@ -83817,6 +83817,23 @@ route.get("/", async (req, res) => {
     } else {
       projects = await scanRecursively();
     }
+    const toolsFolder = import_path3.default.join(ROOT, "tools");
+    if (await import_fs_extra2.default.pathExists(toolsFolder)) {
+      const toolsDirs = await (0, import_fast_glob.default)(["tools/*/"], {
+        cwd: ROOT,
+        onlyDirectories: true,
+        absolute: true,
+        ignore: IGNORE
+      });
+      for (const dir of toolsDirs) {
+        if (await isRunnableProject(dir)) {
+          const absoluteDir = import_path3.default.resolve(dir);
+          if (!projects.find((p) => p.path === absoluteDir)) {
+            projects.push({ path: absoluteDir, workspace: "tools" });
+          }
+        }
+      }
+    }
     const opensourceFolder = import_path3.default.join(ROOT, "opensource");
     if (await import_fs_extra2.default.pathExists(opensourceFolder)) {
       const opensourceDirs = await (0, import_fast_glob.default)(["opensource/*/"], {

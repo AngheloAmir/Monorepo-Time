@@ -173,7 +173,26 @@ route.get("/", async (req: Request, res: Response) => {
       projects = await scanRecursively();
     }
 
-    // Explicitly scan 'root/opensource' directory if it exists
+    // Explicitly scan 'root/tools' directory if it exists
+    const toolsFolder = path.join(ROOT, "tools");
+    if (await fs.pathExists(toolsFolder)) {
+      const toolsDirs = await fg(["tools/*/"], {
+        cwd: ROOT,
+        onlyDirectories: true,
+        absolute: true,
+        ignore: IGNORE,
+      });
+
+      for (const dir of toolsDirs) {
+        if (await isRunnableProject(dir)) {
+          const absoluteDir = path.resolve(dir);
+          if (!projects.find(p => p.path === absoluteDir)) {
+            projects.push({ path: absoluteDir, workspace: "tools" });
+          }
+        }
+      }
+    }
+
     const opensourceFolder = path.join(ROOT, "opensource");
     if (await fs.pathExists(opensourceFolder)) {
       const opensourceDirs = await fg(["opensource/*/"], {
