@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useAppState from "../../../appstates/app";
 import useProjectState, { type ProjectTree, type Folder as FolderType, type File as FileType } from "../../../appstates/docsBrowser";
+import useDocsState from "../../../appstates/docs";
 import FileIcon from "./_fileIcon";
 import EditDropdown from "./EditDropdown";
 import Button3Mini from "../../ui/Button3Mini";
@@ -12,7 +13,6 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
     const path = isFolder ? (item as FolderType).path : (item as FileType).path;
     const isOpen = useProjectState(state => state.openFolders[path] || false);
     const toggleFolder = useProjectState.use.toggleFolder();
-    const openFileEditor = useProjectState.use.openFileEditor();
     const isEditable = useProjectState.use.isEditable();
 
     const loadFile        = useProjectState.use.loadFile();
@@ -122,7 +122,7 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     e.preventDefault();
                     const filePath = file.path.replace('@', '');
                     if (!isEditable(filePath)) return;
-                    openFileEditor(filePath);
+                    useDocsState.getState().openTab(filePath);
                 }}
             >
                 <div className="w-4" />

@@ -1,19 +1,111 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
+import useProjectState from './docsBrowser';
+
+export interface DocTab {
+    path: string;
+    title: string;
+    content: string;
+    originalContent: string;
+    type: string;
+}
 
 interface DocsContext {
     sidebarWidth: number;
     setSidebarWidth: (width: number) => void;
-    sample: () => Promise<void>;
+    
+    tabs: DocTab[];
+    activeTabPath: string | null;
+    
+    openTab: (path: string) => Promise<void>;
+    closeTab: (path: string) => void;
+    setActiveTab: (path: string) => void;
+    updateTabContent: (path: string, content: string) => void;
+    saveTab: (path: string) => Promise<void>;
+    isDirty: (path: string) => boolean;
 }
 
-const docsState = create<DocsContext>()((set) => ({
+const docsState = create<DocsContext>()((set, get) => ({
     sidebarWidth: 300,
     setSidebarWidth: (width: number) => set({ sidebarWidth: width }),
-    sample: async () => {
-        // Sample implementation
+    
+    tabs: [],
+    activeTabPath: null,
+
+    openTab: async (path: string) => {
+        const { tabs } = get();
+        const existingTab = tabs.find(t => t.path === path);
+        
+        if (existingTab) {
+            set({ activeTabPath: path });
+            return;
+        }
+
+        // Load file content
+        const projectState = useProjectState.getState();
+        const content = await projectState.loadFile(path);
+        const fileName = path.split('/').pop() || "";
+        const fileType = path.split('.').pop() || "";
+
+        const newTab: DocTab = {
+            path,
+            title: fileName,
+            content: typeof content === 'string' ? content : "",
+            originalContent: typeof content === 'string' ? content : "",
+            type: fileType
+        };
+
+        set({
+            tabs: [...tabs, newTab],
+            activeTabPath: path
+        });
     },
+
+    closeTab: (path: string) => {
+        const { tabs, activeTabPath } = get();
+        const newTabs = tabs.filter(t => t.path !== path);
+        let newActivePath = activeTabPath;
+
+        if (activeTabPath === path) {
+            newActivePath = newTabs.length > 0 ? newTabs[newTabs.length - 1].path : null;
+        }
+
+        set({
+            tabs: newTabs,
+            activeTabPath: newActivePath
+        });
+    },
+
+    setActiveTab: (path: string) => set({ activeTabPath: path }),
+
+    updateTabContent: (path: string, content: string) => {
+        const { tabs } = get();
+        const newTabs = tabs.map(t => t.path === path ? { ...t, content } : t);
+        set({ tabs: newTabs });
+    },
+
+    saveTab: async (path: string) => {
+        const { tabs } = get();
+        const tab = tabs.find(t => t.path === path);
+        if (!tab) return;
+
+        const projectState = useProjectState.getState();
+        await projectState.saveFile(path, tab.content);
+        
+        const newTabs = tabs.map(t => t.path === path ? { ...t, originalContent: t.content } : t);
+        set({ tabs: newTabs });
+        
+        // Also reload project tree to show colors if needed
+        projectState.loadProjectTree();
+    },
+
+    isDirty: (path: string) => {
+        const { tabs } = get();
+        const tab = tabs.find(t => t.path === path);
+        return tab ? tab.content !== tab.originalContent : false;
+    }
 }));
 
 const useDocsState = createSelectors(docsState);
 export default useDocsState;
+export type { DocsContext };

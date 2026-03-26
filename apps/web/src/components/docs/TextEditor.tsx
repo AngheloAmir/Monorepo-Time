@@ -1,140 +1,156 @@
 import { useEffect, useState } from "react";
-import useProjectState from "../../appstates/docsBrowser";
-import Button3 from "../ui/Button3";
+import useDocsState, { type DocTab } from "../../appstates/docs";
 import CustomAceEditor from "../lib/CustomAceEditor";
-
-interface DiffMarkers { 
-    added: number[];
-    modified: number[];
-}
+import useProjectState from "../../appstates/docsBrowser";
 
 export default function TextEditor() {
-    const isFileEditorOpen = useProjectState.use.isFileEditorOpen();
-    const currentFile      = useProjectState.use.currentFile();
-    const currentFilePath  = useProjectState.use.currentFilePath();
-    const curentFileType   = useProjectState.use.curentFileType();
-    const loadProjectTree = useProjectState.use.loadProjectTree();
-    const closeFileEditor  = useProjectState.use.closeFileEditor();
-    const loadFile         = useProjectState.use.loadFile();
-    const saveFile         = useProjectState.use.saveFile();
-    const getFileDiff      = useProjectState.use.getFileDiff();
-    const [textContent, setTextContent] = useState('');
-    const [diffMarkers, setDiffMarkers] = useState<DiffMarkers | undefined>(undefined);
-    const [selectedLines, setSelectedLines] = useState<{ start: number; end: number } | undefined>(undefined);
+    const tabs = useDocsState.use.tabs();
+    const activeTabPath = useDocsState.use.activeTabPath();
+    const setActiveTab = useDocsState.use.setActiveTab();
+    const closeTab = useDocsState.use.closeTab();
+    const updateTabContent = useDocsState.use.updateTabContent();
+    const saveTab = useDocsState.use.saveTab();
+    const isDirty = useDocsState.use.isDirty();
+    const getFileDiff = useProjectState.use.getFileDiff();
 
+    // Global Ctrl+S handler
     useEffect(() => {
-        if(isFileEditorOpen && currentFilePath) {
-            // Load file content
-            loadFile(currentFilePath).then((content) => {
-                setTextContent(typeof content === 'string' ? content : "");
-            });
-            
-            // Load git diff markers
-            getFileDiff(currentFilePath).then((diff) => {
-                if (diff && (diff.added?.length > 0 || diff.modified?.length > 0)) {
-                    setDiffMarkers({
-                        added: diff.added || [],
-                        modified: diff.modified || []
-                    });
-                } else {
-                    setDiffMarkers(undefined);
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                if (activeTabPath) {
+                    e.preventDefault();
+                    saveTab(activeTabPath);
                 }
-            });
-        } else {
-            // Reset when editor closes
-            setDiffMarkers(undefined);
-        }
-    }, [isFileEditorOpen, currentFilePath]);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [activeTabPath, saveTab]);
 
-    if (!isFileEditorOpen) {
+    if (tabs.length === 0) {
         return (
-            <div className="flex-1 flex items-center justify-center text-white/20 italic">
+            <div className="flex-1 flex items-center justify-center text-white/20 italic bg-gray-900/40 rounded">
                 Select a file to edit
             </div>
         );
     }
 
     return (
-        <div className="flex-1 flex flex-col h-full min-h-0 bg-gray-900/40 rounded overflow-hidden p-2">
-            <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                    <i className="fa-solid fa-file-code text-blue-400"></i>
-                    <span className="text-white font-medium">{currentFile}</span>
-                    <span className="text-xs text-white/40 truncate max-w-[300px]">{currentFilePath}</span>
-                </div>
-                <div className="flex gap-2">
-                    <Button3 
-                        className="!w-24 !h-8"
-                        onClick={() => {
-                            if (!currentFilePath) return;
-                            saveFile(currentFilePath, textContent);
-                            loadProjectTree();
-                        }}
-                        text="Save"
-                        icon="fa-solid fa-floppy-disk"
-                    />
-                    <button 
-                        onClick={() => closeFileEditor()}
-                        className="text-white/40 hover:text-white"
+        <div className="flex-1 flex flex-col h-full min-h-0 bg-gray-900/40 rounded overflow-hidden">
+            {/* Tabs Bar */}
+            <div className="flex bg-black/20 overflow-x-auto no-scrollbar border-b border-white/5">
+                {tabs.map((tab) => (
+                    <div
+                        key={tab.path}
+                        className={`
+                            group flex items-center gap-2 px-3 py-2 cursor-pointer border-r border-white/5 select-none transition-colors
+                            ${activeTabPath === tab.path ? 'bg-white/10 text-white border-b border-b-blue-500' : 'text-white/40 hover:bg-white/5 hover:text-white/60'}
+                        `}
+                        onClick={() => setActiveTab(tab.path)}
                     >
-                        <i className="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div className="flex-1 text-md h-full min-h-0 relative">
-                <CustomAceEditor
-                    value={textContent}
-                    transparent={true}
-                    mode={
-                        curentFileType === 'js' || curentFileType === 'jsx' ? 'javascript' : 
-                        curentFileType === 'ts' || curentFileType === 'tsx' ? 'typescript' : 
-                        curentFileType === 'md' ? 'markdown' :
-                        'json'
-                    }
-                    height="100%"
-                    width="100%"
-                    onChange={(value) => {
-                        setTextContent(value);
-                    }}
-                    diffMarkers={diffMarkers}
-                    onSave={() => {
-                        if (!currentFilePath) return;
-                        saveFile(currentFilePath, textContent);
-                        loadProjectTree();
-                    }}
-                    rightClickMenu={(_line :any, _column :any, _selectedText :any, selection :any) => {
-                        if (selection) {
-                            setSelectedLines({
-                                start: selection.startLine,
-                                end:   selection.endLine
-                            });
-                        }
-                    }}
-                    contextMenuComponent={
-                        <div className="bg-gray-800 w-[200px] p-2 rounded-md border border-white/10 shadow-xl">
-                            <button className="flex gap-2 w-full text-left p-2 rounded-md hover:bg-white/10 text-white"
-                                onClick={() => {
-                                    if (!currentFilePath) return;
-                                    const event = new CustomEvent('opencode:terminal:type', {
-                                        detail: "@" + 
-                                                currentFilePath + 
-                                                " Lines: " + 
-                                                selectedLines?.start + 
-                                                " - " + 
-                                                selectedLines?.end
-                                                + "\n"
-                                    });
-                                    window.dispatchEvent(event);
+                        <i className={`fa-solid fa-file-code text-xs ${activeTabPath === tab.path ? 'text-blue-400' : 'text-white/20'}`}></i>
+                        <span className="text-xs truncate max-w-[150px]">{tab.title}</span>
+                        
+                        <div className="flex items-center justify-center w-4 h-4">
+                            {isDirty(tab.path) ? (
+                                <div className="w-2 h-2 bg-white rounded-full group-hover:hidden"></div>
+                            ) : null}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    closeTab(tab.path);
                                 }}
+                                className={`text-[10px] hover:bg-white/20 rounded h-4 w-4 flex items-center justify-center ${isDirty(tab.path) ? 'hidden group-hover:flex' : 'flex'}`}
                             >
-                                <i className="fa-solid fa-code text-blue-400"></i>
-                                <span className="text-sm">Chat About This</span>
+                                <i className="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                    }
-                />
+                    </div>
+                ))}
+            </div>
+
+            {/* Editor Area */}
+            <div className="flex-1 relative">
+                {tabs.map((tab) => (
+                    <div
+                        key={tab.path}
+                        className={`absolute inset-0 ${activeTabPath === tab.path ? 'block' : 'hidden'}`}
+                    >
+                        <TabEditor 
+                            tab={tab} 
+                            updateTabContent={updateTabContent} 
+                            saveTab={saveTab}
+                            getFileDiff={getFileDiff}
+                        />
+                    </div>
+                ))}
             </div>
         </div>
+    );
+}
+
+function TabEditor({ tab, updateTabContent, saveTab, getFileDiff }: { 
+    tab: DocTab, 
+    updateTabContent: (path: string, content: string) => void,
+    saveTab: (path: string) => Promise<void>,
+    getFileDiff: (path: string) => Promise<any>
+}) {
+    const [diffMarkers, setDiffMarkers] = useState<any>(undefined);
+
+    useEffect(() => {
+        getFileDiff(tab.path).then((diff) => {
+            if (diff && (diff.added?.length > 0 || diff.modified?.length > 0)) {
+                setDiffMarkers({
+                    added: diff.added || [],
+                    modified: diff.modified || []
+                });
+            } else {
+                setDiffMarkers(undefined);
+            }
+        });
+    }, [tab.path, getFileDiff]);
+
+    return (
+        <CustomAceEditor
+            value={tab.content}
+            transparent={true}
+            mode={
+                tab.type === 'js' || tab.type === 'jsx' ? 'javascript' : 
+                tab.type === 'ts' || tab.type === 'tsx' ? 'typescript' : 
+                tab.type === 'md' ? 'markdown' :
+                'json'
+            }
+            height="100%"
+            width="100%"
+            onChange={(value) => {
+                updateTabContent(tab.path, value);
+            }}
+            diffMarkers={diffMarkers}
+            onSave={() => {
+                saveTab(tab.path);
+            }}
+            rightClickMenu={(_line: any, _column: any, _selectedText: any, selection: any) => {
+                if (selection) {
+                    const event = new CustomEvent('opencode:terminal:type', {
+                        detail: "@" + 
+                                tab.path + 
+                                " Lines: " + 
+                                selection.startLine + 
+                                " - " + 
+                                selection.endLine
+                                + "\n"
+                    });
+                    window.dispatchEvent(event);
+                }
+            }}
+            contextMenuComponent={
+                <div className="bg-gray-800 w-[200px] p-2 rounded-md border border-white/10 shadow-xl">
+                    <button className="flex gap-2 w-full text-left p-2 rounded-md hover:bg-white/10 text-white">
+                        <i className="fa-solid fa-code text-blue-400"></i>
+                        <span className="text-sm italic">Context Menu Actions</span>
+                    </button>
+                </div>
+            }
+        />
     );
 }
