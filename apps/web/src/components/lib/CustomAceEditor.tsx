@@ -28,6 +28,10 @@ interface Props {
     wrapperClassName?: string;
     transparent?: boolean;
     lineHighlights?: Record<number, string>;
+    diffMarkers?: {
+        added: number[];
+        modified: number[];
+    };
 
     onSave?: () => void;
     rightClickMenu?: (line: number, column: number, selectedText: string, selection?: { startLine: number; endLine: number }) => void;
@@ -46,6 +50,7 @@ export default function CustomAceEditor({
     wrapperClassName,
     transparent = false,
     lineHighlights,
+    diffMarkers,
 
     onSave,
     rightClickMenu,
@@ -70,9 +75,9 @@ export default function CustomAceEditor({
         return () => document.removeEventListener("mousedown", handleClick);
     }, []);
 
-    // Apply custom line highlights when they change
+    // Apply custom line highlights and diff markers when they change
     useEffect(() => {
-        if (!editorRef.current || !lineHighlights) return;
+        if (!editorRef.current) return;
 
         const editor = editorRef.current.editor;
         const session = editor.getSession();
@@ -83,21 +88,39 @@ export default function CustomAceEditor({
         });
         markerIdsRef.current = [];
 
-        // Add markers for each highlighted line
-        Object.entries(lineHighlights).forEach(([lineStr, color]) => {
-            const lineNumber = parseInt(lineStr, 10);
-            const Range = ace.require("ace/range").Range;
-            const range = new Range(lineNumber - 1, 0, lineNumber - 1, 1);
-            
-            let markerClass = "ace-highlight-none";
-            if (color === "green") markerClass = "ace-highlight-green";
-            else if (color === "orange") markerClass = "ace-highlight-orange";
-            else if (color === "yellow") markerClass = "ace-highlight-yellow";
+        const Range = ace.require("ace/range").Range;
 
-            const markerId = session.addMarker(range, markerClass, "fullLine", true);
-            markerIdsRef.current.push(markerId);
-        });
-    }, [lineHighlights]);
+        // Add markers for line highlights
+        if (lineHighlights) {
+            Object.entries(lineHighlights).forEach(([lineStr, color]) => {
+                const lineNumber = parseInt(lineStr, 10);
+                const range = new Range(lineNumber - 1, 0, lineNumber - 1, 1);
+                
+                let markerClass = "ace-highlight-none";
+                if (color === "green") markerClass = "ace-highlight-green";
+                else if (color === "orange") markerClass = "ace-highlight-orange";
+                else if (color === "yellow") markerClass = "ace-highlight-yellow";
+
+                const markerId = session.addMarker(range, markerClass, "fullLine", true);
+                markerIdsRef.current.push(markerId);
+            });
+        }
+
+        // Add markers for diff markers
+        if (diffMarkers) {
+            diffMarkers.added?.forEach(lineNumber => {
+                const range = new Range(lineNumber - 1, 0, lineNumber - 1, 1);
+                const markerId = session.addMarker(range, "ace-highlight-green", "fullLine", true);
+                markerIdsRef.current.push(markerId);
+            });
+
+            diffMarkers.modified?.forEach(lineNumber => {
+                const range = new Range(lineNumber - 1, 0, lineNumber - 1, 1);
+                const markerId = session.addMarker(range, "ace-highlight-orange", "fullLine", true);
+                markerIdsRef.current.push(markerId);
+            });
+        }
+    }, [lineHighlights, diffMarkers]);
 
 
     // Handle Right Click Menu

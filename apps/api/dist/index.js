@@ -85115,7 +85115,6 @@ router14.post("/branch/merge", async (req, res) => {
   }
 });
 router14.post("/push", async (req, res) => {
-  var _a2, _b2;
   try {
     const { message } = req.body;
     if (!message) {
@@ -85124,31 +85123,21 @@ router14.post("/push", async (req, res) => {
     }
     await cleanStaleLocks();
     try {
-      await runGit(["config", "user.name", "angheloamir"]);
-      await runGit(["config", "user.email", "angheloamir@gmail.com"]);
-      try {
-        await runGit(["add", "."]);
-        await runGit(["commit", "-m", message]);
-      } catch (e) {
-        if (!(((_a2 = e.stdout) == null ? void 0 : _a2.includes("nothing to commit")) || ((_b2 = e.message) == null ? void 0 : _b2.includes("nothing to commit")))) {
-          throw e;
-        }
-      }
-      await runGit(["commit", "--amend", "--no-edit", "--reset-author"]);
-      const currentBranch = await runGit(["rev-parse", "--abbrev-ref", "HEAD"]);
-      await runGit(["push", "dev", currentBranch, "--force"]);
-      await runGit(["config", "user.name", "Clean and Seal"]);
-      await runGit(["config", "user.email", "cleanandsealdp@gmail.com"]);
-      await runGit(["commit", "--amend", "--no-edit", "--reset-author"]);
-      res.json({ success: true });
-    } finally {
-      try {
-        await runGit(["config", "user.name", "Clean and Seal"]);
-        await runGit(["config", "user.email", "cleanandsealdp@gmail.com"]);
-      } catch (configError) {
-        console.error("Failed to restore git identity:", configError);
+      await runGit(["add", "."]);
+      await runGit(["commit", "-m", message]);
+    } catch (e) {
+      if (e.stdout && e.stdout.includes("nothing to commit")) {
+      } else if (e.message && e.message.includes("nothing to commit")) {
+      } else {
+        throw e;
       }
     }
+    await runGit(["push"]);
+    try {
+      await runGit(["stash", "clear"]);
+    } catch {
+    }
+    res.json({ success: true });
   } catch (error) {
     console.error("Git Push Error:", error);
     res.status(500).json({ error: error.message });
@@ -97639,7 +97628,8 @@ var DEFAULT_IGNORES2 = [
   "**/dist",
   "**/out",
   "**/build",
-  "**/coverage"
+  "**/coverage",
+  "**/*.mtmeta.json"
 ];
 router23.get("/", async (req, res) => {
   try {
@@ -97832,8 +97822,22 @@ router24.post("/get", async (req, res) => {
       res.status(400).json({ error: "Path is not a file" });
       return;
     }
-    const content = await import_fs_extra23.default.readFile(filePath, "utf-8");
-    res.json({ content });
+    const textExtensions = ["txt", "md", "js", "jsx", "ts", "tsx", "json", "css", "html", "yml", "yaml", "xml"];
+    const ext = import_path30.default.extname(filePath).slice(1).toLowerCase();
+    let content = null;
+    if (textExtensions.includes(ext) || !ext) {
+      content = await import_fs_extra23.default.readFile(filePath, "utf-8");
+    }
+    let metadata = {};
+    const metaPath = filePath + ".mtmeta.json";
+    if (await import_fs_extra23.default.pathExists(metaPath)) {
+      try {
+        metadata = await import_fs_extra23.default.readJson(metaPath);
+      } catch (e) {
+        console.warn("Failed to read metadata file:", metaPath);
+      }
+    }
+    res.json({ content, metadata });
   } catch (error) {
     console.error("Error reading file:", error);
     res.status(500).json({ error: "Failed to read file", details: error.message });
@@ -97841,7 +97845,7 @@ router24.post("/get", async (req, res) => {
 });
 router24.post("/set", async (req, res) => {
   try {
-    let { path: filePath, content } = req.body;
+    let { path: filePath, content, metadata } = req.body;
     if (!filePath) {
       res.status(400).json({ error: "File path is required" });
       return;
@@ -97852,6 +97856,10 @@ router24.post("/set", async (req, res) => {
       return;
     }
     await import_fs_extra23.default.outputFile(filePath, content);
+    if (metadata) {
+      const metaPath = filePath + ".mtmeta.json";
+      await import_fs_extra23.default.outputJson(metaPath, metadata);
+    }
     res.json({ success: true, message: "File saved successfully" });
   } catch (error) {
     console.error("Error writing file:", error);
@@ -98024,6 +98032,27 @@ router24.post("/diff", async (req, res) => {
   } catch (error) {
     console.error("Error getting diff:", error);
     res.status(500).json({ error: "Failed to get diff", details: error.message });
+  }
+});
+router24.post("/open-external", async (req, res) => {
+  try {
+    let { path: itemPath } = req.body;
+    if (!itemPath) {
+      res.status(400).json({ error: "Path is required" });
+      return;
+    }
+    itemPath = resolvePath(itemPath);
+    if (!await import_fs_extra23.default.pathExists(itemPath)) {
+      res.status(404).json({ error: "Path not found" });
+      return;
+    }
+    const command2 = process.platform === "linux" ? "xdg-open" : process.platform === "win32" ? "start" : "open";
+    console.log(`Opening external: ${command2} ${itemPath}`);
+    await execa(command2, [itemPath]);
+    res.json({ success: true, message: "File opened externally" });
+  } catch (error) {
+    console.error("Error opening external:", error);
+    res.status(500).json({ error: "Failed to open file externally", details: error.message });
   }
 });
 var textEditor_default = router24;
@@ -98364,6 +98393,8 @@ function SETROUTES(app3, frontendPath2) {
   app3.use("/" + api_default.scanProject, projectBrowser_default);
   app3.use("/" + api_default.scanDocs, docsBrowser_default);
   app3.use("/" + api_default.textEditor, textEditor_default);
+  const docsRoot = import_path33.default.join(ROOT3, "docs");
+  app3.use("/docs-static", import_express33.default.static(docsRoot));
   app3.use(import_express33.default.static(frontendPath2));
   app3.get(/(.*)/, (req, res) => {
     res.sendFile(import_path33.default.join(frontendPath2, "index.html"));

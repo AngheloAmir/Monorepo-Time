@@ -84,7 +84,6 @@ export default function SETROUTES(app: Express, frontendPath: string) {
 
     // Serve documentation folder statically
     const docsRoot = path.join(ROOT, 'docs');
-    console.log(`Serving docs statically from: ${docsRoot}`);
     app.use("/docs-static", express.static(docsRoot));
 
 
