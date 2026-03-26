@@ -8,7 +8,7 @@ import Workspace from './components/app_contents/Workspace';
 import Modal from './modal';
 import RootTerminal from './components/workspace/RootTerminal';
 import useAppState from './appstates/app';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Flash from './components/app_contents/Flash';
 import Loading from './components/app_contents/_Loading';
 import Turborepo from './components/app_contents/Turborepo';
@@ -42,9 +42,15 @@ export default function App() {
 
     const [isFlashVisible, setIsFlashVisible] = useState(false);
     const [loading, setLoading] = useState(true);
+    
+    const currentPageRef = useRef<any>(null);
+    useEffect(() => {
+        currentPageRef.current = currentPage;
+    }, [currentPage]);
 
     useEffect(() => {   
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (currentPageRef.current === 'docs') return;
             if ((e.ctrlKey || e.metaKey)) {
                 if (e.key.toLowerCase() === 's') {
                     e.preventDefault();
