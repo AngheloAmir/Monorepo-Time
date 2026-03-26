@@ -69,3 +69,4 @@ asdasdasdasdasdaasd
 curl -s "http://localhost:4096/config?directory=$PWD" | jq '.model'
 
 Note: The token usage percentage is simulated (random). To get real token usage, you would need to fetch session stats from the API after each message.
+

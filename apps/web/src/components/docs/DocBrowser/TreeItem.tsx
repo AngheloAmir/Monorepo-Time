@@ -14,9 +14,6 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
     const isOpen = useProjectState(state => state.openFolders[path] || false);
     const toggleFolder = useProjectState.use.toggleFolder();
     const isEditable = useProjectState.use.isEditable();
-
-    const loadFile        = useProjectState.use.loadFile();
-    const [textContent, setTextContent] = useState<string | null>(null);
     
     const setSelectedPath = useProjectState.use.setSelectedPath();
     const selectedPath    = useProjectState(state => state.selectedPath);
@@ -25,17 +22,9 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
     const name = isFolder ? (item as FolderType).folder : (item as FileType).file;
     const color = item.color;
 
-    const isPasteProjecTextEnable = useProjectState.use.isPasteProjecTextEnable();
-
     const textColor = color === 'yellow' ?
         'text-yellow-400' : color === 'green' ?
             'text-green-400' : 'text-white/70';
-
-    function preLoadTextContent( filepath: string ) {
-        loadFile(filepath).then((data) => {
-            setTextContent(data);
-        });
-    }
 
     if (isFolder) {
         const folder = item as FolderType;
@@ -101,28 +90,16 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                 style={{ paddingLeft: `${paddingLeft}px` }}
                 draggable
                 onDragStart={(e) => {
-                    if(!isPasteProjecTextEnable) {
-                        e.dataTransfer.setData("text/plain", `@${file.path} \n`);
-                        e.dataTransfer.effectAllowed = "copy";
-                    }
-                    else {
-                        e.dataTransfer.setData("text/plain", `${file.path}\n${textContent}\n\n` );
-                        e.dataTransfer.effectAllowed = "copy";
-                    }   
+                    e.dataTransfer.setData("text/plain", `@${file.path} \n`);
+                    e.dataTransfer.effectAllowed = "copy";
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
                     setSelectedPath(file.path);
-                    if(isPasteProjecTextEnable) 
-                        preLoadTextContent(file.path);
-                    else 
-                        setTextContent("");
-                }}
-                onDoubleClick={(e) => {
-                    e.preventDefault();
                     const filePath = file.path.replace('@', '');
-                    if (!isEditable(filePath)) return;
-                    useDocsState.getState().openTab(filePath);
+                    if (isEditable(filePath)) {
+                        useDocsState.getState().openTab(filePath);
+                    }
                 }}
             >
                 <div className="w-4" />
@@ -152,5 +129,3 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
         );
     }
 };
-
-

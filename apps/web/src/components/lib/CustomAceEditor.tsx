@@ -218,7 +218,7 @@ export default function CustomAceEditor({
                     tabSize: 2,
                     useWorker: false,
                     fontFamily: "monospace",
-                    fontSize: 14,
+                    fontSize: 16,
                     highlightActiveLine: focused,
                 }}
                 height={height}

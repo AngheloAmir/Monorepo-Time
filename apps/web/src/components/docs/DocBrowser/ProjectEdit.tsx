@@ -11,9 +11,6 @@ export default function ProjectEdit() {
     const createNewFile = useProjectState.use.createNewFile();
     const getParentPath = useProjectState.use.getParentPath();
 
-    const isPasteProjecTextEnable    = useProjectState.use.isPasteProjecTextEnable();
-    const setIsPasteProjecTextEnable = useProjectState.use.setIsPasteProjecTextEnable();
-
     async function onFolder() {
         showModal("prompt", "New Folder", `Create a new folder at ${selectedFolder}`, "success", async (newName: any) => {
             if (newName) {
@@ -43,7 +40,6 @@ export default function ProjectEdit() {
             </div>
 
             <div className='flex flex-end gap-2'>
-
                 <Button3Mini
                     onClick={onFile}
                     title="New File"
@@ -55,22 +51,7 @@ export default function ProjectEdit() {
                     title="New Folder"
                     icon="fas fa-folder text-xs"
                 />
-
-                <Button3Mini
-                    onClick={() => setIsPasteProjecTextEnable(!isPasteProjecTextEnable)}
-                    title={
-                        isPasteProjecTextEnable ? 
-                            "Will Paste Project Text" :
-                            "Paste @<path>"
-                    }
-                    icon="fas fa-paste text-xs"
-                    className={isPasteProjecTextEnable ? 
-                        "bg-red-600" :
-                        ""
-                    }
-                />
             </div>
-
         </div>
     );
 }
