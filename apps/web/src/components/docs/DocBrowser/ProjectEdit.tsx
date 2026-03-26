@@ -1,6 +1,4 @@
-import useGitStash from "../../../appstates/gitstash";
 import useProjectState from "../../../appstates/docsBrowser";
-import useAppState from "../../../appstates/app";
 import useModal from "../../../modal/modals";
 import Button3Mini from "../../ui/Button3Mini";
 
@@ -12,7 +10,6 @@ export default function ProjectEdit() {
     const createNewFolder = useProjectState.use.createNewFolder();
     const createNewFile = useProjectState.use.createNewFile();
     const getParentPath = useProjectState.use.getParentPath();
-    const stashCount    = useGitStash.use.stashCount();
 
     const isPasteProjecTextEnable    = useProjectState.use.isPasteProjecTextEnable();
     const setIsPasteProjecTextEnable = useProjectState.use.setIsPasteProjecTextEnable();
@@ -46,18 +43,6 @@ export default function ProjectEdit() {
             </div>
 
             <div className='flex flex-end gap-2'>
-                <div className="relative">
-                    <Button3Mini
-                        onClick={() => useAppState.use.setShowGit()(true)}
-                        title="Git Stash"
-                        icon="fa-solid fa-clock-rotate-left text-xs"
-                    />
-                    {stashCount > 0 && (
-                        <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-red-500/30 pointer-events-none">
-                            {stashCount}
-                        </span>
-                    )}
-                </div>
 
                 <Button3Mini
                     onClick={onFile}

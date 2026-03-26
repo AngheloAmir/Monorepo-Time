@@ -5,7 +5,6 @@ import useProjectState from "../../../appstates/docsBrowser";
 import ProjectEdit from './ProjectEdit';
 // import FileEditor from './FileEditor'; 
 import useAppState from "../../../appstates/app";
-import useGitStash from "../../../appstates/gitstash";
 
 interface DocBrowserProps {
     className?: string;
@@ -15,7 +14,6 @@ interface DocBrowserProps {
 export default function DocBrowser(props: DocBrowserProps) {
     const projectTree      = useProjectState.use.projectTree();
     const loadRootDir     = useAppState.use.loadRootDir();
-    const loadGitStashList = useGitStash.use.loadGitStashList();
     const setSelectedPath  = useProjectState.use.setSelectedPath();
     const loadProjectTree  = useProjectState.use.loadProjectTree();
     const [reloadInterval, setReloadInterval] = useState<any>(null);
@@ -25,11 +23,9 @@ export default function DocBrowser(props: DocBrowserProps) {
             //check if installed but really old code here
             loadRootDir();
             loadProjectTree();
-            loadGitStashList();
 
             const intervalId = setInterval(() => {
                 loadProjectTree();
-                loadGitStashList();
             }, 5000);
             setReloadInterval(intervalId);
         }

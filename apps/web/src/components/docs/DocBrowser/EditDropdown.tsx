@@ -34,7 +34,7 @@ export default function EditDropdown({ path, name, onClose }: { path: string; na
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
         onClose();
-        showModal("confirm", "Delete", `Are you sure you want to delete "${name}"? This can only be undone if the file was previously committed to Git.`, "error", async (confirmed: any) => {
+        showModal("confirm", "Delete", `Are you sure you want to delete "${name}"?`, "error", async (confirmed: any) => {
             if (confirmed) {
                 await deleteItem(path);
                 loadProjectTree();
