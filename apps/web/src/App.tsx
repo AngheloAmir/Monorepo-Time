@@ -21,6 +21,7 @@ import GitPanel from './components/GitPanel';
 import Orchestrator from './components/Orchestrator';
 //import useOrchestrator from './appstates/orchestrator';
 import OpencodeOrchestartor from './components/opencodex';
+import Docs from './components/app_contents/Docs';
 
 declare global {
     interface Window {
@@ -108,6 +109,13 @@ export default function App() {
                             isSelected: currentPage === 'workspace',
                             onClick: () => navAction.setCurrentPage('workspace')
                         },
+                        {
+                            name: 'docs',
+                            label: 'Docs',
+                            icon: 'fa fa-book',
+                            isSelected: currentPage === 'docs',
+                            onClick: () => navAction.setCurrentPage('docs')
+                        },
                         // {
                         //     name: 'open-code',
                         //     label: 'Opencode',
@@ -157,7 +165,7 @@ export default function App() {
                         <Cloudflare isVisible={currentPage === "cloudflare"} />
                         <Network isVisible={currentPage === "network"} />
                         <CRUDTester isVisible={currentPage === "crud"} />
-
+                        <Docs isVisible={currentPage === "docs"} />
                         {/* <ColorPallette isVisible={currentPage === "color-pallette"} /> */}
                     </div>
                 </main>

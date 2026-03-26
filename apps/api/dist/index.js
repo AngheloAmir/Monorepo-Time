@@ -85114,6 +85114,7 @@ router14.post("/branch/merge", async (req, res) => {
   }
 });
 router14.post("/push", async (req, res) => {
+  var _a2, _b2;
   try {
     const { message } = req.body;
     if (!message) {
@@ -85122,21 +85123,31 @@ router14.post("/push", async (req, res) => {
     }
     await cleanStaleLocks();
     try {
-      await runGit(["add", "."]);
-      await runGit(["commit", "-m", message]);
-    } catch (e) {
-      if (e.stdout && e.stdout.includes("nothing to commit")) {
-      } else if (e.message && e.message.includes("nothing to commit")) {
-      } else {
-        throw e;
+      await runGit(["config", "user.name", "angheloamir"]);
+      await runGit(["config", "user.email", "angheloamir@gmail.com"]);
+      try {
+        await runGit(["add", "."]);
+        await runGit(["commit", "-m", message]);
+      } catch (e) {
+        if (!(((_a2 = e.stdout) == null ? void 0 : _a2.includes("nothing to commit")) || ((_b2 = e.message) == null ? void 0 : _b2.includes("nothing to commit")))) {
+          throw e;
+        }
+      }
+      await runGit(["commit", "--amend", "--no-edit", "--reset-author"]);
+      const currentBranch = await runGit(["rev-parse", "--abbrev-ref", "HEAD"]);
+      await runGit(["push", "dev", currentBranch, "--force"]);
+      await runGit(["config", "user.name", "Clean and Seal"]);
+      await runGit(["config", "user.email", "cleanandsealdp@gmail.com"]);
+      await runGit(["commit", "--amend", "--no-edit", "--reset-author"]);
+      res.json({ success: true });
+    } finally {
+      try {
+        await runGit(["config", "user.name", "Clean and Seal"]);
+        await runGit(["config", "user.email", "cleanandsealdp@gmail.com"]);
+      } catch (configError) {
+        console.error("Failed to restore git identity:", configError);
       }
     }
-    await runGit(["push"]);
-    try {
-      await runGit(["stash", "clear"]);
-    } catch {
-    }
-    res.json({ success: true });
   } catch (error) {
     console.error("Git Push Error:", error);
     res.status(500).json({ error: error.message });
