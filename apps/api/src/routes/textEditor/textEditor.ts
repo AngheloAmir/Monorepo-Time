@@ -42,7 +42,13 @@ router.post('/get', async (req: Request, res: Response) => {
             return;
         }
 
-        const content = await fs.readFile(filePath, 'utf-8');
+        const textExtensions = ['txt', 'md', 'js', 'jsx', 'ts', 'tsx', 'json', 'css', 'html', 'yml', 'yaml', 'xml'];
+        const ext = path.extname(filePath).slice(1).toLowerCase();
+        
+        let content = null;
+        if (textExtensions.includes(ext) || !ext) {
+            content = await fs.readFile(filePath, 'utf-8');
+        }
         
         let metadata = {};
         const metaPath = filePath + '.mtmeta.json';

@@ -145,7 +145,7 @@ const projectState = create<projectContext>()((set, get) => ({
             'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'ico', 'svg', 'tiff', 'tif', 'avif',
             'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', '3gp',
             'mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'wma',
-            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
             'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
             'ttf', 'otf', 'woff', 'woff2', 'eot',
             'exe', 'dll', 'so', 'dylib', 'bin', 'dat', 'db', 'sqlite'

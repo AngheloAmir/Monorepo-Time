@@ -43,7 +43,6 @@ const docsState = create<DocsContext>()((set, get) => ({
         const existingTab = tabs.find(t => t.path === path);
         
         if (existingTab) {
-            // Update viewMode if it's different
             if (existingTab.viewMode !== viewMode) {
                 const newTabs = tabs.map(t => t.path === path ? { ...t, viewMode } : t);
                 set({ tabs: newTabs, activeTabPath: path });
@@ -61,7 +60,7 @@ const docsState = create<DocsContext>()((set, get) => ({
         const highlights = metadata.highlights || {};
 
         const fileName = path.split('/').pop() || "";
-        const fileType = path.split('.').pop() || "";
+        const fileType = (path.split('.').pop() || "").toLowerCase();
 
         const newTab: DocTab = {
             path,

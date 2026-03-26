@@ -13,7 +13,7 @@ import interactiveTerminal from './terminal/interactiveTerminal';
 import stopInteractiveTerm from './terminal/stopInteractiveTerminal';
 import updateWorkspace from './workspace/updateworkspace';
 import vscodeHideShow from './utils/vscodeHideShow';
-import rootPath from './utils/rootPath';
+import rootPath, { ROOT } from './utils/rootPath';
 import scaffoldRepo from './utils/scafoldrepo';
 import turborepoExist from './home/turborepoexist';
 import firstRunRoute from './utils/firstrun';
@@ -83,9 +83,8 @@ export default function SETROUTES(app: Express, frontendPath: string) {
 
 
     // Serve documentation folder statically
-    const MONOREPO_ROOT = path.dirname(path.dirname(path.dirname(path.dirname(process.cwd()))));
-    // Actually, finding monorepo root more robustly
-    const docsRoot = path.join(process.cwd(), 'docs'); // Basic assumption for now
+    const docsRoot = path.join(ROOT, 'docs');
+    console.log(`Serving docs statically from: ${docsRoot}`);
     app.use("/docs-static", express.static(docsRoot));
 
 

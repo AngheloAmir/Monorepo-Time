@@ -1,13 +1,17 @@
 import ReactMarkdown from 'react-markdown';
 import type { DocTab } from '../../appstates/docs';
 import config from 'config';
+import { useState } from 'react';
 
 export default function FileViewer({ tab }: { tab: DocTab }) {
+    const [hasError, setHasError] = useState(false);
     const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(tab.type.toLowerCase());
     const isPdf = tab.type.toLowerCase() === 'pdf';
     const isMarkdown = tab.type.toLowerCase() === 'md';
 
-    const staticUrl = `${config.serverPath}/docs-static/${tab.path}`;
+    const cleanPath = tab.path.replace(/^\/?docs\//, '');
+    const serverBase = config.serverPath.endsWith('/') ? config.serverPath.slice(0, -1) : config.serverPath;
+    const staticUrl = `${serverBase}/docs-static/${cleanPath}`;
 
     if (isMarkdown) {
         return (
@@ -86,12 +90,18 @@ export default function FileViewer({ tab }: { tab: DocTab }) {
 
     if (isImage) {
         return (
-            <div className="h-full flex items-center justify-center p-4 bg-black/40">
+            <div className="h-full flex flex-col items-center justify-center p-4 bg-black/40">
                 <img 
                     src={staticUrl} 
                     alt={tab.title} 
+                    onError={() => setHasError(true)}
                     className="max-w-full max-h-full object-contain shadow-2xl rounded"
                 />
+                {hasError && (
+                    <div className="mt-4 p-2 bg-red-900/20 border border-red-500/30 rounded text-red-400 text-[10px] font-mono whitespace-pre-wrap max-w-md text-center">
+                        Failed to load image: {staticUrl}
+                    </div>
+                )}
             </div>
         );
     }
@@ -103,7 +113,13 @@ export default function FileViewer({ tab }: { tab: DocTab }) {
                     src={staticUrl} 
                     className="w-full h-full border-none"
                     title={tab.title}
+                    onError={() => setHasError(true)}
                 />
+                {hasError && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 bg-red-900/20 border border-red-500/30 rounded text-red-400 text-xs">
+                        Failed to load PDF: {staticUrl}
+                    </div>
+                )}
             </div>
         );
     }

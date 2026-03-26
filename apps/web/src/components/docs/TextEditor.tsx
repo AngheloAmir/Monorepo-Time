@@ -76,16 +76,16 @@ export default function TextEditor() {
                         key={tab.path}
                         className={`absolute inset-0 ${activeTabPath === tab.path ? 'block' : 'hidden'}`}
                     >
-                        {tab.viewMode === 'viewer' ? (
+                        {tab.viewMode === 'viewer' && activeTabPath === tab.path ? (
                             <FileViewer tab={tab} />
-                        ) : (
+                        ) : tab.viewMode === 'editor' ? (
                             <TabEditor 
                                 tab={tab} 
                                 updateTabContent={updateTabContent} 
                                 saveTab={saveTab}
                                 setLineHighlight={setLineHighlight}
                             />
-                        )}
+                        ) : null}
                     </div>
                 ))}
             </div>
