@@ -1,27 +1,19 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
-import apiRoute from 'apiroute';
-import config from 'config';
 
-interface CrudContext {
-
+interface DocsContext {
+    sidebarWidth: number;
+    setSidebarWidth: (width: number) => void;
     sample: () => Promise<void>;
 }
 
-const crudState = create<CrudContext>()((set, get) => ({
-
+const docsState = create<DocsContext>()((set) => ({
+    sidebarWidth: 300,
+    setSidebarWidth: (width: number) => set({ sidebarWidth: width }),
     sample: async () => {
-        //this is a sample
-        // await fetch(`${config.serverPath}${apiRoute.crudTest}`, {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify({ crudtest: data }),
-        //     });
+        // Sample implementation
     },
-
 }));
 
-const useCrudState = createSelectors(crudState);
-export default useCrudState;
+const useDocsState = createSelectors(docsState);
+export default useDocsState;

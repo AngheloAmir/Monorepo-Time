@@ -1,4 +1,4 @@
-const apiRoute = {
+const apiRoute: Record<string, string> = {
     /** Scan a workspace 
      * get request returns  workspace: WorkspaceInfo[]
     */
@@ -103,6 +103,7 @@ const apiRoute = {
     deleteWorkspace: 'deleteworkspace',
 
     scanProject: 'scanproject',
+    scanDocs:    'scandocs',
     textEditor: 'texteditor',
 
     gitStash: 'gitstash',

@@ -65,7 +65,8 @@ const projectState = create<projectContext>()((set, get) => ({
     openFolders: {},
     loadProjectTree: async () => {
         if (config.useDemo) return;
-        const response = await fetch(`${config.serverPath}${apiRoute.scanProject}`);
+        //@ts-ignore
+        const response = await fetch(`${config.serverPath}${apiRoute.scanDocs}`);
         const data = await response.json();
         set({
             projectTree: data.content,

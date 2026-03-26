@@ -9,6 +9,7 @@ ace.config.set("basePath", "https://cdn.jsdelivr.net/npm/ace-builds@1.32.6/src-n
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-typescript";
+import "ace-builds/src-noconflict/mode-markdown";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/ext-language_tools";
@@ -21,7 +22,7 @@ interface DiffMarkers {
 interface Props {
     value?: string;
     onChange?: (value: string) => void;
-    mode?: "json" | "javascript" | "typescript";
+    mode?: "json" | "javascript" | "typescript" | "markdown";
     theme?: "monokai" | "github";
     readOnly?: boolean;
     height?: string;

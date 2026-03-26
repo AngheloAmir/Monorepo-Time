@@ -3,7 +3,7 @@ import config from 'config';
 import TreeItem from "./TreeItem";
 import useProjectState from "../../../appstates/docsBrowser";
 import ProjectEdit from './ProjectEdit';
-import FileEditor  from './FileEditor';
+// import FileEditor from './FileEditor'; 
 import useAppState from "../../../appstates/app";
 import useGitStash from "../../../appstates/gitstash";
 
@@ -61,8 +61,6 @@ export default function DocBrowser(props: DocBrowserProps) {
                     </div>
                 )}
             </div>
-
-            <FileEditor />
         </div>
     );
 }

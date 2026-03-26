@@ -28,6 +28,7 @@ import setWorkspaceTemplate from './workspace/setworkspace';
 import stopTerminalWorkspace from './terminal/stopTerminalWorkspace';
 import deleteWorkspace from './workspace/deleteWorkspace';
 import scanProject from './textEditor/projectBrowser';
+import scanDocs from './textEditor/docsBrowser';
 import textEditor from './textEditor/textEditor';
 import gitStashHelper from './utils/gitStashHelper';
 
@@ -77,6 +78,7 @@ export default function SETROUTES(app: Express, frontendPath: string) {
 
     //project browser and editor endpoints
     app.use("/" + apiRoute.scanProject, scanProject);
+    app.use("/" + apiRoute.scanDocs,    scanDocs);
     app.use("/" + apiRoute.textEditor, textEditor);
 
 
