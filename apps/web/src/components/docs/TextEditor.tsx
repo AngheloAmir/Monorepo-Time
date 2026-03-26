@@ -92,9 +92,23 @@ function TabEditor({ tab, updateTabContent, saveTab, setLineHighlight }: {
     tab: DocTab, 
     updateTabContent: (path: string, content: string) => void,
     saveTab: (path: string) => Promise<void>,
-    setLineHighlight: (path: string, line: number, color: string | null) => void
+    setLineHighlight: (path: string, lines: number[], color: string | null) => void
 }) {
-    const [contextMenuProps, setContextMenuProps] = useState<{ line: number } | null>(null);
+    const [contextMenuProps, setContextMenuProps] = useState<{ line: number, selection?: { startLine: number, endLine: number } } | null>(null);
+
+    const applyHighlight = (color: string | null) => {
+        if (!contextMenuProps) return;
+        
+        let lines: number[] = [contextMenuProps.line];
+        if (contextMenuProps.selection) {
+            lines = [];
+            for (let i = contextMenuProps.selection.startLine; i <= contextMenuProps.selection.endLine; i++) {
+                lines.push(i);
+            }
+        }
+        
+        setLineHighlight(tab.path, lines, color);
+    };
 
     return (
         <CustomAceEditor
@@ -115,43 +129,35 @@ function TabEditor({ tab, updateTabContent, saveTab, setLineHighlight }: {
             onSave={() => {
                 saveTab(tab.path);
             }}
-            rightClickMenu={(line: number) => {
-                setContextMenuProps({ line });
+            rightClickMenu={(line: number, _col: any, _text: any, selection: any) => {
+                setContextMenuProps({ line, selection });
             }}
             contextMenuComponent={
                 <div className="bg-gray-800 w-[240px] p-1 rounded-md border border-white/10 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-100">
                     <button 
-                        onClick={() => {
-                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, 'green');
-                        }}
+                        onClick={() => applyHighlight('green')}
                         className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-green-500/20 text-white/80 hover:text-white transition-colors"
                     >
                         <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
-                        <span className="text-sm">Highlight line Green</span>
+                        <span className="text-sm">Highlight {contextMenuProps?.selection ? 'Selection' : 'Line'} Green</span>
                     </button>
                     <button 
-                        onClick={() => {
-                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, 'orange');
-                        }}
+                        onClick={() => applyHighlight('orange')}
                         className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-orange-500/20 text-white/80 hover:text-white transition-colors"
                     >
                         <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"></div>
-                        <span className="text-sm">Highlight line Orange</span>
+                        <span className="text-sm">Highlight {contextMenuProps?.selection ? 'Selection' : 'Line'} Orange</span>
                     </button>
                     <button 
-                        onClick={() => {
-                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, 'yellow');
-                        }}
+                        onClick={() => applyHighlight('yellow')}
                         className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-yellow-500/20 text-white/80 hover:text-white transition-colors"
                     >
                         <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></div>
-                        <span className="text-sm">Highlight line Yellow</span>
+                        <span className="text-sm">Highlight {contextMenuProps?.selection ? 'Selection' : 'Line'} Yellow</span>
                     </button>
                     <div className="h-[1px] bg-white/5 my-1 mx-2"></div>
                     <button 
-                        onClick={() => {
-                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, null);
-                        }}
+                        onClick={() => applyHighlight(null)}
                         className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-white/10 text-white/60 hover:text-white transition-colors"
                     >
                         <i className="fa-solid fa-eraser text-xs w-3 text-center"></i>

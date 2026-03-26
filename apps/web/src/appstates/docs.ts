@@ -24,7 +24,7 @@ interface DocsContext {
     updateTabContent: (path: string, content: string) => void;
     saveTab: (path: string) => Promise<void>;
     isDirty: (path: string) => boolean;
-    setLineHighlight: (path: string, line: number, color: string | null) => void;
+    setLineHighlight: (path: string, lines: number[], color: string | null) => void;
 }
 
 const docsState = create<DocsContext>()((set, get) => ({
@@ -112,16 +112,18 @@ const docsState = create<DocsContext>()((set, get) => ({
         return tab ? tab.content !== tab.originalContent : false;
     },
 
-    setLineHighlight: (path: string, line: number, color: string | null) => {
+    setLineHighlight: (path: string, lines: number[], color: string | null) => {
         const { tabs } = get();
         const newTabs = tabs.map(t => {
             if (t.path === path) {
                 const newHighlights = { ...t.highlights };
-                if (color) {
-                    newHighlights[line] = color;
-                } else {
-                    delete newHighlights[line];
-                }
+                lines.forEach(line => {
+                    if (color) {
+                        newHighlights[line] = color;
+                    } else {
+                        delete newHighlights[line];
+                    }
+                });
                 return { ...t, highlights: newHighlights };
             }
             return t;
