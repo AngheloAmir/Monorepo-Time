@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import useDocsState, { type DocTab } from "../../appstates/docs";
 import CustomAceEditor from "../lib/CustomAceEditor";
+import FileViewer from "./FileViewer";
 
 export default function TextEditor() {
     const tabs = useDocsState.use.tabs();
@@ -47,7 +48,7 @@ export default function TextEditor() {
                         `}
                         onClick={() => setActiveTab(tab.path)}
                     >
-                        <i className={`fa-solid fa-file-code text-xs ${activeTabPath === tab.path ? 'text-blue-400' : 'text-white/20'}`}></i>
+                        <i className={`fa-solid ${tab.viewMode === 'viewer' ? 'fa-eye' : 'fa-file-code'} text-xs ${activeTabPath === tab.path ? 'text-blue-400' : 'text-white/20'}`}></i>
                         <span className="text-xs truncate max-w-[150px]">{tab.title}</span>
                         
                         <div className="flex items-center justify-center w-4 h-4">
@@ -75,12 +76,16 @@ export default function TextEditor() {
                         key={tab.path}
                         className={`absolute inset-0 ${activeTabPath === tab.path ? 'block' : 'hidden'}`}
                     >
-                        <TabEditor 
-                            tab={tab} 
-                            updateTabContent={updateTabContent} 
-                            saveTab={saveTab}
-                            setLineHighlight={setLineHighlight}
-                        />
+                        {tab.viewMode === 'viewer' ? (
+                            <FileViewer tab={tab} />
+                        ) : (
+                            <TabEditor 
+                                tab={tab} 
+                                updateTabContent={updateTabContent} 
+                                saveTab={saveTab}
+                                setLineHighlight={setLineHighlight}
+                            />
+                        )}
                     </div>
                 ))}
             </div>

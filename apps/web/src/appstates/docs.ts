@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { createSelectors } from './zustandSelector';
 import useProjectState from './docsBrowser';
+import config from 'config';
+import apiRoute from 'apiroute';
 
 export interface DocTab {
     path: string;
@@ -9,6 +11,7 @@ export interface DocTab {
     originalContent: string;
     type: string;
     highlights: Record<number, string>;
+    viewMode: 'editor' | 'viewer';
 }
 
 interface DocsContext {
@@ -18,13 +21,14 @@ interface DocsContext {
     tabs: DocTab[];
     activeTabPath: string | null;
     
-    openTab: (path: string) => Promise<void>;
+    openTab: (path: string, viewMode?: 'editor' | 'viewer') => Promise<void>;
     closeTab: (path: string) => void;
     setActiveTab: (path: string) => void;
     updateTabContent: (path: string, content: string) => void;
     saveTab: (path: string) => Promise<void>;
     isDirty: (path: string) => boolean;
     setLineHighlight: (path: string, lines: number[], color: string | null) => void;
+    openExternal: (path: string) => Promise<void>;
 }
 
 const docsState = create<DocsContext>()((set, get) => ({
@@ -34,18 +38,24 @@ const docsState = create<DocsContext>()((set, get) => ({
     tabs: [],
     activeTabPath: null,
 
-    openTab: async (path: string) => {
+    openTab: async (path: string, viewMode: 'editor' | 'viewer' = 'editor') => {
         const { tabs } = get();
         const existingTab = tabs.find(t => t.path === path);
         
         if (existingTab) {
-            set({ activeTabPath: path });
+            // Update viewMode if it's different
+            if (existingTab.viewMode !== viewMode) {
+                const newTabs = tabs.map(t => t.path === path ? { ...t, viewMode } : t);
+                set({ tabs: newTabs, activeTabPath: path });
+            } else {
+                set({ activeTabPath: path });
+            }
             return;
         }
 
         // Load file content
         const projectState = useProjectState.getState();
-        const response: any = await projectState.loadFile(path, true); // Assuming loadFile can return full response
+        const response: any = await projectState.loadFile(path, true);
         const content = response.content;
         const metadata = response.metadata || {};
         const highlights = metadata.highlights || {};
@@ -59,7 +69,8 @@ const docsState = create<DocsContext>()((set, get) => ({
             content: typeof content === 'string' ? content : "",
             originalContent: typeof content === 'string' ? content : "",
             type: fileType,
-            highlights: highlights
+            highlights: highlights,
+            viewMode: viewMode
         };
 
         set({
@@ -129,6 +140,18 @@ const docsState = create<DocsContext>()((set, get) => ({
             return t;
         });
         set({ tabs: newTabs });
+    },
+
+    openExternal: async (path: string) => {
+        try {
+            await fetch(`${config.serverPath}${apiRoute.textEditor}/open-external`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path }),
+            });
+        } catch (e) {
+            console.error("Failed to open external:", e);
+        }
     }
 }));
 

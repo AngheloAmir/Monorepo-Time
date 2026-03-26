@@ -338,4 +338,37 @@ router.post('/diff', async (req: Request, res: Response) => {
     }
 });
 
+// POST /open-external - Open a file using the system's default application - valid body: { path: string }
+router.post('/open-external', async (req: Request, res: Response) => {
+    try {
+        let { path: itemPath } = req.body;
+
+        if (!itemPath) {
+            res.status(400).json({ error: 'Path is required' });
+            return;
+        }
+
+        // Resolve path relative to ROOT
+        itemPath = resolvePath(itemPath);
+
+        // Verify the path exists
+        if (!(await fs.pathExists(itemPath))) {
+            res.status(404).json({ error: 'Path not found' });
+            return;
+        }
+
+        // Open file using system default application (xdg-open for Linux)
+        // Note: For other OSes, we could check process.platform
+        const command = process.platform === 'linux' ? 'xdg-open' : process.platform === 'win32' ? 'start' : 'open';
+        
+        console.log(`Opening external: ${command} ${itemPath}`);
+        await execa(command, [itemPath]);
+        
+        res.json({ success: true, message: 'File opened externally' });
+    } catch (error: any) {
+        console.error('Error opening external:', error);
+        res.status(500).json({ error: 'Failed to open file externally', details: error.message });
+    }
+});
+
 export default router;

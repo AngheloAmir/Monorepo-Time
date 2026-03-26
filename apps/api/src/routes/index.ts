@@ -77,9 +77,16 @@ export default function SETROUTES(app: Express, frontendPath: string) {
     app.use("/" + apiRoute.opencode,                 opencode);
 
     //project browser and editor endpoints
-    app.use("/" + apiRoute.scanProject, scanProject);
-    app.use("/" + apiRoute.scanDocs,    scanDocs);
-    app.use("/" + apiRoute.textEditor, textEditor);
+    app.use("/" + (apiRoute as any).scanProject, scanProject);
+    app.use("/" + (apiRoute as any).scanDocs,    scanDocs);
+    app.use("/" + (apiRoute as any).textEditor, textEditor);
+
+
+    // Serve documentation folder statically
+    const MONOREPO_ROOT = path.dirname(path.dirname(path.dirname(path.dirname(process.cwd()))));
+    // Actually, finding monorepo root more robustly
+    const docsRoot = path.join(process.cwd(), 'docs'); // Basic assumption for now
+    app.use("/docs-static", express.static(docsRoot));
 
 
     // Serve frontend static files==================================================

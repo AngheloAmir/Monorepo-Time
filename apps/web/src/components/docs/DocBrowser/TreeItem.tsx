@@ -98,7 +98,18 @@ export default function TreeItem({ item, level = 0 }: { item: ProjectTree, level
                     setSelectedPath(file.path);
                     const filePath = file.path.replace('@', '');
                     if (isEditable(filePath)) {
-                        useDocsState.getState().openTab(filePath);
+                        useDocsState.getState().openTab(filePath, 'editor');
+                    }
+                }}
+                onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    const filePath = file.path.replace('@', '');
+                    const ext = filePath.split('.').pop()?.toLowerCase() || '';
+                    
+                    if (['md', 'pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                        useDocsState.getState().openTab(filePath, 'viewer');
+                    } else if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext)) {
+                        useDocsState.getState().openExternal(filePath);
                     }
                 }}
             >
