@@ -39,8 +39,8 @@ interface projectContext {
     closeFileEditor: () => void;
 
     isEditable: (path: string) => boolean;
-    loadFile: (path: string) => Promise<string | any>;
-    saveFile: (path: string, content: string) => Promise<any>;
+    loadFile: (path: string, fullResponse?: boolean) => Promise<string | any>;
+    saveFile: (path: string, content: string, metadata?: any) => Promise<any>;
 
     //current active path
     selectedPath:   string;
@@ -155,7 +155,7 @@ const projectState = create<projectContext>()((set, get) => ({
         return !nonEditableExtensions.includes(ext || '');
     },
 
-    loadFile: async (path: string) => {
+    loadFile: async (path: string, fullResponse?: boolean) => {
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/get`, {
                 method: 'POST',
@@ -164,22 +164,22 @@ const projectState = create<projectContext>()((set, get) => ({
                 },
                 body: JSON.stringify({ path }),
             });
-            if (!response.ok) return "";
+            if (!response.ok) return fullResponse ? { content: "", metadata: {} } : "";
             const data = await response.json();
-            return data.content;
+            return fullResponse ? data : data.content;
         } catch (e) {
             console.error(e);
-            return "";
+            return fullResponse ? { content: "", metadata: {} } : "";
         }
     },
-    saveFile: async (path: string, content: string) => {
+    saveFile: async (path: string, content: string, metadata?: any) => {
         try {
             const response = await fetch(`${config.serverPath}${apiRoute.textEditor}/set`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ path, content }),
+                body: JSON.stringify({ path, content, metadata }),
             });
             return await response.json();
         } catch (e) {

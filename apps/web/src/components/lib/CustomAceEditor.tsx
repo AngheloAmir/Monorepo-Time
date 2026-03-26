@@ -14,10 +14,7 @@ import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/ext-language_tools";
 
-interface DiffMarkers {
-    added: number[];
-    modified: number[];
-}
+export type HighlightColor = "green" | "orange" | "yellow";
 
 interface Props {
     value?: string;
@@ -30,7 +27,7 @@ interface Props {
     className?: string;
     wrapperClassName?: string;
     transparent?: boolean;
-    diffMarkers?: DiffMarkers;
+    lineHighlights?: Record<number, string>;
 
     onSave?: () => void;
     rightClickMenu?: (line: number, column: number, selectedText: string, selection?: { startLine: number; endLine: number }) => void;
@@ -48,7 +45,7 @@ export default function CustomAceEditor({
     className,
     wrapperClassName,
     transparent = false,
-    diffMarkers,
+    lineHighlights,
 
     onSave,
     rightClickMenu,
@@ -73,9 +70,9 @@ export default function CustomAceEditor({
         return () => document.removeEventListener("mousedown", handleClick);
     }, []);
 
-    // Apply diff markers when they change
+    // Apply custom line highlights when they change
     useEffect(() => {
-        if (!editorRef.current || !diffMarkers) return;
+        if (!editorRef.current || !lineHighlights) return;
 
         const editor = editorRef.current.editor;
         const session = editor.getSession();
@@ -86,22 +83,21 @@ export default function CustomAceEditor({
         });
         markerIdsRef.current = [];
 
-        // Add markers for added lines (green)
-        diffMarkers.added.forEach(lineNumber => {
+        // Add markers for each highlighted line
+        Object.entries(lineHighlights).forEach(([lineStr, color]) => {
+            const lineNumber = parseInt(lineStr, 10);
             const Range = ace.require("ace/range").Range;
             const range = new Range(lineNumber - 1, 0, lineNumber - 1, 1);
-            const markerId = session.addMarker(range, "ace-diff-added", "fullLine", true);
-            markerIdsRef.current.push(markerId);
-        });
+            
+            let markerClass = "ace-highlight-none";
+            if (color === "green") markerClass = "ace-highlight-green";
+            else if (color === "orange") markerClass = "ace-highlight-orange";
+            else if (color === "yellow") markerClass = "ace-highlight-yellow";
 
-        // Add markers for modified lines (orange)
-        diffMarkers.modified.forEach(lineNumber => {
-            const Range = ace.require("ace/range").Range;
-            const range = new Range(lineNumber - 1, 0, lineNumber - 1, 1);
-            const markerId = session.addMarker(range, "ace-diff-modified", "fullLine", true);
+            const markerId = session.addMarker(range, markerClass, "fullLine", true);
             markerIdsRef.current.push(markerId);
         });
-    }, [diffMarkers]);
+    }, [lineHighlights]);
 
 
     // Handle Right Click Menu
@@ -138,20 +134,26 @@ export default function CustomAceEditor({
             container.removeEventListener("contextmenu", handleContextMenu);
         };
     }, [rightClickMenu, contextMenuComponent]);
+
     return (
         <div className={`h-full w-full ${wrapperClassName || ""}`}>
-            {/* Diff marker styles */}
+            {/* Custom highlight styles */}
             <style>
                 {`
-                    .ace-diff-added {
+                    .ace-highlight-green {
                         position: absolute;
                         background-color: rgba(46, 160, 67, 0.25) !important;
                         border-left: 3px solid #2ea043 !important;
                     }
-                    .ace-diff-modified {
+                    .ace-highlight-orange {
                         position: absolute;
                         background-color: rgba(255, 166, 0, 0.2) !important;
                         border-left: 3px solid #ffa600 !important;
+                    }
+                    .ace-highlight-yellow {
+                        position: absolute;
+                        background-color: rgba(255, 255, 0, 0.15) !important;
+                        border-left: 3px solid #ffff00 !important;
                     }
                 `}
             </style>

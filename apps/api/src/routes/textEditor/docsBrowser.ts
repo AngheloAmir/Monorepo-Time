@@ -44,7 +44,8 @@ const DEFAULT_IGNORES = [
     '**/dist',
     '**/out',
     '**/build',
-    '**/coverage'
+    '**/coverage',
+    '**/*.mtmeta.json'
 ];
 
 router.get("/", async (req: Request, res: Response): Promise<any> => {

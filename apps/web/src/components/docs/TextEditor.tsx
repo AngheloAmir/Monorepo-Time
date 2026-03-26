@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import useDocsState, { type DocTab } from "../../appstates/docs";
 import CustomAceEditor from "../lib/CustomAceEditor";
-import useProjectState from "../../appstates/docsBrowser";
 
 export default function TextEditor() {
     const tabs = useDocsState.use.tabs();
@@ -11,7 +10,7 @@ export default function TextEditor() {
     const updateTabContent = useDocsState.use.updateTabContent();
     const saveTab = useDocsState.use.saveTab();
     const isDirty = useDocsState.use.isDirty();
-    const getFileDiff = useProjectState.use.getFileDiff();
+    const setLineHighlight = useDocsState.use.setLineHighlight();
 
     // Global Ctrl+S handler
     useEffect(() => {
@@ -80,7 +79,7 @@ export default function TextEditor() {
                             tab={tab} 
                             updateTabContent={updateTabContent} 
                             saveTab={saveTab}
-                            getFileDiff={getFileDiff}
+                            setLineHighlight={setLineHighlight}
                         />
                     </div>
                 ))}
@@ -89,26 +88,13 @@ export default function TextEditor() {
     );
 }
 
-function TabEditor({ tab, updateTabContent, saveTab, getFileDiff }: { 
+function TabEditor({ tab, updateTabContent, saveTab, setLineHighlight }: { 
     tab: DocTab, 
     updateTabContent: (path: string, content: string) => void,
     saveTab: (path: string) => Promise<void>,
-    getFileDiff: (path: string) => Promise<any>
+    setLineHighlight: (path: string, line: number, color: string | null) => void
 }) {
-    const [diffMarkers, setDiffMarkers] = useState<any>(undefined);
-
-    useEffect(() => {
-        getFileDiff(tab.path).then((diff) => {
-            if (diff && (diff.added?.length > 0 || diff.modified?.length > 0)) {
-                setDiffMarkers({
-                    added: diff.added || [],
-                    modified: diff.modified || []
-                });
-            } else {
-                setDiffMarkers(undefined);
-            }
-        });
-    }, [tab.path, getFileDiff]);
+    const [contextMenuProps, setContextMenuProps] = useState<{ line: number } | null>(null);
 
     return (
         <CustomAceEditor
@@ -125,29 +111,51 @@ function TabEditor({ tab, updateTabContent, saveTab, getFileDiff }: {
             onChange={(value) => {
                 updateTabContent(tab.path, value);
             }}
-            diffMarkers={diffMarkers}
+            lineHighlights={tab.highlights}
             onSave={() => {
                 saveTab(tab.path);
             }}
-            rightClickMenu={(_line: any, _column: any, _selectedText: any, selection: any) => {
-                if (selection) {
-                    const event = new CustomEvent('opencode:terminal:type', {
-                        detail: "@" + 
-                                tab.path + 
-                                " Lines: " + 
-                                selection.startLine + 
-                                " - " + 
-                                selection.endLine
-                                + "\n"
-                    });
-                    window.dispatchEvent(event);
-                }
+            rightClickMenu={(line: number) => {
+                setContextMenuProps({ line });
             }}
             contextMenuComponent={
-                <div className="bg-gray-800 w-[200px] p-2 rounded-md border border-white/10 shadow-xl">
-                    <button className="flex gap-2 w-full text-left p-2 rounded-md hover:bg-white/10 text-white">
-                        <i className="fa-solid fa-code text-blue-400"></i>
-                        <span className="text-sm italic">Context Menu Actions</span>
+                <div className="bg-gray-800 w-[240px] p-1 rounded-md border border-white/10 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-100">
+                    <button 
+                        onClick={() => {
+                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, 'green');
+                        }}
+                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-green-500/20 text-white/80 hover:text-white transition-colors"
+                    >
+                        <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+                        <span className="text-sm">Highlight line Green</span>
+                    </button>
+                    <button 
+                        onClick={() => {
+                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, 'orange');
+                        }}
+                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-orange-500/20 text-white/80 hover:text-white transition-colors"
+                    >
+                        <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]"></div>
+                        <span className="text-sm">Highlight line Orange</span>
+                    </button>
+                    <button 
+                        onClick={() => {
+                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, 'yellow');
+                        }}
+                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-yellow-500/20 text-white/80 hover:text-white transition-colors"
+                    >
+                        <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></div>
+                        <span className="text-sm">Highlight line Yellow</span>
+                    </button>
+                    <div className="h-[1px] bg-white/5 my-1 mx-2"></div>
+                    <button 
+                        onClick={() => {
+                            if (contextMenuProps) setLineHighlight(tab.path, contextMenuProps.line, null);
+                        }}
+                        className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-sm hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                    >
+                        <i className="fa-solid fa-eraser text-xs w-3 text-center"></i>
+                        <span className="text-sm">Remove Highlight</span>
                     </button>
                 </div>
             }

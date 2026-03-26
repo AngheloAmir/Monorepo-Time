@@ -8,6 +8,7 @@ export interface DocTab {
     content: string;
     originalContent: string;
     type: string;
+    highlights: Record<number, string>;
 }
 
 interface DocsContext {
@@ -23,6 +24,7 @@ interface DocsContext {
     updateTabContent: (path: string, content: string) => void;
     saveTab: (path: string) => Promise<void>;
     isDirty: (path: string) => boolean;
+    setLineHighlight: (path: string, line: number, color: string | null) => void;
 }
 
 const docsState = create<DocsContext>()((set, get) => ({
@@ -43,7 +45,11 @@ const docsState = create<DocsContext>()((set, get) => ({
 
         // Load file content
         const projectState = useProjectState.getState();
-        const content = await projectState.loadFile(path);
+        const response: any = await projectState.loadFile(path, true); // Assuming loadFile can return full response
+        const content = response.content;
+        const metadata = response.metadata || {};
+        const highlights = metadata.highlights || {};
+
         const fileName = path.split('/').pop() || "";
         const fileType = path.split('.').pop() || "";
 
@@ -52,7 +58,8 @@ const docsState = create<DocsContext>()((set, get) => ({
             title: fileName,
             content: typeof content === 'string' ? content : "",
             originalContent: typeof content === 'string' ? content : "",
-            type: fileType
+            type: fileType,
+            highlights: highlights
         };
 
         set({
@@ -90,7 +97,7 @@ const docsState = create<DocsContext>()((set, get) => ({
         if (!tab) return;
 
         const projectState = useProjectState.getState();
-        await projectState.saveFile(path, tab.content);
+        await projectState.saveFile(path, tab.content, { highlights: tab.highlights });
         
         const newTabs = tabs.map(t => t.path === path ? { ...t, originalContent: t.content } : t);
         set({ tabs: newTabs });
@@ -103,6 +110,23 @@ const docsState = create<DocsContext>()((set, get) => ({
         const { tabs } = get();
         const tab = tabs.find(t => t.path === path);
         return tab ? tab.content !== tab.originalContent : false;
+    },
+
+    setLineHighlight: (path: string, line: number, color: string | null) => {
+        const { tabs } = get();
+        const newTabs = tabs.map(t => {
+            if (t.path === path) {
+                const newHighlights = { ...t.highlights };
+                if (color) {
+                    newHighlights[line] = color;
+                } else {
+                    delete newHighlights[line];
+                }
+                return { ...t, highlights: newHighlights };
+            }
+            return t;
+        });
+        set({ tabs: newTabs });
     }
 }));
 

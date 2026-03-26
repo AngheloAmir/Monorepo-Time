@@ -16,6 +16,8 @@ async function getDefaults(projectPath) {
     fetch(`${baseUrl}/config?${params}`).then(r => r.json()),
     fetch(`${baseUrl}/provider?${params}`).then(r => r.json())
   ]);
+  asdasd
+  asdasd
 
   // 2. Resolve Default Agent
   // Filter out subagents and hidden agents

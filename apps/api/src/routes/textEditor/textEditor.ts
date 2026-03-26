@@ -43,17 +43,27 @@ router.post('/get', async (req: Request, res: Response) => {
         }
 
         const content = await fs.readFile(filePath, 'utf-8');
-        res.json({ content });
+        
+        let metadata = {};
+        const metaPath = filePath + '.mtmeta.json';
+        if (await fs.pathExists(metaPath)) {
+            try {
+                metadata = await fs.readJson(metaPath);
+            } catch (e) {
+                console.warn('Failed to read metadata file:', metaPath);
+            }
+        }
+
+        res.json({ content, metadata });
     } catch (error: any) {
         console.error('Error reading file:', error);
         res.status(500).json({ error: 'Failed to read file', details: error.message });
     }
 });
 
-// POST /setFileContent - valid body: { path: string, content: string }
 router.post('/set', async (req: Request, res: Response) => {
     try {
-        let { path: filePath, content } = req.body;
+        let { path: filePath, content, metadata } = req.body;
 
         if (!filePath) {
             res.status(400).json({ error: 'File path is required' });
@@ -69,6 +79,12 @@ router.post('/set', async (req: Request, res: Response) => {
         }
 
         await fs.outputFile(filePath, content);
+
+        if (metadata) {
+            const metaPath = filePath + '.mtmeta.json';
+            await fs.outputJson(metaPath, metadata);
+        }
+
         res.json({ success: true, message: 'File saved successfully' });
     } catch (error: any) {
         console.error('Error writing file:', error);
